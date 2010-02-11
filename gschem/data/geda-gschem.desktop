@@ -1,0 +1,19 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+GenericName=gschem
+Name=gEDA Schematic Editor
+Name[af]=gEDA Stroombaandiagram Bewerker
+Name[de]=gEDA Schaltplan Editor
+Name[nl]=gEDA schema bewerking
+Name[es]=Editor de esquemas gEDA
+Comment=Create and edit electrical schematics and symbols with gschem
+Comment[af]=Skep en bewerk stroombaandiagramme en simbole met gschem
+Comment[de]=Erstellen oder editieren eines elektrischen Schaltplans oder Symbols mit gschem
+Comment[nl]=Creer en bewerk elektrische schema's en symbolen met gschem
+Comment[es]=Crear y modificar esquemas y símbolos con gschem
+Type=Application
+Exec=gschem %F
+Icon=geda-gschem
+MimeType=application/x-geda-schematic;application/x-geda-symbol;
+Categories=Engineering;Electronics

@@ -1,0 +1,17 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+GenericName=gattrib
+Name=gEDA Attribute Editor
+Name[es]=Editor de Propiedades de gEDA
+Name[de]=gEDA Attributeditor
+Name[nl]=gEDA Attribuut Bewerking
+Comment=Manipulate component attributes with gattrib
+Comment[es]=Manejar propiedades de componentes con gattrib
+Comment[de]=Editieren von Bauteilattributen mit gattrib
+Comment[nl]=Manipuleer componenten attributen met gattrib
+Type=Application
+Exec=gattrib %F
+Icon=geda-gattrib
+#MimeType=application/x-geda-schematic;application/x-geda-symbol;
+Categories=Engineering;Electronics
