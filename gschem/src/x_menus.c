@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 1998-2008 Ales Hvezda
- * Copyright (C) 1998-2008 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2010 Ales Hvezda
+ * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -209,7 +209,7 @@ void get_main_menu(GtkWidget ** menubar)
     }
     
     menu_name = (char *) gettext(*raw_menu_name);
-    root_menu = gtk_menu_item_new_with_label (menu_name);
+    root_menu = gtk_menu_item_new_with_mnemonic (menu_name);
     /* do not free *raw_menu_name */
 
     /* no longer right justify the help menu since that has gone out of style */
@@ -387,7 +387,7 @@ static void update_recent_files_menus()
 
       recent_menu_item =
         (GtkWidget *) gtk_object_get_data(GTK_OBJECT(w_current->menubar),
-                                          "File/Open Recen_t");
+                                          "_File/Open Recen_t");
       if(recent_menu_item == NULL)
          return;
 
@@ -456,7 +456,7 @@ void x_menu_attach_recent_files_submenu(GSCHEM_TOPLEVEL *w_current)
    GtkWidget *recent_menu_item, *recent_submenu;
 
    recent_menu_item = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(
-            w_current->menubar), "File/Open Recen_t");
+            w_current->menubar), "_File/Open Recen_t");
    if(recent_menu_item == NULL)
       return;
 

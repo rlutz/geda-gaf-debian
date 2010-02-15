@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
- * Copyright (C) 1998-2008 Ales Hvezda
- * Copyright (C) 1998-2008 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2010 Ales Hvezda
+ * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -610,7 +610,7 @@ static void o_path_print_solid (TOPLEVEL *toplevel, FILE *fp, PATH *path,
 
     switch (section->code) {
       case PATH_MOVETO:
-        fprintf (fp, "closepath ");
+        fprintf (fp, "closepath");
         /* Fall through */
       case PATH_MOVETO_OPEN:
         fprintf (fp, "%i %i moveto",
@@ -627,12 +627,12 @@ static void o_path_print_solid (TOPLEVEL *toplevel, FILE *fp, PATH *path,
                      section->x3 - origin_x, section->y3 - origin_y);
         break;
       case PATH_END:
-        fprintf (fp, "closepath ");
+        fprintf (fp, "closepath");
         break;
     }
   }
 
-  fprintf (fp, "stroke\n");
+  fprintf (fp, " stroke\n");
 }
 
 
@@ -773,7 +773,7 @@ static void o_path_print_filled (TOPLEVEL *toplevel, FILE *fp, PATH *path,
 
     switch (section->code) {
       case PATH_MOVETO:
-        fprintf (fp, "closepath ");
+        fprintf (fp, "closepath");
         /* Fall through */
       case PATH_MOVETO_OPEN:
         fprintf (fp, "%i %i moveto",
@@ -790,12 +790,12 @@ static void o_path_print_filled (TOPLEVEL *toplevel, FILE *fp, PATH *path,
                      section->x3 - origin_x, section->y3 - origin_y);
         break;
       case PATH_END:
-        fprintf (fp, "closepath ");
+        fprintf (fp, "closepath");
         break;
     }
   }
 
-  fprintf (fp, "fill\n");
+  fprintf (fp, " fill\n");
 }
 
 

@@ -1,3 +1,59 @@
+commit bd34cfde2450790b357e574281f9562adce64303
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 17:09:45 2010 -0500
+
+    Updated copyright text/header in most source files.
+    
+    Updated all copyright text dates that should be updated for the new year.
+    Fixed a bunch of GNU text typos (these should have been either
+    GPL or gEDA).  Removed some $Id$ tags which are no longer used/needed.
+    Fixed a few file header that were just plain incorrect.
+
+commit 93b0370c433f5eb6716ce537288803df4ff99549
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 09:01:16 2010 -0500
+
+    First set of changes done by make update-po (ran by prelim make distcheck)
+
+commit dcfcb835d5dec2c0ec71526188bbd6c1b76a94ac
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 14 13:03:47 2010 +0000
+
+    Import translations from Launchpad
+
+commit 4e91bc5e52699639cf78a9112b0422d2763a6346
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 12 18:00:44 2010 +0000
+
+    Update translations from Launchpad
+
+commit 6261b5ea22dfcff6aac6060f98dd7606b7cb4ed2
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Feb 8 16:31:00 2010 +0000
+
+    Merge translations with those exported from launchpad
+
+commit d3b0112dd7665d2c97ab70ec8f92496b7f98023e
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 6 20:26:10 2010 +0000
+
+    gattrib: Import translations from Launchpad
+
+commit 67f8e23339892fbcb958c2051e8fabe5345350fe
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 10:27:32 2010 +0000
+
+    Run make update-po in all */po/ directories
+
+commit 4a952841e7aca364018a9ebd81a0c1793c371273
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Fri Nov 20 06:58:52 2009 +0000
+
+    gschem, gattrib desktop file: add trailing semicolon
+    
+    the openSUSE buildservice claims that it's necessary to add a
+    trailing semicolon to the Categories list entries.
+
 commit a8d42b7de50639897c888646883ce88d819d2589
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Oct 4 21:11:20 2009 -0400

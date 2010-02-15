@@ -1,6 +1,6 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 1998-2009 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
  *
  * Code based on GTK 2.14.5 gtk/gtkaccellabel.c (LGPL)
  *
@@ -38,6 +38,8 @@
 #include "config.h"
 
 #include "gschem.h"
+
+#define P_(x) (x)
 
 enum {
   PROP_0,
@@ -330,22 +332,22 @@ gschem_accel_label_class_init (GschemAccelLabelClass *class)
   g_object_class_install_property (gobject_class,
                                    PROP_ACCEL_CLOSURE,
                                    g_param_spec_boxed ("accel-closure",
-                                                       _("Accelerator Closure"),
-                                                       _("The closure to be monitored for accelerator changes"),
+                                                       P_("Accelerator Closure"),
+                                                       P_("The closure to be monitored for accelerator changes"),
                                                        G_TYPE_CLOSURE,
                                                        G_PARAM_READWRITE));
   g_object_class_install_property (gobject_class,
                                    PROP_ACCEL_WIDGET,
                                    g_param_spec_object ("accel-widget",
-                                                        _("Accelerator Widget"),
-                                                        _("The widget to be monitored for accelerator changes"),
+                                                        P_("Accelerator Widget"),
+                                                        P_("The widget to be monitored for accelerator changes"),
                                                         GTK_TYPE_WIDGET,
                                                         G_PARAM_READWRITE));
   g_object_class_install_property (gobject_class,
                                    PROP_ACCEL_STRING,
                                    g_param_spec_string ("accel-string",
-                                                        _("Accelerator String"),
-                                                        _("The accelerator string to be displayed"),
+                                                        P_("Accelerator String"),
+                                                        P_("The accelerator string to be displayed"),
                                                         NULL,
                                                         G_PARAM_READWRITE));
 }

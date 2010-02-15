@@ -3,19 +3,20 @@
 # Copyright (C) 2008 Werner Hoch
 # This file is distributed under the same license as the libgeda package.
 #
-# Werner Hoch <werner.ho@gmx.de>, 2008.
+# Werner Hoch <werner.ho@gmx.de>, 2008, 2009.
 msgid ""
 msgstr ""
-"Project-Id-Version: de\n"
+"Project-Id-Version: geda\n"
 "Report-Msgid-Bugs-To: geda-bug@seul.org\n"
-"POT-Creation-Date: 2009-10-04 21:39-0400\n"
-"PO-Revision-Date: 2008-12-21 12:20+0100\n"
+"POT-Creation-Date: 2010-02-14 08:42-0500\n"
+"PO-Revision-Date: 2010-01-31 13:00+0000\n"
 "Last-Translator: Werner Hoch <werner.ho@gmx.de>\n"
 "Language-Team: deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
+"X-Launchpad-Export-Date: 2010-02-14 12:56+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
 
 #: libgeda/data/libgeda.xml.in.h:3
 msgid "gEDA circuit schematic"
@@ -244,34 +245,35 @@ msgid "RC file [%s] already read in.\n"
 msgstr "Konfigurationsdatei [%s] wurde bereits gelesen.\n"
 
 #: libgeda/src/g_rc.c:177
-#, fuzzy, c-format
+#, c-format
 msgid "Read system config file [%%s]\n"
-msgstr "Lese die Systemdatei %s [%%s]\n"
+msgstr "Lese die Systemkonfigurationsdatei [%%s]\n"
 
 #: libgeda/src/g_rc.c:178
-#, fuzzy, c-format
+#, c-format
 msgid "Did not find required system config file [%%s]\n"
-msgstr "Konnte die erforderliche Systemdatei %s nicht finden [%%s]\n"
+msgstr ""
+"Konnte die erforderliche Systemkonfigurationsdatei nicht finden [%%s]\n"
 
 #: libgeda/src/g_rc.c:212
-#, fuzzy, c-format
+#, c-format
 msgid "Read user config file [%%s]\n"
-msgstr "Lese vorgegebene %s Datei [%%s]\n"
+msgstr "Lese User-Konfigurationsdatei [%%s]\n"
 
 #: libgeda/src/g_rc.c:213
-#, fuzzy, c-format
+#, c-format
 msgid "Did not find optional user config file [%%s]\n"
-msgstr "Konnte die optionale lokale %s-Datei [%%s] nicht finden\n"
+msgstr "Die optionale User-Konfigurationsdatei [%%s] wurde nicht gefunden\n"
 
 #: libgeda/src/g_rc.c:244
-#, fuzzy, c-format
+#, c-format
 msgid "Read local config file [%%s]\n"
-msgstr "Lese die lokale %s-Datei [%%s]\n"
+msgstr "Lese die lokale Konfigurationsdatei [%%s]\n"
 
 #: libgeda/src/g_rc.c:245
-#, fuzzy, c-format
+#, c-format
 msgid "Did not find optional local config file [%%s]\n"
-msgstr "Konnte die optionale lokale %s-Datei [%%s] nicht finden\n"
+msgstr "Die optionale lokale Konfigurationsdatei [%%s] wurde nicht gefunden\n"
 
 #: libgeda/src/g_rc.c:282
 #, c-format
@@ -316,9 +318,8 @@ msgstr "Fehlerhafte Farbangabe entdeckt [%s]\n"
 #: libgeda/src/o_line_basic.c:263 libgeda/src/o_net_basic.c:181
 #: libgeda/src/o_path_basic.c:193 libgeda/src/o_pin_basic.c:194
 #: libgeda/src/o_text_basic.c:417
-#, fuzzy
 msgid "Setting color to default color\n"
-msgstr "Verwende die Farbe WEISS\n"
+msgstr "Verwende die Default Farbe\n"
 
 #: libgeda/src/o_attrib.c:120
 msgid "Attempt to attach non text item as an attribute!\n"
@@ -707,19 +708,19 @@ msgstr "Mehr als ein Bauteil mit dem Namen [%s] gefunden\n"
 
 #: libgeda/src/s_color.c:206
 msgid "Color index out of range"
-msgstr ""
+msgstr "Farbindex außerhalb des gültigen Wertebereichs"
 
 #: libgeda/src/s_color.c:261
 msgid "Color map entry must be a two-element list"
-msgstr ""
+msgstr "Der Eintrag in der Farbtabelle muss eine zweielementige Liste sein"
 
 #: libgeda/src/s_color.c:269
 msgid "Index in color map entry must be an integer"
-msgstr ""
+msgstr "Der Indexeintrag in der Farbtabelle muss ein Integerwert sein"
 
 #: libgeda/src/s_color.c:295
 msgid "Value in color map entry must be #f or a string"
-msgstr ""
+msgstr "Der Wert in der Farbtabelle muss '#f' oder ein String sein."
 
 #: libgeda/src/s_hierarchy.c:90
 #, c-format

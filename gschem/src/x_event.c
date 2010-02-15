@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 1998-2008 Ales Hvezda
- * Copyright (C) 1998-2008 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2010 Ales Hvezda
+ * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -296,9 +296,6 @@ gint x_event_button_pressed(GtkWidget *widget, GdkEventButton *event,
           w_current->inside_action = 0;
           i_set_state(w_current, SELECT);
           i_update_toolbar(w_current);
-        } else {
-          o_place_invalidate_rubber (w_current, TRUE);
-          w_current->rubber_visible = 1;
         }
         break;
 
@@ -588,8 +585,6 @@ gint x_event_button_released(GtkWidget *widget, GdkEventButton *event,
         /* having this stay in copy was driving me nuts*/
         w_current->inside_action = 1;
         /* Keep the state and the inside_action, as the copy has not finished. */
-        o_place_invalidate_rubber (w_current, TRUE);
-        w_current->rubber_visible = 1;
         i_set_state(w_current, ENDMCOPY);
         i_update_toolbar(w_current);
         o_undo_savestate(w_current, UNDO_ALL);

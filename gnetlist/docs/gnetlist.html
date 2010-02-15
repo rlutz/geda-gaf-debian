@@ -1,5 +1,5 @@
 <!-- Creator     : groff version 1.18.1 -->
-<!-- CreationDate: Sun Oct  4 21:43:07 2009 -->
+<!-- CreationDate: Sun Feb 14 21:25:56 2010 -->
 <html>
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
@@ -39,10 +39,12 @@
 <tr valign="top" align="left">
 <td width="10%"></td>
 <td width="89%">
-<p><b>gnetlist</b> [-e] [-i] [-I] [-q] [-s] [-v] [-l
-schem_file] [-m schem_file ] [-n] [ -O option ] [-h |
---help] [-g guile_procedure] [-c scheme_string ] [-o
-output_filename] schematic1 [... schematicN]</p>
+<p><b>gnetlist</b> [&minus;e] [&minus;i] [&minus;I]
+[&minus;q] [&minus;s] [&minus;v] [&minus;l schem_file]
+[&minus;m schem_file ] [&minus;n] [ &minus;O option ]
+[&minus;h | &minus;&minus;help] [&minus;g guile_procedure]
+[&minus;c scheme_string ] [&minus;o output_filename]
+schematic1 [... schematicN]</p>
 </td>
 </table>
 <a name="DESCRIPTION"></a>
@@ -80,7 +82,7 @@ supports the following backends:</p>
 </td>
 <td width="85%">
 
-<p>Allegro netlist format (-g allegro)</p>
+<p>Allegro netlist format (&minus;g allegro)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -90,7 +92,8 @@ supports the following backends:</p>
 </td>
 <td width="85%">
 
-<p>BOM / BOM2 - Bill of Materials (-g bom and -g bom2)</p>
+<p>BOM / BOM2 - Bill of Materials (&minus;g bom and
+&minus;g bom2)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -100,7 +103,7 @@ supports the following backends:</p>
 </td>
 <td width="85%">
 
-<p>Partslist 1,2,3 - More Bill of Materials (-g
+<p>Partslist 1,2,3 - More Bill of Materials (&minus;g
 partslist[1-3])</p>
 </td>
 <tr valign="top" align="left">
@@ -111,7 +114,7 @@ partslist[1-3])</p>
 </td>
 <td width="85%">
 
-<p>DRC - Start of a design rule checker (-g drc)</p>
+<p>DRC - Start of a design rule checker (&minus;g drc)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -121,7 +124,7 @@ partslist[1-3])</p>
 </td>
 <td width="85%">
 
-<p>DRC2 - A second design rule checker (-g drc2)</p>
+<p>DRC2 - A second design rule checker (&minus;g drc2)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -131,7 +134,7 @@ partslist[1-3])</p>
 </td>
 <td width="85%">
 
-<p>gEDA - native format, mainly used for testing (-g
+<p>gEDA - native format, mainly used for testing (&minus;g
 geda)</p>
 </td>
 <tr valign="top" align="left">
@@ -142,7 +145,7 @@ geda)</p>
 </td>
 <td width="85%">
 
-<p>Gossip netlist format (-g gossip)</p>
+<p>Gossip netlist format (&minus;g gossip)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -152,7 +155,7 @@ geda)</p>
 </td>
 <td width="85%">
 
-<p>PADS netlist format (-g pads)</p>
+<p>PADS netlist format (&minus;g pads)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -162,7 +165,7 @@ geda)</p>
 </td>
 <td width="85%">
 
-<p>PCB / PCBboard (-g PCB and -g PCBboard)</p>
+<p>PCB / PCBboard (&minus;g PCB and &minus;g PCBboard)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -173,7 +176,7 @@ geda)</p>
 <td width="85%">
 
 <p>PCB actions file for forward annotating pin/pad names
-from schematic to layout (-g pcbpins)</p>
+from schematic to layout (&minus;g pcbpins)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -183,7 +186,7 @@ from schematic to layout (-g pcbpins)</p>
 </td>
 <td width="85%">
 
-<p>gsch2pcb backend (-g gsch2pcb)</p>
+<p>gsch2pcb backend (&minus;g gsch2pcb)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -193,7 +196,7 @@ from schematic to layout (-g pcbpins)</p>
 </td>
 <td width="85%">
 
-<p>ProtelII netlist format (-g protelII)</p>
+<p>ProtelII netlist format (&minus;g protelII)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -203,7 +206,7 @@ from schematic to layout (-g pcbpins)</p>
 </td>
 <td width="85%">
 
-<p>Spice compatible netlist format (-g spice)</p>
+<p>Spice compatible netlist format (&minus;g spice)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -213,7 +216,7 @@ from schematic to layout (-g pcbpins)</p>
 </td>
 <td width="85%">
 
-<p>Enhanced spice compatible netlist format (-g
+<p>Enhanced spice compatible netlist format (&minus;g
 spice-sdb)</p>
 </td>
 <tr valign="top" align="left">
@@ -224,7 +227,7 @@ spice-sdb)</p>
 </td>
 <td width="85%">
 
-<p>Tango netlist format (-g tango)</p>
+<p>Tango netlist format (&minus;g tango)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -234,7 +237,7 @@ spice-sdb)</p>
 </td>
 <td width="85%">
 
-<p>Verilog code (-g verilog)</p>
+<p>Verilog code (&minus;g verilog)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -244,7 +247,7 @@ spice-sdb)</p>
 </td>
 <td width="85%">
 
-<p>VHDL code (-g vhdl)</p>
+<p>VHDL code (&minus;g vhdl)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -254,7 +257,7 @@ spice-sdb)</p>
 </td>
 <td width="85%">
 
-<p>VIPEC netlist format (-g vipec)</p>
+<p>VIPEC netlist format (&minus;g vipec)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -264,7 +267,7 @@ spice-sdb)</p>
 </td>
 <td width="85%">
 
-<p>Bartels Autoengineer netlist format (-g bae)</p>
+<p>Bartels Autoengineer netlist format (&minus;g bae)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -274,7 +277,7 @@ spice-sdb)</p>
 </td>
 <td width="85%">
 
-<p>GOSSIP system simulation system netlist format (-g
+<p>GOSSIP system simulation system netlist format (&minus;g
 gossip)</p>
 </td>
 <tr valign="top" align="left">
@@ -285,7 +288,7 @@ gossip)</p>
 </td>
 <td width="85%">
 
-<p>MAXASCII netlist format (-g maxascii)</p>
+<p>MAXASCII netlist format (&minus;g maxascii)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -295,7 +298,7 @@ gossip)</p>
 </td>
 <td width="85%">
 
-<p>VHDL-AMS netlist format (-g vams)</p>
+<p>VHDL-AMS netlist format (&minus;g vams)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -305,7 +308,7 @@ gossip)</p>
 </td>
 <td width="85%">
 
-<p>Futurenet2 netlist format (-g futurenet2)</p>
+<p>Futurenet2 netlist format (&minus;g futurenet2)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -315,8 +318,8 @@ gossip)</p>
 </td>
 <td width="85%">
 
-<p>SWITCAP switched capacitor simulator netlist format (-g
-switcap)</p>
+<p>SWITCAP switched capacitor simulator netlist format
+(&minus;g switcap)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -326,7 +329,7 @@ switcap)</p>
 </td>
 <td width="85%">
 
-<p>RF Cascade netlist format (-g cascade)</p>
+<p>RF Cascade netlist format (&minus;g cascade)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -336,7 +339,7 @@ switcap)</p>
 </td>
 <td width="85%">
 
-<p>RACAL-REDAC netlist format (-g redac)</p>
+<p>RACAL-REDAC netlist format (&minus;g redac)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -346,7 +349,7 @@ switcap)</p>
 </td>
 <td width="85%">
 
-<p>SystemC netlist backend (-g systemc)</p>
+<p>SystemC netlist backend (&minus;g systemc)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -356,7 +359,7 @@ switcap)</p>
 </td>
 <td width="85%">
 
-<p>Calay format netlist backend (-g calay)</p>
+<p>Calay format netlist backend (&minus;g calay)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -366,7 +369,7 @@ switcap)</p>
 </td>
 <td width="85%">
 
-<p>Osmond format netlist backend (-g osmond)</p>
+<p>Osmond format netlist backend (&minus;g osmond)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -376,7 +379,7 @@ switcap)</p>
 </td>
 <td width="85%">
 
-<p>Eagle netlist format (-g eagle)</p>
+<p>Eagle netlist format (&minus;g eagle)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -387,7 +390,7 @@ switcap)</p>
 <td width="85%">
 
 <p>Netlister for symbolic circuit analysis using
-Mathematica (-g mathematica)</p>
+Mathematica (&minus;g mathematica)</p>
 </td>
 <tr valign="top" align="left">
 <td width="11%"></td>
@@ -397,7 +400,8 @@ Mathematica (-g mathematica)</p>
 </td>
 <td width="85%">
 
-<p>LiquidPCB format netlist backend (-g liquidpcb)</p>
+<p>LiquidPCB format netlist backend (&minus;g
+liquidpcb)</p>
 </td>
 </table>
 <!-- INDENTATION -->
@@ -469,8 +473,8 @@ user as possible. (optional)</p>
 <td width="23%"></td>
 <td width="76%">
 <p>Specify the guile procedure which is executed to create
-the netlist. Use &quot;-g help&quot; to display a list of
-available backends.</p>
+the netlist. Use &quot;&minus;g help&quot; to display a list
+of available backends.</p>
 </td>
 </table>
 <!-- INDENTATION -->
@@ -508,9 +512,9 @@ default filename is &quot;output.net&quot;.</p>
 <td width="76%">
 <p>Specify a filename which contains scheme code to be
 loaded and execute before any backend is loaded or any guile
-procedure (using -g flag) is executed. This flag can be
-specified multiple times and can be used to pass information
-to backends.</p>
+procedure (using &minus;g flag) is executed. This flag can
+be specified multiple times and can be used to pass
+information to backends.</p>
 </td>
 </table>
 <!-- INDENTATION -->
@@ -564,11 +568,11 @@ spice-sdb backend.</p>
 <td width="76%">
 <p>Specify a filename which contains scheme code to be
 loaded and execute after the backend is loaded but still
-before any guile procedure (using -g flag) is executed. This
-flag can be specified multiple times and can be used to pass
-information to backends. This flag, for example, allows the
-user to override variables inside of the backends (such as
-paths).</p>
+before any guile procedure (using &minus;g flag) is
+executed. This flag can be specified multiple times and can
+be used to pass information to backends. This flag, for
+example, allows the user to override variables inside of the
+backends (such as paths).</p>
 </td>
 </table>
 <!-- INDENTATION -->
@@ -745,7 +749,7 @@ a netlist:</p>
 </td>
 <td width="85%">
 
-<p>./gnetlist -g geda stack_1.sch</p>
+<p>./gnetlist &minus;g geda stack_1.sch</p>
 </td>
 </table>
 <!-- INDENTATION -->
@@ -758,7 +762,7 @@ a netlist:</p>
 &quot;output.net&quot;<br>
 in the current working directory.</p>
 <!-- INDENTATION -->
-<p>You can specify the output filename by using the -o
+<p>You can specify the output filename by using the &minus;o
 flag:</p>
 </td>
 </table>
@@ -771,7 +775,8 @@ flag:</p>
 </td>
 <td width="85%">
 
-<p>./gnetlist -g geda stack_1.sch -o stack.netlist</p>
+<p>./gnetlist &minus;g geda stack_1.sch &minus;o
+stack.netlist</p>
 </td>
 </table>
 <!-- INDENTATION -->
@@ -782,8 +787,8 @@ flag:</p>
 <td width="89%">
 <p>The spice backend is run against the schematic(s) if you
 specify<br>
--g spice and the tango backend is run if you specify -g
-tango.</p>
+&minus;g spice and the tango backend is run if you specify
+&minus;g tango.</p>
 <!-- INDENTATION -->
 <p>To interact with the guile interpreter:</p>
 </td>
@@ -797,7 +802,7 @@ tango.</p>
 </td>
 <td width="85%">
 
-<p>./gnetlist -i stack_1.sch</p>
+<p>./gnetlist &minus;i stack_1.sch</p>
 </td>
 </table>
 <!-- INDENTATION -->
@@ -811,7 +816,7 @@ procedures.</p>
 <!-- INDENTATION -->
 <p>To get a more verbose feedback as to what gnetlist is
 doing run<br>
-with the -v flag:</p>
+with the &minus;v flag:</p>
 </td>
 </table>
 <!-- TABS -->
@@ -823,7 +828,7 @@ with the -v flag:</p>
 </td>
 <td width="85%">
 
-<p>./gnetlist -v -g geda stack_1.sch</p>
+<p>./gnetlist &minus;v &minus;g geda stack_1.sch</p>
 </td>
 </table>
 <a name="ENVIRONMENT"></a>

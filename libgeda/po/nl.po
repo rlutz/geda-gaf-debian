@@ -5,17 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: libgeda\n"
+"Project-Id-Version: geda\n"
 "Report-Msgid-Bugs-To: geda-bug@seul.org\n"
-"POT-Creation-Date: 2009-10-04 21:39-0400\n"
-"PO-Revision-Date: 2009-01-02 08:04+0100\n"
-"Last-Translator: Bert Timmerman <bert.timmerman@xs4all.nl>\n"
+"POT-Creation-Date: 2010-02-14 08:42-0500\n"
+"PO-Revision-Date: 2010-01-31 13:00+0000\n"
+"Last-Translator: lambert63 <bert.timmerman@xs4all.nl>\n"
 "Language-Team: geda-dev <geda-dev@seul.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Dutch\n"
+"X-Launchpad-Export-Date: 2010-02-14 12:56+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: NETHERLANDS\n"
+"X-Poedit-Language: Dutch\n"
 
 #: libgeda/data/libgeda.xml.in.h:3
 msgid "gEDA circuit schematic"
@@ -247,34 +249,34 @@ msgid "RC file [%s] already read in.\n"
 msgstr "RC bestand [%s] is reeds ingelezen.\n"
 
 #: libgeda/src/g_rc.c:177
-#, fuzzy, c-format
+#, c-format
 msgid "Read system config file [%%s]\n"
-msgstr "Lees system-%s bestand [%%s]\n"
+msgstr "Lees systeem configuratie bestand [%%s]\n"
 
 #: libgeda/src/g_rc.c:178
-#, fuzzy, c-format
+#, c-format
 msgid "Did not find required system config file [%%s]\n"
-msgstr "Benodigde system-%s bestand is niet gevonden [%%s]\n"
+msgstr "Benodigde systeem configuratie bestand is niet gevonden [%%s]\n"
 
 #: libgeda/src/g_rc.c:212
-#, fuzzy, c-format
+#, c-format
 msgid "Read user config file [%%s]\n"
-msgstr "Lees gespecificeerd %s bestand [%%s]\n"
+msgstr "Lees gebruiker configuratie bestand [%%s]\n"
 
 #: libgeda/src/g_rc.c:213
-#, fuzzy, c-format
+#, c-format
 msgid "Did not find optional user config file [%%s]\n"
-msgstr "Kan geen optioneel plaatselijk %s bestand [%%s] vinden\n"
+msgstr "Kan geen optioneel gebruiker configuratie bestand [%%s] vinden\n"
 
 #: libgeda/src/g_rc.c:244
-#, fuzzy, c-format
+#, c-format
 msgid "Read local config file [%%s]\n"
-msgstr "Lees plaatselijk %s bestand [%%s]\n"
+msgstr "Lees plaatselijk configuratie bestand [%%s]\n"
 
 #: libgeda/src/g_rc.c:245
-#, fuzzy, c-format
+#, c-format
 msgid "Did not find optional local config file [%%s]\n"
-msgstr "Kan geen optioneel plaatselijk %s bestand [%%s] vinden\n"
+msgstr "Kan geen optioneel plaatselijk configuratie bestand [%%s] vinden\n"
 
 #: libgeda/src/g_rc.c:282
 #, c-format
@@ -297,6 +299,8 @@ msgid ""
 "WARNING: using a string for 'always-promote-attributes' is deprecated. Use a "
 "list of strings instead\n"
 msgstr ""
+"WAARSCHUWING: gebruik van een string voor 'always-promote-attributes' is "
+"vervallen, gebruik hiervoor in de plaats een lijst van strings\n"
 
 #: libgeda/src/o_arc_basic.c:275
 #, c-format
@@ -317,9 +321,8 @@ msgstr "Ongeldige kleur [ %s ] gevonden\n"
 #: libgeda/src/o_line_basic.c:263 libgeda/src/o_net_basic.c:181
 #: libgeda/src/o_path_basic.c:193 libgeda/src/o_pin_basic.c:194
 #: libgeda/src/o_text_basic.c:417
-#, fuzzy
 msgid "Setting color to default color\n"
-msgstr "Stel de kleur in op WIT \n"
+msgstr "Stel de kleur in op standaard kleur\n"
 
 #: libgeda/src/o_attrib.c:120
 msgid "Attempt to attach non text item as an attribute!\n"
@@ -697,19 +700,19 @@ msgstr "Meer dan een komponent gevonden met de naam [%s]\n"
 
 #: libgeda/src/s_color.c:206
 msgid "Color index out of range"
-msgstr ""
+msgstr "Kleuren index buiten bereik"
 
 #: libgeda/src/s_color.c:261
 msgid "Color map entry must be a two-element list"
-msgstr ""
+msgstr "Kleuren map invoer moet een twee-element lijst zijn"
 
 #: libgeda/src/s_color.c:269
 msgid "Index in color map entry must be an integer"
-msgstr ""
+msgstr "Index in kleuren map invoer moet een integer zijn"
 
 #: libgeda/src/s_color.c:295
 msgid "Value in color map entry must be #f or a string"
-msgstr ""
+msgstr "Waarde in kleuren map invoer moet een #f of een string zijn"
 
 #: libgeda/src/s_hierarchy.c:90
 #, c-format
@@ -761,29 +764,3 @@ msgstr "Kan geen [%s] vinden in welke BronBibliotheek dan ook!\n"
 
 #~ msgid "Did not find slotdef=#:#,#,#... attribute\n"
 #~ msgstr "Kan slotdef=#:#,#,#... attribuut niet vinden\n"
-
-# Geen gebruikelijke slotdef=#:... gevonden, doe een waarschuwing in het log
-#~ msgid "Improper slotdef syntax: missing \":\".\n"
-#~ msgstr "Ongewenst slotdef syntax: \":\" ontbreekt.\n"
-
-#~ msgid "Did not find proper slotdef=#:#,#,#... attribute\n"
-#~ msgstr "Kan het gewenste slotdef=#:#,#,#... attribuut niet vinden\n"
-
-#~ msgid "component missing pinseq= attribute\n"
-#~ msgstr "komponent mist het pinseq= attribuut\n"
-
-#~ msgid "Could not find character '%s' definition.\n"
-#~ msgstr "Kan karakter '%s' definitie niet vinden.\n"
-
-#~ msgid "Failed to validate utf-8 character in font definition: \"%s\".\n"
-#~ msgstr "Valideren van utf-8 karakter in font definitie: \"%s\" faalde.\n"
-
-#~ msgid "Could not load question font char -- check font-directory keyword\n"
-#~ msgstr ""
-#~ "Kan vraag font karakter niet laden -- controleer font-map sleutelwoord\n"
-
-#~ msgid "Read ~/.gEDA/%s file [%%s]\n"
-#~ msgstr "Lees ~/.gEDA/%s bestand [%%s]\n"
-
-#~ msgid "Did not find optional ~/.gEDA/%s file [%%s]\n"
-#~ msgstr "Kan geen optioneel ~/.gEDA/%s file [%%s] bestand vinden\n"

@@ -1,0 +1,2528 @@
+# Hungarian translation for geda
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# This file is distributed under the same license as the geda package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: geda\n"
+"Report-Msgid-Bugs-To: geda-bug@seul.org\n"
+"POT-Creation-Date: 2010-02-14 08:42-0500\n"
+"PO-Revision-Date: 2010-02-13 10:43+0000\n"
+"Last-Translator: kop <Unknown>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-02-14 12:56+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: gschem/src/rcstrings.c:2
+msgid "_File"
+msgstr "_Fájl"
+
+#: gschem/src/rcstrings.c:3
+msgid "New Window"
+msgstr "Új ablak"
+
+#: gschem/src/rcstrings.c:4
+msgid "_New"
+msgstr "_Új"
+
+#: gschem/src/rcstrings.c:5
+msgid "_Open..."
+msgstr "_Megnyitás..."
+
+#: gschem/src/rcstrings.c:6
+msgid "Open Recen_t"
+msgstr "Legutóbbi megnyitása"
+
+#: gschem/src/rcstrings.c:7
+msgid "_Save"
+msgstr "Menté_s"
+
+#: gschem/src/rcstrings.c:8
+msgid "Save _As..."
+msgstr "Mentés másként"
+
+#: gschem/src/rcstrings.c:9
+msgid "Save All"
+msgstr "Mind mentése"
+
+#: gschem/src/rcstrings.c:10 gschem/src/rcstrings.c:79
+msgid "_Revert"
+msgstr "_Visszaállítás"
+
+#: gschem/src/rcstrings.c:11
+msgid "_Print..."
+msgstr "_Nyomtatás…"
+
+#: gschem/src/rcstrings.c:12
+msgid "Write _image..."
+msgstr ""
+
+#: gschem/src/rcstrings.c:13 gschem/src/x_script.c:47
+msgid "Execute Script..."
+msgstr "Szkript végrehajtása"
+
+#: gschem/src/rcstrings.c:14 gschem/src/rcstrings.c:80
+msgid "_Close"
+msgstr "_Bezárás"
+
+#: gschem/src/rcstrings.c:15
+msgid "_Quit"
+msgstr "Kilépés"
+
+#: gschem/src/rcstrings.c:17
+msgid "_Edit"
+msgstr "Szerkesztés"
+
+#: gschem/src/rcstrings.c:18
+msgid "_Undo"
+msgstr "_Visszavonás"
+
+#: gschem/src/rcstrings.c:19
+msgid "_Redo"
+msgstr "Új_ra"
+
+#: gschem/src/rcstrings.c:20
+msgid "Cu_t"
+msgstr "Kivágás"
+
+#: gschem/src/rcstrings.c:21
+msgid "_Copy"
+msgstr "Másolás (_C)"
+
+#: gschem/src/rcstrings.c:22
+msgid "_Paste"
+msgstr "Beillesztés (_P)"
+
+#: gschem/src/rcstrings.c:23
+msgid "_Delete"
+msgstr "Törlés (_D)"
+
+#: gschem/src/rcstrings.c:24 gschem/src/i_basic.c:77 gschem/src/x_window.c:521
+msgid "Select Mode"
+msgstr "Kiválasztás mód"
+
+#: gschem/src/rcstrings.c:25
+msgid "Edit..."
+msgstr "Szerkesztés..."
+
+#: gschem/src/rcstrings.c:26
+msgid "Edit Text..."
+msgstr "Szöveg szerkesztése..."
+
+#: gschem/src/rcstrings.c:27 gschem/src/i_basic.c:84
+msgid "Copy Mode"
+msgstr "Másolási mód"
+
+#: gschem/src/rcstrings.c:28 gschem/src/i_basic.c:142
+msgid "Multiple Copy Mode"
+msgstr "Többszörös másolás mód"
+
+#: gschem/src/rcstrings.c:29 gschem/src/i_basic.c:87
+msgid "Move Mode"
+msgstr "Mozgatási mód"
+
+#: gschem/src/rcstrings.c:30
+msgid "Rotate 90 Mode"
+msgstr "Elforgatás 90 fokkal"
+
+#: gschem/src/rcstrings.c:31 gschem/src/i_basic.c:91
+msgid "Mirror Mode"
+msgstr "Tükrözés"
+
+#: gschem/src/rcstrings.c:32
+msgid "Slot..."
+msgstr ""
+
+#: gschem/src/rcstrings.c:33
+msgid "Color..."
+msgstr "Szín..."
+
+#: gschem/src/rcstrings.c:34 gschem/src/i_callbacks.c:922
+#: gschem/src/x_dialog.c:2413
+msgid "Lock"
+msgstr "Zárolás"
+
+#: gschem/src/rcstrings.c:35 gschem/src/i_callbacks.c:940
+msgid "Unlock"
+msgstr "Zárolás feloldása"
+
+#: gschem/src/rcstrings.c:36
+msgid "Invoke Macro"
+msgstr "Makró végrehajtása"
+
+#: gschem/src/rcstrings.c:37
+msgid "Line Width & Type..."
+msgstr "Vonalszélesség és típus"
+
+#: gschem/src/rcstrings.c:38
+msgid "Fill Type..."
+msgstr "Kitöltés típusa"
+
+#: gschem/src/rcstrings.c:39
+msgid "Symbol Translate..."
+msgstr "Szimbólum áthelyezése"
+
+#: gschem/src/rcstrings.c:40
+msgid "Embed Component/Picture"
+msgstr "Alkatrész/kép beágyazása"
+
+#: gschem/src/rcstrings.c:41
+msgid "Unembed Component/Picture"
+msgstr "Alkatrész/kép beágyazásának megszüntetése"
+
+#: gschem/src/rcstrings.c:42
+msgid "Update Component"
+msgstr "Alkatrész frissítése"
+
+#: gschem/src/rcstrings.c:43
+msgid "Show/Hide Inv Text"
+msgstr "Láthatatlan szöveg mutatása/elrejtése"
+
+#: gschem/src/rcstrings.c:44
+msgid "Make Inv Text Vis"
+msgstr "Láthatatlan szöveg láthatóvá tétele"
+
+#: gschem/src/rcstrings.c:46
+msgid "_Buffer"
+msgstr "_Buffer"
+
+#: gschem/src/rcstrings.c:47
+msgid "Copy into 1"
+msgstr "Másolás 1-be"
+
+#: gschem/src/rcstrings.c:48
+msgid "Copy into 2"
+msgstr "Másolás 2-be"
+
+#: gschem/src/rcstrings.c:49
+msgid "Copy into 3"
+msgstr "Másolás 3-ba"
+
+#: gschem/src/rcstrings.c:50
+msgid "Copy into 4"
+msgstr "Másolás 4-be"
+
+#: gschem/src/rcstrings.c:51
+msgid "Copy into 5"
+msgstr "Másolás 5-be"
+
+#: gschem/src/rcstrings.c:52
+msgid "Cut into 1"
+msgstr "Kivágás 1-be"
+
+#: gschem/src/rcstrings.c:53
+msgid "Cut into 2"
+msgstr "Kivágás 2-be"
+
+#: gschem/src/rcstrings.c:54
+msgid "Cut into 3"
+msgstr "Kivágás 3-ba"
+
+#: gschem/src/rcstrings.c:55
+msgid "Cut into 4"
+msgstr "Kivágás 4-be"
+
+#: gschem/src/rcstrings.c:56
+msgid "Cut into 5"
+msgstr "Kivágás 5-be"
+
+#: gschem/src/rcstrings.c:57
+msgid "Paste from 1"
+msgstr "Beillesztés 1-ből"
+
+#: gschem/src/rcstrings.c:58
+msgid "Paste from 2"
+msgstr "Beillesztés 2-ből"
+
+#: gschem/src/rcstrings.c:59
+msgid "Paste from 3"
+msgstr "Beillesztés 3-ból"
+
+#: gschem/src/rcstrings.c:60
+msgid "Paste from 4"
+msgstr "Beillesztés 4-ből"
+
+#: gschem/src/rcstrings.c:61
+msgid "Paste from 5"
+msgstr "Beillesztés 5-ből"
+
+#: gschem/src/rcstrings.c:63
+msgid "_View"
+msgstr "Nézet"
+
+#: gschem/src/rcstrings.c:64
+msgid "_Redraw"
+msgstr "Újrarajzolás"
+
+#: gschem/src/rcstrings.c:65
+msgid "_Pan"
+msgstr ""
+
+#: gschem/src/rcstrings.c:66
+msgid "Zoom _Box"
+msgstr ""
+
+#: gschem/src/rcstrings.c:67
+msgid "Zoom _Extents"
+msgstr ""
+
+#: gschem/src/rcstrings.c:68
+msgid "Zoom _In"
+msgstr "Nagyítás"
+
+#: gschem/src/rcstrings.c:69
+msgid "Zoom _Out"
+msgstr "Kicsinyítés"
+
+#: gschem/src/rcstrings.c:70
+msgid "Zoom _Full"
+msgstr ""
+
+#: gschem/src/rcstrings.c:71
+msgid "_Dark color scheme"
+msgstr "Sötét színséma"
+
+#: gschem/src/rcstrings.c:72
+msgid "_Light color scheme"
+msgstr "Világos színséma"
+
+#: gschem/src/rcstrings.c:74
+msgid "_Page"
+msgstr "Oldal"
+
+#: gschem/src/rcstrings.c:75
+msgid "_Manager..."
+msgstr ""
+
+#: gschem/src/rcstrings.c:76
+msgid "_Previous"
+msgstr "Előző"
+
+#: gschem/src/rcstrings.c:77
+msgid "_Next"
+msgstr "Következő"
+
+#: gschem/src/rcstrings.c:78
+msgid "Ne_w"
+msgstr "Új"
+
+#: gschem/src/rcstrings.c:81
+msgid "_Discard"
+msgstr "El_dobás"
+
+#: gschem/src/rcstrings.c:83
+msgid "_Add"
+msgstr "Hozzá_adás"
+
+#: gschem/src/rcstrings.c:84
+msgid "_Component..."
+msgstr "Alkatrész"
+
+#: gschem/src/rcstrings.c:85
+msgid "_Net"
+msgstr "_Net"
+
+#: gschem/src/rcstrings.c:86
+msgid "B_us"
+msgstr "B_usz"
+
+#: gschem/src/rcstrings.c:87
+msgid "_Attribute..."
+msgstr "_Attribútum"
+
+#: gschem/src/rcstrings.c:88
+msgid "_Text..."
+msgstr "Szöveg"
+
+#: gschem/src/rcstrings.c:89
+msgid "_Line"
+msgstr "Vona_l"
+
+#: gschem/src/rcstrings.c:90
+msgid "_Box"
+msgstr "Do_boz"
+
+#: gschem/src/rcstrings.c:91
+msgid "C_ircle"
+msgstr "Kör"
+
+#: gschem/src/rcstrings.c:92
+msgid "A_rc"
+msgstr "Kö_rív"
+
+#: gschem/src/rcstrings.c:93
+msgid "_Pin"
+msgstr ""
+
+#: gschem/src/rcstrings.c:94
+msgid "Pictu_re..."
+msgstr "Kép"
+
+#: gschem/src/rcstrings.c:96
+msgid "Hie_rarchy"
+msgstr "Hie_rarchia"
+
+#: gschem/src/rcstrings.c:97
+msgid "_Down Schematic"
+msgstr "Kapcsolási rajz szerkesztése"
+
+#: gschem/src/rcstrings.c:98
+msgid "Down _Symbol"
+msgstr "Szimbólum szerkesztése"
+
+#: gschem/src/rcstrings.c:99
+msgid "_Up"
+msgstr "Vissza a rajzhoz"
+
+#: gschem/src/rcstrings.c:100
+msgid "D_ocumentation..."
+msgstr "D_okumentáció"
+
+#: gschem/src/rcstrings.c:102
+msgid "A_ttributes"
+msgstr "A_ttribútumok"
+
+#: gschem/src/rcstrings.c:103
+msgid "_Attach"
+msgstr ""
+
+#: gschem/src/rcstrings.c:104
+msgid "_Detach"
+msgstr ""
+
+#: gschem/src/rcstrings.c:105
+msgid "Show _Value"
+msgstr "Érték mutatása"
+
+#: gschem/src/rcstrings.c:106
+msgid "Show _Name"
+msgstr "Név mutatása"
+
+#: gschem/src/rcstrings.c:107
+msgid "Show _Both"
+msgstr "Mindkettő mutatása"
+
+#: gschem/src/rcstrings.c:108
+msgid "_Toggle Visibility"
+msgstr "Lá_thatóság váltása"
+
+#: gschem/src/rcstrings.c:109
+msgid "_Find Specific Text..."
+msgstr "Szöveg keresése"
+
+#: gschem/src/rcstrings.c:110
+msgid "_Hide Specific Text..."
+msgstr "Szöveg elrejtése"
+
+#: gschem/src/rcstrings.c:111
+msgid "_Show Specific Text..."
+msgstr "Szöveg mutatása"
+
+#: gschem/src/rcstrings.c:112
+msgid "A_utonumber Text..."
+msgstr "Szöveg automatikus számozása"
+
+#: gschem/src/rcstrings.c:114
+msgid "_Options"
+msgstr "Beállítás_ok"
+
+#: gschem/src/rcstrings.c:115
+msgid "_Text Size..."
+msgstr "Szöveg mére_te"
+
+#: gschem/src/rcstrings.c:116
+msgid "Cycle _grid styles"
+msgstr ""
+
+#: gschem/src/rcstrings.c:117
+msgid "Toggle _Snap On/Off"
+msgstr ""
+
+#: gschem/src/rcstrings.c:118
+msgid "Snap Grid S_pacing..."
+msgstr ""
+
+#: gschem/src/rcstrings.c:119
+msgid "Scale _up Grid Spacing"
+msgstr ""
+
+#: gschem/src/rcstrings.c:120
+msgid "Scale _down Grid Spacing"
+msgstr ""
+
+#: gschem/src/rcstrings.c:121
+msgid "Toggle _Outline/Box"
+msgstr ""
+
+#: gschem/src/rcstrings.c:122
+msgid "Toggle Net _Rubberband"
+msgstr ""
+
+#: gschem/src/rcstrings.c:123
+msgid "Toggle _Magnetic Net"
+msgstr ""
+
+#: gschem/src/rcstrings.c:124
+msgid "Show _Log Window..."
+msgstr ""
+
+#: gschem/src/rcstrings.c:125
+msgid "Show _Coord Window..."
+msgstr ""
+
+#: gschem/src/rcstrings.c:127
+msgid "_Help"
+msgstr "Segítség"
+
+#: gschem/src/rcstrings.c:128
+msgid "gEDA Docu_mentation..."
+msgstr ""
+
+#: gschem/src/rcstrings.c:129
+msgid "gschem _FAQ..."
+msgstr ""
+
+#: gschem/src/rcstrings.c:130
+msgid "gEDA _Wiki..."
+msgstr ""
+
+#: gschem/src/rcstrings.c:131
+msgid "Component D_ocumentation..."
+msgstr ""
+
+#: gschem/src/rcstrings.c:132
+msgid "_Hotkeys..."
+msgstr ""
+
+#: gschem/src/rcstrings.c:133
+msgid "_About..."
+msgstr ""
+
+#: gschem/src/a_zoom.c:212
+msgid "Zoom too small!  Cannot zoom further.\n"
+msgstr "Túl nagy nagyítás! Nem tudok tovább nagyítani.\n"
+
+#: gschem/src/g_funcs.c:339 gschem/src/i_callbacks.c:68
+#, c-format
+msgid "Could not fork\n"
+msgstr "Az elágazás sikertelen.\n"
+
+#: gschem/src/g_funcs.c:355 gschem/src/i_callbacks.c:78
+#, c-format
+msgid "Could not invoke %s\n"
+msgstr "Nem tudom elindítani a(z) %s-t.\n"
+
+#: gschem/src/g_funcs.c:361 gschem/src/i_callbacks.c:82
+msgid "Documentation commands not supported under MinGW.\n"
+msgstr "Dokumentációs parancsok nem működnek MinGW alatt.\n"
+
+#: gschem/src/g_rc.c:291
+#, c-format
+msgid "Invalid zoomfactor [%d] passed to %s\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:417
+#, c-format
+msgid "Invalid size [%d] passed to text-size\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:438
+msgid ""
+"\n"
+"The config option postscript-font-scale is deprecated and will be removed in "
+"gEDA 1.8.0.\n"
+"Printed text is fixed to match on-screen sizes. Please remove this option "
+"from your config files.\n"
+"\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:481
+#, c-format
+msgid "Invalid size [%d] passed to snap-size\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:936
+#, c-format
+msgid "Invalid num levels [%d] passed to undo-levels\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:1194
+#, c-format
+msgid "Invalid size [%d] passed to bus-ripper-size\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:1269
+#, c-format
+msgid "Invalid dot size [%d] passed to dots-grid-dot-size\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:1310
+#, c-format
+msgid "Invalid pixel spacing [%d] passed to dots-grid-fixed-threshold\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:1336
+#, c-format
+msgid "Invalid pixel spacing [%d] passed to mesh-grid-display-threshold\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:1361
+#, c-format
+msgid "Invalid offset [%d] passed to add-attribute-offset\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:1385
+#, c-format
+msgid "Invalid number of seconds [%d] passed to auto-save-interval\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:1426
+#, c-format
+msgid "Invalid gain [%d] passed to mousepan-gain\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:1449
+#, c-format
+msgid "Invalid gain [%d] passed to keyboardpan-gain\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:1495
+#, c-format
+msgid "Invalid number of pixels [%d] passed to select-slack-pixels\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:1521
+#, c-format
+msgid "Invalid gain [%d] passed to zoom-gain\n"
+msgstr ""
+
+#: gschem/src/g_rc.c:1546
+#, c-format
+msgid "Invalid number of steps [%d] scrollpan-steps\n"
+msgstr ""
+
+#: gschem/src/gschem.c:184
+#, c-format
+msgid "gEDA/gschem version %s%s.%s\n"
+msgstr "gEDA/gschem verzió %s%s.%s\n"
+
+#: gschem/src/gschem.c:187
+msgid ""
+"gEDA/gschem comes with ABSOLUTELY NO WARRANTY; see COPYING for more "
+"details.\n"
+msgstr ""
+"A gEDA/gschem NEM RENDELKEZIK SEMMIFÉLE GARANCIÁVAL; olvasd el a COPYING "
+"fájlt további részletekért\n"
+
+#: gschem/src/gschem.c:189
+msgid ""
+"This is free software, and you are welcome to redistribute it under certain\n"
+msgstr "Ez egy szabad program, bizonyos feltételek mellett szabadon\n"
+
+#: gschem/src/gschem.c:191
+msgid ""
+"conditions; please see the COPYING file for more details.\n"
+"\n"
+msgstr ""
+"terjeszthető, olvasd el a COPYING fájt további információkért.\n"
+"\n"
+
+#: gschem/src/gschem.c:194
+#, c-format
+msgid "This is the MINGW32 port.\n"
+msgstr "Ez a MinGW32 port.\n"
+
+#: gschem/src/gschem.c:198
+#, c-format
+msgid "Current locale settings: %s\n"
+msgstr "Jelenlegi területi beállítás: %s\n"
+
+#: gschem/src/gschem.c:213
+msgid ""
+"You must set the GEDADATA environment variable!\n"
+"\n"
+"gschem cannot locate its data files. You must set the GEDADATA\n"
+"environment variable to point to the correct location.\n"
+msgstr ""
+
+#: gschem/src/gschem.c:243
+#, c-format
+msgid "Couldn't find init scm file [%s]\n"
+msgstr ""
+
+#: gschem/src/gschem.c:247
+#, c-format
+msgid "Read init scm file [%s]\n"
+msgstr "[%s] init scm fájl olvasása.\n"
+
+#: gschem/src/gschem.c:251
+#, c-format
+msgid "Failed to read init scm file [%s]\n"
+msgstr "[%s] init scm fájl olvasása sikertelen.\n"
+
+#: gschem/src/gschem.c:312
+#, c-format
+msgid "Scheme directory NOT set!\n"
+msgstr "A scheme könyvtár nincs beállítva!\n"
+
+#: gschem/src/gschem.c:319 gschem/src/x_script.c:66
+#, c-format
+msgid "Executing guile script [%s]\n"
+msgstr "[%s] guile szkript végrehajtása.\n"
+
+#: gschem/src/gschem_cairo.c:310
+#, c-format
+msgid "Unknown end for line (%d)\n"
+msgstr ""
+
+#: gschem/src/gschem_cairo.c:318
+#, c-format
+msgid "Unknown type for stroke (%d) !\n"
+msgstr ""
+
+#: gschem/src/i_basic.c:79
+msgid "Component Mode"
+msgstr "Alkatrész mód"
+
+#: gschem/src/i_basic.c:81
+msgid "Text Mode"
+msgstr "Szövegbeviteli üzemmód"
+
+#: gschem/src/i_basic.c:89
+msgid "Rotate Mode"
+msgstr "Forgatás üzemmód"
+
+#: gschem/src/i_basic.c:95
+msgid "Zoom Box"
+msgstr "Doboz nagyítás"
+
+#: gschem/src/i_basic.c:99
+msgid "Pan Mode"
+msgstr "\"Középre\" üzemmód"
+
+#: gschem/src/i_basic.c:103
+#, c-format
+msgid "Paste %d Mode"
+msgstr "Beillesztés %d üzemmód"
+
+#: gschem/src/i_basic.c:109
+msgid "Magnetic Net Mode"
+msgstr ""
+
+#: gschem/src/i_basic.c:111
+msgid "Net Mode"
+msgstr "Összeköttetés üzemmód"
+
+#: gschem/src/i_basic.c:115
+msgid "Bus Mode"
+msgstr "Busz üzemmód"
+
+#: gschem/src/i_basic.c:118
+msgid "Line Mode"
+msgstr "Vonal üzemmód"
+
+#: gschem/src/i_basic.c:121
+msgid "Box Mode"
+msgstr "Téglalap üzemmód"
+
+#: gschem/src/i_basic.c:124
+msgid "Picture Mode"
+msgstr "Kép üzemmód"
+
+#: gschem/src/i_basic.c:127
+msgid "Circle Mode"
+msgstr "Kör üzemmód"
+
+#: gschem/src/i_basic.c:130
+msgid "Arc Mode"
+msgstr "Ív üzemmód"
+
+#: gschem/src/i_basic.c:133
+msgid "Pin Mode"
+msgstr "Alkatrészláb üzemmód"
+
+#: gschem/src/i_basic.c:135 gschem/src/i_callbacks.c:538
+#: gschem/src/i_callbacks.c:562
+msgid "Copy"
+msgstr "Másolás"
+
+#: gschem/src/i_basic.c:137 gschem/src/i_callbacks.c:628
+#: gschem/src/i_callbacks.c:652
+msgid "Move"
+msgstr "Mozgatás"
+
+#: gschem/src/i_basic.c:139 gschem/src/i_callbacks.c:583
+#: gschem/src/i_callbacks.c:607
+msgid "Multiple Copy"
+msgstr "Többszörös másolás"
+
+#: gschem/src/i_basic.c:168
+msgid "Show Hidden"
+msgstr "Rejtett megjelenítése"
+
+#: gschem/src/i_basic.c:171
+msgid "Snap Off"
+msgstr ""
+
+#: gschem/src/i_basic.c:173
+msgid "Resnap Active"
+msgstr ""
+
+#: gschem/src/i_basic.c:254 gschem/src/x_window.c:495
+msgid "Action"
+msgstr "Művelet"
+
+#: gschem/src/i_basic.c:260 gschem/src/x_dialog.c:2410
+#: gschem/src/x_window.c:490
+msgid "Stroke"
+msgstr ""
+
+#: gschem/src/i_basic.c:266 gschem/src/x_window.c:492
+msgid "none"
+msgstr "semmi"
+
+#: gschem/src/i_basic.c:271
+msgid "Repeat/"
+msgstr "Imétlés/"
+
+#: gschem/src/i_basic.c:549 gschem/src/i_basic.c:563
+msgid "OFF"
+msgstr "Ki"
+
+#: gschem/src/i_basic.c:567
+msgid "NONE"
+msgstr ""
+
+#: gschem/src/i_basic.c:572
+#, c-format
+msgid "Grid(%s, %s)"
+msgstr "Háló (%s, %s)"
+
+#: gschem/src/i_callbacks.c:63
+#, c-format
+msgid "Documentation for [%s,%s,%s,%s]\n"
+msgstr "Dokumentáció [%s,%s,%s,%s]-hoz\n"
+
+#: gschem/src/i_callbacks.c:123 gschem/src/i_callbacks.c:1707
+#, c-format
+msgid "New page created [%s]\n"
+msgstr "[%s] oldal létrehozva.\n"
+
+#: gschem/src/i_callbacks.c:165
+#, c-format
+msgid "New Window created [%s]\n"
+msgstr "[%s] ablak létrehozva.\n"
+
+#: gschem/src/i_callbacks.c:283
+msgid "Failed to Save All"
+msgstr "Nem sikerült mindent menteni."
+
+#: gschem/src/i_callbacks.c:285
+msgid "Saved All"
+msgstr "Minden oldal elmentve."
+
+#: gschem/src/i_callbacks.c:375
+msgid "Closing Window\n"
+msgstr "Ablak bezárása\n"
+
+#: gschem/src/i_callbacks.c:543 gschem/src/i_callbacks.c:588
+#: gschem/src/i_callbacks.c:633
+msgid "Select objs first"
+msgstr "Először válassz objektumokat"
+
+#: gschem/src/i_callbacks.c:672 gschem/src/x_multiattrib.c:1496
+msgid "Delete"
+msgstr "Törlés"
+
+#: gschem/src/i_callbacks.c:697
+msgid "Edit"
+msgstr "Szerkesztés"
+
+#: gschem/src/i_callbacks.c:712
+msgid "Edit pin type"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:731
+msgid "Edit Text"
+msgstr "Szöveg szerkesztése"
+
+#: gschem/src/i_callbacks.c:754
+msgid "Slot"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:771
+msgid "Color"
+msgstr "Szín"
+
+#: gschem/src/i_callbacks.c:808 gschem/src/i_callbacks.c:853
+msgid "Rotate"
+msgstr "Forgatás"
+
+#: gschem/src/i_callbacks.c:876 gschem/src/i_callbacks.c:901
+msgid "Mirror"
+msgstr "Tükrözés"
+
+#: gschem/src/i_callbacks.c:958 gschem/src/x_dialog.c:1801
+msgid "Translate"
+msgstr "Eltolás"
+
+#: gschem/src/i_callbacks.c:961
+msgid "WARNING: Do not translate with snap off!\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:962
+msgid "WARNING: Turning snap on and continuing with translate.\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:969
+msgid "WARNING: Snap grid size is not equal to 100!\n"
+msgstr "Vigyázat, a hálószemméret nem 100!\n"
+
+#: gschem/src/i_callbacks.c:971
+msgid ""
+"WARNING: If you are translating a symbol to the origin, the snap grid size "
+"should be set to 100\n"
+msgstr ""
+"Vigyázat, az alkatrész kezdőponthoz való tolásához a hálószemméretnek 100-"
+"nak kell lennie!\n"
+
+#: gschem/src/i_callbacks.c:1002
+msgid "Embed"
+msgstr "Beágyazás"
+
+#: gschem/src/i_callbacks.c:1043
+msgid "Unembed"
+msgstr "Beágyazás megszüntetése"
+
+#: gschem/src/i_callbacks.c:1087
+msgid "Update"
+msgstr "Frissítés"
+
+#: gschem/src/i_callbacks.c:1146
+msgid "ShowHidden"
+msgstr "Rejtettek megjelenítése"
+
+#: gschem/src/i_callbacks.c:1170
+msgid "MakeVisible"
+msgstr "Láthatóvá tétel"
+
+#: gschem/src/i_callbacks.c:1476 gschem/src/i_callbacks.c:1548
+msgid "Pan"
+msgstr "Középre"
+
+#: gschem/src/i_callbacks.c:1567
+msgid "Update Cues"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:1751
+msgid "Really revert page?"
+msgstr "Biztosan újratöltsem az oldalt?"
+
+#: gschem/src/i_callbacks.c:1821
+msgid "Copy to clipboard"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:1839
+msgid "Cut to clipboard"
+msgstr "Kivágás a vágólapra"
+
+#: gschem/src/i_callbacks.c:1857
+msgid "Paste from clipboard"
+msgstr "Beillesztés a vágólapról"
+
+#: gschem/src/i_callbacks.c:1869 gschem/src/i_callbacks.c:2108
+#: gschem/src/i_callbacks.c:2130 gschem/src/i_callbacks.c:2152
+#: gschem/src/i_callbacks.c:2174 gschem/src/i_callbacks.c:2196
+msgid "Empty buffer"
+msgstr "Üres buffer"
+
+#: gschem/src/i_callbacks.c:1914
+msgid "Copy 1"
+msgstr "Másolás az 1-be"
+
+#: gschem/src/i_callbacks.c:1933
+msgid "Copy 2"
+msgstr "Másolás a 2-be"
+
+#: gschem/src/i_callbacks.c:1952
+msgid "Copy 3"
+msgstr "Másolás a 3-ba"
+
+#: gschem/src/i_callbacks.c:1971
+msgid "Copy 4"
+msgstr "Másolás a 4-be"
+
+#: gschem/src/i_callbacks.c:1990
+msgid "Copy 5"
+msgstr "Másolás az 5-be"
+
+#: gschem/src/i_callbacks.c:2009
+msgid "Cut 1"
+msgstr "Kivágás az 1-be"
+
+#: gschem/src/i_callbacks.c:2028
+msgid "Cut 2"
+msgstr "Kivágás a 2-be"
+
+#: gschem/src/i_callbacks.c:2047
+msgid "Cut 3"
+msgstr "Kivágás a 3-ba"
+
+#: gschem/src/i_callbacks.c:2066
+msgid "Cut 4"
+msgstr "Kivágás a 4-be"
+
+#: gschem/src/i_callbacks.c:2085
+msgid "Cut 5"
+msgstr "Kivágás az 5-be"
+
+#: gschem/src/i_callbacks.c:2101
+msgid "Paste 1"
+msgstr "Beillesztés az 1-ből"
+
+#: gschem/src/i_callbacks.c:2123
+msgid "Paste 2"
+msgstr "Beillesztés a 2-ből"
+
+#: gschem/src/i_callbacks.c:2145
+msgid "Paste 3"
+msgstr "Beillesztés a 3-ból"
+
+#: gschem/src/i_callbacks.c:2167
+msgid "Paste 4"
+msgstr "Beillesztés a 4-ből"
+
+#: gschem/src/i_callbacks.c:2189
+msgid "Paste 5"
+msgstr "Beillesztés az 5-ből"
+
+#: gschem/src/i_callbacks.c:2326 gschem/src/x_window.c:354
+msgid "Component"
+msgstr "Alkatrész"
+
+#: gschem/src/i_callbacks.c:2362 gschem/src/i_callbacks.c:2381
+#: gschem/src/x_dialog.c:2383
+msgid "Attribute"
+msgstr "Attribútum"
+
+#: gschem/src/i_callbacks.c:2403 gschem/src/i_callbacks.c:2430
+#: gschem/src/x_dialog.c:2380
+msgid "Net"
+msgstr "Net"
+
+#: gschem/src/i_callbacks.c:2474 gschem/src/i_callbacks.c:2501
+#: gschem/src/x_dialog.c:2398 gschem/src/x_window.c:374
+msgid "Bus"
+msgstr "Busz"
+
+#: gschem/src/i_callbacks.c:2582 gschem/src/i_callbacks.c:2605
+msgid "Line"
+msgstr "Vonal"
+
+#: gschem/src/i_callbacks.c:2627 gschem/src/i_callbacks.c:2650
+msgid "Box"
+msgstr "Téglalap"
+
+#: gschem/src/i_callbacks.c:2706 gschem/src/i_callbacks.c:2730
+msgid "Circle"
+msgstr "Kör"
+
+#: gschem/src/i_callbacks.c:2752 gschem/src/i_callbacks.c:2775
+msgid "Arc"
+msgstr "Ív"
+
+#: gschem/src/i_callbacks.c:2797 gschem/src/i_callbacks.c:2820
+#: gschem/src/x_dialog.c:2371
+msgid "Pin"
+msgstr "Alkatrészláb"
+
+#: gschem/src/i_callbacks.c:2879
+#, c-format
+msgid "Searching for source [%s]\n"
+msgstr "[%s] forrás keresése\n"
+
+#: gschem/src/i_callbacks.c:2903
+#, c-format
+msgid "Cannot find source [%s]\n"
+msgstr "Nem találom a(z) [%s] forrást.\n"
+
+#: gschem/src/i_callbacks.c:2972
+#, c-format
+msgid "Searching for symbol [%s]\n"
+msgstr "[%s] szimbólum keresése\n"
+
+#: gschem/src/i_callbacks.c:2978
+msgid "Symbol is not a real file. Symbol cannot be loaded.\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3009
+msgid "Cannot find any schematics above the current one!\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3063
+msgid ""
+"This command retrieves the component documentation from the web, but there "
+"is no component selected"
+msgstr ""
+"Ez a parancs letölti az alkatrész dokumentációját az internetről, de nincs "
+"kiválasztott alkatrész."
+
+#: gschem/src/i_callbacks.c:3091
+msgid "Attach"
+msgstr "Csatolás"
+
+#: gschem/src/i_callbacks.c:3138
+msgid "Detach"
+msgstr "Leválasztás"
+
+#: gschem/src/i_callbacks.c:3173
+msgid "ShowN"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3209
+msgid "ShowV"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3245
+msgid "ShowB"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3282
+msgid "VisToggle"
+msgstr "Láthatóság be/ki"
+
+#: gschem/src/i_callbacks.c:3312
+#, c-format
+msgid "Sorry but this is a non-functioning menu option\n"
+msgstr "Elnézést, ez egy nem működő menüpont.\n"
+
+#: gschem/src/i_callbacks.c:3402
+msgid "Action feedback mode set to OUTLINE\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3405
+msgid "Action feedback mode set to BOUNDINGBOX\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3430
+msgid "Grid OFF\n"
+msgstr "Háló ki\n"
+
+#: gschem/src/i_callbacks.c:3431
+msgid "Dot grid selected\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3432
+msgid "Mesh grid selected\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3453
+msgid "Snap OFF (CAUTION!)\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3456
+msgid "Snap ON\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3459
+msgid "Snap back to the grid (CAUTION!)\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3485
+msgid "Rubber band OFF \n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3488
+msgid "Rubber band ON\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3503
+msgid "magnetic net mode: ON\n"
+msgstr ""
+
+#: gschem/src/i_callbacks.c:3506
+msgid "magnetic net mode: OFF\n"
+msgstr ""
+
+#: gschem/src/o_box.c:153
+#, c-format
+msgid "Unknown type for box (fill)!\n"
+msgstr ""
+
+#: gschem/src/o_buffer.c:57
+#, c-format
+msgid "o_buffer_copy: Invalid buffer %i\n"
+msgstr ""
+
+#: gschem/src/o_buffer.c:72
+#, c-format
+msgid "o_buffer_cut: Invalid buffer %i\n"
+msgstr ""
+
+#: gschem/src/o_buffer.c:93
+#, c-format
+msgid "Got an invalid buffer_number [o_buffer_paste_start]\n"
+msgstr ""
+
+#: gschem/src/o_bus.c:118
+#, c-format
+msgid "Got an invalid which one in o_bus_draw_stretch\n"
+msgstr ""
+
+#: gschem/src/o_circle.c:134
+#, c-format
+msgid "Unknown type for circle (fill)!\n"
+msgstr ""
+
+#: gschem/src/o_complex.c:249 gschem/src/o_complex.c:253
+#, c-format
+msgid "Translating schematic [%d %d]\n"
+msgstr ""
+
+#: gschem/src/o_misc.c:61
+#, c-format
+msgid "Got an unexpected NULL in o_edit\n"
+msgstr ""
+
+#: gschem/src/o_misc.c:125
+msgid "Object already locked\n"
+msgstr "Az objektum már zárolva van.\n"
+
+#: gschem/src/o_misc.c:163
+msgid "Object already unlocked\n"
+msgstr ""
+
+#: gschem/src/o_misc.c:448
+msgid "Hidden text is now visible\n"
+msgstr ""
+
+#: gschem/src/o_misc.c:450
+msgid "Hidden text is now invisible\n"
+msgstr ""
+
+#: gschem/src/o_misc.c:696
+#, c-format
+msgid "Could not find symbol [%s] in library. Update failed.\n"
+msgstr "Nem találom a(z) [%s] szimbólumot. A frissítés nem sikerült.\n"
+
+#: gschem/src/o_misc.c:843
+#, c-format
+msgid "o_autosave_backups: Can't get the real filename of %s."
+msgstr ""
+
+#: gschem/src/o_misc.c:887
+#, c-format
+msgid "Could NOT set previous backup file [%s] read-write\n"
+msgstr ""
+
+#: gschem/src/o_misc.c:905
+#, c-format
+msgid "Could NOT set backup file [%s] readonly\n"
+msgstr ""
+
+#: gschem/src/o_misc.c:910
+#, c-format
+msgid "Could NOT save backup file [%s]\n"
+msgstr ""
+
+#: gschem/src/o_move.c:188
+#, c-format
+msgid "ERROR: NULL object in o_move_end!\n"
+msgstr ""
+
+#: gschem/src/o_move.c:461
+#, c-format
+msgid "DOH! tried to find the whichone, but didn't find it!\n"
+msgstr ""
+
+#: gschem/src/o_move.c:483
+#, c-format
+msgid "Got a non line object in o_move_check_endpoint\n"
+msgstr ""
+
+#: gschem/src/o_net.c:159
+#, c-format
+msgid "Got an invalid which one in o_net_draw_stretch\n"
+msgstr ""
+
+#: gschem/src/o_net.c:536
+msgid "Warning: Starting net at off grid coordinate\n"
+msgstr ""
+
+#: gschem/src/o_net.c:598
+msgid "Warning: Ending net at off grid coordinate\n"
+msgstr ""
+
+#: gschem/src/o_net.c:952 gschem/src/o_net.c:989 gschem/src/o_net.c:1060
+#: gschem/src/o_net.c:1096
+#, c-format
+msgid "Tried to add more than two bus rippers. Internal gschem error.\n"
+msgstr ""
+
+#: gschem/src/o_net.c:1166
+#, c-format
+msgid "Bus ripper symbol [%s] was not found in any component library\n"
+msgstr ""
+
+#: gschem/src/o_path.c:348
+#, c-format
+msgid "Unknown type for path (fill)!\n"
+msgstr ""
+
+#: gschem/src/o_picture.c:166 gschem/src/o_picture.c:542
+#, c-format
+msgid "Failed to load picture: %s"
+msgstr "Sikertelen a(z) %s kép betöltése"
+
+#: gschem/src/o_picture.c:180
+msgid "Picture"
+msgstr "Kép"
+
+#: gschem/src/o_picture.c:450 gschem/src/x_attribedit.c:141
+#, c-format
+msgid "ERROR: NULL object!\n"
+msgstr ""
+
+#: gschem/src/o_slot.c:81
+msgid "Slot attribute malformed\n"
+msgstr ""
+
+#: gschem/src/o_slot.c:89
+msgid "numslots attribute missing\n"
+msgstr "numslots attribútum hiányzik.\n"
+
+#: gschem/src/o_slot.c:90
+msgid "Slotting not allowed for this component\n"
+msgstr ""
+
+#: gschem/src/o_slot.c:105
+msgid "New slot number out of range\n"
+msgstr ""
+
+#: gschem/src/o_undo.c:304
+msgid "Undo/Redo disabled in rc file\n"
+msgstr "A visszavonás/újra művelet nem használható rc fájlban.\n"
+
+#: gschem/src/parsecmd.c:47
+#, c-format
+msgid ""
+"Usage: %s [OPTIONS] schematic_filename1 ... schematic_filenameN\n"
+"  -q            Quiet mode\n"
+"  -v            Verbose mode on\n"
+"  -r filename   Rc filename\n"
+"  -s filename   Script (guile) filename\n"
+"  -o filename   Output filename (for printing)\n"
+"  -p            Automatically place the window\n"
+"  -t            Print stroke information\n"
+"  -h            Help; this message\n"
+"\n"
+msgstr ""
+"Használat: %s [OPCIÓK] rajz_fájlnév1 ... rajz_fájlnévN\n"
+"   -q csendes mód\n"
+"   -v közlékeny mód\n"
+"   -r fájlnév rc fájlnév\n"
+"   -s fájlnév (guile) szkript végrehajtása\n"
+"   -o fájlnév kimeneti fájl neve nyomtatáshoz\n"
+"   -p ablak automatikus elhelyezése\n"
+"   -t Print stroke information\n"
+"   -h segítség, ez az üzenet\n"
+"\n"
+
+#: gschem/src/x_attribedit.c:127
+#, c-format
+msgid "Got invalid show option; defaulting to show both\n"
+msgstr ""
+
+#: gschem/src/x_attribedit.c:330
+msgid "Single Attribute Editor"
+msgstr ""
+
+#: gschem/src/x_attribedit.c:359
+msgid "<b>Edit Attribute</b>"
+msgstr "<b>Attribútum szerkesztése</b>"
+
+#: gschem/src/x_attribedit.c:361
+msgid "<b>Add Attribute</b>"
+msgstr "<b>Attribútum hozzáadása</b>"
+
+#: gschem/src/x_attribedit.c:377 gschem/src/x_multiattrib.c:1921
+msgid "Name:"
+msgstr "Név:"
+
+#: gschem/src/x_attribedit.c:394 gschem/src/x_multiattrib.c:1940
+msgid "Value:"
+msgstr "Érték:"
+
+#: gschem/src/x_attribedit.c:410 gschem/src/x_multiattrib.c:1983
+msgid "Visible"
+msgstr "Látható"
+
+#: gschem/src/x_attribedit.c:430
+msgid "Show Value Only"
+msgstr "Csak az érték mutatása"
+
+#: gschem/src/x_attribedit.c:432
+msgid "Show Name Only"
+msgstr "Csak a név mutatása"
+
+#: gschem/src/x_attribedit.c:434 gschem/src/x_multiattrib.c:1459
+msgid "Show Name & Value"
+msgstr "Név és érték mutatása"
+
+#: gschem/src/x_attribedit.c:441
+msgid "<b>Attach Options</b>"
+msgstr ""
+
+#: gschem/src/x_attribedit.c:456
+msgid "All"
+msgstr "Mind"
+
+#: gschem/src/x_attribedit.c:464 gschem/src/x_compselect.c:892
+#: gschem/src/x_compselect.c:1006
+msgid "Components"
+msgstr "Alkatrészek"
+
+#: gschem/src/x_attribedit.c:472 gschem/src/x_window.c:364
+msgid "Nets"
+msgstr "Összeköttetések"
+
+#: gschem/src/x_attribedit.c:480
+msgid "Replace existing attributes"
+msgstr "Meglevő attribútumok cseréje"
+
+#: gschem/src/x_autonumber.c:415
+msgid ""
+"slotted object without slot attribute may cause problems when autonumbering "
+"slots\n"
+msgstr ""
+
+#: gschem/src/x_autonumber.c:430
+#, c-format
+msgid ""
+"duplicate slot may cause problems: [symbolname=%s, number=%d, slot=%d]\n"
+msgstr ""
+
+#: gschem/src/x_autonumber.c:682
+msgid "No searchstring given in autonumber text.\n"
+msgstr "Nincs keresőszöveg megadva az újraszámozáshoz.\n"
+
+#: gschem/src/x_autonumber.c:734
+msgid "No '*' or '?' given at the end of the autonumber text.\n"
+msgstr "Hiányzik a  '*' vagy '?' a szöveg végéről.\n"
+
+#: gschem/src/x_autonumber.c:869
+msgid "Diagonal"
+msgstr "Átlós"
+
+#: gschem/src/x_autonumber.c:870
+msgid "Top to bottom"
+msgstr "Fentről lefelé"
+
+#: gschem/src/x_autonumber.c:870
+msgid "Bottom to top"
+msgstr "Lentről felfelé"
+
+#: gschem/src/x_autonumber.c:871
+msgid "Left to right"
+msgstr "Balról jobbra"
+
+#: gschem/src/x_autonumber.c:871
+msgid "Right to left"
+msgstr "Jobbról balra"
+
+#: gschem/src/x_autonumber.c:872
+msgid "File order"
+msgstr "Fáljsorrend"
+
+#: gschem/src/x_autonumber.c:1208
+msgid "Autonumber text"
+msgstr "Automatikus számozás"
+
+#: gschem/src/x_autonumber.c:1232
+msgid "<b>Scope</b>"
+msgstr "<b>Hatáskör</b>"
+
+#: gschem/src/x_autonumber.c:1254
+msgid "Search for:"
+msgstr "Keresés:"
+
+#: gschem/src/x_autonumber.c:1268
+msgid "Autonumber text in:"
+msgstr ""
+
+#: gschem/src/x_autonumber.c:1275
+msgid "Skip numbers found in:"
+msgstr ""
+
+#: gschem/src/x_autonumber.c:1287 gschem/src/x_autonumber.c:1296
+msgid "Selected objects"
+msgstr "Kiválasztott objektumok"
+
+#: gschem/src/x_autonumber.c:1288 gschem/src/x_autonumber.c:1297
+msgid "Current page"
+msgstr "Jelenlegi oldal"
+
+#: gschem/src/x_autonumber.c:1289 gschem/src/x_autonumber.c:1298
+msgid "Whole hierarchy"
+msgstr "Teljes hierarchia"
+
+#: gschem/src/x_autonumber.c:1300
+msgid "Overwrite existing numbers"
+msgstr "Meglevő számok felülírása"
+
+#: gschem/src/x_autonumber.c:1305
+msgid "<b>Options</b>"
+msgstr "<b>Opciók</b>"
+
+#: gschem/src/x_autonumber.c:1327
+msgid "Starting number:"
+msgstr "Kezdőszám:"
+
+#: gschem/src/x_autonumber.c:1334
+msgid "Sort order:"
+msgstr "Rendezési sorrend:"
+
+#: gschem/src/x_autonumber.c:1355
+msgid "Remove numbers"
+msgstr "Számok törlése"
+
+#: gschem/src/x_autonumber.c:1359
+msgid "Automatic slotting"
+msgstr "Automatikus slot-kiválasztás"
+
+#: gschem/src/x_color.c:94 gschem/src/x_color.c:103
+#, c-format
+msgid "Could not allocate the color %s!\n"
+msgstr "Nem találom a(z) %s színt!\n"
+
+#: gschem/src/x_color.c:94
+msgid "black"
+msgstr "fekete"
+
+#: gschem/src/x_color.c:103
+msgid "white"
+msgstr "fehér"
+
+#: gschem/src/x_color.c:125
+#, c-format
+msgid "Could not allocate display color %i!\n"
+msgstr ""
+
+#: gschem/src/x_color.c:147
+#, c-format
+msgid "Could not allocate outline color %i!\n"
+msgstr ""
+
+#: gschem/src/x_color.c:164 gschem/src/x_color.c:181 gschem/src/x_color.c:197
+#, c-format
+msgid "Tried to get an invalid color: %d\n"
+msgstr ""
+
+#: gschem/src/x_color.c:214
+#, c-format
+msgid "Tried to get an invalid outline color: %d\n"
+msgstr ""
+
+#: gschem/src/x_compselect.c:1036
+msgid "Filter:"
+msgstr "Szűrő:"
+
+#: gschem/src/x_compselect.c:1139 gschem/src/x_dialog.c:3759
+#: gschem/src/x_multiattrib.c:1787
+msgid "Name"
+msgstr "Név"
+
+#: gschem/src/x_compselect.c:1148 gschem/src/x_multiattrib.c:1811
+msgid "Value"
+msgstr "Érték"
+
+#: gschem/src/x_compselect.c:1187
+msgid "Default behavior - reference component"
+msgstr "Alapviselkedés - mutató az alkatrészre"
+
+#: gschem/src/x_compselect.c:1190
+msgid "Embed component in schematic"
+msgstr "Alkatrész beágyazása a rajzba"
+
+#: gschem/src/x_compselect.c:1193
+msgid "Include component as individual objects"
+msgstr "Alkatrész hozzáadása mint független objektum"
+
+#: gschem/src/x_compselect.c:1350
+msgid "Select Component..."
+msgstr "Alkatrész kiválasztása..."
+
+#: gschem/src/x_compselect.c:1373
+msgid "In Use"
+msgstr "Használatban"
+
+#: gschem/src/x_compselect.c:1377
+msgid "Libraries"
+msgstr "Könyvtárak"
+
+#: gschem/src/x_compselect.c:1386 gschem/src/x_fileselect.c:122
+msgid "Preview"
+msgstr "Előnézet"
+
+#: gschem/src/x_compselect.c:1414
+msgid "Attributes"
+msgstr "Attribútumok"
+
+#: gschem/src/x_dialog.c:175
+msgid "Text Entry..."
+msgstr ""
+
+#: gschem/src/x_dialog.c:206
+msgid ""
+"Enter text, click apply,\n"
+"move cursor into window, click to place text.\n"
+"Middle button to rotate while placing."
+msgstr ""
+"Írd be a szöveget, kattints az \"Alkalmaz\"-ra,\n"
+"mozgasd az egérmutatót a rajz fölé, kattints\n"
+"a szöveg lerakásához.\n"
+"Elforgatás: középső egérgomb."
+
+#: gschem/src/x_dialog.c:295
+msgid "Lower Left"
+msgstr "Bal alsó"
+
+#: gschem/src/x_dialog.c:306
+msgid "Middle Left"
+msgstr "Bal közép"
+
+#: gschem/src/x_dialog.c:317
+msgid "Upper Left"
+msgstr "Bal felső"
+
+#: gschem/src/x_dialog.c:328
+msgid "Lower Middle"
+msgstr "Közép alsó"
+
+#: gschem/src/x_dialog.c:339
+msgid "Middle Middle"
+msgstr "Közép közép"
+
+#: gschem/src/x_dialog.c:350
+msgid "Upper Middle"
+msgstr "Közép felső"
+
+#: gschem/src/x_dialog.c:361
+msgid "Lower Right"
+msgstr "Jobb alsó"
+
+#: gschem/src/x_dialog.c:372
+msgid "Middle Right"
+msgstr "Jobb közép"
+
+#: gschem/src/x_dialog.c:383
+msgid "Upper Right"
+msgstr "Jobb felső"
+
+#: gschem/src/x_dialog.c:497
+msgid "Edit Text Properties"
+msgstr "Szövegtulajdonságok szerkesztése"
+
+#: gschem/src/x_dialog.c:531
+msgid "<b>Text Content</b>"
+msgstr ""
+
+#: gschem/src/x_dialog.c:563
+msgid "<b>Text Properties</b>"
+msgstr "<b>Szöveg tulajdonságai</b>"
+
+#: gschem/src/x_dialog.c:578
+msgid "Color:"
+msgstr "Szín:"
+
+#: gschem/src/x_dialog.c:585
+msgid "Size:"
+msgstr "Méret:"
+
+#: gschem/src/x_dialog.c:594
+msgid "Alignment:"
+msgstr "Igazítás:"
+
+#: gschem/src/x_dialog.c:648
+msgid "Solid"
+msgstr "Folytonos"
+
+#: gschem/src/x_dialog.c:649
+msgid "Dotted"
+msgstr "Pontvonal"
+
+#: gschem/src/x_dialog.c:650
+msgid "Dashed"
+msgstr "Szaggatott"
+
+#: gschem/src/x_dialog.c:651
+msgid "Center"
+msgstr "Középre"
+
+#: gschem/src/x_dialog.c:652
+msgid "Phantom"
+msgstr ""
+
+#: gschem/src/x_dialog.c:653 gschem/src/x_dialog.c:750
+#: gschem/src/x_dialog.c:759 gschem/src/x_dialog.c:768
+#: gschem/src/x_dialog.c:869 gschem/src/x_dialog.c:871
+#: gschem/src/x_dialog.c:873 gschem/src/x_dialog.c:1101
+#: gschem/src/x_dialog.c:1204 gschem/src/x_dialog.c:1213
+#: gschem/src/x_dialog.c:1222 gschem/src/x_dialog.c:1231
+#: gschem/src/x_dialog.c:1240 gschem/src/x_dialog.c:1353
+#: gschem/src/x_dialog.c:1355 gschem/src/x_dialog.c:1357
+#: gschem/src/x_dialog.c:1359 gschem/src/x_dialog.c:1361
+msgid "*unchanged*"
+msgstr "*változatlan*"
+
+#: gschem/src/x_dialog.c:979
+msgid "Edit Line Width & Type"
+msgstr "Vonalvastagság és típus szerkesztése"
+
+#: gschem/src/x_dialog.c:1018 gschem/src/x_print.c:307
+msgid "Type:"
+msgstr "Típus:"
+
+#: gschem/src/x_dialog.c:1022
+msgid "Width:"
+msgstr "Vastagság:"
+
+#: gschem/src/x_dialog.c:1026
+msgid "Dash Length:"
+msgstr "Vonalszakasz hossza:"
+
+#: gschem/src/x_dialog.c:1030
+msgid "Dash Space:"
+msgstr "Kihagyás hossza:"
+
+#: gschem/src/x_dialog.c:1097
+msgid "Hollow"
+msgstr "Üres"
+
+#: gschem/src/x_dialog.c:1098
+msgid "Filled"
+msgstr "Kitöltött"
+
+#: gschem/src/x_dialog.c:1099
+msgid "Mesh"
+msgstr "Háló"
+
+#: gschem/src/x_dialog.c:1100
+msgid "Hatch"
+msgstr "Sraffozott"
+
+#: gschem/src/x_dialog.c:1471
+msgid "Edit Fill Type"
+msgstr "Kitöltés szerkesztése"
+
+#: gschem/src/x_dialog.c:1509
+msgid "Fill Type:"
+msgstr "Kitöltés típusa:"
+
+#: gschem/src/x_dialog.c:1513
+msgid "Line Width:"
+msgstr "Vonalvastagság:"
+
+#: gschem/src/x_dialog.c:1517
+msgid "Angle 1:"
+msgstr ""
+
+#: gschem/src/x_dialog.c:1521
+msgid "Pitch 1:"
+msgstr ""
+
+#: gschem/src/x_dialog.c:1525
+msgid "Angle 2:"
+msgstr ""
+
+#: gschem/src/x_dialog.c:1529
+msgid "Pitch 2:"
+msgstr ""
+
+#: gschem/src/x_dialog.c:1658
+msgid "Arc Params"
+msgstr "Ívparaméterek"
+
+#: gschem/src/x_dialog.c:1698
+msgid "Arc Radius:"
+msgstr ""
+
+#: gschem/src/x_dialog.c:1706
+msgid "Start Angle:"
+msgstr "Kezdőszög:"
+
+#: gschem/src/x_dialog.c:1714
+msgid "Degrees of Sweep:"
+msgstr "Ív szöge:"
+
+#: gschem/src/x_dialog.c:1831
+msgid ""
+"Offset to translate?\n"
+"(0 for origin)"
+msgstr ""
+"Offszet az eltoláshoz?\n"
+"(0 az origóhoz)"
+
+#: gschem/src/x_dialog.c:1899
+msgid "Text Size"
+msgstr "Betűméret"
+
+#: gschem/src/x_dialog.c:1929
+msgid "Enter new text size:"
+msgstr "Új betűméret:"
+
+#: gschem/src/x_dialog.c:2005
+msgid "Snap Size"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2035
+msgid "Enter new snap grid spacing:"
+msgstr "Új hálóméret:"
+
+#: gschem/src/x_dialog.c:2112
+msgid "Edit slot number"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2143
+msgid "Edit slot number:"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2204
+msgid "About..."
+msgstr "Névjegy…"
+
+#: gschem/src/x_dialog.c:2224
+msgid "<b>gEDA: GPL Electronic Design Automation</b>"
+msgstr "<b>gEDA: GPL Electronic Design Automation</b>"
+
+#: gschem/src/x_dialog.c:2228
+#, c-format
+msgid "<b>gschem version %s%s.%s</b>"
+msgstr "<b>gschem verzió %s%s.%s</b>"
+
+#: gschem/src/x_dialog.c:2236
+msgid ""
+"Written by:\n"
+"Ales Hvezda\n"
+"ahvezda@geda.seul.org\n"
+"And many others (See AUTHORS file)"
+msgstr ""
+"Írta:\n"
+"Ales Hvezda\n"
+"ahvezda@geda.seul.org\n"
+"és sokan mások (lásd az AUTHORS fájlban)"
+
+#: gschem/src/x_dialog.c:2299
+msgid "Coords"
+msgstr "Koordináták"
+
+#: gschem/src/x_dialog.c:2320
+msgid "Screen"
+msgstr "Képernyő"
+
+#: gschem/src/x_dialog.c:2329
+msgid "World"
+msgstr "Világ"
+
+#: gschem/src/x_dialog.c:2368
+msgid "Background"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2374
+msgid "Net endpoint"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2377
+msgid "Graphic"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2386
+msgid "Logic bubble"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2389
+msgid "Grid point"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2392
+msgid "Detached attribute"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2395 gschem/src/x_window.c:382
+msgid "Text"
+msgstr "Szöveg"
+
+#: gschem/src/x_dialog.c:2401
+msgid "Selection"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2404
+msgid "Bounding box"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2407
+msgid "Zoom box"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2416
+msgid "Output background"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2419
+msgid "Net junction"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2422
+msgid "Mesh grid major"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2425
+msgid "Mesh grid minor"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2428
+msgid "Unknown"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2574
+#, c-format
+msgid "ERROR: NULL object in color_edit_dialog_apply!\n"
+msgstr ""
+
+#: gschem/src/x_dialog.c:2618
+msgid "Color Edit"
+msgstr "Szín szerkesztése"
+
+#: gschem/src/x_dialog.c:2649
+msgid "Object color:"
+msgstr "Objektum színe:"
+
+#: gschem/src/x_dialog.c:2707
+msgid "Hotkeys"
+msgstr "Gyorsbillentyűk"
+
+#: gschem/src/x_dialog.c:2771
+msgid "Function"
+msgstr "Funkció"
+
+#: gschem/src/x_dialog.c:2778
+msgid "Keystroke(s)"
+msgstr ""
+
+#: gschem/src/x_dialog.c:3087
+msgid "Find Text"
+msgstr "Szöveg keresése"
+
+#: gschem/src/x_dialog.c:3118
+msgid "Text to find:"
+msgstr "Keresendő szöveg:"
+
+#: gschem/src/x_dialog.c:3128
+msgid "descend into hierarchy"
+msgstr ""
+
+#: gschem/src/x_dialog.c:3193
+msgid "Hide Text"
+msgstr "Szöveg elrejtése"
+
+#: gschem/src/x_dialog.c:3224
+msgid "Hide text starting with:"
+msgstr "A következővel kezdődő szöveg elrejtése:"
+
+#: gschem/src/x_dialog.c:3293
+msgid "Show Text"
+msgstr "Szöveg mutatása"
+
+#: gschem/src/x_dialog.c:3324
+msgid "Show text starting with:"
+msgstr "A következővel kezdődő szöveg mutatása:"
+
+#: gschem/src/x_dialog.c:3781
+msgid "S_elect the schematics you want to save:"
+msgstr "Válaszd ki a menteni kívánt rajzot:"
+
+#: gschem/src/x_dialog.c:3875
+#, c-format
+msgid "Save the changes to schematic \"%s\" before closing?"
+msgstr "Elmentsem a(z) \"%s\" rajz változásait bezárás előtt?"
+
+#: gschem/src/x_dialog.c:3881
+#, c-format
+msgid ""
+"There are %d schematics with unsaved changes. Save changes before closing?"
+msgstr ""
+"%d megváltoztatott rajz van még megnyitva. Elmentsem őket kilépés előtt?"
+
+#: gschem/src/x_dialog.c:3910
+msgid "If you don't save, all your changes will be permanently lost."
+msgstr "Ha nem menti, akkor az összes változás véglegesen elveszik."
+
+#: gschem/src/x_dialog.c:3930
+msgid "_Close without saving"
+msgstr "_Bezárás mentés nélkül"
+
+#: gschem/src/x_dialog.c:4266
+#, c-format
+msgid ""
+"<span weight=\"bold\" size=\"larger\">The input attribute \"%s\" is invalid\n"
+"Please correct in order to continue</span>\n"
+"\n"
+"The name and value must be non-empty.\n"
+"The name cannot end with a space.\n"
+"The value cannot start with a space."
+msgstr ""
+
+#: gschem/src/x_dialog.c:4268
+msgid "Invalid Attribute"
+msgstr "Hibás attribútum"
+
+#: gschem/src/x_dialog.c:4304
+msgid "Pin type"
+msgstr ""
+
+#: gschem/src/x_dialog.c:4328
+msgid "Net pin"
+msgstr ""
+
+#: gschem/src/x_dialog.c:4330
+msgid "Bus pin (graphical)"
+msgstr ""
+
+#: gschem/src/x_fileselect.c:42
+msgid "Schematics"
+msgstr "rajzok"
+
+#: gschem/src/x_fileselect.c:47
+msgid "Symbols"
+msgstr "szimbólumok"
+
+#: gschem/src/x_fileselect.c:52
+msgid "Schematics and symbols"
+msgstr "rajzok és szimbólumok"
+
+#: gschem/src/x_fileselect.c:58
+msgid "All files"
+msgstr "Összes fájl"
+
+#: gschem/src/x_fileselect.c:171
+msgid "Open..."
+msgstr "Megnyitás…"
+
+#: gschem/src/x_fileselect.c:231
+msgid "Save as..."
+msgstr "Mentés másként..."
+
+#: gschem/src/x_fileselect.c:284
+#, c-format
+msgid ""
+"The selected file `%s' already exists.\n"
+"\n"
+"Would you like to overwrite it?"
+msgstr ""
+"A kiválasztott fájl - '%s' - már létezik.\n"
+"Felül szeretnéd írni?"
+
+#: gschem/src/x_fileselect.c:287
+msgid "Overwrite file?"
+msgstr "Felülírod a fájlt?"
+
+#: gschem/src/x_fileselect.c:289
+msgid "Save cancelled on user request\n"
+msgstr "A mentés a felhasználó kérésének megfelelően megszakítva.\n"
+
+#: gschem/src/x_image.c:176
+msgid "Encapsulated Postscript"
+msgstr "Beágyazott Postscript (EPS)"
+
+#: gschem/src/x_image.c:296
+#, c-format
+msgid "x_image_lowlevel: Unable to write eps file %s.\n"
+msgstr ""
+
+#: gschem/src/x_image.c:374
+#, c-format
+msgid "x_image_lowlevel: Unable to write %s file %s.\n"
+msgstr ""
+
+#: gschem/src/x_image.c:384
+#, c-format
+msgid ""
+"There was the following error when saving image with type %s to filename:\n"
+"%s\n"
+"\n"
+"%s.\n"
+msgstr ""
+"A következő hiba lépett fel a %s típusú kép mentésekor az alábbi "
+"fájlnévvel:\n"
+"%s\n"
+"\n"
+"%s\n"
+
+#: gschem/src/x_image.c:403
+#, c-format
+msgid "Wrote color image to [%s] [%d x %d]\n"
+msgstr "Színes kép kiírva: [%s] [%d x %d]\n"
+
+#: gschem/src/x_image.c:405
+#, c-format
+msgid "Wrote black and white image to [%s] [%d x %d]\n"
+msgstr "Fekete-fehér kép kiírva: [%s] [%d x %d]\n"
+
+#: gschem/src/x_image.c:413
+msgid "x_image_lowlevel: Unable to get pixbuf from gschem's window.\n"
+msgstr ""
+
+#: gschem/src/x_image.c:458
+msgid "Width x Height"
+msgstr "szélesség x magasság"
+
+#: gschem/src/x_image.c:474
+msgid "Image type"
+msgstr "Képtípus"
+
+#: gschem/src/x_image.c:495
+msgid "Write image..."
+msgstr "Képfájl írása..."
+
+#: gschem/src/x_log.c:188
+msgid "** Invalid UTF-8 in log message. See stderr or gschem.log.\n"
+msgstr ""
+"** hibás UTF-8 a log üzenetben. Nézd meg az stderr-t vagy a gschem.log-ot.\n"
+
+#: gschem/src/x_log.c:256
+msgid "Status"
+msgstr "Állapot."
+
+#: gschem/src/x_menus.c:36
+msgid "/Add Net"
+msgstr "/Összeköttetés hozzáadása"
+
+#: gschem/src/x_menus.c:37
+msgid "/Add Attribute..."
+msgstr "/Attribútum hozzáadása"
+
+#: gschem/src/x_menus.c:38
+msgid "/Add Component..."
+msgstr "/Alkatrész hozzáadása"
+
+#: gschem/src/x_menus.c:39
+msgid "/Add Bus"
+msgstr "/Busz hozzáadása"
+
+#: gschem/src/x_menus.c:40
+msgid "/Add Text"
+msgstr "/Szöveg hozzáadása"
+
+#: gschem/src/x_menus.c:42
+msgid "/Zoom In"
+msgstr "/Nagyítás"
+
+#: gschem/src/x_menus.c:43
+msgid "/Zoom Out"
+msgstr "/Kicsinyítés"
+
+#: gschem/src/x_menus.c:44
+msgid "/Zoom Box"
+msgstr ""
+
+#: gschem/src/x_menus.c:45
+msgid "/Zoom Extents"
+msgstr "/Teljes rajz"
+
+#: gschem/src/x_menus.c:47
+msgid "/Select"
+msgstr "/Kiválasztás"
+
+#: gschem/src/x_menus.c:48
+msgid "/Edit..."
+msgstr "/Szerkesztés"
+
+#: gschem/src/x_menus.c:49
+msgid "/Edit pin type..."
+msgstr ""
+
+#: gschem/src/x_menus.c:50
+msgid "/Copy"
+msgstr "/Másolás"
+
+#: gschem/src/x_menus.c:51
+msgid "/Move"
+msgstr "/Mozgatás"
+
+#: gschem/src/x_menus.c:52
+msgid "/Delete"
+msgstr "/Törlés"
+
+#: gschem/src/x_menus.c:55
+msgid "/Down Schematic"
+msgstr "Rajz szerkesztése"
+
+#: gschem/src/x_menus.c:56
+msgid "/Down Symbol"
+msgstr "/Szimbólum szerkesztése"
+
+#: gschem/src/x_menus.c:57
+msgid "/Up"
+msgstr "/Fel"
+
+#: gschem/src/x_menus.c:319
+#, c-format
+msgid "Tried to set the sensitivity on non-existent menu item '%s'\n"
+msgstr ""
+
+#: gschem/src/x_menus.c:343
+msgid "Popup_menu_item_factory doesn't exist!\n"
+msgstr ""
+
+#: gschem/src/x_menus.c:356
+msgid "Tried to set the sensitivity on a non-existent popup menu_item\n"
+msgstr ""
+
+#: gschem/src/x_menus.c:436
+#, c-format
+msgid "Couldn't open file %s\n"
+msgstr "Nem tudom megnyitni a(z) %s fájlt.\n"
+
+#: gschem/src/x_menus.c:493
+msgid "Clear"
+msgstr "Törlés"
+
+#: gschem/src/x_multiattrib.c:913
+msgid "Attributes with empty name are not allowed. Please set a name."
+msgstr ""
+"Név nélküli attribútumok nem használhatóak. Kérlek adj nevet az "
+"attribútumnak!"
+
+#: gschem/src/x_multiattrib.c:1461
+msgid "Show Value only"
+msgstr "Csak az érték mutatása"
+
+#: gschem/src/x_multiattrib.c:1463
+msgid "Show Name only"
+msgstr "Csak a név mutatása"
+
+#: gschem/src/x_multiattrib.c:1491
+msgid "Promote"
+msgstr ""
+
+#: gschem/src/x_multiattrib.c:1495
+msgid "Duplicate"
+msgstr "Megkettőzés"
+
+#: gschem/src/x_multiattrib.c:1713
+msgid "Edit Attributes"
+msgstr "Attribútumok szerkesztése"
+
+#: gschem/src/x_multiattrib.c:1831
+msgid "Vis?"
+msgstr "Látható?"
+
+#: gschem/src/x_multiattrib.c:1849
+msgid "N"
+msgstr "N"
+
+#: gschem/src/x_multiattrib.c:1867
+msgid "V"
+msgstr "É"
+
+#: gschem/src/x_multiattrib.c:1889
+msgid "Show inherited attributes"
+msgstr ""
+
+#: gschem/src/x_multiattrib.c:1905
+msgid "Add Attribute"
+msgstr "Attribútum hozzáadása"
+
+#: gschem/src/x_pagesel.c:252
+msgid "New Page"
+msgstr "Új lap"
+
+#: gschem/src/x_pagesel.c:253
+msgid "Open Page..."
+msgstr "Lap megnyitása"
+
+#: gschem/src/x_pagesel.c:255
+msgid "Save Page"
+msgstr "Mentés"
+
+#: gschem/src/x_pagesel.c:256
+msgid "Close Page"
+msgstr "Lap bezárása"
+
+#: gschem/src/x_pagesel.c:257
+msgid "Discard Page"
+msgstr "Rajz eldobása"
+
+#: gschem/src/x_pagesel.c:376
+msgid "Page Manager"
+msgstr "Oldalkiválasztó"
+
+#: gschem/src/x_pagesel.c:432
+msgid "Filename"
+msgstr "Fájlnév"
+
+#: gschem/src/x_pagesel.c:448
+msgid "Changed"
+msgstr "Módosítva"
+
+#: gschem/src/x_pagesel.c:468
+msgid "Right click on the filename for more options..."
+msgstr "Kattints a jobb egérgombbal a fájlnével a további opciókért..."
+
+#: gschem/src/x_preview.c:234
+msgid "Preview Buffer"
+msgstr ""
+
+#: gschem/src/x_print.c:84
+msgid "Select PostScript Filename..."
+msgstr "PostScript fájlnév kiválasztása..."
+
+#: gschem/src/x_print.c:164
+msgid "Extents with margins"
+msgstr "Körvonal margóval"
+
+#: gschem/src/x_print.c:170
+msgid "Extents no margins"
+msgstr "Körvonal margó nélkül"
+
+#: gschem/src/x_print.c:176
+msgid "Current Window"
+msgstr "Jelenlegi nézet"
+
+#: gschem/src/x_print.c:210
+msgid "Landscape"
+msgstr "Fekvő"
+
+#: gschem/src/x_print.c:216
+msgid "Portrait"
+msgstr "Álló"
+
+#: gschem/src/x_print.c:276
+msgid "Print..."
+msgstr "Nyomtatás..."
+
+#: gschem/src/x_print.c:284
+msgid "Settings"
+msgstr "Beállitások"
+
+#: gschem/src/x_print.c:296
+msgid "Output paper size:"
+msgstr "Papírméret:"
+
+#: gschem/src/x_print.c:318
+msgid "Orientation:"
+msgstr "Tájolás:"
+
+#: gschem/src/x_print.c:330
+msgid "Destination"
+msgstr "Cél"
+
+#: gschem/src/x_print.c:343
+msgid "File:"
+msgstr "Fájl:"
+
+#: gschem/src/x_print.c:373
+msgid "Command:"
+msgstr "Parancs:"
+
+#: gschem/src/x_print.c:741
+msgid "No print destination specified\n"
+msgstr "Nincs megadva a nyomtatási cél!\n"
+
+#: gschem/src/x_print.c:748
+#, c-format
+msgid "Cannot print current schematic to [%s]\n"
+msgstr "Nem tudom [%s]-ba nyomtatni a rajzot\n"
+
+#: gschem/src/x_print.c:757
+#, c-format
+msgid ""
+"Error printing to file '%s'\n"
+"Check the log window for more information"
+msgstr ""
+"Hiba a(z) '%s' fájlba történő nyomtatás közben.\n"
+"Olvasd el a log ablakban leírtakat a további információkért."
+
+#: gschem/src/x_print.c:764
+#, c-format
+msgid "Printed current schematic to [%s]\n"
+msgstr "A rajz kinyomtatva a(z) [%s] fájlba.\n"
+
+#: gschem/src/x_window.c:81
+#, c-format
+msgid "Couldn't allocate gc\n"
+msgstr "Nem találom a gc-t.\n"
+
+#: gschem/src/x_window.c:316
+msgid "New"
+msgstr "Új"
+
+#: gschem/src/x_window.c:317
+msgid "New file"
+msgstr "Új fájl"
+
+#: gschem/src/x_window.c:323
+msgid "Open"
+msgstr "Megnyitás"
+
+#: gschem/src/x_window.c:324
+msgid "Open file..."
+msgstr "Fájl megnyitása…"
+
+#: gschem/src/x_window.c:330
+msgid "Save"
+msgstr "Mentés"
+
+#: gschem/src/x_window.c:331
+msgid "Save file"
+msgstr "Fájl mentése"
+
+#: gschem/src/x_window.c:338
+msgid "Undo"
+msgstr "Visszavonás"
+
+#: gschem/src/x_window.c:339
+msgid "Undo last operation"
+msgstr "Utolsó művelet visszavonása"
+
+#: gschem/src/x_window.c:345
+msgid "Redo"
+msgstr "Újra"
+
+#: gschem/src/x_window.c:346
+msgid "Redo last undo"
+msgstr "Utolsó visszavont művelet újra"
+
+#: gschem/src/x_window.c:355
+msgid ""
+"Add component...\n"
+"Select library and component from list, move the mouse into main window, "
+"click to place\n"
+"Right mouse button to cancel"
+msgstr ""
+"Alkatrész hozzáadása...\n"
+"Válaszd ki a könyvtárt és abból az alkatrészt, mozgasd az egérmutatót a rajz "
+"fölé, lerakás bal klikk."
+
+#: gschem/src/x_window.c:365
+msgid ""
+"Add nets mode\n"
+"Right mouse button to cancel"
+msgstr "Összeköttetések hozzáadása mód"
+
+#: gschem/src/x_window.c:375
+msgid ""
+"Add buses mode\n"
+"Right mouse button to cancel"
+msgstr "Busz hozzáadása mód"
+
+#: gschem/src/x_window.c:383
+msgid "Add Text..."
+msgstr "Szöveg hozzáadása"
+
+#: gschem/src/x_window.c:393
+msgid "Select"
+msgstr "Kiválasztás"
+
+#: gschem/src/x_window.c:394
+msgid "Select mode"
+msgstr "Kiválasztás mód"
+
+#: gschem/src/x_window.c:481
+msgid "Pick"
+msgstr "Kijelöl"
+
+#: gschem/src/x_window.c:497
+msgid "Repeat/none"
+msgstr "Ismétlés/semmi"
+
+#: gschem/src/x_window.c:507
+msgid "Menu/Cancel"
+msgstr "Menü/mégsem"
+
+#: gschem/src/x_window.c:509
+msgid "Pan/Cancel"
+msgstr "Középre/mégsem"
+
+#: gschem/src/x_window.c:731
+#, c-format
+msgid "Loading schematic [%s]\n"
+msgstr "[%s] rajz betöltése\n"
+
+#: gschem/src/x_window.c:743
+msgid "Failed to load file"
+msgstr "A fájl betöltése nem sikerült."
+
+#: gschem/src/x_window.c:752
+#, c-format
+msgid "New file [%s]\n"
+msgstr "Új fájl: [%s]\n"
+
+#: gschem/src/x_window.c:857
+#, c-format
+msgid "Could NOT save page [%s]\n"
+msgstr "A [%s] rajz mentése nem sikerült.\n"
+
+#: gschem/src/x_window.c:858
+msgid "Error while trying to save"
+msgstr "Hiba mentés közben"
+
+#: gschem/src/x_window.c:867
+#, c-format
+msgid "Saved as [%s]\n"
+msgstr "[%s]-ként elmentve.\n"
+
+#: gschem/src/x_window.c:869
+#, c-format
+msgid "Saved [%s]\n"
+msgstr "[%s] elmentve.\n"
+
+#: gschem/src/x_window.c:871
+msgid "Saved"
+msgstr "Elmentve"
+
+#: gschem/src/x_window.c:945
+#, c-format
+msgid "Discarding page [%s]\n"
+msgstr "A(z) [%s] rajz eldobása\n"
+
+#: gschem/src/x_window.c:945
+#, c-format
+msgid "Closing [%s]\n"
+msgstr "[%s] bezárása\n"
+
+#: gschem/data/geda-gschem.desktop.in.h:3
+msgid "gEDA Schematic Editor"
+msgstr "gEDA kapcsolásirajz-szerkesztő"
+
+#: gschem/data/geda-gschem.desktop.in.h:4
+msgid "Create and edit electrical schematics and symbols with gschem"
+msgstr ""
+"Elektromos kapcsolási rajzok és szimbólumok készítése és szerkesztése a "
+"gschemmel"
+
+#~ msgid "Save Page As..."
+#~ msgstr "Mentés másképp"
+
+#~ msgid "Revert Page"
+#~ msgstr "Újratöltés"
+
+#~ msgid "Recent files"
+#~ msgstr "Legutóbbi fájlok"
+
+#~ msgid "Close Window"
+#~ msgstr "Ablak bezárása"
+
+#~ msgid "About gschem"
+#~ msgstr "Névjegy"
+
+#~ msgid "Manual"
+#~ msgstr "Kézikönyv"
+
+#, fuzzy
+#~ msgid "gEDA: GPL Electronic Design Automation"
+#~ msgstr "<b>gEDA: GPL Electronic Design Automation</b>"

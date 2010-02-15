@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 1998-2008 Ales Hvezda
- * Copyright (C) 1998-2008 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2010 Ales Hvezda
+ * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -159,7 +159,6 @@ static PangoFontMetrics *setup_pango_return_metrics (GSCHEM_TOPLEVEL *w_current,
   PangoAttrList *attrs;
   cairo_font_options_t *options;
   double font_size_pt;
-  char *font_string;
   char *unescaped;
 
   context = pango_layout_get_context (layout);
@@ -174,9 +173,9 @@ static PangoFontMetrics *setup_pango_return_metrics (GSCHEM_TOPLEVEL *w_current,
   pango_cairo_context_set_resolution (context, 1000. * scale_factor);
   font_size_pt = o_text_get_font_size_in_points (w_current->toplevel,
                                                  o_current);
-  font_string = g_strdup_printf ("%s %f\n", FONT_NAME, font_size_pt);
-  desc = pango_font_description_from_string (font_string);
-  g_free (font_string);
+
+  desc = pango_font_description_from_string (FONT_NAME);
+  pango_font_description_set_size (desc, (double)PANGO_SCALE * font_size_pt);
 
   pango_layout_set_font_description (layout, desc);
   font_metrics = pango_context_get_metrics (context, desc, NULL);
@@ -670,8 +669,9 @@ void o_text_edit_end(GSCHEM_TOPLEVEL *w_current, char *string, int len, int text
         if (numselect == 1 && string) {
           o_text_set_string (w_current->toplevel, object, string);
 	  /* handle slot= attribute, it's a special case */
-	  if (g_ascii_strncasecmp (string, "slot=", 5) == 0) {
-	    o_slot_end (w_current, string, strlen (string));
+	  if (object->attached_to != NULL &&
+	      g_ascii_strncasecmp (string, "slot=", 5) == 0) {
+	    o_slot_end (w_current, object->attached_to, string);
 	  }
         }
         o_text_recreate(toplevel, object);
@@ -718,8 +718,9 @@ void o_text_change(GSCHEM_TOPLEVEL *w_current, OBJECT *object, char *string,
   o_invalidate (w_current, object);
 
   /* handle slot= attribute, it's a special case */
-  if (g_ascii_strncasecmp (string, "slot=", 5) == 0) {
-    o_slot_end (w_current, string, strlen (string));
+  if (object->attached_to != NULL &&
+      g_ascii_strncasecmp (string, "slot=", 5) == 0) {
+    o_slot_end (w_current, object->attached_to, string);
   }
 
   toplevel->page_current->CHANGED = 1;

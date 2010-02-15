@@ -1,3 +1,408 @@
+commit 11921dc18209ed4ea12288114634bb94a5b9b8a9
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 21:26:37 2010 -0500
+
+    Updated man page dates
+
+commit bd34cfde2450790b357e574281f9562adce64303
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 17:09:45 2010 -0500
+
+    Updated copyright text/header in most source files.
+    
+    Updated all copyright text dates that should be updated for the new year.
+    Fixed a bunch of GNU text typos (these should have been either
+    GPL or gEDA).  Removed some $Id$ tags which are no longer used/needed.
+    Fixed a few file header that were just plain incorrect.
+
+commit 93b0370c433f5eb6716ce537288803df4ff99549
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 09:01:16 2010 -0500
+
+    First set of changes done by make update-po (ran by prelim make distcheck)
+
+commit dcfcb835d5dec2c0ec71526188bbd6c1b76a94ac
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 14 13:03:47 2010 +0000
+
+    Import translations from Launchpad
+
+commit fae9fef150f96412b592817e98d09a2c8300fbfc
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 13 14:15:40 2010 +0000
+
+    gschem/po: Update some fuzzy strings in the Dutch translation
+    
+    These changes relate to menu-accelerators, so I was able to take
+    an educated guess at the correct strings.
+
+commit c8af8579d460fdbf9591133c7e30556ce77ba329
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 13 12:57:57 2010 +0000
+
+    gschem/po: Merge changes to Dutch translation
+    
+    Merges changes sent by Bert Timmerman.
+    
+    These didn't apply cleanly, so I've had to merge them manually.
+    
+    This commit introduces a number of fuzzy translations which should
+    be fixed before release. They are mostly relateed to menu accelerators,
+    so could probably be un-fuzzied without too much risk.
+
+commit 20fd55710ff9d4529f2ce4703559d39e2fa6abd9
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 12 18:23:01 2010 +0000
+
+    gschem: Fix hard-coded menu names to match new accelerators
+    
+    Fixes breakage caused by changing the root menu names to include
+    accelerators.
+    (cherry picked from commit 11dd19eedb4fedf06858ec7af1f13371b69441f9)
+
+commit 4e91bc5e52699639cf78a9112b0422d2763a6346
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 12 18:00:44 2010 +0000
+
+    Update translations from Launchpad
+
+commit 9a21d1e7e67cccd3d8f6285d1582a1933cc48fe6
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Fri Feb 12 11:25:40 2010 +0000
+
+    gschem: update polish translation
+    
+    I did most of the previous translation in Launchpad but now I'm using
+    git so it's more handy for me to submit a patch.
+
+commit 7ebe889c777237eed359da7687202fa1f23be537
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Fri Feb 12 10:41:22 2010 +0100
+
+    gschem: updated german translation
+
+commit d8b5d756ae661bb15dc4e24f470e36d833442513
+Author: Carlos Nieves Onega <cnieves@iespana.es>
+Date:   Thu Feb 11 18:56:39 2010 +0100
+
+    Updated spanish translation.
+
+commit bf9d3b95633bbb575e0d480561990af43569d184
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Thu Feb 11 01:45:01 2010 +0000
+
+    gschem: Update translations to reflect accelerator changes
+    
+    In this instance, I'm going to un-fuzzy the appropriate translations,
+    as I don't want to break strings which were previously translated at
+    this stage in the release process.
+    
+    For certain languages - those where it was simple, I've updated some
+    or all of the accelerator strings.
+
+commit 5e8b72937c09caf15ef791459d6086e3aaf77be6
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Thu Feb 11 01:34:37 2010 +0000
+
+    gschem: Provide accelerator mnemonics for root menus
+    
+    (cherry picked from commit e94dd5222f2267218572e81cfae9fbbdc2f70021)
+
+commit f5efae4bcb1d79abd21400e08a1bf63bcb43aa4d
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Thu Feb 11 01:34:28 2010 +0000
+
+    gschem: Allow mnemonics for root menus, such as _File, _Edit etc..
+    
+    (cherry picked from commit a800451bef4df21797df3707b672571e5441e594)
+
+commit d66d391c8ade7b7e55df3cb23b802238c92de4fa
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Thu Feb 11 01:34:20 2010 +0000
+
+    gschem: Fix update of pinnumbers after auto-renumberering slots
+    
+    Call o_slot_end() rather than o_text_set_string(), in order to
+    ensure the object's pinnumbers are updated correctly.
+    
+    NB: This patch requires the changes making o_slot_end() to take an
+    OBJECT * arguement, as the objects being updated aren't necessarily
+    selected.
+    (cherry-picked from commit 9c71110a49be8a677f7ea3eabaebf6479873c7af)
+
+commit d1a6a10c62f993e22ec4b752f803f907ad0b9a35
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Thu Feb 11 01:34:06 2010 +0000
+
+    gschem: Pass o_slot_end() an OBJECT *object parameter
+    
+    The OBJECT * parameter points to the object who's slot is being
+    updated - not the slot attribute itself.
+    
+    Previously o_slot_end() used the first object in the selection.
+    This call is used for other cases where slotting needs to be
+    updated - not all will necessarily have the object selected.
+    (cherry picked from commit 040db4675fcbd7739ad8c0dfbc82bbcf2eaff815)
+
+commit 920c90fcc90ca188cbbbbdbcbdfec4ed65e54493
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Thu Feb 11 01:33:45 2010 +0000
+
+    gschem: Remove the exit(-1) error path from o_slot_end()
+    
+    This is not a friendly way to treat the user.. g_return_if_fail() instead.
+    (cherry picked from commit d03c03949e17313a222645fc38c376b802f5fb4c)
+
+commit 2bed5dcf9424ecc238d3bba391db73fb12a170cb
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Thu Feb 11 01:33:37 2010 +0000
+
+    gschem: Remove unused "len" parameter from o_slot_end()
+    
+    (cherry picked from commit 2998c43e60e95a28df9ce7db2cd64dfaf46712b9)
+
+commit f4bda0a16f626235ada74f0b7ec5fec51e0f2c73
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Thu Feb 11 01:33:28 2010 +0000
+
+    gschem: Fix slot editing routines to not edit inherited attributes (#2949232)
+    
+    Fixes a bug where symbols without a promoted slot= attribute had their
+    non-promited slot= attribute modified. Also, a similar bug was lurking
+    in the auto-number code, which could break the auto-number slots feature
+    or cause crashes when the remove numbers feature was used on slotted
+    components without a promoted slot= attribute.
+    
+    Tidied up some variable names to make all the fixed functions consistent.
+    
+    A neater fix might have been changing the interface to s_slot_search_slot()
+    back, such that it only reports non-inherited attributes. This would
+    ideally involve renaming the function in libgeda, to (say, for example)
+    s_slot_search_attached_slot(). Since this change is intended for back-
+    port to stable-1.6 as well, I don't want to break libgeda ABI. It seems
+    unwise to change the function's behaviour without a break in API, hence
+    the solution in this patch.. to have callers to s_slot_search_slot() check
+    !o_attrib_is_inherited() on the returned attribute before editing it.
+    
+    Reported-by: John Doty <jpd@noqsi.com>
+    (cherry picked from commit b635dd1c3b9297d3f6e1487f4e2a03cc9effcf05)
+
+commit 6261b5ea22dfcff6aac6060f98dd7606b7cb4ed2
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Feb 8 16:31:00 2010 +0000
+
+    Merge translations with those exported from launchpad
+
+commit 9d6d0a0cc0cf0675a6f5f313272dcd224675ebf8
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 7 00:39:07 2010 +0000
+
+    gschem/po: A few updates to the en_GB translation
+    
+    (Actually with some changes this time!)
+
+commit 89a4b16eb855aa65480c82766a1cc559ca31ea5f
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 6 23:11:49 2010 +0000
+
+    gschem: Make update-po for changed rcstrings.c
+    
+    Updated en_GB translations for menu accelerators, as they are
+    trivial.
+    
+    Other languages still have their menu strings marked as fuzzy,
+    meaning the translations won't work (they didn't before anyway).
+    
+    I've deliberately not unmaked the strings as fuzzy, as if this
+    were done, it would be much harder for translators to see that
+    the keyboard accelerators need fixing.
+
+commit 2525daa773aa3c5713e1ff40913236256cf2e2de
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 6 23:10:52 2010 +0000
+
+    gschem: Fix rcstrings.c to relect text in menus
+    
+    This makes our menus translatable again. Looks like most cases were
+    due to adding "_" to the menu text to make _Accelerators.
+    (cherry picked from commit 0b87692907ad83635fab42a59fa4e86f464905c5)
+
+commit 431772cec853ba3344ca68865dc29441c73d6b14
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 13:09:30 2010 +0000
+
+    gschem: Import translations from Launchpad
+
+commit cd8a454298c0dc4860e4a81260a41c8d7476c2d9
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 13:34:14 2010 +0000
+
+    gschem/po: Update af.po translation (removing many bogus fuzzy translations)
+    
+    Some fixes were obvious, others were obviously wrong, so I removed them.
+
+commit 5d55f0efdbf386d672179e7b1c5c0e905029dc23
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 12:38:06 2010 +0000
+
+    gschem/po: Fix plural form header for es.po
+    
+    Looks like something accidentally mangled this header.
+    (cherry picked from commit 89ad783e3f1298ee1ea0a12d148a192c74e4d78f)
+
+commit fd66d4de4dd32b4d080a9cbd4f53f2a598269b63
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 11:08:04 2010 +0000
+
+    Update en_GB translation (actually do it this time!)
+
+commit 67f8e23339892fbcb958c2051e8fabe5345350fe
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 10:27:32 2010 +0000
+
+    Run make update-po in all */po/ directories
+
+commit abc32686e9bf42b25e0f6b0548d620436ee05da6
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 10:58:55 2010 +0000
+
+    gschem: Remove _() translatable markers from some internal strings
+    
+    Save work for the translators, as we don't really need or want to
+    translate the descriptive strings for GObject properties.
+    
+    Introduce a P_() helper as in GTK code. This means we can find the
+    potentially translatable strings at a later date.
+    (cherry picked from commit 3c64f506a6b3babc4db67a5841d5b95a2189b34c)
+
+commit c603cb9f75068837eb8f5a309f590fb3d8e5156e
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@users.sourceforge.net>
+Date:   Fri Nov 20 16:23:15 2009 +0000
+
+    Fix for some manpage issues. [2901183]
+    
+    Fixes undefined use of `l' macro, and incorrect uses of `-' character.
+    (cherry picked from commit 93dd5a941f34d1dd58cf9a57a07dec1e01ce3afe)
+
+commit 7575c114b590077a3399d28a499005625f7ae212
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 02:00:34 2010 +0000
+
+    gschem: Don't update page connectivity from o_place_rotate()  Bug #2904715
+    
+    This fixes bug #2904715, where gschem would crash if an object being
+    multi-copied contained nets, and the place-buffer was rotated (by 90
+    degrees) four times during the place operation.
+    
+    Items in the place list should never have their connectivity updated
+    on the page. (They don't belong to the page, so have no business
+    being referenced from the page, or objects on it).
+    
+    Rather than calling o_rotate_world_update() (which updates connectivity)
+    call o_glist_rotate_world() and then the scheme rotate hooks explictly.
+    
+    Rotate hook handling was split from o_rotate_world_update() into a new
+    function, o_rotate_call_hooks(). When doing this split, I took the
+    chance to remove a few pointless tests of o_current != NULL in there.
+    We know o_current isn't going to be NULL, and we already dereferenced
+    it (unchecked) a few lines above.
+    
+    As o_place_rotate() is always called from within an action - and in
+    those cases, o_rotate_world_update() would not update the undo list,
+    I have not included the conditional undo update in o_place_rotate().
+    (cherry picked from commit 16090ce2eedc014d82e96fd340ec27f9ea6b186d)
+
+commit 037651cdde1684c640d1339f699e1e45838e35e1
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Tue Jan 19 23:17:06 2010 +0000
+
+    gschem: Set font description explictly, rather than by parsing a string
+    
+    This makes the font description string robust against numeric locale
+    settings, which could cause problems if "," gets used as the decimal
+    separator in the requested font size.
+    
+    This issue caused text rendering to be broken in gschem on Win32 for
+    locales where "," was used as the decimal specifier. The underlying
+    bug (failing to override the LC_NUMERIC settings) is now fixed,
+    although it is just as well to be as robust as possible here.
+    
+    Thanks to Cesar and Bert for testing this fix.
+    
+    Tested-by: Cesar Strauss <cestrauss@gmail.com>
+    Tested-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+    (cherry picked from commit 620ee00b6211b04c75e9cadffe5547ce4ed1ca8b)
+
+commit a78d166a1b57b80ff46e2ac98a14989b8af77c3e
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Tue Jan 19 23:11:36 2010 +0000
+
+    Set the LC_NUMERIC locale to "C" rather than "POSIX"
+    
+    This value is supported on Win32 platforms, whereas "POSIX" doesn't
+    appear to have any effect.
+    
+    This is required in order to get correct postscript output in locales
+    where "," is used as the decimal point separator. It also affects the
+    font strings passed to Pango, causing broken text rendering in gschem.
+    
+    Thanks to Cesar for testing this change indeed fixes the issue.
+    
+    Tested-by: Cesar Strauss <cestrauss@gmail.com>
+    (cherry picked from commit 5d130060e694cfd3b3be177f1fae4a576728ff25)
+
+commit 9fb9761c0ae5b34670683de30f4251e24d55e652
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Nov 20 06:58:57 2009 +0000
+
+    Don't immediately redraw rubberband objects after placing
+    
+    This allows the user to see the placed (and selected) object
+    without it being overwriten by any object still attached to the
+    mouse cursor. (This made it appear that the object had not been
+    placed).
+    
+    The rubberband objects attached to the cursor are re-drawn as soon
+    as the mouse moves.
+
+commit df1a9efec9a33336723c863f7a4c9844c3c12b3c
+Author: Sergey Alyoshin <aslv@users.sourceforge.net>
+Date:   Fri Nov 20 06:58:56 2009 +0000
+
+    gschem: Updated Russian translation.
+
+commit 18fc37097a266ecdb70560524e6c161f0807d36e
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Fri Nov 20 06:58:55 2009 +0000
+
+    gschem: Fix rendering with zoomed out dashed lines. Bug #2876373
+    
+    Rather than using SCREENabs, use the screen_width function to
+    determine the on-screen size of dash elements. This clamps the
+    width at a rendereable size, so cairo does not get tripped into
+    an error state (and stop drawing other objects on the schematic).
+
+commit b98d2ea8aa5ce3dfab39ce5fa4a52c39e5a467b3
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Fri Nov 20 06:58:54 2009 +0000
+
+    updated german translation for gschem
+
+commit d5d8bf2982724c52fa66431801534a35b75a3e52
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Nov 20 06:58:53 2009 +0000
+
+    Updated the Dutch translations for gschem
+
+commit 4a952841e7aca364018a9ebd81a0c1793c371273
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Fri Nov 20 06:58:52 2009 +0000
+
+    gschem, gattrib desktop file: add trailing semicolon
+    
+    the openSUSE buildservice claims that it's necessary to add a
+    trailing semicolon to the Categories list entries.
+
 commit 3fd50335ddfe0ed7f358d46a0fba23bff25073e6
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Oct 4 21:23:05 2009 -0400

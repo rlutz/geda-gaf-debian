@@ -34,7 +34,7 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = libgeda
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/libgeda.pc.in ChangeLog INSTALL TODO
+	$(srcdir)/libgeda.pc.in ABOUT-NLS ChangeLog INSTALL TODO
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/codeset.m4 \
 	$(top_srcdir)/m4/geda-assert.m4 $(top_srcdir)/m4/geda-awk.m4 \
