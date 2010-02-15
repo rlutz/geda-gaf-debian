@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 1998-2007 Ales Hvezda
- * Copyright (C) 1998-2007 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2010 Ales Hvezda
+ * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -292,8 +292,8 @@ void gschem_cairo_stroke (GSCHEM_TOPLEVEL *w_current, int line_type, int line_en
   int width, length, space;
 
   width  = screen_width (w_current, wwidth);
-  length = SCREENabs (w_current, wlength);
-  space  = SCREENabs (w_current, wspace);
+  length = screen_width (w_current, wlength);
+  space  = screen_width (w_current, wspace);
   offset = ((width % 2) == 0) ? 0 : 0.5;
 
   cairo_set_line_width (w_current->cr, width);

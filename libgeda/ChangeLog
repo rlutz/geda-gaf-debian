@@ -1,3 +1,103 @@
+commit bd34cfde2450790b357e574281f9562adce64303
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 17:09:45 2010 -0500
+
+    Updated copyright text/header in most source files.
+    
+    Updated all copyright text dates that should be updated for the new year.
+    Fixed a bunch of GNU text typos (these should have been either
+    GPL or gEDA).  Removed some $Id$ tags which are no longer used/needed.
+    Fixed a few file header that were just plain incorrect.
+
+commit 93b0370c433f5eb6716ce537288803df4ff99549
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 09:01:16 2010 -0500
+
+    First set of changes done by make update-po (ran by prelim make distcheck)
+
+commit dcfcb835d5dec2c0ec71526188bbd6c1b76a94ac
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 14 13:03:47 2010 +0000
+
+    Import translations from Launchpad
+
+commit 4e91bc5e52699639cf78a9112b0422d2763a6346
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 12 18:00:44 2010 +0000
+
+    Update translations from Launchpad
+
+commit 6261b5ea22dfcff6aac6060f98dd7606b7cb4ed2
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Feb 8 16:31:00 2010 +0000
+
+    Merge translations with those exported from launchpad
+
+commit 575bca9da7f38599c4c7b06b38d186ea0ad11f00
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 6 20:14:51 2010 +0000
+
+    libgeda: Update Arabic translation from latest Launchpad
+
+commit 7600ad3e08cc1160e08be7ec3611936a9c9db06a
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 6 18:54:33 2010 +0000
+
+    libgeda: Import translations from Launchpad
+
+commit fd66d4de4dd32b4d080a9cbd4f53f2a598269b63
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 11:08:04 2010 +0000
+
+    Update en_GB translation (actually do it this time!)
+
+commit 67f8e23339892fbcb958c2051e8fabe5345350fe
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 10:27:32 2010 +0000
+
+    Run make update-po in all */po/ directories
+
+commit 1d3486d420ff603548697f4fcb553776d2cea62f
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Jan 30 15:34:47 2010 +0000
+
+    libgeda: Fix postscript output issue with unclosed paths
+    
+    Continues the fix from commit 012a3c3ddf55b0260b296476fa7d047af88818f7
+    
+    Ensure we always have a space before the "fill" command in the output
+    postscript.
+    (cherry picked from commit 39209cd034abc4059e4cda6590be158dc366e787)
+
+commit 071e2a23a844003854688e981e43bc07c22bcd6b
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Jan 27 18:17:45 2010 +0000
+
+    libgeda: Fix postscript output issue with certain paths
+    
+    Ensure we always have a space before the "stroke" command.
+    
+    Reported-by: Donald Tillman <don@till.com>
+    (cherry picked from commit 012a3c3ddf55b0260b296476fa7d047af88818f7)
+
+commit 923a59b1f9c6399f9cb280da57d5eaa6edd26f74
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Fri Nov 20 06:58:54 2009 +0000
+
+    updated german translation for libgeda
+
+commit da2510c304cc6d62dba465c396a19fc91ed7b506
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Nov 20 06:58:53 2009 +0000
+
+    Updated the Dutch translations for libgeda.
+
+commit d8740dadf4a78d240a4dc8255f72fd316579146e
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Oct 4 21:58:54 2009 -0400
+
+    Commited a few more updates to the libgeda/po files (caused by make distcheck)
+
 commit a8d42b7de50639897c888646883ce88d819d2589
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Oct 4 21:11:20 2009 -0400

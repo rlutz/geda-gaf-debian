@@ -1,3 +1,29 @@
+commit 11921dc18209ed4ea12288114634bb94a5b9b8a9
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 21:26:37 2010 -0500
+
+    Updated man page dates
+
+commit bd34cfde2450790b357e574281f9562adce64303
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 17:09:45 2010 -0500
+
+    Updated copyright text/header in most source files.
+    
+    Updated all copyright text dates that should be updated for the new year.
+    Fixed a bunch of GNU text typos (these should have been either
+    GPL or gEDA).  Removed some $Id$ tags which are no longer used/needed.
+    Fixed a few file header that were just plain incorrect.
+
+commit c603cb9f75068837eb8f5a309f590fb3d8e5156e
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@users.sourceforge.net>
+Date:   Fri Nov 20 16:23:15 2009 +0000
+
+    Fix for some manpage issues. [2901183]
+    
+    Fixes undefined use of `l' macro, and incorrect uses of `-' character.
+    (cherry picked from commit 93dd5a941f34d1dd58cf9a57a07dec1e01ce3afe)
+
 commit 3fd50335ddfe0ed7f358d46a0fba23bff25073e6
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Oct 4 21:23:05 2009 -0400

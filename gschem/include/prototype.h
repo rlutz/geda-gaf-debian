@@ -613,6 +613,7 @@ void o_edit(GSCHEM_TOPLEVEL *w_current, GList *list);
 void o_lock(GSCHEM_TOPLEVEL *w_current);
 void o_unlock(GSCHEM_TOPLEVEL *w_current);
 void o_rotate_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery, int angle, GList *list);
+void o_rotate_call_hooks(GSCHEM_TOPLEVEL *w_current, GList *list);
 void o_mirror_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery, GList *list);
 void o_edit_show_hidden_lowlevel(GSCHEM_TOPLEVEL *w_current, const GList *o_list);
 void o_edit_show_hidden(GSCHEM_TOPLEVEL *w_current, const GList *o_list);
@@ -706,7 +707,7 @@ void o_select_unselect_all(GSCHEM_TOPLEVEL *w_current);
 void o_select_move_to_place_list(GSCHEM_TOPLEVEL *w_current);
 /* o_slot.c */
 void o_slot_start(GSCHEM_TOPLEVEL *w_current, OBJECT *object);
-void o_slot_end(GSCHEM_TOPLEVEL *w_current, const char *string, int len);
+void o_slot_end(GSCHEM_TOPLEVEL *w_current, OBJECT *object, const char *string);
 /* o_text.c */
 int o_text_get_rendered_bounds(void *user_data, OBJECT *object, int *min_x, int *min_y, int *max_x, int *max_y);
 void o_text_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current);

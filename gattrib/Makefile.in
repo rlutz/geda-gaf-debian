@@ -33,7 +33,7 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = gattrib
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	ChangeLog INSTALL
+	ABOUT-NLS ChangeLog INSTALL
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/codeset.m4 \
 	$(top_srcdir)/m4/geda-assert.m4 $(top_srcdir)/m4/geda-awk.m4 \

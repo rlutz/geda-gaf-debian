@@ -1,3 +1,13 @@
+commit 79a3ead89fac399440055782ab19dafaf2d47eea
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Tue Oct 6 19:49:34 2009 +0200
+
+    Minor correction of symbol resistor-2.sym
+    
+    Reported by Christian Riggenbach <criggenbach@magahugu.net>
+    on geda-user mailing list
+    (cherry picked from commit 84fae3a8201c2d1a5bc3bf4d0f03a0dcc8b3ee86)
+
 commit 1d83fae5a612f52affc5252fa3ef3324d01657a1
 Author: Cesar Strauss <cestrauss@gmail.com>
 Date:   Wed Sep 23 19:50:59 2009 -0300

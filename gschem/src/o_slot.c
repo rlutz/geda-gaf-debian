@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 1998-2008 Ales Hvezda
- * Copyright (C) 1998-2008 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2010 Ales Hvezda
+ * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,113 +62,91 @@ void o_slot_start (GSCHEM_TOPLEVEL *w_current, OBJECT *object)
  *  \par Function Description
  *
  */
-void o_slot_end(GSCHEM_TOPLEVEL *w_current, const char *string, int len)
+void o_slot_end(GSCHEM_TOPLEVEL *w_current, OBJECT *object, const char *string)
 {
   TOPLEVEL *toplevel = w_current->toplevel;
   OBJECT *new_obj;
-  OBJECT *object;
-  OBJECT *temp;
   char *slot_value;
   char *numslots_value;
-  OBJECT *slot_text_object;
+  OBJECT *o_slot;
   char *value = NULL;
   int numslots;
   int new_slot_number;
   int status;
 
+  g_return_if_fail (object != NULL);
+
   status = o_attrib_string_get_name_value (string, NULL, &value);
   if (!status) {
-    s_log_message(_("Slot attribute malformed\n"));
+    s_log_message (_("Slot attribute malformed\n"));
     return;
   }
 
-  object = o_select_return_first_object(w_current);
+  numslots_value =
+    o_attrib_search_object_attribs_by_name (object, "numslots", 0);
 
-  /* get the parent object if the selection is only a text object */
-  if (object != NULL && object->type == OBJ_TEXT) {
-    if (object->attached_to != NULL) {
-      object = object->attached_to;
-    }
+  if (!numslots_value) {
+    s_log_message (_("numslots attribute missing\n"));
+    s_log_message (_("Slotting not allowed for this component\n"));
+    g_free (value);
+    return;
   }
 
-  if (object != NULL) {
-    numslots_value =
-      o_attrib_search_object_attribs_by_name (object, "numslots", 0);
+  numslots = atoi (numslots_value);
+  g_free (numslots_value);
 
-    if (!numslots_value) {
-      s_log_message(_("numslots attribute missing\n"));
-      s_log_message(_("Slotting not allowed for this component\n"));
-      g_free(value);
-      return;
-    }
-
-    numslots = atoi(numslots_value);
-    g_free(numslots_value);
-
-    new_slot_number = atoi(value);
+  new_slot_number = atoi (value);
 
 #if DEBUG
-    printf("numslots = %d\n", numslots);
+  printf ("numslots = %d\n", numslots);
 #endif
 
-    if (new_slot_number > numslots || new_slot_number <=0 ) {
-      s_log_message(_("New slot number out of range\n"));
-      g_free(value);
-      return;
+  if (new_slot_number > numslots || new_slot_number <=0 ) {
+    s_log_message (_("New slot number out of range\n"));
+    g_free (value);
+    return;
+  }
+
+  /* first see if slot attribute already exists outside
+   * complex */
+  slot_value = s_slot_search_slot (object, &o_slot);
+  g_free (slot_value);
+
+  if (o_slot != NULL && !o_attrib_is_inherited (o_slot)) {
+    o_text_set_string (toplevel, o_slot, string);
+
+    if (o_slot->visibility == VISIBLE ||
+        (o_slot->visibility == INVISIBLE && toplevel->show_hidden_text)) {
+      o_invalidate (w_current, o_slot);
     }
 
-    /* first see if slot attribute already exists outside
-     * complex */
-    slot_value = s_slot_search_slot (object, &slot_text_object);
+    o_text_recreate (toplevel, o_slot);
 
-    if (slot_value) {
-      o_text_set_string (toplevel, slot_text_object, string);
-
-      temp = slot_text_object;
-
-      if (temp->visibility == VISIBLE ||
-          (temp->visibility == INVISIBLE && toplevel->show_hidden_text)) {
-        o_invalidate (w_current,temp);
-      }
-
-      o_text_recreate(toplevel, temp);
-
-      /* this doesn't deal with the selection list
-       * item */
-      if (temp->visibility == VISIBLE ||
-          (temp->visibility == INVISIBLE && toplevel->show_hidden_text)) {
-        o_invalidate (w_current,temp);
-      }
-
-      g_free(slot_value);
-
-    } else {
-      /* here you need to do the add the slot
-         attribute since it doesn't exist */
-      new_obj = o_text_new (toplevel, OBJ_TEXT, ATTRIBUTE_COLOR,
-                            object->complex->x, object->complex->y,
-                            LOWER_LEFT, 0, /* zero is angle */
-                            string, 10, INVISIBLE, SHOW_NAME_VALUE);
-      s_page_append (toplevel, toplevel->page_current, new_obj);
-
-      /* manually attach attribute */
-      o_attrib_attach (toplevel, new_obj, object, FALSE);
-
-      slot_text_object = new_obj;
+    /* this doesn't deal with the selection list
+     * item */
+    if (o_slot->visibility == VISIBLE ||
+        (o_slot->visibility == INVISIBLE && toplevel->show_hidden_text)) {
+      o_invalidate (w_current, o_slot);
     }
-
-    o_invalidate (w_current, object);
-    s_slot_update_object (toplevel, object);
-
-    o_invalidate (w_current,object);
-
-    toplevel->page_current->CHANGED = 1;
-    g_free(value);
 
   } else {
-    fprintf(stderr,
-            _("uggg! you tried to slot edit something that doesn't exist!\n"));
-    g_free(value);
-    exit(-1);
+    /* here you need to do the add the slot
+       attribute since it doesn't exist */
+    new_obj = o_text_new (toplevel, OBJ_TEXT, ATTRIBUTE_COLOR,
+                          object->complex->x, object->complex->y,
+                          LOWER_LEFT, 0, /* zero is angle */
+                          string, 10, INVISIBLE, SHOW_NAME_VALUE);
+    s_page_append (toplevel, toplevel->page_current, new_obj);
+
+    /* manually attach attribute */
+    o_attrib_attach (toplevel, new_obj, object, FALSE);
   }
+
+  o_invalidate (w_current, object);
+  s_slot_update_object (toplevel, object);
+
+  o_invalidate (w_current,object);
+
+  toplevel->page_current->CHANGED = 1;
+  g_free (value);
 }

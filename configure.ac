@@ -8,7 +8,7 @@ dnl directory.
 # Set up configuration system
 #####################################################################
 
-AC_INIT([gEDA/gaf], [1.6.0], [geda-bug@seul.org], [geda-gaf])
+AC_INIT([gEDA/gaf], [1.6.1], [geda-bug@seul.org], [geda-gaf])
 AC_PREREQ([2.60])
 
 AC_CONFIG_SRCDIR([libgeda/src/libgeda.c])
@@ -24,7 +24,7 @@ AC_GNU_SOURCE # FIXME for some reason this is needed?
 # Do version number magic
 #####################################################################
 
-AX_GIT_VERSION([20091004])
+AX_GIT_VERSION([20100214])
 
 # This is used for keeping the ChangeLog files up-to-date
 AC_SUBST([CHANGELOG_BASE], [1.0-20070526])
@@ -49,6 +49,7 @@ AC_PROG_LIBTOOL
 AM_PROG_CC_C_O
 AX_GCC_FLAGS([-Wall])
 
+AC_PROG_MKDIR_P
 AM_PROG_LEX
 AX_PROG_AWK
 AX_PROG_GROFF
@@ -105,6 +106,12 @@ AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
 # fail anyway.
 AC_CHECK_HEADERS([errno.h fcntl.h])
 
+# FIXME On a system without locale.h, the user may have just disabled NLS
+# to be able to build.  But are there known systems with working NLS but
+# without a locale.h?  We do need to include locale.h on some systems
+# to be able to build gschem/src/gschem.c
+AC_CHECK_HEADERS([locale.h])
+
 # Check for rint in math library. FIXME do we actually need to test
 # this? Should we use lrint instead?
 AC_CHECK_LIB([m], [lrint],
@@ -152,7 +159,7 @@ AX_DATA_DIRS
 # Where should PCB footprints be searched for?
 AX_PCB_DIRS
 # Set up libgeda with the correct ld version number
-AX_LIBGEDA([38:0:0])
+AX_LIBGEDA([38:1:0])
 
 #####################################################################
 # Generate output

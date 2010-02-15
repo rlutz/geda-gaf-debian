@@ -1,3 +1,24 @@
+commit 0a2711ce62dd3f19ae81ecdfd893231de390da9a
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 18:30:45 2010 -0500
+
+    Removed a bunch of obsolete wiki snapshot creation/cleanup scripts
+
+commit 1b200e957de912ec369124a2efebe16ec4e6b531
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 18:26:23 2010 -0500
+
+    Updated the wiki snapshot from the official wiki
+
+commit 19e4de650dad95977bc07bae4f897ab6b9d7b110
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 18:00:02 2010 -0500
+
+    Tweaked scripts with updated paths
+    
+    Eventually these scripts should be fixed or rewritten so that they
+    do not have any hardcoded paths.
+
 commit b7ca06041ea464b0d064bfa965843d2907a83571
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Oct 4 19:39:14 2009 -0400

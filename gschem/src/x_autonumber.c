@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 1998-2008 Ales Hvezda
- * Copyright (C) 1998-2008 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2010 Ales Hvezda
+ * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -588,8 +588,9 @@ void autonumber_remove_number(AUTONUMBER_TEXT * autotext, OBJECT *o_current)
     o_parent = o_current->attached_to;
     if (o_parent != NULL) {
       slot_str = s_slot_search_slot (o_parent, &o_slot);
-      if (slot_str != NULL && o_slot != NULL) {
-        g_free(slot_str);
+      g_free (slot_str);
+      /* Only attempt to remove non-inherited slot attributes */
+      if (o_slot != NULL && !o_attrib_is_inherited (o_slot)) {
         /* delete the slot attribute */
         o_selection_remove (autotext->w_current->toplevel,
                             autotext->w_current->toplevel->
@@ -610,32 +611,12 @@ void autonumber_remove_number(AUTONUMBER_TEXT * autotext, OBJECT *o_current)
 void autonumber_apply_new_text(AUTONUMBER_TEXT * autotext, OBJECT *o_current,
 			       gint number, gint slot)
 {
-  OBJECT *o_parent, *o_slot;
-  gchar *slot_str;
-  gchar *str = NULL;
+  char *str;
 
-  /* add the slot as attribute to the object */
-  o_parent = o_current->attached_to;
-  if (slot != 0 && o_parent != NULL) {
-    slot_str = s_slot_search_slot (o_parent, &o_slot);
-    if (slot_str != NULL) {
-      /* update the slot attribute */
-      g_free(slot_str);
-      slot_str = g_strdup_printf("slot=%d",slot);
-      o_text_set_string (autotext->w_current->toplevel, o_slot, slot_str);
-      g_free (slot_str);
-      o_invalidate (autotext->w_current, o_slot);
-      o_text_recreate(autotext->w_current->toplevel, o_slot);
-      o_invalidate (autotext->w_current, o_slot);
-    }
-    else {
-      /* create a new attribute and attach it */
-      o_attrib_add_attrib(autotext->w_current,
-			  g_strdup_printf("slot=%d",slot),
-			  INVISIBLE, SHOW_NAME_VALUE,
-			  o_parent);
-    }
-  }
+  /* update the slot on the owning object */
+  str = g_strdup_printf ("slot=%d", slot);
+  o_slot_end (autotext->w_current, o_current->attached_to, str);
+  g_free (str);
 
   /* replace old text */
   str = g_strdup_printf("%s%d", autotext->current_searchtext, number);
