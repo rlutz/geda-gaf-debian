@@ -1,3 +1,67 @@
+commit a30f00bbee18ad5140616ad6459365cb48b03ee7
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Fri Jan 14 23:21:56 2011 -0500
+
+    Updated version strings in all man pages
+
+commit 48f3d8aedb5db6f5dfb6232565e65e03d45b5efb
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Fri Jan 14 23:18:41 2011 -0500
+
+    Manually ran make update-po in order to prep for the make distcheck
+    
+    This step is always done right before make distcheck is run to create
+    a release tarball.
+
+commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 22:00:09 2011 +0000
+
+    Update FSF address in copyright headers.
+    
+    The FSF have now moved to 51 Franklin Street, Fifth Floor, Boston, MA
+    02110-1301 USA.  Our GPL and LPGL copyright headers need to updated to
+    reflect this.
+    
+    Only files remaining with old address are wiki files (although the
+    wiki has now been updated) and PostScript files.
+
+commit 9ae03d499783cbbc42dfd5180d0abfa88b8ed8f0
+Author: Wojciech Kazubski <wk0@o2.pl>
+Date:   Tue Jan 4 15:37:48 2011 +0000
+
+    gschem: Don't crop the png output [3100660] [3100680]
+    
+    Gschem sometimes crops the image exported to bitmap file (png,
+    bmp... but not eps). This appears in certain range of picture
+    proportions, landscape but close to square.
+    
+    This patch alters the algorithm that adjusts the image proportions to
+    remove this problem.
+
+commit bafbcd605c7beaacfdaf9a46801553be5b0c97ad
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Tue Jan 4 15:37:47 2011 +0000
+
+    gschem: Exit any current event state before switching pages
+    
+    If we don't do this, state from an operation on one page can cause
+    corruption and genereral chaos. This was reproducable by moving
+    some objects (em), then switching pages with a key-binding.
+
+commit 4491d031d5f02a43ec72443a3be6668c9cdc58b6
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Nov 1 20:59:11 2010 +0000
+
+    Fix hiding the command prompt window on Win32 builds with -mwindows
+    
+    There was a mistake in gschem and gattrib's Makefile.am, where it
+    included the non-existant MINGW_GUI_CFLAGS rather than pulling in
+    MINGW_GUI_LDFLAGS where the required -mwindows was set.
+    
+    Cherry-picked from: e5f32954a1fb23534309d6fa06d887859afbc664
+    and subsequent fix: 66e54fd03f75f70d9fcf101d6ed3cad1bb354b13
+
 commit 11921dc18209ed4ea12288114634bb94a5b9b8a9
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Feb 14 21:26:37 2010 -0500
@@ -5694,7 +5758,7 @@ Date:   Sun Mar 2 16:20:27 2008 +0100
     same as the net width.
 
 commit ffd2298ca90e9e8616a2804c5708cb3d2ccb0a83
-Merge: b62e017... 1a49d46...
+Merge: b62e017 1a49d46
 Author: Werner Hoch <werner.ho@gmx.de>
 Date:   Sat Mar 1 09:43:53 2008 +0100
 
@@ -6723,7 +6787,7 @@ Date:   Wed Nov 28 14:58:15 2007 +0000
     improvement over using a hardcoded list of applications to try.
 
 commit ae225157603f063747709fa3d639ed8cdf63f6b1
-Merge: 1abfd25... 43b5713...
+Merge: 1abfd25 43b5713
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Tue Nov 27 07:53:37 2007 +0000
 

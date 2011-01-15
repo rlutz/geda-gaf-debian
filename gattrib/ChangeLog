@@ -1,3 +1,38 @@
+commit 48f3d8aedb5db6f5dfb6232565e65e03d45b5efb
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Fri Jan 14 23:18:41 2011 -0500
+
+    Manually ran make update-po in order to prep for the make distcheck
+    
+    This step is always done right before make distcheck is run to create
+    a release tarball.
+
+commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 22:00:09 2011 +0000
+
+    Update FSF address in copyright headers.
+    
+    The FSF have now moved to 51 Franklin Street, Fifth Floor, Boston, MA
+    02110-1301 USA.  Our GPL and LPGL copyright headers need to updated to
+    reflect this.
+    
+    Only files remaining with old address are wiki files (although the
+    wiki has now been updated) and PostScript files.
+
+commit 4491d031d5f02a43ec72443a3be6668c9cdc58b6
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Nov 1 20:59:11 2010 +0000
+
+    Fix hiding the command prompt window on Win32 builds with -mwindows
+    
+    There was a mistake in gschem and gattrib's Makefile.am, where it
+    included the non-existant MINGW_GUI_CFLAGS rather than pulling in
+    MINGW_GUI_LDFLAGS where the required -mwindows was set.
+    
+    Cherry-picked from: e5f32954a1fb23534309d6fa06d887859afbc664
+    and subsequent fix: 66e54fd03f75f70d9fcf101d6ed3cad1bb354b13
+
 commit bd34cfde2450790b357e574281f9562adce64303
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Feb 14 17:09:45 2010 -0500
@@ -76,7 +111,7 @@ Date:   Tue Sep 29 01:43:05 2009 +0100
       o_attrib_find_attrib_by_name() is no longer static to o_attrib.c
 
 commit a1bff619eb7f1c7be77cca7c47b82dc80b4e3571
-Merge: 488a484... 1d83fae...
+Merge: 488a484 1d83fae
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Mon Sep 28 17:07:21 2009 +0100
 
@@ -1493,7 +1528,7 @@ Date:   Fri Dec 7 17:20:55 2007 +0000
     concise, and will be addressed in later patches.
 
 commit ae225157603f063747709fa3d639ed8cdf63f6b1
-Merge: 1abfd25... 43b5713...
+Merge: 1abfd25 43b5713
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Tue Nov 27 07:53:37 2007 +0000
 

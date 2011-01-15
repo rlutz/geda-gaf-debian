@@ -1,3 +1,16 @@
+commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 22:00:09 2011 +0000
+
+    Update FSF address in copyright headers.
+    
+    The FSF have now moved to 51 Franklin Street, Fifth Floor, Boston, MA
+    02110-1301 USA.  Our GPL and LPGL copyright headers need to updated to
+    reflect this.
+    
+    Only files remaining with old address are wiki files (although the
+    wiki has now been updated) and PostScript files.
+
 commit 98fc06c271432b9f59ca49865b8ca9dbe844b9de
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sat Aug 8 00:44:40 2009 -0400

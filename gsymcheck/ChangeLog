@@ -1,3 +1,22 @@
+commit a30f00bbee18ad5140616ad6459365cb48b03ee7
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Fri Jan 14 23:21:56 2011 -0500
+
+    Updated version strings in all man pages
+
+commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 22:00:09 2011 +0000
+
+    Update FSF address in copyright headers.
+    
+    The FSF have now moved to 51 Franklin Street, Fifth Floor, Boston, MA
+    02110-1301 USA.  Our GPL and LPGL copyright headers need to updated to
+    reflect this.
+    
+    Only files remaining with old address are wiki files (although the
+    wiki has now been updated) and PostScript files.
+
 commit 11921dc18209ed4ea12288114634bb94a5b9b8a9
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Feb 14 21:26:37 2010 -0500
@@ -995,7 +1014,7 @@ Date:   Fri Dec 7 17:20:55 2007 +0000
     concise, and will be addressed in later patches.
 
 commit ae225157603f063747709fa3d639ed8cdf63f6b1
-Merge: 1abfd25... 43b5713...
+Merge: 1abfd25 43b5713
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Tue Nov 27 07:53:37 2007 +0000
 

@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /*! \file o_text_basic.c
@@ -275,7 +275,7 @@ OBJECT *o_text_new(TOPLEVEL *toplevel,
   new_node->sel_func = select_func;  
 
   new_node->color = color;
-  new_node->visibility = visibility; 
+  o_set_visibility (toplevel, new_node, visibility);
   new_node->show_name_value = show_name_value;
 
   update_disp_string (new_node);
@@ -299,7 +299,8 @@ void o_text_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
 {
   int left, right, top, bottom;
 
-  if (o_current->visibility == INVISIBLE && !toplevel->show_hidden_text) {
+  if ((!o_is_visible (toplevel, o_current)) &&
+      (!toplevel->show_hidden_text)) {
     return;
   }
 

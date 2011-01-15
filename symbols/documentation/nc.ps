@@ -1,18 +1,23 @@
 %!PS-Adobe-3.0
-%%Creator: groff version 1.18.1
-%%CreationDate: Sun Feb 14 21:25:59 2010
+%%Creator: groff version 1.20.1
+%%CreationDate: Fri Jan 14 22:48:52 2011
 %%DocumentNeededResources: font Helvetica
 %%+ font Times-Bold
 %%+ font Times-Roman
 %%+ font Times-Italic
 %%+ font Symbol
-%%DocumentSuppliedResources: procset grops 1.18 1
+%%DocumentSuppliedResources: procset grops 1.20 1
 %%Pages: 1
 %%PageOrder: Ascend
+%%DocumentMedia: Default 612 792 0 () ()
 %%Orientation: Portrait
 %%EndComments
+%%BeginDefaults
+%%PageMedia: Default
+%%EndDefaults
 %%BeginProlog
-%%BeginResource: procset grops 1.18 1
+%%BeginResource: procset grops 1.20 1
+%!PS-Adobe-3.0 Resource-ProcSet
 /setpacking where{
 pop
 currentpacking
@@ -69,6 +74,7 @@ exch pop add exch pop
 /level0 save def
 1 setlinecap
 1 setlinejoin
+DEFS/BPhook known{DEFS begin BPhook end}if
 72 RES div dup scale
 LS{
 90 rotate
@@ -80,7 +86,7 @@ LS{
 /EP{
 level0 restore
 showpage
-}bind def
+}def
 /DA{
 newpath arcn stroke
 }bind def
@@ -113,22 +119,31 @@ TM setmatrix
 /Fr{
 setrgbcolor fill
 }bind def
+/setcmykcolor where{
+pop
 /Fk{
 setcmykcolor fill
 }bind def
+}if
 /Fg{
 setgray fill
 }bind def
 /FL/fill load def
 /LW/setlinewidth load def
 /Cr/setrgbcolor load def
+/setcmykcolor where{
+pop
 /Ck/setcmykcolor load def
+}if
 /Cg/setgray load def
 /RE{
 findfont
 dup maxlength 1 index/FontName known not{1 add}if dict begin
 {
-1 index/FID ne{def}{pop pop}ifelse
+1 index/FID ne
+2 index/UniqueID ne
+and
+{def}{pop pop}ifelse
 }forall
 /Encoding exch def
 dup/FontName exch def
@@ -165,9 +180,11 @@ newpath
 /CNT countdictstack def
 userdict begin
 /showpage{}def
+/setpagedevice{}def
+mark
 }bind def
 /PEND{
-clear
+cleartomark
 countdictstack CNT sub{end}repeat
 level1 restore
 }bind def
@@ -177,6 +194,11 @@ pop
 setpacking
 }if
 %%EndResource
+%%EndProlog
+%%BeginSetup
+%%BeginFeature: *PageSize Default
+<< /PageSize [ 612 792 ] /ImagingBBox null >> setpagedevice
+%%EndFeature
 %%IncludeResource: font Helvetica
 %%IncludeResource: font Times-Bold
 %%IncludeResource: font Times-Roman
@@ -212,7 +234,7 @@ def/PL 792 def/LS false def/ENC0[/asciicircum/asciitilde/Scaron/Zcaron
 /ugrave/uacute/ucircumflex/udieresis/yacute/thorn/ydieresis]def
 /Times-Italic@0 ENC0/Times-Italic RE/Times-Roman@0 ENC0/Times-Roman RE
 /Times-Bold@0 ENC0/Times-Bold RE/Helvetica@0 ENC0/Helvetica RE
-%%EndProlog
+%%EndSetup
 %%Page: 1 1
 %%BeginPageSetup
 BP
@@ -225,75 +247,59 @@ RL -4.32 0 RL 0 4.32 RL CL 0 Fg 213.84 106.896 MT 0 -4.32 RL -4.32 0 RL
 84 DL 256.824 111.072 256.824 84 DL 274.824 111.072 256.824 111.072 DL
 288.288 97.536 361.008 97.536 DL 366.48 99.696 MT 0 -4.32 RL -4.32 0 RL
 0 4.32 RL CL 0 Fg 366.48 99.696 MT 0 -4.32 RL -4.32 0 RL 0 4.32 RL CL 0
-Cg ST/F0 12/Helvetica@0 SF<47504c>224.16 88.58 Q<4544>224.16 115.8 Q<41>
--.48 E/F1 24/Helvetica@0 SF<674544>304.104 95.352 Q<41>-.96 E/F2 10
-/Times-Bold@0 SF<4e6f20436f6e6e656374696f6e2053686f72742046>72 148.16 Q
-<6f726d2044617461205368656574>-.25 E
-<47656e6572616c204465736372697074696f6e>72 172.16 Q/F3 10/Times-Roman@0
-SF<546865>72 187.76 Q F2<4e6f20436f6e6e656374696f6e>2.5 E F3<636f6d706f
-6e656e742069732061206d6f6e6f2d706f6c65207769746820756e697175652070726f70
-6572746965732e>2.5 E F2 -.25<4170>72 211.76 S<706c69636174696f6e73>.25 E
-.4 LW 77.5 227.36 72.5 227.36 DL 77.5 222.36 77.5 227.36 DL 72.5 222.36
-77.5 222.36 DL 72.5 227.36 72.5 222.36 DL/F4 10/Times-Italic@0 SF
-<4469676974616c20636972>97 227.36 Q<6375697473>-.37 E 77.5 242.96 72.5
-242.96 DL 77.5 237.96 77.5 242.96 DL 72.5 237.96 77.5 237.96 DL 72.5
-242.96 72.5 237.96 DL<416e616c6f>97 242.96 Q 2.5<6763>-.1 G<6972>-2.5 E
-<6375697473>-.37 E 77.5 258.56 72.5 258.56 DL 77.5 253.56 77.5 258.56 DL
-72.5 253.56 77.5 253.56 DL 72.5 258.56 72.5 253.56 DL
-<4d69786564207369676e616c20636972>97 258.56 Q<6375697473>-.37 E 77.5
-274.16 72.5 274.16 DL 77.5 269.16 77.5 274.16 DL 72.5 269.16 77.5 269.16
-DL 72.5 274.16 72.5 269.16 DL<436f6e73756d6572207072>97 274.16 Q
-<6f6475637473>-.45 E 77.5 289.76 72.5 289.76 DL 77.5 284.76 77.5 289.76
-DL 72.5 284.76 77.5 284.76 DL 72.5 289.76 72.5 284.76 DL
-<496e647573747279207072>97 289.76 Q<6f6475637473>-.45 E F2 -.25<4665>72
-313.76 S<61747572>.25 E<6573>-.18 E F3 21.5<8345>72 329.36 S
-<534420746f6c6572616e74>-21.5 E 21.5<834c>72 344.96 S
-<6174636875702066726565>-21.5 E 21.5<834f>72 360.56 S
-<706572617465732077697468207a65726f20706f>-21.5 E
-<77657220737570706c696573>-.25 E 21.5<8353>72 376.16 S
-<696d706c6520636f6e6e656374696f6e>-21.5 E F2
-<456c656374726963616c20436861726163746572697374696373>72 400.16 Q 391.29
-410.66 72 410.66 DL -.1<5061>77 420.16 S 30.96
-<72616d657465722053796d626f6c>.1 F 12.5
-<436f6e646974696f6e73204d696e2054>15 F 12.5<7970204d617820556e697473>
--.74 F 391.29 424.66 72 424.66 DL F3<537570706c792056>77 434.16 Q 17.68
-<6f6c7461676520566363>-1.29 F<416e>31.13 E 48.5<7930>-.15 G/F5 10/Symbol
-SF<a5>10.535 E F3<56>23.655 E 391.29 438.66 72 438.66 DL
-<537570706c792043757272656e74>77 448.16 Q 32.52<49636320416e>20 F 48.5
-<7930>-.15 G 26.715<3030>-21.365 G<6d41>-.745 E 391.29 452.66 72 452.66
-DL 391.29 410.66 391.29 452.66 DL 356.01 410.66 356.01 452.66 DL 257.3
-410.66 257.3 452.66 DL 195.62 410.66 195.62 452.66 DL 148.39 410.66
-148.39 452.66 DL 72 410.66 72 452.66 DL F2
-<50696e204465736372697074696f6e73>72 480.16 Q 270.19 490.66 72 490.66 DL
-40.275<50696e204e616d65>82.275 500.16 R<46756e6374696f6e>28.9 E 270.19
-504.66 72 504.66 DL F3 57.5<314e>77 514.16 S 40<434e>-57.5 G
-<6f6e652077686174736f65>-40 E -.15<7665>-.25 G<72>.15 E 270.19 518.66 72
-518.66 DL 270.19 490.66 270.19 518.66 DL 183.39 490.66 183.39 518.66 DL
-129.5 490.66 129.5 518.66 DL 72 490.66 72 518.66 DL F2
-<44657461696c6564204465736372697074696f6e>72 546.16 Q F3 .882<5468652063
-6f6d706f6e656e74207265616c6c7920646f6573206e6f7468696e672c2065>72 561.76
-R .882<7863657074206d616b696e6720697420706572666563746c7920636c65617220
-74686174207768656e20697420697320636f6e6e656374656420746f2070696e73206f6e>
--.15 F<6f7468657220636f6d706f6e656e74732c20746865>72 573.76 Q 2.5<7973>
--.15 G<686f756c64206e6f742c206f72206174206c65617374206e656564206e6f742c
-20626520636f6e6e656374656420746f20616e>-2.5 E<797468696e6720656c73652e>
--.15 E F2<4f72646572696e6720496e66>72 597.76 Q<6f726d6174696f6e>-.25 E
-370 608.26 72 608.26 DL -.1<5061>77 617.76 S 57.33<72742054>.1 F
-<656d702e2052616e6765>-.92 E -.92<5465>41.42 G 23.43<726d696e616c2050>
-.92 F<61636b616765>-.1 E 370 622.26 72 622.26 DL F3 50.01
-<6e632d6c656674202d3237332e3136b043>77 631.76 R<746f202b>2.5 E F5<a5>A
-F3 17.5<b043204c656674>B<4e6f6e65>48.35 E 44.45
-<6e632d7269676874202d3237332e3136b043>77 643.76 R<746f202b>2.5 E F5<a5>A
-F3 17.5<b043205269676874>B<4e6f6e65>42.78 E 50.56
-<6e632d746f70202d3237332e3136b043>77 655.76 R<746f202b>2.5 E F5<a5>A F3
-17.5<b0432054>B 47.2<6f70204e6f6e65>-.8 F 35
-<6e632d626f74746f6d202d3237332e3136b043>77 667.76 R<746f202b>2.5 E F5
-<a5>A F3 17.5<b04320426f74746f6d>B<4e6f6e65>35 E 370 672.26 72 672.26 DL
-370 608.26 370 672.26 DL 308.34 608.26 308.34 672.26 DL 243.33 608.26
-243.33 672.26 DL 145.61 608.26 145.61 672.26 DL 72 608.26 72 672.26 DL
-F2<5265666572>72 699.76 Q<656e636573>-.18 E F4<687474703a2f2f777777>72
-715.36 Q<2e67>-.74 E<6564612e7365756c2e6f72>-.1 E<672f73796d6c696272>
--.37 E<6172792f73796d626f6c732f6d6973632f>-.15 E 0 Cg EP
+Cg ST/F0 12/Helvetica@0 SF(GPL)224.16 88.58 Q(ED)224.16 115.8 Q(A)-.48 E
+/F1 24/Helvetica@0 SF(gED)304.104 95.352 Q(A)-.96 E/F2 10/Times-Bold@0
+SF(No Connection Short F)72 148.16 Q(orm Data Sheet)-.25 E
+(General Description)72 172.16 Q/F3 10/Times-Roman@0 SF(The)72 187.76 Q
+F2(No Connection)2.5 E F3
+(component is a mono-pole with unique properties.)2.5 E F2 -.25(Ap)72
+211.76 S(plications).25 E .4 LW 77.5 227.36 72.5 227.36 DL 77.5 222.36
+77.5 227.36 DL 72.5 222.36 77.5 222.36 DL 72.5 227.36 72.5 222.36 DL/F4
+10/Times-Italic@0 SF(Digital cir)97 227.36 Q(cuits)-.37 E 77.5 242.96
+72.5 242.96 DL 77.5 237.96 77.5 242.96 DL 72.5 237.96 77.5 237.96 DL
+72.5 242.96 72.5 237.96 DL(Analo)97 242.96 Q 2.5(gc)-.1 G(ir)-2.5 E
+(cuits)-.37 E 77.5 258.56 72.5 258.56 DL 77.5 253.56 77.5 258.56 DL 72.5
+253.56 77.5 253.56 DL 72.5 258.56 72.5 253.56 DL(Mixed signal cir)97
+258.56 Q(cuits)-.37 E 77.5 274.16 72.5 274.16 DL 77.5 269.16 77.5 274.16
+DL 72.5 269.16 77.5 269.16 DL 72.5 274.16 72.5 269.16 DL(Consumer pr)97
+274.16 Q(oducts)-.45 E 77.5 289.76 72.5 289.76 DL 77.5 284.76 77.5
+289.76 DL 72.5 284.76 77.5 284.76 DL 72.5 289.76 72.5 284.76 DL
+(Industry pr)97 289.76 Q(oducts)-.45 E F2 -.25(Fe)72 313.76 S(atur).25 E
+(es)-.18 E F3 21.5<8345>72 329.36 S(SD tolerant)-21.5 E 21.5<834c>72
+344.96 S(atchup free)-21.5 E 21.5<834f>72 360.56 S(perates with zero po)
+-21.5 E(wer supplies)-.25 E 21.5<8353>72 376.16 S(imple connection)-21.5
+E F2(Electrical Characteristics)72 400.16 Q 391.69 410.66 72 410.66 DL
+-.1(Pa)77 420.16 S 30.96(rameter Symbol).1 F 12.5(Conditions Min T)15 F
+12.5(yp Max Units)-.34 F 391.69 424.66 72 424.66 DL F3(Supply V)77
+434.16 Q 17.68(oltage Vcc)-1.29 F(An)31.13 E 48.5(y0)-.15 G/F5 10/Symbol
+SF<a5>10.935 E F3(V)23.655 E 391.69 438.66 72 438.66 DL(Supply Current)
+77 448.16 Q 32.52(Icc An)20 F 48.5(y0)-.15 G 26.915(00)-21.165 G(mA)
+-.945 E 391.69 452.66 72 452.66 DL 391.69 410.66 391.69 452.66 DL 356.41
+410.66 356.41 452.66 DL 257.3 410.66 257.3 452.66 DL 195.62 410.66
+195.62 452.66 DL 148.39 410.66 148.39 452.66 DL 72 410.66 72 452.66 DL
+F2(Pin Descriptions)72 480.16 Q 270.19 490.66 72 490.66 DL 40.275
+(Pin Name)82.275 500.16 R(Function)28.9 E 270.19 504.66 72 504.66 DL F3
+57.5(1N)77 514.16 S 40(CN)-57.5 G(one whatsoe)-40 E -.15(ve)-.25 G(r).15
+E 270.19 518.66 72 518.66 DL 270.19 490.66 270.19 518.66 DL 183.39
+490.66 183.39 518.66 DL 129.5 490.66 129.5 518.66 DL 72 490.66 72 518.66
+DL F2(Detailed Description)72 546.16 Q F3 .882
+(The component really does nothing, e)72 561.76 R .882
+(xcept making it perfectly clear that when it is connected to pins on)
+-.15 F(other components, the)72 573.76 Q 2.5(ys)-.15 G
+(hould not, or at least need not, be connected to an)-2.5 E
+(ything else.)-.15 E F2(Ordering Inf)72 597.76 Q(ormation)-.25 E 370
+608.26 72 608.26 DL -.1(Pa)77 617.76 S 57.33(rt T).1 F(emp. Range)-.92 E
+-.92(Te)41.42 G 23.43(rminal P).92 F(ackage)-.1 E 370 622.26 72 622.26
+DL F3 50.01(nc-left -273.16\260C)77 631.76 R(to +)2.5 E F5<a5>A F3 17.5
+(\260C Left)B(None)48.35 E 44.45(nc-right -273.16\260C)77 643.76 R(to +)
+2.5 E F5<a5>A F3 17.5(\260C Right)B(None)42.78 E 50.56
+(nc-top -273.16\260C)77 655.76 R(to +)2.5 E F5<a5>A F3 17.5(\260C T)B
+47.2(op None)-.8 F 35(nc-bottom -273.16\260C)77 667.76 R(to +)2.5 E F5
+<a5>A F3 17.5(\260C Bottom)B(None)35 E 370 672.26 72 672.26 DL 370
+608.26 370 672.26 DL 308.34 608.26 308.34 672.26 DL 243.33 608.26 243.33
+672.26 DL 145.61 608.26 145.61 672.26 DL 72 608.26 72 672.26 DL F2
+(Refer)72 699.76 Q(ences)-.18 E F4(http://www)72 715.36 Q(.g)-.74 E
+(eda.seul.or)-.1 E(g/symlibr)-.37 E(ary/symbols/misc/)-.15 E 0 Cg EP
 %%Trailer
 end
 %%EOF
