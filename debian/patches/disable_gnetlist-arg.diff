@@ -1,0 +1,44 @@
+Description: gsch2pcb: Don't allow `gnetlist-arg' in project file.
+Origin: http://git.gpleda.org/?p=gaf.git;a=commitdiff_plain;h=16b3d32fcf8458389a491aed9437be835131b4b9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/geda-gaf/+bug/700194
+
+--- a/utils/src/gsch2pcb.c
++++ b/utils/src/gsch2pcb.c
+@@ -1253,9 +1253,6 @@
+ 	else if (!strcmp(config, "gnetlist"))
+ 		extra_gnetlist_list =
+ 				g_list_append(extra_gnetlist_list, g_strdup(arg));
+-	else if (!strcmp(config, "gnetlist-arg"))
+-		extra_gnetlist_arg_list =
+-				g_list_append(extra_gnetlist_arg_list, g_strdup(arg));
+ 	else if (!strcmp(config, "empty-footprint"))
+ 		empty_footprint_name = g_strdup(arg);
+ 	else
+@@ -1370,10 +1367,10 @@
+ "   --gnetlist backend    A convenience run of extra gnetlist -g commands.\n"
+ "                         Example:  gnetlist partslist3\n"
+ "                         Creates:  myproject.partslist3\n"
+-"   --gnetlist-arg arg    Allows additional arguments to be passed to gnetlist.\n"
+ " --empty-footprint name  See the project.sample file.\n"
+ "\n"
+ "options (not recognized in a project file):\n"
++"   --gnetlist-arg arg    Allows additional arguments to be passed to gnetlist.\n"
+ "       --fix-elements    If a schematic component footprint is not equal\n"
+ "                         to its PCB element Description, update the\n"
+ "                         Description instead of replacing the element.\n"
+@@ -1432,6 +1429,14 @@
+ 				fix_elements = TRUE;
+ 				continue;
+ 				}
++      else if (!strcmp(opt, "gnetlist-arg"))
++        {
++        extra_gnetlist_arg_list =
++                g_list_append(extra_gnetlist_arg_list,
++                                g_strdup(arg));
++        i++;
++        continue;
++        }
+ 			else if (!strcmp(opt, "help") || !strcmp(opt, "h"))
+ 				usage();
+ 			else if (   i < argc

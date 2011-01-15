@@ -2,3 +2,4 @@ desktop.diff
 manpage_typos.diff
 sch2eaglepos_bashism.diff
 fix_string_exceptions.diff
+disable_gnetlist-arg.diff
