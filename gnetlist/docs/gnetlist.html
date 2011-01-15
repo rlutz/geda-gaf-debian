@@ -1,14 +1,25 @@
-<!-- Creator     : groff version 1.18.1 -->
-<!-- CreationDate: Sun Feb 14 21:25:56 2010 -->
+<!-- Creator     : groff version 1.20.1 -->
+<!-- CreationDate: Fri Jan 14 23:26:00 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
 <title>gnetlist</title>
+
 </head>
 <body>
 
-<h1 align=center>gnetlist</h1>
+<h1 align="center">gnetlist</h1>
+
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -20,886 +31,697 @@
 <a href="#COPYRIGHT">COPYRIGHT</a><br>
 
 <hr>
+
+
+<h2>NAME
 <a name="NAME"></a>
-<h2>NAME</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>gnetlist - gEDA/gaf Netlist extraction/generation</p>
-</td>
-</table>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">gnetlist -
+gEDA/gaf Netlist extraction/generation</p>
+
+<h2>SYNOPSIS
 <a name="SYNOPSIS"></a>
-<h2>SYNOPSIS</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>gnetlist</b> [&minus;e] [&minus;i] [&minus;I]
-[&minus;q] [&minus;s] [&minus;v] [&minus;l schem_file]
-[&minus;m schem_file ] [&minus;n] [ &minus;O option ]
-[&minus;h | &minus;&minus;help] [&minus;g guile_procedure]
-[&minus;c scheme_string ] [&minus;o output_filename]
-schematic1 [... schematicN]</p>
-</td>
-</table>
+</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>gnetlist</b>
+[&minus;e] [&minus;i] [&minus;I] [&minus;q] [&minus;s]
+[&minus;v] [&minus;l schem_file] [&minus;m schem_file ]
+[&minus;n] [ &minus;O option ] [&minus;h |
+&minus;&minus;help] [&minus;g guile_procedure] [&minus;c
+scheme_string ] [&minus;o output_filename] schematic1 [...
+schematicN]</p>
+
+<h2>DESCRIPTION
 <a name="DESCRIPTION"></a>
-<h2>DESCRIPTION</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><i>gnetlist</i> is the netlist extraction/generation
-program which is part gEDA (GPL Electronic Design
-Automation) toolset. This program takes a schematic for its
-input and outputs a netlist.</p>
-<!-- INDENTATION -->
-<p>gnetlist depends heavily on guile (a scheme based
-scripting language). It uses guile to define the output
-format. Basically gnetlist reads a schematic, creates an
-internal representation of the various connections, and then
-a guile script extracts the connections into some netlist
+</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><i>gnetlist</i>
+is the netlist extraction/generation program which is part
+gEDA (GPL Electronic Design Automation) toolset. This
+program takes a schematic for its input and outputs a
+netlist.</p>
+
+<p style="margin-left:11%; margin-top: 1em">gnetlist
+depends heavily on guile (a scheme based scripting
+language). It uses guile to define the output format.
+Basically gnetlist reads a schematic, creates an internal
+representation of the various connections, and then a guile
+script extracts the connections into some netlist
 format.</p>
-<!-- INDENTATION -->
-<p>gnetlist is very much so a work in progress. Currently it
-supports the following backends:</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="3" cellspacing="0" cellpadding="0">
+
+<p style="margin-left:11%; margin-top: 1em">gnetlist is
+very much so a work in progress. Currently it supports the
+following backends:</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>Allegro netlist format (&minus;g allegro)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>Allegro netlist format (&minus;g allegro)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
+
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
 
 <p>BOM / BOM2 - Bill of Materials (&minus;g bom and
-&minus;g bom2)</p>
-</td>
+&minus;g bom2)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
+
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
 
 <p>Partslist 1,2,3 - More Bill of Materials (&minus;g
-partslist[1-3])</p>
-</td>
+partslist[1-3])</p> </td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>DRC - Start of a design rule checker (&minus;g drc)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>DRC - Start of a design rule checker (&minus;g drc)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>DRC2 - A second design rule checker (&minus;g drc2)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>DRC2 - A second design rule checker (&minus;g drc2)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
+
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
 
 <p>gEDA - native format, mainly used for testing (&minus;g
-geda)</p>
-</td>
+geda)</p> </td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>Gossip netlist format (&minus;g gossip)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>Gossip netlist format (&minus;g gossip)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>PADS netlist format (&minus;g pads)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>PADS netlist format (&minus;g pads)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>PCB / PCBboard (&minus;g PCB and &minus;g PCBboard)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>PCB / PCBboard (&minus;g PCB and &minus;g PCBboard)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
+
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
 
 <p>PCB actions file for forward annotating pin/pad names
-from schematic to layout (&minus;g pcbpins)</p>
-</td>
+from schematic to layout (&minus;g pcbpins)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>gsch2pcb backend (&minus;g gsch2pcb)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>gsch2pcb backend (&minus;g gsch2pcb)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>ProtelII netlist format (&minus;g protelII)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>ProtelII netlist format (&minus;g protelII)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>Spice compatible netlist format (&minus;g spice)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>Spice compatible netlist format (&minus;g spice)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
+
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
 
 <p>Enhanced spice compatible netlist format (&minus;g
-spice-sdb)</p>
-</td>
+spice-sdb)</p> </td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>Tango netlist format (&minus;g tango)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>Tango netlist format (&minus;g tango)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>Verilog code (&minus;g verilog)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>Verilog code (&minus;g verilog)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>VHDL code (&minus;g vhdl)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>VHDL code (&minus;g vhdl)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>VIPEC netlist format (&minus;g vipec)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>VIPEC netlist format (&minus;g vipec)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>Bartels Autoengineer netlist format (&minus;g bae)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>Bartels Autoengineer netlist format (&minus;g bae)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
+
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
 
 <p>GOSSIP system simulation system netlist format (&minus;g
-gossip)</p>
-</td>
+gossip)</p> </td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>MAXASCII netlist format (&minus;g maxascii)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>MAXASCII netlist format (&minus;g maxascii)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>VHDL-AMS netlist format (&minus;g vams)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>VHDL-AMS netlist format (&minus;g vams)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>Futurenet2 netlist format (&minus;g futurenet2)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>Futurenet2 netlist format (&minus;g futurenet2)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
+
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
 
 <p>SWITCAP switched capacitor simulator netlist format
-(&minus;g switcap)</p>
-</td>
+(&minus;g switcap)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>RF Cascade netlist format (&minus;g cascade)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>RF Cascade netlist format (&minus;g cascade)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>RACAL-REDAC netlist format (&minus;g redac)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>RACAL-REDAC netlist format (&minus;g redac)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>SystemC netlist backend (&minus;g systemc)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>SystemC netlist backend (&minus;g systemc)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>Calay format netlist backend (&minus;g calay)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>Calay format netlist backend (&minus;g calay)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>Osmond format netlist backend (&minus;g osmond)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>Osmond format netlist backend (&minus;g osmond)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
 
-<p>Eagle netlist format (&minus;g eagle)</p>
-</td>
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
+
+<p>Eagle netlist format (&minus;g eagle)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
+
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
 
 <p>Netlister for symbolic circuit analysis using
-Mathematica (&minus;g mathematica)</p>
-</td>
+Mathematica (&minus;g mathematica)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="2%">
+<td width="1%">
 
-<p>&bull;</p>
-</td>
-<td width="85%">
+
+<p>&bull;</p></td>
+<td width="2%"></td>
+<td width="86%">
+
 
 <p>LiquidPCB format netlist backend (&minus;g
-liquidpcb)</p>
-</td>
+liquidpcb)</p> </td></tr>
 </table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>For more info on these formats please look at the
-README.*</p>
-<!-- INDENTATION -->
-<p>Please read the official documentation on how to use
-gnetlist, since this man page just describes the command
-line arguments and a few examples on how to run
-gnetlist.</p>
-</td>
-</table>
+
+<p style="margin-left:14%; margin-top: 1em">For more info
+on these formats please look at the README.*</p>
+
+<p style="margin-left:14%; margin-top: 1em">Please read the
+official documentation on how to use gnetlist, since this
+man page just describes the command line arguments and a few
+examples on how to run gnetlist.</p>
+
+<h2>OPTIONS
 <a name="OPTIONS"></a>
-<h2>OPTIONS</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><i>gnelist</i> accepts the following options:</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="4" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="13%"></td>
-<td width="4%">
+</h2>
 
-<p><b>-q</b></p>
-</td>
-<td width="5%"></td>
-<td width="76%">
 
-<p>Quiet mode on. This mode turns off all
-warnings/notes/messages. (optional)</p>
-</td>
-<tr valign="top" align="left">
-<td width="13%"></td>
-<td width="4%">
+<p style="margin-left:11%; margin-top: 1em"><i>gnelist</i>
+accepts the following options:</p>
 
-<p><b>-v</b></p>
-</td>
-<td width="5%"></td>
-<td width="76%">
-
-<p>Verbose mode on. This mode gives as much feedback to the
-user as possible. (optional)</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-g guile_procedure</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Specify the guile procedure which is executed to create
-the netlist. Use &quot;&minus;g help&quot; to display a list
-of available backends.</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-o output_filename</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Specify the filename which will contain the netlist
-generated by gnetlist. If this option is not specified the
-default filename is &quot;output.net&quot;.</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-l scheme_file</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Specify a filename which contains scheme code to be
-loaded and execute before any backend is loaded or any guile
-procedure (using &minus;g flag) is executed. This flag can
-be specified multiple times and can be used to pass
-information to backends.</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-e, --embed</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Force embedding contents of .include file when using the
-spice-sdb backend.</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-O string</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Pass the given option to the specified backend.</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-m scheme_file</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Specify a filename which contains scheme code to be
-loaded and execute after the backend is loaded but still
-before any guile procedure (using &minus;g flag) is
-executed. This flag can be specified multiple times and can
-be used to pass information to backends. This flag, for
-example, allows the user to override variables inside of the
-backends (such as paths).</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-n, --nomunge</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Do not autocorrect the refdes attributes. Only applies to
-the spice-sdb backend.</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-c string</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Pass the specified string to the guile interpreter. This
-allows you to execute arbitrary guile scripts from the
-command line. Be sure to surround the string with either
-single or double quotes to satisfy your shell. The string is
-execute before any init or netlist backend scheme code is
-loaded or executed.</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-I, --include</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Put .INCLUDE &lt;filename&gt; in output file instead of
-model file&rsquo;s contents.</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-h, --help</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Print out short command line help.</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="4" cellspacing="0" cellpadding="0">
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="4%">
+<td width="3%">
 
-<p><b>-i</b></p>
-</td>
-<td width="7%"></td>
-<td width="76%">
+
+<p style="margin-top: 1em"><b>-q</b></p></td>
+<td width="9%"></td>
+<td width="77%">
+
+
+<p style="margin-top: 1em">Quiet mode on. This mode turns
+off all warnings/notes/messages. (optional)</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>-v</b></p></td>
+<td width="9%"></td>
+<td width="77%">
+
+
+<p>Verbose mode on. This mode gives as much feedback to the
+user as possible. (optional)</p></td></tr>
+</table>
+
+<p style="margin-left:11%;"><b>-g guile_procedure</b></p>
+
+<p style="margin-left:23%;">Specify the guile procedure
+which is executed to create the netlist. Use &quot;&minus;g
+help&quot; to display a list of available backends.</p>
+
+<p style="margin-left:11%;"><b>-o output_filename</b></p>
+
+<p style="margin-left:23%;">Specify the filename which will
+contain the netlist generated by gnetlist. If this option is
+not specified the default filename is
+&quot;output.net&quot;.</p>
+
+<p style="margin-left:11%;"><b>-l scheme_file</b></p>
+
+<p style="margin-left:23%;">Specify a filename which
+contains scheme code to be loaded and execute before any
+backend is loaded or any guile procedure (using &minus;g
+flag) is executed. This flag can be specified multiple times
+and can be used to pass information to backends.</p>
+
+<p style="margin-left:11%;"><b>-e, --embed</b></p>
+
+<p style="margin-left:23%;">Force embedding contents of
+.include file when using the spice-sdb backend.</p>
+
+<p style="margin-left:11%;"><b>-O string</b></p>
+
+<p style="margin-left:23%;">Pass the given option to the
+specified backend.</p>
+
+<p style="margin-left:11%;"><b>-m scheme_file</b></p>
+
+<p style="margin-left:23%;">Specify a filename which
+contains scheme code to be loaded and execute after the
+backend is loaded but still before any guile procedure
+(using &minus;g flag) is executed. This flag can be
+specified multiple times and can be used to pass information
+to backends. This flag, for example, allows the user to
+override variables inside of the backends (such as
+paths).</p>
+
+<p style="margin-left:11%;"><b>-n, --nomunge</b></p>
+
+<p style="margin-left:23%;">Do not autocorrect the refdes
+attributes. Only applies to the spice-sdb backend.</p>
+
+<p style="margin-left:11%;"><b>-c string</b></p>
+
+<p style="margin-left:23%;">Pass the specified string to
+the guile interpreter. This allows you to execute arbitrary
+guile scripts from the command line. Be sure to surround the
+string with either single or double quotes to satisfy your
+shell. The string is execute before any init or netlist
+backend scheme code is loaded or executed.</p>
+
+<p style="margin-left:11%;"><b>-I, --include</b></p>
+
+<p style="margin-left:23%;">Put .INCLUDE &lt;filename&gt;
+in output file instead of model file&rsquo;s contents.</p>
+
+<p style="margin-left:11%;"><b>-h, --help</b></p>
+
+<p style="margin-left:23%;">Print out short command line
+help.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="3%">
+
+
+<p><b>-i</b></p></td>
+<td width="9%"></td>
+<td width="77%">
+
 
 <p>Interactive mode. After the schematic is read in and
 parsed then go into interactive mode. Interactive mode
-allows the user to execute guile procedures directly.</p>
-</td>
+allows the user to execute guile procedures directly.</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="4%">
+<td width="3%">
 
-<p><b>-s</b></p>
-</td>
-<td width="7%"></td>
-<td width="76%">
 
-<p>Sort output netlist (for Gnucap)</p>
-</td>
+<p><b>-s</b></p></td>
+<td width="9%"></td>
+<td width="77%">
+
+
+<p>Sort output netlist (for Gnucap)</p></td></tr>
 </table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>schematic1 [... schematicN]</p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>At least one schematic file must be specified. If
-multiple schematics are specified then they are sequentially
-read in and parsed with the assumption that they are all
-part of the same design. It is important that the
-schematic(s) follow all the options (ie last).</p>
-</td>
-</table>
+
+<p style="margin-left:11%;">schematic1 [... schematicN]</p>
+
+<p style="margin-left:23%;">At least one schematic file
+must be specified. If multiple schematics are specified then
+they are sequentially read in and parsed with the assumption
+that they are all part of the same design. It is important
+that the schematic(s) follow all the options (ie last).</p>
+
+<h2>EXAMPLES
 <a name="EXAMPLES"></a>
-<h2>EXAMPLES</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>These examples assume that you have a stack_1.sch in the
-current directory.</p>
-<!-- INDENTATION -->
-<p>gnetlist requires that at least one schematic to be
-specified on the command line:</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="3" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="7%"></td>
-<td width="7%">
-</td>
-<td width="85%">
+</h2>
 
-<p>./gnetlist stack_1.sch</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>This is not very useful since it does not direct gnetlist
-to do<br>
+
+<p style="margin-left:11%; margin-top: 1em">These examples
+assume that you have a stack_1.sch in the current
+directory.</p>
+
+<p style="margin-left:11%; margin-top: 1em">gnetlist
+requires that at least one schematic to be specified on the
+command line:</p>
+
+<p style="margin-left:11%; margin-top: 1em">./gnetlist
+stack_1.sch</p>
+
+<p style="margin-left:11%; margin-top: 1em">This is not
+very useful since it does not direct gnetlist to do <br>
 anything.</p>
-<!-- INDENTATION -->
-<p>Specify a guile procedure name to get gnetlist to output
-a netlist:</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="3" cellspacing="0" cellpadding="0">
+
+<p style="margin-left:11%; margin-top: 1em">Specify a guile
+procedure name to get gnetlist to output a netlist:</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
 <tr valign="top" align="left">
+<td width="8%"></td>
 <td width="7%"></td>
-<td width="7%">
-</td>
 <td width="85%">
 
-<p>./gnetlist &minus;g geda stack_1.sch</p>
-</td>
+
+<p>./gnetlist &minus;g geda stack_1.sch</p></td></tr>
 </table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>The netlist output will be written to a file called
-&quot;output.net&quot;<br>
+
+<p style="margin-left:11%; margin-top: 1em">The netlist
+output will be written to a file called
+&quot;output.net&quot; <br>
 in the current working directory.</p>
-<!-- INDENTATION -->
-<p>You can specify the output filename by using the &minus;o
-flag:</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="3" cellspacing="0" cellpadding="0">
+
+<p style="margin-left:11%; margin-top: 1em">You can specify
+the output filename by using the &minus;o flag:</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
 <tr valign="top" align="left">
-<td width="7%"></td>
-<td width="7%">
-</td>
-<td width="85%">
+<td width="8%"></td>
+<td width="92%">
+
 
 <p>./gnetlist &minus;g geda stack_1.sch &minus;o
-stack.netlist</p>
-</td>
+stack.netlist</p> </td></tr>
 </table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>The spice backend is run against the schematic(s) if you
-specify<br>
+
+<p style="margin-left:11%; margin-top: 1em">The spice
+backend is run against the schematic(s) if you specify <br>
 &minus;g spice and the tango backend is run if you specify
 &minus;g tango.</p>
-<!-- INDENTATION -->
-<p>To interact with the guile interpreter:</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="3" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="7%"></td>
-<td width="7%">
-</td>
-<td width="85%">
 
-<p>./gnetlist &minus;i stack_1.sch</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
+<p style="margin-left:11%; margin-top: 1em">To interact
+with the guile interpreter:</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
 <tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>You will get a prompt where you can execute guile
-procedures.</p>
-<!-- INDENTATION -->
-<p>To get a more verbose feedback as to what gnetlist is
-doing run<br>
+<td width="8%"></td>
+<td width="92%">
+
+
+<p>./gnetlist &minus;i stack_1.sch</p></td></tr>
+</table>
+
+<p style="margin-left:11%; margin-top: 1em">You will get a
+prompt where you can execute guile procedures.</p>
+
+<p style="margin-left:11%; margin-top: 1em">To get a more
+verbose feedback as to what gnetlist is doing run <br>
 with the &minus;v flag:</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="3" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="7%"></td>
-<td width="7%">
-</td>
-<td width="85%">
 
-<p>./gnetlist &minus;v &minus;g geda stack_1.sch</p>
-</td>
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="8%"></td>
+<td width="92%">
+
+
+<p>./gnetlist &minus;v &minus;g geda stack_1.sch</p></td></tr>
 </table>
+
+<h2>ENVIRONMENT
 <a name="ENVIRONMENT"></a>
-<h2>ENVIRONMENT</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><i>gnetlist</i> respects the following environment
-variable:</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>GEDADATA</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Specifies where the various required scheme and rc files
-are located (the default is ${prefix}/share/gEDA). This
-environment variables does not need to be set by the end
-user unless they are moving the executables to a new install
-${prefix}.</p>
-</td>
-</table>
+</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><i>gnetlist</i>
+respects the following environment variable: <b><br>
+GEDADATA</b></p>
+
+<p style="margin-left:23%;">Specifies where the various
+required scheme and rc files are located (the default is
+${prefix}/share/gEDA). This environment variables does not
+need to be set by the end user unless they are moving the
+executables to a new install ${prefix}.</p>
+
+<h2>AUTHOR
 <a name="AUTHOR"></a>
-<h2>AUTHOR</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>Ales Hvezda and many others</p>
-</td>
-</table>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Ales Hvezda and
+many others</p>
+
+<h2>SEE ALSO
 <a name="SEE ALSO"></a>
-<h2>SEE ALSO</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>gschem</b>(1), <b>gsymcheck</b>(1)</p>
-</td>
-</table>
+</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>gschem</b>(1),
+<b>gsymcheck</b>(1)</p>
+
+<h2>COPYRIGHT
 <a name="COPYRIGHT"></a>
-<h2>COPYRIGHT</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>Copyright &copy; 1999-2008 Ales Hvezda</p>
-<!-- INDENTATION -->
-<p>This document can be freely redistributed according to
-the terms of the GNU General Public License version 2.0.</p>
-</td>
-</table>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Copyright
+&copy; 1999-2008 Ales Hvezda</p>
+
+<p style="margin-left:11%; margin-top: 1em">This document
+can be freely redistributed according to the terms of the
+GNU General Public License version 2.0.</p>
 <hr>
 </body>
 </html>

@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <config.h>
 
@@ -128,8 +128,8 @@ SCM g_get_attrib_name_value(SCM attrib_smob)
   attribute = (struct st_attrib_smob *)SCM_CDR(attrib_smob);
 
   if (attribute != NULL &&
-      attribute->attribute != NULL) {
-    o_attrib_get_name_value (attribute->attribute, &name, &value );
+      attribute->attribute != NULL &&
+      o_attrib_get_name_value (attribute->attribute, &name, &value)) {
     returned = scm_cons (scm_makfrom0str (name),
                          scm_makfrom0str (value));
     g_free(name);
@@ -576,8 +576,8 @@ SCM g_get_attrib_value_by_attrib_name(SCM object_smob, SCM scm_attrib_name)
     a_iter = object->object->attribs;
     while (a_iter != NULL) {
       a_current = a_iter->data;
-      if (a_current != NULL) {
-        o_attrib_get_name_value (a_current, &name, &value );
+      if (a_current != NULL &&
+          o_attrib_get_name_value (a_current, &name, &value)) {
         if (strcmp(name, attrib_name) == 0)
           returned = scm_cons (scm_makfrom0str (value), returned);
         g_free (name);

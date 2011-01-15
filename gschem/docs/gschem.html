@@ -1,14 +1,25 @@
-<!-- Creator     : groff version 1.18.1 -->
-<!-- CreationDate: Sun Feb 14 21:26:02 2010 -->
+<!-- Creator     : groff version 1.20.1 -->
+<!-- CreationDate: Fri Jan 14 23:25:25 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
 <title>gschem</title>
+
 </head>
 <body>
 
-<h1 align=center>gschem</h1>
+<h1 align="center">gschem</h1>
+
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
@@ -20,358 +31,238 @@
 <a href="#COPYRIGHT">COPYRIGHT</a><br>
 
 <hr>
+
+
+<h2>NAME
 <a name="NAME"></a>
-<h2>NAME</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>gschem - gEDA/gaf Schematic Capture</p>
-</td>
-</table>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">gschem -
+gEDA/gaf Schematic Capture</p>
+
+<h2>SYNOPSIS
 <a name="SYNOPSIS"></a>
-<h2>SYNOPSIS</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>gschem</b> [&minus;q] [&minus;v] [&minus;t] [&minus;r
-rcfilename] [&minus;s scriptfilename] [&minus;o
-outputfilename] [&minus;p] [&minus;h] [schematic1 ...
-schematicN]</p>
-</td>
-</table>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>gschem</b>
+[&minus;q] [&minus;v] [&minus;t] [&minus;r rcfilename]
+[&minus;s scriptfilename] [&minus;o outputfilename]
+[&minus;p] [&minus;h] [schematic1 ... schematicN]</p>
+
+<h2>DESCRIPTION
 <a name="DESCRIPTION"></a>
-<h2>DESCRIPTION</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><i>gschem</i> is the schematic capture program which is
-part gEDA (GPL Electronic Design Automation) toolset. This
-program is used to draw electronic schematics. Schematics
-consist of standard symbols (which are either part of a
-standard library or created by the user) which represent the
-various gates and components. These components are then
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><i>gschem</i>
+is the schematic capture program which is part gEDA (GPL
+Electronic Design Automation) toolset. This program is used
+to draw electronic schematics. Schematics consist of
+standard symbols (which are either part of a standard
+library or created by the user) which represent the various
+gates and components. These components are then
 interconnected by nets (wires). Schematics may be printed to
 a PostScript file for printing or further conversion to
 other output formats. Output to various image formats is
 also supported.</p>
-<!-- INDENTATION -->
-<p><i>gschem</i> is also the symbol creation editor. All the
-standard methods of creating schematics are used in the
-creation of symbols. There are a few special rules when
-creating symbols, so please refer to the (non-existant as of
-now) symbol creation document.</p>
-<!-- INDENTATION -->
-<p>Please read the official documentation (very minimal at
-this point) on how to use <i>gschem</i>, since this man page
-just describes the command line arguments and a few examples
-on how to run <i>gschem</i>.</p>
-</td>
-</table>
+
+<p style="margin-left:11%; margin-top: 1em"><i>gschem</i>
+is also the symbol creation editor. All the standard methods
+of creating schematics are used in the creation of symbols.
+There are a few special rules when creating symbols, so
+please refer to the (non-existant as of now) symbol creation
+document.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Please read the
+official documentation (very minimal at this point) on how
+to use <i>gschem</i>, since this man page just describes the
+command line arguments and a few examples on how to run
+<i>gschem</i>.</p>
+
+<h2>OPTIONS
 <a name="OPTIONS"></a>
-<h2>OPTIONS</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><i>gschem</i> accepts the following options:</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="4" cellspacing="0" cellpadding="0">
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><i>gschem</i>
+accepts the following options:</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="5%">
+<td width="3%">
 
-<p><b>-q</b></p>
-</td>
-<td width="5%"></td>
-<td width="76%">
+
+<p><b>-q</b></p></td>
+<td width="9%"></td>
+<td width="77%">
+
 
 <p>Quiet mode on. This mode turns off all
-warnings/notes/messages. (optional)</p>
-</td>
+warnings/notes/messages. (optional)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="5%">
+<td width="3%">
 
-<p><b>-v</b></p>
-</td>
-<td width="5%"></td>
-<td width="76%">
+
+<p><b>-v</b></p></td>
+<td width="9%"></td>
+<td width="77%">
+
 
 <p>Verbose mode on. This mode gives as much feedback to the
-user as possible. (optional)</p>
-</td>
+user as possible. (optional)</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="5%">
+<td width="3%">
 
-<p><b>-t</b></p>
-</td>
-<td width="5%"></td>
-<td width="76%">
+
+<p><b>-t</b></p></td>
+<td width="9%"></td>
+<td width="77%">
+
 
 <p>Print out more information when using mouse strokes.
 With this command line flag and the middle button configured
 for mouse strokes, gschem will output the stroke sequence
 numbers as the user executes strokes. These numbers can be
-used to define new strokes in the system-gschemrc file.</p>
-</td>
+used to define new strokes in the system-gschemrc file.</p></td></tr>
 </table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-r filename</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Specify a rc filename. Normally <i>gschem</i> searches
-for the system-gschemrc, then ~/.gEDA/gschemrc, and finally
-for a gschemrc in the current directory. This options allows
-the user to specify an additional rc file which is read
-after all the other rc files are read. (optional)</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-s filename</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Specify a guile script to be executed at startup.
-(optional)</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>-o filename</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Specify a filename for postscript output. This command
-line argument is useful when running <i>gschem</i> from a
-shell script and with a guile script. The filename can be
-changed through the print dialog box.</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="4" cellspacing="0" cellpadding="0">
+
+<p style="margin-left:11%;"><b>-r filename</b></p>
+
+<p style="margin-left:23%;">Specify a rc filename. Normally
+<i>gschem</i> searches for the system-gschemrc, then
+~/.gEDA/gschemrc, and finally for a gschemrc in the current
+directory. This options allows the user to specify an
+additional rc file which is read after all the other rc
+files are read. (optional)</p>
+
+<p style="margin-left:11%;"><b>-s filename</b></p>
+
+<p style="margin-left:23%;">Specify a guile script to be
+executed at startup. (optional)</p>
+
+<p style="margin-left:11%;"><b>-o filename</b></p>
+
+<p style="margin-left:23%;">Specify a filename for
+postscript output. This command line argument is useful when
+running <i>gschem</i> from a shell script and with a guile
+script. The filename can be changed through the print dialog
+box.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="4%">
+<td width="3%">
 
-<p><b>-p</b></p>
-</td>
-<td width="7%"></td>
-<td width="76%">
+
+<p><b>-p</b></p></td>
+<td width="9%"></td>
+<td width="77%">
+
 
 <p>Automatically place the window, especially useful if
 running gschem from the command line and generating
-output.</p>
-</td>
+output.</p> </td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="4%">
+<td width="3%">
 
-<p><b>-h</b></p>
-</td>
-<td width="7%"></td>
-<td width="76%">
 
-<p>Print out short command line help.</p>
-</td>
+<p><b>-h</b></p></td>
+<td width="9%"></td>
+<td width="77%">
+
+
+<p>Print out short command line help.</p></td></tr>
 </table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>schematic1 [... schematicN]</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>Schematic file to be loaded. Specifing a schematic file
-is optional. If multiple schematic files are specified they
-are read in sequentially and put on seperate pages. It is
-important that the schematic(s) follow all the options (ie
-last).</p>
-</td>
-</table>
+
+<p style="margin-left:11%;"><b>schematic1 [...
+schematicN]</b></p>
+
+<p style="margin-left:23%;">Schematic file to be loaded.
+Specifing a schematic file is optional. If multiple
+schematic files are specified they are read in sequentially
+and put on seperate pages. It is important that the
+schematic(s) follow all the options (ie last).</p>
+
+<h2>EXAMPLES
 <a name="EXAMPLES"></a>
-<h2>EXAMPLES</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>These examples assume that you have a schematic called
-stack_1.sch in the current directory</p>
-<!-- INDENTATION -->
-<p>To run <i>gschem</i> and then interact with the
-program:</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="7%"></td>
-<td width="92%">
+</h2>
 
-<p>gschem</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>To run <i>gschem</i> in interactive mode but load a
-sample schematic:</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="7%"></td>
-<td width="92%">
 
-<p>gschem adders_1.sch</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>To run <i>gschem</i> and load up all schematics in the
-current subdirectory:</p>
-</td>
-</table>
-<!-- TABS -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="7%"></td>
-<td width="92%">
+<p style="margin-left:11%; margin-top: 1em">These examples
+assume that you have a schematic called stack_1.sch in the
+current directory</p>
 
-<p>gschem *.sch</p>
-</td>
-</table>
+<p style="margin-left:11%; margin-top: 1em">To run
+<i>gschem</i> and then interact with the program:</p>
+
+<p style="margin-left:11%; margin-top: 1em">gschem</p>
+
+<p style="margin-left:11%; margin-top: 1em">To run
+<i>gschem</i> in interactive mode but load a sample
+schematic:</p>
+
+<p style="margin-left:11%; margin-top: 1em">gschem
+adders_1.sch</p>
+
+<p style="margin-left:11%; margin-top: 1em">To run
+<i>gschem</i> and load up all schematics in the current
+subdirectory:</p>
+
+<p style="margin-left:11%; margin-top: 1em">gschem
+*.sch</p>
+
+<h2>ENVIRONMENT
 <a name="ENVIRONMENT"></a>
-<h2>ENVIRONMENT</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><i>gschem</i> respects the following environment
-variable:</p>
-</td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>GEDADATA</b></p></td>
-</table>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="23%"></td>
-<td width="76%">
-<p>specifies where the various required scheme and rc files
-are located (the default is ${prefix}/share/gEDA). This
-environment variables does not need to be set by the end
-user unless they are moving the executables to a new install
-${prefix}.</p>
-</td>
-</table>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><i>gschem</i>
+respects the following environment variable: <b><br>
+GEDADATA</b></p>
+
+<p style="margin-left:23%;">specifies where the various
+required scheme and rc files are located (the default is
+${prefix}/share/gEDA). This environment variables does not
+need to be set by the end user unless they are moving the
+executables to a new install ${prefix}.</p>
+
+<h2>AUTHOR
 <a name="AUTHOR"></a>
-<h2>AUTHOR</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p>Ales Hvezda and many others</p>
-</td>
-</table>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Ales Hvezda and
+many others</p>
+
+<h2>SEE ALSO
 <a name="SEE ALSO"></a>
-<h2>SEE ALSO</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<p><b>gnetlist</b>(1), <b>gsymcheck</b>(1)</p>
-</td>
-</table>
+</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>gnetlist</b>(1),
+<b>gsymcheck</b>(1)</p>
+
+<h2>COPYRIGHT
 <a name="COPYRIGHT"></a>
-<h2>COPYRIGHT</h2>
-<!-- INDENTATION -->
-<table width="100%" border=0 rules="none" frame="void"
-       cols="2" cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="10%"></td>
-<td width="89%">
-<pre>Copyright &copy;  1999-2008 Ales Hvezda
+</h2>
 
-This document can be freely redistributed according to the terms of the
-GNU General Public License version 2.0
 
-</pre>
+<p style="margin-left:11%; margin-top: 1em">Copyright
+&copy; 1999-2008 Ales Hvezda</p>
+
+<p style="margin-left:11%; margin-top: 1em">This document
+can be freely redistributed according to the terms of the
+<br>
+GNU General Public License version 2.0</p>
 <hr>
 </body>
 </html>

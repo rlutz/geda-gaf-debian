@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <config.h>
 
@@ -349,7 +349,7 @@ void x_image_lowlevel(GSCHEM_TOPLEVEL *w_current, const char* filename,
 
   /* Preserve proportions */
   prop = (float)width / height;
-  if(page_width > page_height) {
+  if (((float)page_width / page_height) > prop) {
     page_height = (page_width / prop);
   }else{
     page_width = (page_height * prop);

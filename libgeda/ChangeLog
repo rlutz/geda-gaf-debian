@@ -1,3 +1,92 @@
+commit 48f3d8aedb5db6f5dfb6232565e65e03d45b5efb
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Fri Jan 14 23:18:41 2011 -0500
+
+    Manually ran make update-po in order to prep for the make distcheck
+    
+    This step is always done right before make distcheck is run to create
+    a release tarball.
+
+commit e1c3ba4c453716f3b0cb475a9cc358f34a4683d9
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 11 01:36:15 2011 +0100
+
+    libgeda: invalidate bounds in attribute promotion
+    
+    Call o_bounds_invalidate in o_complex_promote_attribs
+    and in o_complex_remove_promotable_attribs.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+    Closes-bug: lp-700841
+    
+    (cherry picked from commit 2d07ac4933633837fc394e5001a452c7db290d13)
+
+commit 28ee546a15e360ab1b870205437905abc876e82e
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 11 08:37:07 2011 +0100
+
+    libgeda: getter for object visibility field
+    
+    Add method o_is_visible to query value of visibility field.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+    Affects-bug: lp-700841
+    Affects-bug: lp-701431
+    
+    (cherry picked from commit 45cb94eff246e342a0331bf8b0c908fdccda1359)
+
+commit c538d2c97885876d695ff45a8457c8d74e872809
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 11 08:33:43 2011 +0100
+
+    libgeda: setter for object visibility field
+    
+    Add method o_set_visibility to change value of visibility field.
+    If object visibility is changed, mark its cached bounds as invalid.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+    Affects-bug: lp-700841
+    Affects-bug: lp-701431
+    
+    (cherry picked from commit 37f3c42bf3d509bde85dec3150bfdca0a3e81551)
+
+commit 06f09ecaee96c130825f238689aef530657f892f
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 11 01:26:24 2011 +0100
+
+    libgeda: add recursion in o_bounds_invalidate
+    
+    Instead of invalidating cached bounds for single object, follow the
+    hierarchy and invalidate cached bounds of all parents as well.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+    Affects-bug: lp-700841
+    
+    (cherry picked from commit bb27719f730b078dc250196af40141ff7cac8636)
+
+commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 22:00:09 2011 +0000
+
+    Update FSF address in copyright headers.
+    
+    The FSF have now moved to 51 Franklin Street, Fifth Floor, Boston, MA
+    02110-1301 USA.  Our GPL and LPGL copyright headers need to updated to
+    reflect this.
+    
+    Only files remaining with old address are wiki files (although the
+    wiki has now been updated) and PostScript files.
+
+commit 8d708818425dea37690d739a5e9eaf26eb9cf46c
+Author: Patrick Bernaud <patrickb@chez.com>
+Date:   Tue Jan 4 15:37:48 2011 +0000
+
+    libgeda: Check attribute string before requesting name/value [3032626]
+
 commit bd34cfde2450790b357e574281f9562adce64303
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Feb 14 17:09:45 2010 -0500
@@ -4312,7 +4401,7 @@ Date:   Wed Mar 5 05:27:41 2008 -0500
     Updated version to 1.5.0 to mark the start of the next development cycle
 
 commit ffd2298ca90e9e8616a2804c5708cb3d2ccb0a83
-Merge: b62e017... 1a49d46...
+Merge: b62e017 1a49d46
 Author: Werner Hoch <werner.ho@gmx.de>
 Date:   Sat Mar 1 09:43:53 2008 +0100
 
@@ -5142,7 +5231,7 @@ Date:   Wed Nov 28 16:27:05 2007 +0000
     libgeda: Correct func name in SCM_ASSERT call
 
 commit ae225157603f063747709fa3d639ed8cdf63f6b1
-Merge: 1abfd25... 43b5713...
+Merge: 1abfd25 43b5713
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Tue Nov 27 07:53:37 2007 +0000
 

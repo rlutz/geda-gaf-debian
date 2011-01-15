@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /*! \file o_complex_basic.c
@@ -65,8 +65,8 @@ int world_get_single_object_bounds(TOPLEVEL *toplevel, OBJECT *o_current,
       case(OBJ_TEXT):
         /* only do bounding boxes for visible or doing show_hidden_text*/
         /* you might lose some attrs though */
-        if (! (o_current->visibility == VISIBLE ||
-               toplevel->show_hidden_text )) {
+        if (! (o_is_visible (toplevel, o_current) ||
+                toplevel->show_hidden_text)) {
           return 0;
         }
         /* This case falls through intentionally */
@@ -227,7 +227,8 @@ static int o_complex_is_eligible_attribute (TOPLEVEL *toplevel, OBJECT *object)
   }
 
   /* object is invisible and we do not want to promote invisible text */
-  if (object->visibility == INVISIBLE && toplevel->promote_invisible == FALSE)
+  if ((!o_is_visible (toplevel, object)) &&
+      (toplevel->promote_invisible == FALSE))
     return FALSE; /* attribute not eligible for promotion */
 
   /* yup, attribute can be promoted */
@@ -334,7 +335,7 @@ GList *o_complex_promote_attribs (TOPLEVEL *toplevel, OBJECT *object)
       OBJECT *o_kept = (OBJECT *) iter->data;
       OBJECT *o_copy = o_object_copy (toplevel, o_kept,
                                       toplevel->ADDING_SEL);
-      o_kept->visibility = INVISIBLE;
+      o_set_visibility (toplevel, o_kept, INVISIBLE);
       o_copy->parent = NULL;
       promoted = g_list_prepend (promoted, o_copy);
     }
@@ -347,6 +348,9 @@ GList *o_complex_promote_attribs (TOPLEVEL *toplevel, OBJECT *object)
         g_list_remove (object->complex->prim_objs, o_removed);
     }
     promoted = promotable;
+    /* Invalidate the object's bounds since we may have
+     * stolen objects from inside it. */
+    o_bounds_invalidate (toplevel, object);
   }
 
   /* Attach promoted attributes to the original complex object */
@@ -383,7 +387,7 @@ static void o_complex_remove_promotable_attribs (TOPLEVEL *toplevel, OBJECT *obj
   for (iter = promotable; iter != NULL; iter = g_list_next (iter)) {
     OBJECT *a_object = iter->data;
     if (toplevel->keep_invisible == TRUE) {   /* Hide promotable attributes */
-      a_object->visibility = INVISIBLE;
+      o_set_visibility (toplevel, a_object, INVISIBLE);
     } else {                                /* Delete promotable attributes */
       object->complex->prim_objs =
         g_list_remove (object->complex->prim_objs, a_object);
@@ -391,6 +395,7 @@ static void o_complex_remove_promotable_attribs (TOPLEVEL *toplevel, OBJECT *obj
     }
   }
 
+  o_bounds_invalidate (toplevel, object);
   g_list_free (promotable);
 }
 

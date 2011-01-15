@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 USA
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #-------------------------------------------------------------------
 
 """
@@ -275,15 +275,15 @@ class CmdLineArgs:
 
             if Option == '-a':
                 if self.ProgramMode == "extract":          # sanity check
-                    raise "Incompatible command line args"
+                    raise SyntaxError("Incompatible command line args")
 
             if Option == '-e':
                 if self.ProgramMode == "archive":          # sanity check
-                    raise "Incompatible command line args"
+                    raise SyntaxError("Incompatible command line args")
 
             if Option == '-f':
                 if self.ProgramMode == "extract":          # sanity check
-                    raise "Incompatible command line args"
+                    raise SyntaxError("Incompatible command line args")
                 try:
                     os.stat(Value)
                 except OSError:
@@ -294,7 +294,7 @@ class CmdLineArgs:
 
             if Option == '-o':
                 if self.ProgramMode == "extract":          # sanity check
-                    raise "incompatible command line args"
+                    raise SyntaxError("Incompatible command line args")
                 if CheckFilename(Value):
                     self.OutputFileName = Value            #strcopy?
                 else:
@@ -904,7 +904,7 @@ elif Args.ProgramMode == "extract":
     Extract(Args)
     sys.exit(0)
 else:
-    raise "Unknown program mode found."
+    raise RuntimeError("Unknown program mode found.")
 
 #  That's it -- very simple!!
 
