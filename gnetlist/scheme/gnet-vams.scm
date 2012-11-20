@@ -15,7 +15,8 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with this program; if not, write to the Free Software
-;;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+;;; MA 02111-1301 USA.
 
 ;;; --------------------------------------------------------------------------
 ;;; 
@@ -23,6 +24,8 @@
 ;;;  Build on the VHDL backend from Magnus Danielson
 ;;;
 ;;; --------------------------------------------------------------------------
+
+(use-modules (srfi srfi-1))
 
 ;;; ===================================================================================
 ;;;                  TOP LEVEL FUNCTION
@@ -775,17 +778,35 @@
 (define vams:write-component-attributes 
  (lambda (port uref generic-list)
    (if (not (null? generic-list))
-       (let ((attrib (car generic-list)))
+       (let ((attrib (car generic-list))
+	     (value (gnetlist:get-package-attribute uref (car generic-list))))
 	 (begin
-	   (display "\t\t\t" port)
-	   (display attrib port)  
-	   (display " => " port)
-	   (display (gnetlist:get-package-attribute uref attrib) port)
-	   (if (not (null? (cdr generic-list)))
-	       (begin
-		 (display ", " port)
-		 (newline port)
-		 (vams:write-component-attributes port uref (cdr generic-list)))))))))
+
+	   (if (string=? value "unknown")
+	     (vams:write-component-attributes port uref (cdr generic-list))
+	     (begin
+	       (display "\t\t\t" port)
+	       (display attrib port)  
+	       (display " => " port)
+	       (display value port)
+	       (vams:write-component-attributes-helper port uref (cdr generic-list)))))))))
+
+(define vams:write-component-attributes-helper 
+ (lambda (port uref generic-list)
+   (if (not (null? generic-list))
+       (let ((attrib (car generic-list))
+	     (value (gnetlist:get-package-attribute uref (car generic-list))))
+	 (begin
+
+	   (if (not (string=? value "unknown"))
+	     (begin
+               (display ", " port)
+               (newline port)
+	       (display "\t\t\t" port)
+	       (display attrib port)  
+	       (display " => " port)
+	       (display value port)
+	       (vams:write-component-attributes-helper port uref (cdr generic-list)))))))))
 
 
 ;;;           ARCHITECTURE GENERATING PART
@@ -942,17 +963,8 @@
 
 ;; returns all elements from ls, that are not in without-ls.  
 ;; a simple list function.
-
-(define vams:only-different-nets
-  (lambda (ls without-ls)
-     (if (null? ls)
-	'()
-	(append 
-	 (if (not (member (car ls) without-ls)) 
-	     (list (car ls))
-	     '())
-	 (vams:only-different-nets (cdr ls) without-ls)))))
-
+(define (vams:only-different-nets ls without-ls)
+  (lset-difference equal? ls without-ls))
 
 
 ;; sort all port-components out
@@ -1061,12 +1073,11 @@
 
 
 ;;; set generate-mode to default (1), when not defined before.
-
-(if (not (defined? 'generate-mode)) (define generate-mode '1))
+(define generate-mode (if (defined? 'generate-mode) generate-mode '1))
 
 
 ;;; set to-attribs list empty, when not needed.
-(if (not (defined? 'top-attribs)) (define top-attribs '()))
+(define top-attribs (if (defined? 'top-attribs) top-attribs '()))
 
 (display "loaded gnet-vams.scm\n")
 

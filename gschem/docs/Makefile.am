@@ -11,8 +11,8 @@ if ENABLE_DOXYGEN
 	-cd latex && $(MAKE)
 	-cd ..
 else
-	@echo 'Doxygen is not installed on your system.' >> $@
-	@echo 'The documentation can not be built from the sources.' >> $@
+	@echo 'configure was not run with the --enable-doxygen switch.'
+	@echo 'The documentation cannot be built from the sources.'
 endif
 
 dist_man_MANS = gschem.1
@@ -22,9 +22,9 @@ dist_man_MANS = gschem.1
 html_man_files = gschem.html
 SUFFIXES = .1 .html
 
-if ENABLE_GROFF_HTML
 docsmandir=$(docdir)/man
 docsman_DATA=$(html_man_files)
+if ENABLE_GROFF_HTML
 .1.html:
 	rm -rf $@.tmp && \
 	LC_NUMERIC=C $(GROFF) -man -T html  $< >$@.tmp && \

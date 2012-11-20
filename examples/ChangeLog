@@ -1,3 +1,48 @@
+commit f7fab3715f984c374f41d7c2d74fc2802bbb4e7a
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Nov 14 22:58:12 2012 +0000
+
+    Replace references to geda.seul.org with up-to-date URLs.
+    
+    Update lots of links to seul.org to www.geda-project.org, wiki.geda-project.org, gedasymbols.org and www.gnu.org as appropriate.
+
+commit 11f91c04a33ed79eb4ed51f30027127ddc2d9bf4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 21:36:40 2011 +0000
+
+    examples: Update TwoStageAmp.sch
+    
+    Commit d5d1a98f0e95 removed special handling for attributes with the
+    value "?" in the spice-sdb gnetlist backend.  However, the TwoStageAmp
+    example had an embedded copy of spice-directive-1.sym with a "file=?"
+    attribute.
+    
+    Reported-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 0e506ebd5d5cc87a7f373b83b24f2ad3c90fd18b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 14:13:22 2011 +0000
+
+    Remove per-tool INSTALL files.
+    
+    Only one top-level INSTALL file is needed, and that is provided by
+    automake.
+
+commit 502ab80495c45e092eca6052edd6cf8e7ff55429
+Merge: 27f7a52 e1c3ba4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 13 19:59:35 2011 +0000
+
+    Merge branch 'stable-1.6'
+    
+    Conflicts:
+    	NEWS
+    	libgeda/include/prototype_priv.h
+    	libgeda/src/gdk-pixbuf-hacks.c
+    	libgeda/src/o_basic.c
+    	libgeda/src/o_complex_basic.c
+    	utils/src/gsch2pcb.c
+
 commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Fri Jan 7 22:00:09 2011 +0000
@@ -10,6 +55,15 @@ Date:   Fri Jan 7 22:00:09 2011 +0000
     
     Only files remaining with old address are wiki files (although the
     wiki has now been updated) and PostScript files.
+
+commit 70349cdffe0aa25b9da909b5cc03abe421cfe81c
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Oct 17 03:39:49 2009 +0100
+
+    examples: Use filled paths to make some symbols look nicer
+    
+    I've been using the lightning detector example to make screen-shots,
+    so I'm committing the symbol changes I made for those.
 
 commit 98fc06c271432b9f59ca49865b8ca9dbe844b9de
 Author: Ales Hvezda <ahvezda@seul.org>

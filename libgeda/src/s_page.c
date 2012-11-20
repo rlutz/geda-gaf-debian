@@ -58,6 +58,53 @@
 
 static gint global_pid = 0;
 
+/* Called just before removing an OBJECT from a PAGE. */
+static void
+object_added (TOPLEVEL *toplevel, PAGE *page, OBJECT *object)
+{
+  /* Set up object parent pointer */
+#ifndef NDEBUG
+  if (object->page != NULL) {
+    g_critical ("Object %p already has parent page %p!", object, object->page);
+  }
+#endif
+  object->page = page;
+
+  /* Add object to tile system. */
+  s_tile_add_object (toplevel, object);
+
+  /* Update object connection tracking */
+  s_conn_update_object (toplevel, object);
+
+  o_emit_change_notify (toplevel, object);
+}
+
+/* Called just before removing an OBJECT from a PAGE. */
+static void
+pre_object_removed (TOPLEVEL *toplevel, PAGE *page, OBJECT *object)
+{
+  o_emit_pre_change_notify (toplevel, object);
+
+  /* Clear object parent pointer */
+#ifndef NDEBUG
+  if (object->page == NULL) {
+    g_critical ("Object %p has NULL parent page!", object);
+  }
+#endif
+  object->page = NULL;
+
+  /* Clear page's object_lastplace pointer if set */
+  if (page->object_lastplace == object) {
+    page->object_lastplace = NULL;
+  }
+
+  /* Remove object from connection system */
+  s_conn_remove_object (toplevel, object);
+
+  /* Remove object from tile system */
+  s_tile_remove_object (object);
+}
+
 /*! \brief create a new page object
  *  \par Function Description
  *  Creates a new page and add it to <B>toplevel</B>'s list of pages.
@@ -102,15 +149,14 @@ PAGE *s_page_new (TOPLEVEL *toplevel, const gchar *filename)
   /* new selection mechanism */
   page->selection_list = o_selection_new();
 
-  /* net/pin/bus stretch when doing moves */
-  page->stretch_list = NULL;
-
   page->place_list = NULL;
 
   /* init undo struct pointers */
   s_undo_init(page);
   
   page->object_lastplace = NULL;
+
+  page->weak_refs = NULL;
   
   set_window (toplevel, page,
               toplevel->init_left, toplevel->init_right,
@@ -195,11 +241,9 @@ void s_page_delete (TOPLEVEL *toplevel, PAGE *page)
 
 #if DEBUG
   printf("Freeing page: %s\n", page->page_filename);
-  s_tile_print(toplevel);
+  s_tile_print(toplevel, page);
 #endif
   s_tile_free_all (page);
-
-  s_stretch_destroy_all (page->stretch_list);
 
   /* free current page undo structs */
   s_undo_free_all (toplevel, page); 
@@ -211,8 +255,10 @@ void s_page_delete (TOPLEVEL *toplevel, PAGE *page)
   geda_list_remove( toplevel->pages, page );
 
 #if DEBUG
-  s_tile_print (toplevel);
+  s_tile_print (toplevel, page);
 #endif
+
+  s_weakref_notify (page, page->weak_refs);
 
   g_free (page);
 
@@ -253,6 +299,84 @@ void s_page_delete_list(TOPLEVEL *toplevel)
 
   /* reset toplevel fields */
   toplevel->page_current = NULL;
+}
+
+/*! \brief Add a weak reference watcher to an PAGE.
+ * \par Function Description
+ * Adds the weak reference callback \a notify_func to \a page.  When
+ * \a page is destroyed, \a notify_func will be called with two
+ * arguments: the \a page, and the \a user_data.
+ *
+ * \sa s_page_weak_unref
+ *
+ * \param [in,out] page       Page to weak-reference.
+ * \param [in] notify_func    Weak reference notify function.
+ * \param [in] user_data      Data to be passed to \a notify_func.
+ */
+void
+s_page_weak_ref (PAGE *page,
+                 void (*notify_func)(void *, void *),
+                 void *user_data)
+{
+  g_return_if_fail (page != NULL);
+  page->weak_refs = s_weakref_add (page->weak_refs, notify_func, user_data);
+}
+
+/*! \brief Remove a weak reference watcher from an PAGE.
+ * \par Function Description
+ * Removes the weak reference callback \a notify_func from \a page.
+ *
+ * \sa s_page_weak_ref()
+ *
+ * \param [in,out] page       Page to weak-reference.
+ * \param [in] notify_func    Notify function to search for.
+ * \param [in] user_data      Data to to search for.
+ */
+void
+s_page_weak_unref (PAGE *page,
+                   void (*notify_func)(void *, void *),
+                   void *user_data)
+{
+  g_return_if_fail (page != NULL);
+  page->weak_refs = s_weakref_remove (page->weak_refs,
+                                      notify_func, user_data);
+}
+
+/*! \brief Add a weak pointer to an PAGE.
+ * \par Function Description
+ * Adds the weak pointer at \a weak_pointer_loc to \a page. The
+ * value of \a weak_pointer_loc will be set to NULL when \a page is
+ * destroyed.
+ *
+ * \sa s_page_remove_weak_ptr
+ *
+ * \param [in,out] page          Page to weak-reference.
+ * \param [in] weak_pointer_loc  Memory address of a pointer.
+ */
+void
+s_page_add_weak_ptr (PAGE *page,
+                     void *weak_pointer_loc)
+{
+  g_return_if_fail (page != NULL);
+  page->weak_refs = s_weakref_add_ptr (page->weak_refs, weak_pointer_loc);
+}
+
+/*! \brief Remove a weak pointer from an PAGE.
+ * \par Function Description
+ * Removes the weak pointer at \a weak_pointer_loc from \a page.
+ *
+ * \sa s_page_add_weak_ptr()
+ *
+ * \param [in,out] page          Page to weak-reference.
+ * \param [in] weak_pointer_loc  Memory address of a pointer.
+ */
+void
+s_page_remove_weak_ptr (PAGE *page,
+                        void *weak_pointer_loc)
+{
+  g_return_if_fail (page != NULL);
+  page->weak_refs = s_weakref_remove_ptr (page->weak_refs,
+                                          weak_pointer_loc);
 }
 
 /*! \brief changes the current page in toplevel
@@ -361,11 +485,8 @@ void s_page_print_all (TOPLEVEL *toplevel)
 gint s_page_save_all (TOPLEVEL *toplevel)
 {
   const GList *iter;
-  PAGE *p_save, *p_current;
+  PAGE *p_current;
   gint status = 0;
-
-  /* save current page */
-  p_save = toplevel->page_current;
 
   for ( iter = geda_list_get_glist( toplevel->pages );
         iter != NULL;
@@ -373,28 +494,20 @@ gint s_page_save_all (TOPLEVEL *toplevel)
 
     p_current = (PAGE *)iter->data;
 
-    /* make p_current the current page of toplevel */
-    s_page_goto (toplevel, p_current);
-
-    if (f_save (toplevel, p_current->page_filename)) {
+    if (f_save (toplevel, p_current,
+                p_current->page_filename, NULL)) {
       s_log_message (_("Saved [%s]\n"),
-                     toplevel->page_current->page_filename);
+                     p_current->page_filename);
       /* reset the CHANGED flag of p_current */
       p_current->CHANGED = 0;
 
     } else {
       s_log_message (_("Could NOT save [%s]\n"),
-                     toplevel->page_current->page_filename);
+                     p_current->page_filename);
       /* increase the error counter */
       status++;
     }
 
-  }
-
-  /* restore current page */
-  if (p_save != NULL) 
-  {
-     s_page_goto (toplevel, p_save);
   }
 
   return status;
@@ -520,6 +633,7 @@ gint s_page_autosave (TOPLEVEL *toplevel)
 void s_page_append (TOPLEVEL *toplevel, PAGE *page, OBJECT *object)
 {
   page->_object_list = g_list_append (page->_object_list, object);
+  object_added (toplevel, page, object);
 }
 
 /*! \brief Append a GList of OBJECTs to the PAGE
@@ -534,7 +648,11 @@ void s_page_append (TOPLEVEL *toplevel, PAGE *page, OBJECT *object)
  */
 void s_page_append_list (TOPLEVEL *toplevel, PAGE *page, GList *obj_list)
 {
+  GList *iter;
   page->_object_list = g_list_concat (page->_object_list, obj_list);
+  for (iter = obj_list; iter != NULL; iter = g_list_next (iter)) {
+    object_added (toplevel, page, iter->data);
+  }
 }
 
 /*! \brief Remove an OBJECT from the PAGE
@@ -549,7 +667,37 @@ void s_page_append_list (TOPLEVEL *toplevel, PAGE *page, GList *obj_list)
  */
 void s_page_remove (TOPLEVEL *toplevel, PAGE *page, OBJECT *object)
 {
+  pre_object_removed (toplevel, page, object);
   page->_object_list = g_list_remove (page->_object_list, object);
+}
+
+/*! \brief Replace an OBJECT in a PAGE, in the same list position.
+ *
+ * \par Function Description
+ * Removes \a object1 from \a page's linked list of objects, and puts
+ * \a object2 in the position thus vacated. If \a object1 is not in \a
+ * page, object2 is appended to \a page.
+ *
+ * \param [in] toplevel  The TOPLEVEL object.
+ * \param [in] page      The PAGE to be modified.
+ * \param [in] object1   The OBJECT being removed from the page.
+ * \param [in] object2   The OBJECT being added to the page.
+ */
+void
+s_page_replace (TOPLEVEL *toplevel, PAGE *page,
+                OBJECT *object1, OBJECT *object2)
+{
+  GList *iter = g_list_find (page->_object_list, object1);
+
+  /* If object1 not found, append object2 */
+  if (iter == NULL) {
+    s_page_append (toplevel, page, object2);
+    return;
+  }
+
+  pre_object_removed (toplevel, page, object1);
+  iter->data = object2;
+  object_added (toplevel, page, object2);
 }
 
 /*! \brief Remove and free all OBJECTs from the PAGE
@@ -562,8 +710,13 @@ void s_page_remove (TOPLEVEL *toplevel, PAGE *page, OBJECT *object)
  */
 void s_page_delete_objects (TOPLEVEL *toplevel, PAGE *page)
 {
-  s_delete_object_glist (toplevel, page->_object_list);
+  GList *objects = page->_object_list;
+  GList *iter;
+  for (iter = objects; iter != NULL; iter = g_list_next (iter)) {
+    pre_object_removed (toplevel, page, iter->data);
+  }
   page->_object_list = NULL;
+  s_delete_object_glist (toplevel, objects);
 }
 
 
@@ -632,18 +785,20 @@ GList *s_page_objects_in_regions (TOPLEVEL *toplevel, PAGE *page,
 
   for (iter = page->_object_list; iter != NULL; iter = g_list_next (iter)) {
     OBJECT *object = iter->data;
+    int left, top, right, bottom;
+    int visible;
 
-    for (i = 0; i < n_rects; i++) {
-      int left, top, right, bottom;
-
-      if (world_get_single_object_bounds (toplevel, object,
-                                          &left, &top, &right, &bottom) &&
-          right  >= rects[i].lower_x &&
-          left   <= rects[i].upper_x &&
-          top    <= rects[i].upper_y &&
-          bottom >= rects[i].lower_y) {
-        list = g_list_prepend (list, object);
-        break;
+    visible = world_get_single_object_bounds (toplevel, object,
+                                              &left, &top, &right, &bottom);
+    if (visible) {
+      for (i = 0; i < n_rects; i++) {
+        if (right  >= rects[i].lower_x &&
+            left   <= rects[i].upper_x &&
+            top    <= rects[i].upper_y &&
+            bottom >= rects[i].lower_y) {
+          list = g_list_prepend (list, object);
+          break;
+        }
       }
     }
   }

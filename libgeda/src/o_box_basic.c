@@ -32,9 +32,6 @@
 #include <dmalloc.h>
 #endif
 
-/*! Default setting for draw function. */
-void (*box_draw_func)() = NULL;
-
 /*! \brief Create a BOX OBJECT
  *  \par Function Description
  *  This function creates a new object representing a box.
@@ -85,9 +82,6 @@ OBJECT *o_box_new(TOPLEVEL *toplevel,
 		     END_NONE, TYPE_SOLID, 0, -1, -1);
   o_set_fill_options(toplevel, new_node,
 		     FILLING_HOLLOW, -1, -1, -1, -1, -1);
-
-  new_node->draw_func = box_draw_func; 
-  new_node->sel_func  = select_func;  
 
   /* compute the bounding box */
   o_box_recalc(toplevel, new_node);
@@ -141,6 +135,36 @@ OBJECT *o_box_copy(TOPLEVEL *toplevel, OBJECT *o_current)
 } 
 
 /*! \brief Modify a BOX OBJECT's coordinates.
+ * \par Function Description
+ * Modifies the coordinates of all four corners of \a box, by setting
+ * the box to the rectangle enclosed by the points (\a x1, \a y1) and
+ * (\a x2, \a y2).
+ *
+ * \param [in]     toplevel current #TOPLEVEL.
+ * \param [in,out] object   box #OBJECT to be modified.
+ * \param [in]     x1       x coordinate of first corner of box.
+ * \param [in]     y1       y coordinate of first corner of box.
+ * \param [in]     x2       x coordinate of second corner of box.
+ * \param [in]     y2       y coordinate of second corner of box,
+ */
+void
+o_box_modify_all (TOPLEVEL *toplevel, OBJECT *object,
+                  int x1, int y1, int x2, int y2)
+{
+  o_emit_pre_change_notify (toplevel, object);
+
+  object->box->lower_x = (x1 > x2) ? x1 : x2;
+  object->box->lower_y = (y1 > y2) ? y2 : y1;
+
+  object->box->upper_x = (x1 > x2) ? x2 : x1;
+  object->box->upper_y = (y1 > y2) ? y1 : y2;
+
+  /* recalculate the world coords and bounds */
+  o_box_recalc(toplevel, object);
+  o_emit_change_notify (toplevel, object);
+}
+
+/*! \brief Modify a BOX OBJECT's coordinates.
  *  \par Function Description
  *  This function modifies the coordinates of one of the four corner of
  *  the box. The new coordinates of the corner identified by <B>whichone</B>
@@ -168,7 +192,9 @@ void o_box_modify(TOPLEVEL *toplevel, OBJECT *object,
 		  int x, int y, int whichone)
 {
 	int tmp;
-	
+
+	o_emit_pre_change_notify (toplevel, object);
+
 	/* change the position of the selected corner */
 	switch(whichone) {
 		case BOX_UPPER_LEFT:
@@ -210,6 +236,7 @@ void o_box_modify(TOPLEVEL *toplevel, OBJECT *object,
 	
 	/* recalculate the world coords and the boundings */
 	o_box_recalc(toplevel, object);
+	o_emit_change_notify (toplevel, object);
   
 }
 
@@ -229,10 +256,10 @@ void o_box_modify(TOPLEVEL *toplevel, OBJECT *object,
  *  \param [in]     buf             Character string with box description.
  *  \param [in]     release_ver     libgeda release version number.
  *  \param [in]     fileformat_ver  libgeda file format version number.
- *  \return The BOX OBJECT that was created.
+ *  \return The BOX OBJECT that was created, or NULL on error.
  */
-OBJECT *o_box_read (TOPLEVEL *toplevel, char buf[],
-                    unsigned int release_ver, unsigned int fileformat_ver)
+OBJECT *o_box_read (TOPLEVEL *toplevel, const char buf[],
+                    unsigned int release_ver, unsigned int fileformat_ver, GError **err)
 {
   OBJECT *new_obj;
   char type;
@@ -255,8 +282,11 @@ OBJECT *o_box_read (TOPLEVEL *toplevel, char buf[],
    *  to default.
    */
 
-    sscanf (buf, "%c %d %d %d %d %d\n",
-            &type, &x1, &y1, &width, &height, &color);
+    if (sscanf (buf, "%c %d %d %d %d %d\n",
+		&type, &x1, &y1, &width, &height, &color) != 6) {
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse box object"));
+      return NULL;
+    }
 
     box_width   = 0;
     box_end     = END_NONE;
@@ -278,11 +308,14 @@ OBJECT *o_box_read (TOPLEVEL *toplevel, char buf[],
      *  characters and numbers in plain ASCII on a single line. The meaning of
      *  each item is described in the file format documentation.
      */
-    sscanf (buf, "%c %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-            &type, &x1, &y1, &width, &height, &color,
-            &box_width, &box_end, &box_type, &box_length,
-            &box_space, &box_filling,
-            &fill_width, &angle1, &pitch1, &angle2, &pitch2);
+    if (sscanf (buf, "%c %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+		&type, &x1, &y1, &width, &height, &color,
+		&box_width, &box_end, &box_type, &box_length,
+		&box_space, &box_filling,
+		&fill_width, &angle1, &pitch1, &angle2, &pitch2) != 17) {
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse box object"));
+      return NULL;
+    }
   }
 
   if (width == 0 || height == 0) {
@@ -335,13 +368,14 @@ OBJECT *o_box_read (TOPLEVEL *toplevel, char buf[],
  *  It follows the post-20000704 release file format that handle the line type
  *  and fill options.
  *
+ *  \param [in] toplevel  The TOPLEVEL structure.
  *  \param [in] object  The BOX OBJECT to create string from.
  *  \return A pointer to the BOX character string.
  *
  *  \warning
  *  Caller must g_free returned character string.
  */
-char *o_box_save(OBJECT *object)
+char *o_box_save(TOPLEVEL *toplevel, OBJECT *object)
 {
   int x1, y1; 
   int width, height;
@@ -407,8 +441,6 @@ char *o_box_save(OBJECT *object)
  */
 void o_box_translate_world(TOPLEVEL *toplevel, int dx, int dy, OBJECT *object)
 {
-  if (object == NULL) printf("btw NO!\n");
-
   /* Do world coords */
   object->box->upper_x = object->box->upper_x + dx;
   object->box->upper_y = object->box->upper_y + dy;

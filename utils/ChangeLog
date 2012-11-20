@@ -1,8 +1,586 @@
-commit a30f00bbee18ad5140616ad6459365cb48b03ee7
+commit 87f1e0e76965a514277c949dbf2191993962cb88
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 18 15:26:09 2012 +0000
+
+    Update version numbers to 1.8.0-20121118.
+
+commit 22b71fb85dd6b5665c3961d9d06e1355ebf5b358
+Author: levente <leventelist@gmail.com>
+Date:   Fri Apr 20 00:00:00 2012 +0000
+
+    gsch2pcb: Handle unit suffixes at element update.
+    
+    gsch2pcb rewrites the Element() line while it updates an element. The
+    coordinates are interpreted by atoi(). New versions of PCB uses unit
+    suffixes like 12.4mm. When this read by atoi(), it'll return only the
+    integer part. It then writes back to the Element, without suffix. PCB
+    then interpret as micro inches.
+    
+    Closes-bug: lp-986053
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit f7fab3715f984c374f41d7c2d74fc2802bbb4e7a
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Nov 14 22:58:12 2012 +0000
+
+    Replace references to geda.seul.org with up-to-date URLs.
+    
+    Update lots of links to seul.org to www.geda-project.org, wiki.geda-project.org, gedasymbols.org and www.gnu.org as appropriate.
+
+commit 7fa131aa1b861c1c1c5f3c48230742ee60e4d2b7
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Thu Nov 15 08:52:22 2012 +0000
+
+    utils: fix typo in pads_backannotate man page
+
+commit f0923997c5ea727f6b73afad23ee2f974ac6b6b0
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Mar 18 11:36:59 2012 +0000
+
+    Update FSF mailing address.
+    
+    Change all references to the FSF mailing address to the new Franklin
+    Street location.
+    
+    Closes-bug: lp-934934
+
+commit e2eda476fb8f3a16aeba8eab0cc8b7fa12e37d6b
 Author: Ales Hvezda <ahvezda@seul.org>
-Date:   Fri Jan 14 23:21:56 2011 -0500
+Date:   Sat Dec 31 16:00:23 2011 -0500
+
+    Updated man page date and version in prep for a new release (1.7.2)
+
+commit 038b86468ead7a1acf48e79a06cef8998d42242c
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Dec 23 22:12:20 2011 +0000
+
+    Add manpages for sarlacc_schem, sarlacc_sym.
+    
+    Add manpages for the OrCAD converter utilities sarlacc_schem and
+    sarlacc_sym. Update build targets and gitignore.
+    
+    Closes-bug: lp-698849
+
+commit 6eb6fa5e2a5aeaa12f33d7238c35f71242005561
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Dec 21 22:38:43 2011 +0000
+
+    Add manpage for gsymfix.
+    
+    Add manpage for gsymfix(1), add to build targets and gitignore
+    
+    Affects-bug: lp-698849
+
+commit 7cd21a46a827e37537e256760a10c2a1ae824679
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Dec 21 22:49:14 2011 +0000
+
+    Rename "gsymfix.pl" to "gsymfix".
+    
+    Since this script is installed into $prefix/bin, rename it to the
+    more command-like "gsymfix". Updated build system for new file, and
+    updated NEWS file appropriately.
+
+commit 276c8f36273de940eef281d650eee142e541cf26
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Dec 21 21:42:47 2011 +0000
+
+    Add manpage for gschlas
+    
+    Add manpage for gschlas(1), add to make targets and gitignore.
+    
+    Affects-bug: lp-698849
+
+commit b4d29aabc23e1c387657833424ad4aed5c584849
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Dec 19 14:52:41 2011 +0000
+
+    Move gsymupdate and gschupdate to "not installed".
+    
+    These two scripts have comments that say "Right now this program
+    should only be run against schematics which are either version
+    20020527 or earlier." I believe they were useful 10 years ago but not so
+    much now, so there's no need to install them into $prefix/bin.
+    
+    Affects-bug: lp-698849
+
+commit 7e4cc25ae7e93980ea2d586fc294c627542f83b3
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Dec 19 07:31:09 2011 +0000
+
+    Add manpage for gnet_hier_verilog.sh
+    
+    Add a manpage for gnet_hier_verilog.sh and also move it to noinst_MANS
+    so it doesn't get installed into $prefix/bin.
+    
+    Affects-bug: lp-698849
+
+commit 79b5727fd131179a7abd133e556cfb2f0e99af40
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Dec 19 07:32:55 2011 +0000
+
+    Utils: Fix trailing whitespace in garchive man page.
+    
+    Commit a464d46fd had inadvertently left trailing spaces on a couple of
+    lines, this commit removes them.
+
+commit e100dbd692346fb15de8bfd53865db5553f7db86
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Dec 18 19:12:24 2011 +0000
+
+    Add manpage for gmk_sym.
+    
+    Affects-bug: lp-698849
+
+commit a464d46fde3df46d2d36ca2ef1c36d49bd5b94fe
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Dec 18 14:10:09 2011 +0000
+
+    Add manpage for garchive
+    
+    Affects-bug: lp-698849
+
+commit b14c43e2e50eb7946304646a2dfd34d5716ca8af
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Dec 18 13:42:21 2011 +0000
+
+    Add tragesym.html manpage rendering to gitignore
+
+commit 4e29a2afab4ccdfa2c43a2fcf5320d45190d93f1
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Dec 18 13:40:24 2011 +0000
+
+    Add manpage for convert_sym(1).
+    
+    New manpage for convert_sym, and add to build targets and gitignore.
+    
+    Affects-bug:698849
+
+commit 77e61fd5cf2526f1446985676ddc04fcb3d9f4de
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Dec 18 18:31:04 2011 +0000
+
+    Expand html man page names properly.
+    
+    Fixes an issue in 7d0ed87ac where the expansion of filenames was not
+    happening properly due to a typo in the make subsitution macro.
+
+commit c232f64ab04da64f192fc24d5213f3455772fd79
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Dec 18 11:29:26 2011 +0000
+
+    Add manpage for smash_megafile(1)
+    
+    Add the manpage for smash_megafile and added it to build sources in the make
+    infrastructure and gitignore.
+    
+    Affects-bug: lp-698849
+
+commit b6ebe551f2f67f0d984a99c77b1582e92f9bab14
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Dec 18 18:38:06 2011 +0000
+
+    utils: add olib.html to gitignore
+    
+    This was missed in the addition of the manpage in commit 9497429a2.
+
+commit 44c8ea19dd71d3ae9757a5f9161c09bcaa47eebf
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 18 09:34:42 2011 +0000
+
+    Update .gitignore files for sw2asc move.
+
+commit 9497429a24e873530186a9b17cd82d295b44ac32
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sat Dec 17 09:35:57 2011 +0000
+
+    Add man page for olib(1).
+    
+    Added man page for olib based on the README.olib, added HTML versions
+    to build targets and gitignore.
+    
+    Affects-bug: lp-698849
+
+commit 049b297aaf13aee06ea3c0246a8cd2401cb5b65e
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Dec 14 07:23:50 2011 +0000
+
+    Add man page for tragesym(1).
+    
+    Create a new man page for tragesym starting from the text in
+    README.tragesym.
+    
+    Affects-bug: lp-698849
+
+commit 7d0ed87ac60ad394aee2dd35f81e9f17336b51ee
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 18 08:45:16 2011 +0000
+
+    utils: Generate HTML of all man pages.
+    
+    Reported-by: Gareth Edwards <gareth@edwardsfamily.org.uk>
+
+commit 6db1ebe332d3dd78367459dc4676af6fcce8b330
+Author: Dan McMahill <dan@mcmahill.net>
+Date:   Sat Dec 17 12:14:37 2011 -0500
+
+    Move the sw2asc script out of the gnetlist tree and into the utils tree where it belongs.
+    
+    This script is not really a gnetlist utility but rather one used to help extract
+    some simulation results.  It is used with the SWITCAP2 switched capacitor circuit
+    simulator which is supported by a gnetlist backend and gschem library.
+
+commit 49fb5830b0990cc1f84a3ef966277dead9a6d847
+Author: Dan McMahill <dan@mcmahill.net>
+Date:   Sat Dec 17 12:10:57 2011 -0500
+
+    Fix a few typos and also correctly identify -V with version and -v with verbose
+
+commit 90475267fe88bacd8c36121335904c58f7a76547
+Author: Dan McMahill <dan@mcmahill.net>
+Date:   Sat Dec 17 12:09:23 2011 -0500
+
+    Add man page for sw2asc.
+    
+    Affects-bug: lp-698849
+
+commit e8049ecbcab0dda94245b6ded9a2d89bfcf6733e
+Author: Dan McMahill <dan@mcmahill.net>
+Date:   Sat Dec 17 11:48:10 2011 -0500
+
+    Update the options parsing to take short options as well as long options.
+    
+    This brings the script behavior more in line with the man page description
+    and also provides the short options which are prefered by some users.
+
+commit 7a54f5fbdc0985ff9d2e399c2386bac7b53b093a
+Author: Dan McMahill <dan@mcmahill.net>
+Date:   Sat Dec 17 11:21:40 2011 -0500
+
+    Add man pages for pcb_backannotate and pads_backannotate.
+    
+    Affects-bug: lp-698849
+
+commit 56c72d5f24d6c80d47d6c114a1bcae1156c68ce6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 15 08:45:13 2011 +0000
+
+    schdiff: Use a here document for usage.
+
+commit 79713159cdb78fc17f48c7cd2ad34c130a33fb96
+Author: Alan Somers <asomers@gmail.com>
+Date:   Thu Dec 15 08:33:19 2011 +0000
+
+    schdiff, a graphical diff tool for schematics.
+    
+    Closes-bug: lp-1442898
+
+commit ce4662cfda106f037b02e165a97d73121f0ea195
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Dec 12 22:44:25 2011 +0000
+
+    Add man page for refdes_renum and explain examples.
+    
+    Convert the usage message from the Perl source for refdes_renum into a
+    man page for said script. Also add a brief description of what the examples
+    do to the refdes_renum script usage() message.
+    
+    Affects-bug: lp-698849
+
+commit 0e506ebd5d5cc87a7f373b83b24f2ad3c90fd18b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 14:13:22 2011 +0000
+
+    Remove per-tool INSTALL files.
+    
+    Only one top-level INSTALL file is needed, and that is provided by
+    automake.
+
+commit c5b473354b2340b42d1a48436fb4da113b34657f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 11 22:18:22 2011 +0000
+
+    gsch2pcb: Make --m4-file and -m4-pcbdir arguments work again.
+    
+    These options were broken in commit 6d935086d299, and haven't worked
+    since before 1.6.x.  Since no-one had reported it a bug in all that
+    time, it's obvious that no-one was actually using them, and we could
+    probably get away with just deleting them.  But making them work again
+    will work as well.
+    
+    Closes-bug: lp-897661
+
+commit 23d8520c810c7f7747b1df45ce6315d1abd6f62f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 11 09:18:51 2011 +0000
+
+    gsch2pcb: Fix memory leak with multiple --m4-pcbdir arguments.
+
+commit 18f88729bec5c5ef120d123ce7dcee7537bc6c04
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 11 02:03:37 2011 +0000
+
+    gsch2pcb: Show subprocess output in verbose mode.
+    
+    Commit fdd787ab8698 prevented gsch2pcb from ever outputting subprocess
+    standard output, even in verbose mode.  However, sometimes it's useful
+    to see the output of subprocesses, e.g. backend configuration info
+    from the gsch2pcb gnetlist backend.  This patch makes gsch2pcb output
+    subprocess standard output when in verbose mode, but suppress it
+    normally.
+    
+    Closes-bug: lp-713968
+
+commit 0e6193a0aa8b8105ef7494a5fac80d3929cf1c4d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 4 18:50:24 2011 +0000
+
+    utils: Fix some "set but not used" warnings.
+
+commit 579fbb4828a71ae2c78f270c3e7d1779c52e8997
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 29 13:23:33 2011 +0000
+
+    gsch2pcb: Remove "m4-command" project file option.
+    
+    The "m4-command" option permitted in gsch2pcb project files allows the
+    M4 command line generated by gsch2pcb to be replaced by an arbitrary
+    command line.  This patch removes the option.
+
+commit 400f396b8aa598017fda2ead72c2fbc72b1fc321
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sun Aug 28 02:26:55 2011 +0200
+
+    gsch2pcb: do not use sys/wait.h macros
+    
+    These are not available on windows - exit status of subprocess is
+    directly returned by g_spawn_sync.
+    
+    It seems same trick should work for Unix/Linux processes that called
+    exit(0), so we should be safe here.
+    
+    If not, we can include conditional compilation based on G_OS_WIN32.
+
+commit f70e0ec9cb2ea1b9518642f7e300c1fc230b1d5a
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sun Aug 28 02:03:45 2011 +0200
+
+    gsch2pcb: whitespace fix
+
+commit 987021bbb5f65ce3d28bc05f1c715b49a8a8e015
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Fri Jul 8 21:25:08 2011 +0100
+
+    Improved error handling in gsch2pcb.
+    
+    gsch2pcb: The return code from g_spawn_sync is checked when executing gnetlist.
+    If g_spawn_sync is successful, the exit code from gnetlist is checked, and
+    anything but a non-zero exit will be flagged as an error, and standard error
+    from gnetlist will be forwarded to the terminal. Notice that gnetlist may have
+    a successful exit code, even when errors are encountered, see bug lp-700448.
+    
+    Affects-bug: lp-806686
+
+commit 12260baebf9f828e9297fc794e911224b8dcd163
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jun 19 10:36:02 2011 -0400
+
+    Updated all man page dates/versions
+
+commit 8dcbaf1a2356acafd4b6f4247f1c6f426cf1247f
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:23:55 2011 +0200
+
+    gschlas: g_rc_gschlas_version: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 4a90c799782fc817776e365bddeb89eb0c5945a1
+Author: Kai-Martin Knaak <kmk@lilalaser.de>
+Date:   Wed Feb 23 11:33:00 2011 +0100
+
+    Better reflect the current homepage situation in the URLs
+    
+    	modified:   utils/src/gsch2pcb.c
+    
+    * Don't link explicitely to the wiki. Almost the whole geda homepage
+    is wikified now. This link is dead, anyway:
+      http://geda.seul.org/dokuwiki/doku.php?id=geda
+    
+    * Link to the online manual of gnetlist
+        http://geda.seul.org/wiki/geda:gnetlist_ug
+    
+    * point to pcb.gpleda.org rather than to sf.net for pcb documentation
+    
+    * point to gpleda.org as home page of gEDA
+    
+    	modified:   utils/scripts/pcb_backannotate
+    * Yet another link to sourceforge replaced by pcb.gpleda.org
+    
+    Reviewed-by: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+    Closes-bug: lp-723642
+
+commit fdd787ab8698585d5d10ba2cf2e5dd716388460a
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Tue May 10 20:35:42 2011 +0100
+
+    gsch2pcb: Follow g_spawn_sync() documentation and pass required flags
+    
+    The documentation for g_spawn_sync() tells us that we must pass the
+    flags G_SPAWN_STDOUT_TO_DEV_NULL and G_SPAWN_STDERR_TO_DEV_NULL if we
+    pass NULL for the stdout and stderr returns from the command.
+    
+    These flags cause g_spawn_sync() to redirect stdout and stderr to
+    /dev/null rather than assigning pipes to them.
+    
+    No known bug is fixed by this, but it is possible that without these
+    flags, either the stdout or stderr pipes' buffer could become full if
+    the command executing emits enough data. This might lead to both
+    processes stalling.
+    
+    Whilst I was touching this code, I added some comments as to the
+    meaning of the various NULL arguments we pass to g_spawn_sync().
+
+commit 3a5644f8804fe73e15d79db1dd2959a66aef7fe7
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Tue May 10 20:26:27 2011 +0100
+
+    gsch2pcb: NULL termiate the argument list to g_spawn_sync()
+    
+    Fixes mysterious failures which leave a message on the console:
+    
+      gsch2pcb: gnetlist command failed, `<FILENAME>' not updated
+         at least gnetlist 20030901 is required for m4-xxx options.
+    
+    Could potentially be a security flaw, as the argument list to execute
+    would be parsed off the end of unallocated memory until a NULL pointer
+    happened to be found.
+    
+    Might fix crashes, but couldn't find any relevant bug reports.
+
+commit 7cc025db90267d5cb5b038e2cc39cb15544e0367
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Mar 21 19:21:49 2011 +0000
+
+    Remove OBJECT->sel_func in favour of an OBJECT->selectable flag
+    
+    Only gschem called OBJECT->sel_func anyway, so lets avoid passing vfunc
+    pointers everywhere as a flag. This has the added benefit of removing
+    some dummy functions from gattrib and gschlas which were only present
+    so the status of locked objects could be preserved across load/save.
+
+commit c7e23d6238b0013830f0db4157a799c0657936cb
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Fri Mar 18 01:03:16 2011 +0100
+
+    gsymfix.pl: change default values for missing attributes
+    
+    According to Master Attribute Document valid values are device=none,
+    footprint=none or footprint=unknown.
+    
+    Closes-bug: lp-715503
+
+commit 6c4b8a72cd917872709bfb7918f9a1141d9c8548
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Mar 8 23:45:22 2011 +0100
+
+    gsch2pcb: replace g_spawn_* with build_and_run_command
+    
+    Affects-bug: lp-726828
+
+commit 1ac00b2ab05de162319119c389f63e3841303f8e
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Mar 8 00:44:00 2011 +0100
+
+    gsch2pcb: run_gnetlist now uses build_and_run_command
+    
+    Affects-bug: lp-726828
+
+commit a7a0bd24515bef8bcad69ae9321b4a8e5cbba738
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Mar 8 00:52:16 2011 +0100
+
+    gsch2pcb: helper function build_and_run_command
+    
+    Add a helper function to build and execute commands without
+    relying on shell to split and parse command line.
+    
+    Affects-bug: lp-726828
+
+commit b3e10e97a110e6976aa3b8d12ea8037bf45f4d2e
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Mon Mar 7 02:36:57 2011 +0100
+
+    gsch2pcb: keep multiple schematic files in a list
+    
+    Affects-bug: lp-726828
+
+commit 5b1ad217680aeddc4388b513fe2e41f0d9acee21
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Mon Mar 7 01:16:11 2011 +0100
+
+    gsch2pcb: support quoting in schematics option
+    
+    Use g_shell_parse_argv to support spaces in filenames.
+    
+    Affects-bug: lp-726828
+
+commit 6f705051d3b5b7ae380d0e13ad6fb8f4568066d2
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Mon Mar 7 01:01:38 2011 +0100
+
+    gsch2pcb: fix check for filename ending with .sch
+
+commit 799d67452921ed1447e8b030ee268fe8c34c5785
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jan 16 00:15:29 2011 -0500
 
     Updated version strings in all man pages
+
+commit 502ab80495c45e092eca6052edd6cf8e7ff55429
+Merge: 27f7a52 e1c3ba4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 13 19:59:35 2011 +0000
+
+    Merge branch 'stable-1.6'
+    
+    Conflicts:
+    	NEWS
+    	libgeda/include/prototype_priv.h
+    	libgeda/src/gdk-pixbuf-hacks.c
+    	libgeda/src/o_basic.c
+    	libgeda/src/o_complex_basic.c
+    	utils/src/gsch2pcb.c
+
+commit 7ca2b049dbcfb9f0eb8d3dd3fcf21cbd66c0ec95
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    Print message and exit if rc file load fails.
+    
+    Modifies g_rc_parse() to print useful messages to standard error and
+    exit with non-zero status if an error other than ENOENT occurs while
+    attempting to parse any configuration file.
+    
+    N.b. only copes with rc files loaded at startup; rc files loaded later
+    (e.g. a gafrc auto-loaded while loading a schematic using gschem
+    "File->Open") can't cause the application to die.
+    
+    Since this means that under some circumstances gschem and gattrib can
+    appear to do nothing silently (e.g. when launched from via a .desktop
+    file) subsequent patches need to make gschem and gattrib generate
+    appropriate warning and/or error message dialogs.
+    
+    Affects-bug: lp-698578
+
+commit 8ea29eed4fdc4b756e0437bb086b27d61b1eb7a0
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 8 11:48:28 2011 +0000
+
+    gsch2pcb: Don't allow `gnetlist-arg' in project file.
+    
+    Closes-bug: lp-700194
 
 commit 16b3d32fcf8458389a491aed9437be835131b4b9
 Author: Peter TB Brett <peter@peter-b.co.uk>
@@ -25,6 +603,33 @@ Date:   Fri Jan 7 22:00:09 2011 +0000
     Only files remaining with old address are wiki files (although the
     wiki has now been updated) and PostScript files.
 
+commit 86c305d9a2c62f062cbd9b63810a0173e4855310
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 14:53:51 2011 +0000
+
+    Install HTML versions of manpages even without groff.
+    
+    If groff isn't available, try to install HTML manpages anyway.  This
+    allows users to install manpages even if they don't have groff as long
+    as they aren't compiling from git and don't edit the manpages.
+    
+    Closes-bug: lp-698586
+
+commit 7cf7a33ea187092c242bad45512134b27627f93b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 22:48:26 2011 +0000
+
+    utils: Tidy up manpages.
+    
+    Put utils manpages in utils/docs to match other manpages.  Ensure
+    gxyrs.html is created & distributed.
+
+commit 92bbcfafd4e8e6cc53e02d15b4574e0a5bdb2209
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 17:49:08 2011 +0000
+
+    gsch2pcb: Add man page.
+
 commit dd6edbc063472ab92f77bac39d9da38536c45274
 Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@sabily.org>
 Date:   Tue Jan 4 15:37:48 2011 +0000
@@ -34,6 +639,76 @@ Date:   Tue Jan 4 15:37:48 2011 +0000
     utils/scripts/garchive.py uses string exceptions which have been deprecated in
     Python 2.5, and has been removed in Python 2.6. The attached patch fixes this
     issue.
+
+commit dc5dc7051c988d63941454df58dd635eb66611c1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 4 11:51:39 2011 +0000
+
+    gsch2pcb: Clean up formatting.
+    
+    Re-format gsch2pcb.c using GNU indent, followed by manual pass to tidy
+    comments.
+
+commit 1e93f7bea2cbe0fa8887337c261093b55c31dd6d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 3 23:07:25 2011 +0000
+
+    Revert "Remove some CVS keywords."
+    
+    This reverts commit f5ada1de1372bd3772b4f4bd33afa59803c1dade, which
+    was pushed to the repository in error.
+
+commit f5ada1de1372bd3772b4f4bd33afa59803c1dade
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Dec 21 12:37:10 2010 +0000
+
+    Remove some CVS keywords.
+
+commit 3abdca2a4ee088184e976822c444069d67e20a20
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:25 2010 +0000
+
+    libgeda: Add PAGE argument to file load/save functions.
+
+commit 7fdc71ea471ab0ff89932d49f92436c62f2a8882
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@sabily.org>
+Date:   Sun Oct 31 19:29:57 2010 +0000
+
+    utils: Don't use string exceptions in Python code. [3014181]
+    
+    utils/scripts/garchive.py uses string exceptions which have been deprecated in
+    Python 2.5, and has been removed in Python 2.6. The attached patch fixes this
+    issue.
+
+commit cd369fce23897f3e0c28c7db5f7923edee3ff34c
+Author: Carlos Nieves Onega <cnieves@iespana.es>
+Date:   Mon Sep 13 04:05:03 2010 +0200
+
+    Added gxyrs man page.
+    Added gxyrs man page. This closes bug #2836717.
+
+commit 0e5defe4871370a93c6ccb8bbf4a10e5df098884
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 21:26:37 2010 -0500
+
+    Updated man page dates
+    
+    (cherry picked from commit 11921dc18209ed4ea12288114634bb94a5b9b8a9)
+    (from stable-1.6)
+
+commit c31d9a1a90db32dd1e1d41f9d3d5ef5888424ba1
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 17:09:45 2010 -0500
+
+    Updated copyright text/header in most source files.
+    
+    Updated all copyright text dates that should be updated for the new year.
+    Fixed a bunch of GNU text typos (these should have been either
+    GPL or gEDA).  Removed some $Id$ tags which are no longer used/needed.
+    Fixed a few file header that were just plain incorrect.
+    
+    (cherry picked from commit bd34cfde2450790b357e574281f9562adce64303)
+    (from stable-1.6 branch)
 
 commit 11921dc18209ed4ea12288114634bb94a5b9b8a9
 Author: Ales Hvezda <ahvezda@seul.org>
@@ -60,6 +735,31 @@ Date:   Fri Nov 20 16:23:15 2009 +0000
     
     Fixes undefined use of `l' macro, and incorrect uses of `-' character.
     (cherry picked from commit 93dd5a941f34d1dd58cf9a57a07dec1e01ce3afe)
+
+commit 93dd5a941f34d1dd58cf9a57a07dec1e01ce3afe
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@users.sourceforge.net>
+Date:   Fri Nov 20 16:23:15 2009 +0000
+
+    Fix for some manpage issues. [2901183]
+    
+    Fixes undefined use of `l' macro, and incorrect uses of `-' character.
+
+commit 858982a2a05ff3e128de3621f1d301ecd989f35c
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Changed message on failure to generate doxygen docs
+    
+    If --enable-doxygen was not a configure flag, change the error message
+    on an attempt to build doxygen documentation to suggest the configure
+    flag was the cause of the failure rather than the lack of a doxygen
+    install itself.
+
+commit 1248c66c7973f8d3835f6107d3f1ed9c5c880b43
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Added doxygen targets to remaining applications.
 
 commit 3fd50335ddfe0ed7f358d46a0fba23bff25073e6
 Author: Ales Hvezda <ahvezda@seul.org>

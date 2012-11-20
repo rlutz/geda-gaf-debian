@@ -16,7 +16,7 @@
 ; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 ; The /'s may not work on win32
-(load (string-append gedadata "/scheme/gnet-partslist-common.scm"))
+(load (string-append gedadata "/scheme/partslist-common.scm"))
 
 (define partslist1:write-top-header
   (lambda (port)

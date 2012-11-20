@@ -14,7 +14,8 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with this program; if not, write to the Free Software
-;;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+;;; MA 02111-1301 USA.
 
 ;; --------------------------------------------------------------------------
 ;; This is gnetlist backend for the SWITCAP switched capacitor
@@ -396,9 +397,9 @@
 ;;
 (define switcap:write-top-header
   (lambda (port)
-    (display "/* Switcap netlist produced by gnetlist (part of gEDA) */\n" port)  
-    (display "/* See http://www.geda.seul.org for more information.  */\n" port)  
-    (display "/* Switcap backend written by Dan McMahill             */\n" port)
+    (display "/* Switcap netlist produced by gnetlist (part of gEDA)     */\n" port)
+    (display "/* See http://www.geda-project.org/ for more information.  */\n" port)
+    (display "/* Switcap backend written by Dan McMahill                 */\n" port)
     (display "\n\n" port)
     )
   )

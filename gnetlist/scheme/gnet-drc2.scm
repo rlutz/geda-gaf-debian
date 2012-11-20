@@ -15,12 +15,16 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with this program; if not, write to the Free Software
-;;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+;;; MA 02111-1301 USA.
 
 ;; --------------------------------------------------------------------------
 ;;
 ;; DRC backend written by Carlos Nieves Onega starts here.
 ;;
+;;  2010-12-11: Fix stack overflows with large designs.
+;;  2010-10-02: Applied patch from Karl Hammar. Do drc-matrix lower triangular
+;;                    and let get-drc-matrixelement swap row/column if row < column.
 ;;  2006-04-22: Display the pins when reporting a net with only one connection.
 ;;  2006-04-08: Added support for DRC directives (DontCheckPintypes and 
 ;;              NoConnection), so the DRC doesn't depend on the net name
@@ -134,27 +138,27 @@
 ;;;  Order is important !
 ;;;             unknown in    out   io    oc    oe    pas   tp    tri   clk   pwr unconnected
 ;;;unknown
-;;  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\e )
+;;  '(            #\c )
 ;;;in
-;;  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\e )
+;;  '(            #\c   #\c)
 ;;;out
-;;  '(            #\c   #\c   #\e   #\w   #\e   #\e   #\c   #\e   #\e   #\c   #\e   #\e )
+;;  '(            #\c   #\c   #\e )
 ;;;io
-;;  '(            #\c   #\c   #\w   #\c   #\w   #\w   #\c   #\w   #\c   #\c   #\w   #\e )
+;;  '(            #\c   #\c   #\w   #\c)
 ;;;oc
-;;  '(            #\c   #\c   #\e   #\w   #\e   #\c   #\c   #\e   #\c   #\c   #\e   #\e )
+;;  '(            #\c   #\c   #\e   #\w   #\e)
 ;;;oe
-;;  '(            #\c   #\c   #\e   #\w   #\c   #\e   #\c   #\e   #\c   #\c   #\e   #\e )
+;;  '(            #\c   #\c   #\e   #\w   #\c   #\e)
 ;;;pas
-;;  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\e )
+;;  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c)
 ;;;tp
-;;  '(            #\c   #\c   #\e   #\w   #\e   #\e   #\c   #\e   #\e   #\c   #\e   #\e )
+;;  '(            #\c   #\c   #\e   #\w   #\e   #\e   #\c   #\e)
 ;;;tri
-;;  '(            #\c   #\c   #\e   #\c   #\c   #\c   #\c   #\e   #\c   #\c   #\e   #\e )
+;;  '(            #\c   #\c   #\e   #\c   #\c   #\c   #\c   #\e   #\c)
 ;;;clk
-;;  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\e   #\e )
+;;  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c)
 ;;;pwr
-;;  '(            #\c   #\c   #\e   #\w   #\e   #\e   #\c   #\e   #\e   #\e   #\c   #\e )
+;;  '(            #\c   #\c   #\e   #\w   #\e   #\e   #\c   #\e   #\e   #\e   #\c)
 ;;;unconnected
 ;;  '(            #\e   #\e   #\e   #\e   #\e   #\e   #\e   #\e   #\e   #\e   #\e   #\e )))
 
@@ -163,6 +167,15 @@
 ;; -------------------------------------------------------------------------------
 ;; IMPORTANT: Don't modify anything below unless you know what you are doing.
 ;; -------------------------------------------------------------------------------
+
+(use-modules (srfi srfi-1))
+(or (defined? 'define-syntax)
+    (use-modules (ice-9 syncase)))
+
+(define-syntax define-undefined
+  (syntax-rules ()
+    ((_ name expr)
+     (define name (if (defined? (quote name)) name expr)))))
 
 ;;
 ;; Some internal definitions
@@ -186,81 +199,76 @@
 (define pintype-full-names (list "unknown" "input" "output" "input/output" "open collector" "open emitter" "passive" "totem-pole" "tristate" "clock" "power" "unconnected"))
 
 ; define if a specified pin can drive a net
-(if (defined? 'pintype-can-drive)
-    (begin
-      (define is-integer-list?
-	(lambda (list)
-	  (if (not (null? list))
-	      (if (integer? (car list))
-		  (if (or (< (car list) 0)
-			  (> (car list) 1))
-		      #f
-		      (is-integer-list? (cdr list)))
-		  #f)
-	      #t)))
-      (if (or (not (list? pintype-can-drive))
-	      (not (= (length pintype-can-drive) (length pintype-names)))
-	      (not (is-integer-list? pintype-can-drive)))
-	  (begin
-	    (display "INTERNAL ERROR: List of pins which can drive a net bad specified. Using default value.")
-	    (newline)
-	    (define pintype-can-drive 1))))
-    (define pintype-can-drive 1))     ; Later is redefined if it's not a list.
+(define (pintype-can-drive-valid? lst)
+  (define (int01? x)
+    (and (integer? x)
+         (or (= x 0)
+             (= x 1))))
+  (and (list? lst)
+       (= (length lst) (length pintype-names))
+       (every int01? lst)))
 
-(if (not (list? pintype-can-drive))
-;                                  unk in out io oc oe pas tp tri clk pwr undef
-    (define pintype-can-drive (list 1   0  1   1  1  1  1   1  1   0   1    0 )))
+(define pintype-can-drive
+  (if (defined? 'pintype-can-drive)
+    (if (pintype-can-drive-valid? pintype-can-drive)
+        pintype-can-drive
+        (begin
+          (display "INTERNAL ERROR: List of pins which can drive a net bad specified. Using default value.")
+          (newline)
+          #f))
+    #f))
+
+(if (not pintype-can-drive)
+;                                unk in out io oc oe pas tp tri clk pwr undef
+    (set! pintype-can-drive (list 1   0  1   1  1  1  1   1  1   0   1    0 )))
 
 ; DRC matrix
 ;
 ; #\e: error    #\w: warning   #\c: correct
-(if (not (defined? 'drc-matrix))
-    (define drc-matrix (list
+(define-undefined drc-matrix
+  (list
 ;  Order is important !
 ;             unknown in    out   io    oc    oe    pas   tp    tri   clk   pwr unconnected
 ;unknown
-  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\e )
+  '(            #\c )
 ;in
-  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\e )
+  '(            #\c   #\c   )
 ;out
-  '(            #\c   #\c   #\e   #\w   #\e   #\e   #\c   #\e   #\e   #\c   #\e   #\e )
+  '(            #\c   #\c   #\e   )
 ;io
-  '(            #\c   #\c   #\w   #\c   #\w   #\w   #\c   #\w   #\c   #\c   #\w   #\e )
+  '(            #\c   #\c   #\w   #\c   )
 ;oc
-  '(            #\c   #\c   #\e   #\w   #\e   #\c   #\c   #\e   #\c   #\c   #\e   #\e )
+  '(            #\c   #\c   #\e   #\w   #\e   )
 ;oe
-  '(            #\c   #\c   #\e   #\w   #\c   #\e   #\c   #\e   #\c   #\c   #\e   #\e )
+  '(            #\c   #\c   #\e   #\w   #\c   #\e   )
 ;pas
-  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\e )
+  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c   )
 ;tp
-  '(            #\c   #\c   #\e   #\w   #\e   #\e   #\c   #\e   #\e   #\c   #\e   #\e )
+  '(            #\c   #\c   #\e   #\w   #\e   #\e   #\c   #\e   )
 ;tri
-  '(            #\c   #\c   #\e   #\c   #\c   #\c   #\c   #\e   #\c   #\c   #\e   #\e )
+  '(            #\c   #\c   #\e   #\c   #\c   #\c   #\c   #\e   #\c   )
 ;clk
-  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\e   #\e )
+  '(            #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   #\c   )
 ;pwr
-  '(            #\c   #\c   #\e   #\w   #\e   #\e   #\c   #\e   #\e   #\e   #\c   #\e )
+  '(            #\c   #\c   #\e   #\w   #\e   #\e   #\c   #\e   #\e   #\e   #\c  )
 ;unconnected
   '(            #\e   #\e   #\e   #\e   #\e   #\e   #\e   #\e   #\e   #\e   #\e   #\e )
-)))
+))
 
 ;; Number of errors and warnings found
 (define errors_number 0)
 (define warnings_number 0)
 
-(if (not (defined? 'action-unused-slots))
-    (define action-unused-slots #\w)
+(define-undefined action-unused-slots #\w)
+
+(if (or (not (char? action-unused-slots))
+        (not (or (char=? action-unused-slots #\w)
+                 (char=? action-unused-slots #\c)
+                 (char=? action-unused-slots #\e))))
     (begin
-      (if (or (not (char? action-unused-slots))
- 	      (not (or (char=? action-unused-slots #\w) (char=? action-unused-slots #\c)
-		       (char=? action-unused-slots #\e))))
-	  (begin
-	    (display "INTERNAL ERROR: Action when unused slots are found has a wrong value. Using default.")
-	    (newline)
-	    (define action-unused-slots #\w))
-	  )
-      )
-    )
+      (display "INTERNAL ERROR: Action when unused slots are found has a wrong value. Using default.")
+      (newline)
+      (set! action-unused-slots #\w)))
 
 ;-----------------------------------------------------------------------
 ;   DRC matrix functions
@@ -284,7 +292,9 @@
 ; Get value x y from matrix
 (define drc2:get-drc-matrix-element
   (lambda (row column)
-	  (list-ref (list-ref drc-matrix row) column)))
+    (if (< row column)
+	(list-ref (list-ref drc-matrix column) row)
+	(list-ref (list-ref drc-matrix row) column))))
   
 ; Check if all elements of the DRC matrix are characters
 (define drc2:drc-matrix-elements-are-correct?
@@ -306,27 +316,6 @@
       
 ))
 
-; Check if the DRC matrix is simetric.
-(define drc2:is-simetric-drc-matrix
-  (lambda ()
-    (let check-row ((row 1))
-      (if (let check-column ((column 0))    
-	    (if (not (eqv? (drc2:get-drc-matrix-element row column)
-			   (drc2:get-drc-matrix-element column row)))
-		#f
-		(if (< column (- row 1))
-		    (check-column (+ column 1)) 		    
-		    #t)
-		)
-	    )
-	  (if (< row (- (length pintype-names) 1))
-	      (check-row (+ row 1)) 
-	      #t)	  
-	 #f)
-      )
-      
-))
-	  
 ;
 ; End of DRC matrix functions
 ;-----------------------------------------------------------------------
@@ -430,7 +419,9 @@
 	
 	(let* ( (numslots_string (gnetlist:get-package-attribute uref "numslots"))
 		(numslots (string->number numslots_string))
-		(slot_string (gnetlist:get-package-attribute uref "slot"))
+		(slot_string (let ((slots (gnetlist:get-all-package-attributes uref "slot")))
+                               (if (or (null? slots) (not (car slots)))
+                                   "unknown" (car slots))))
 		(slot (string->number slot_string))
 		)
 	  (let ()
@@ -513,18 +504,11 @@
     ))
 
 ;; Count the ocurrences of a given reference in the given list.
-(define drc2:count-reference-in-list
-  (lambda (refdes list)
-    (if (null? list)
-	0
-	(let ( (comparison (if (defined? 'case_insensitive)
-			       (string-ci=? refdes (car list))
-			       (string=? refdes (car list)))))
-	  (if comparison
-	      (+ 1 (drc2:count-reference-in-list refdes (cdr list)))
-	      (+ 0 (drc2:count-reference-in-list refdes (cdr list))))
-	  ))
-))
+(define (drc2:count-reference-in-list refdes lst)
+  (define refdes=? (if (defined? 'case_insensitive) string-ci=? string=?))
+  (fold
+   (lambda (x count) (if (refdes=? refdes x) (1+ count) count))
+   0 lst))
 
 ;; Check duplicated references of the given list
 ;;   If the number of ocurrences of a reference in the schematic doesn't match the number
@@ -554,6 +538,32 @@
 ;-----------------------------------------------------------------------
 ;  NETs checking functions
 ;
+
+;;
+;; Check for NoConnection nets with more than one pin connected.
+;;
+;; Example of all-nets: (net1 net2 net3 net4)
+(define (drc2:check-connected-noconnects port all-nets)
+  (for-each
+    (lambda (netname)
+      (let
+        ((directives (gnetlist:graphical-objs-in-net-with-attrib-get-attrib
+                    netname
+                    "device=DRC_Directive"
+                    "value")))
+        ;Only check nets with a NoConnection directive
+        (and
+          (member "NoConnection" directives)
+          ( >  (length (gnetlist:get-all-connections netname)) '1)
+          (begin
+            (display (string-append "ERROR: Net '"
+                            netname "' has connections, but "
+                            "has the NoConnection DRC directive: ") port)
+            (drc2:display-pins-of-type port "all" (gnetlist:get-all-connections netname))
+            (display "." port)
+            (newline port)
+            (set! errors_number (1+ errors_number))))))
+    all-nets))
 
 ;;
 ;; Check for nets with less than two pins connected.
@@ -871,40 +881,28 @@
     ))
 
 ; Report pins without the 'pintype' attribute (pintype=unknown)
-(define drc2:report-unknown-pintypes
-  (lambda (port nets)
-    (define count-unknown-pintypes
-      (lambda (port nets)
-	(if (null? nets)
-	    0
-	    (begin
-	      (let*  ( (netname     (car nets))
-		       (connections (gnetlist:get-all-connections netname))
-		       (pintypes    (drc2:get-pintypes-of-net-connections 
-				     connections
-				     '()))
-		       (pintype-count (drc2:count-pintypes-of-net pintypes port)))
-		(+ (list-ref pintype-count (drc2:position-of-pintype "unknown"))
-		   (count-unknown-pintypes port (cdr nets))))))))
-    (define display-unknown-pintypes
-      (lambda (port nets)
-	(if (not (null? nets))
-	    (begin
-	      (let*  ( (netname     (car nets))
-		       (connections (gnetlist:get-all-connections netname))
-		       )
-		(drc2:display-pins-of-type port (drc2:position-of-pintype "unknown")
-					   connections)		   
-		(display-unknown-pintypes port (cdr nets)))))))
-
-    (if (> (count-unknown-pintypes port nets) 0)
-	(begin
-	  (display "NOTE: Found pins without the 'pintype' attribute: " port)
-	  (display-unknown-pintypes port nets)
-	  (display "\n")))
-))
-	
-
+(define (drc2:report-unknown-pintypes port nets)
+  (define (count-unknown-pintypes nets)
+    (fold
+     (lambda (netname count)
+       (let* ((connections (gnetlist:get-all-connections netname))
+              (pintypes (drc2:get-pintypes-of-net-connections connections '()))
+              (pintype-count (drc2:count-pintypes-of-net pintypes port)))
+         (+ count
+            (list-ref pintype-count (drc2:position-of-pintype "unknown")))))
+     0 nets))
+  (define (display-unknown-pintypes nets)
+    (for-each
+     (lambda (netname)
+       (drc2:display-pins-of-type port
+                                  (drc2:position-of-pintype "unknown")
+                                  (gnetlist:get-all-connections netname)))
+     nets))
+  (and (> (count-unknown-pintypes nets) 0)
+       (begin
+         (display "NOTE: Found pins without the 'pintype' attribute: " port)
+         (display-unknown-pintypes nets)
+         (display "\n"))))
 
 ;
 ;  End of Net checking functions
@@ -924,12 +922,6 @@
          (begin
 		    
 	    ;; Perform DRC-matrix sanity checks.
-	    ; See if the matrix is simetric.
-	    (if (not (drc2:is-simetric-drc-matrix))
-		(begin (display "INTERNAL ERROR: DRC matrix is NOT simetric." port)
-		       (newline port)
-		       (newline port)
-		       (error "INTERNAL ERROR. DRC matrix is NOT simetric")))
 	    ; See if all elements of the matrix are chars
 	    (if (not (drc2:drc-matrix-elements-are-correct?))
 		(begin (display "INTERNAL ERROR: DRC matrix elements are NOT all chars." port)
@@ -951,6 +943,14 @@
 		  (display "Checking duplicated references..." port)
 		  (newline port)
 		  (drc2:check-duplicated-references port packages)
+		  (newline port)))
+
+	    ;; Check for NoConnection nets with more than one pin connected.
+	    (if (not (defined? 'dont-check-connected-noconnects))
+		(begin
+		  (display "Checking NoConnection nets for connections..." port)
+		  (newline port)
+		  (drc2:check-connected-noconnects port (gnetlist:get-all-unique-nets "dummy"))
 		  (newline port)))
 
 	    ;; Check nets with only one connection
@@ -1037,7 +1037,7 @@
 	 ;; Make gnetlist return an error if there are DRC errors.
 	 ;; If there are only warnings and it's in quiet mode, then
 	 ;; do not return an error.
-	 (if (> errors_number 0)
+	 (if (and (not (string=? "-" output-filename)) (> errors_number 0))
 	     (begin (display "DRC errors found. See output file.")
                     (newline))
 	     (if (> warnings_number 0)

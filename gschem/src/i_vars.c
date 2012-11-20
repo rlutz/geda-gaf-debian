@@ -117,8 +117,6 @@ int   default_add_attribute_offset = 50;
 
 int   default_auto_save_interval = 120;
 
-int   default_drag_can_move = TRUE;
-
 int   default_width = 800;  /* these variables are used in x_window.c */
 int   default_height = 600;
 
@@ -179,7 +177,7 @@ void i_vars_set(GSCHEM_TOPLEVEL *w_current)
   toplevel->object_clipping = default_object_clipping;
   w_current->embed_complex   = default_embed_complex;
   w_current->include_complex = default_include_complex;
-  toplevel->snap_size       = default_snap_size;
+  w_current->snap_size       = default_snap_size;
   w_current->log_window      = default_log_window;
   w_current->log_window_type = default_log_window_type;
 
@@ -235,8 +233,6 @@ void i_vars_set(GSCHEM_TOPLEVEL *w_current)
   w_current->mesh_grid_display_threshold = default_mesh_grid_display_threshold;
 
   w_current->add_attribute_offset  = default_add_attribute_offset;
-
-  w_current->drag_can_move = default_drag_can_move;
 
   w_current->mousepan_gain = default_mousepan_gain;
   w_current->keyboardpan_gain = default_keyboardpan_gain;

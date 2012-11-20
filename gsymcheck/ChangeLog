@@ -1,8 +1,90 @@
-commit a30f00bbee18ad5140616ad6459365cb48b03ee7
+commit 87f1e0e76965a514277c949dbf2191993962cb88
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 18 15:26:09 2012 +0000
+
+    Update version numbers to 1.8.0-20121118.
+
+commit f0923997c5ea727f6b73afad23ee2f974ac6b6b0
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Mar 18 11:36:59 2012 +0000
+
+    Update FSF mailing address.
+    
+    Change all references to the FSF mailing address to the new Franklin
+    Street location.
+    
+    Closes-bug: lp-934934
+
+commit e2eda476fb8f3a16aeba8eab0cc8b7fa12e37d6b
 Author: Ales Hvezda <ahvezda@seul.org>
-Date:   Fri Jan 14 23:21:56 2011 -0500
+Date:   Sat Dec 31 16:00:23 2011 -0500
+
+    Updated man page date and version in prep for a new release (1.7.2)
+
+commit 0e506ebd5d5cc87a7f373b83b24f2ad3c90fd18b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 14:13:22 2011 +0000
+
+    Remove per-tool INSTALL files.
+    
+    Only one top-level INSTALL file is needed, and that is provided by
+    automake.
+
+commit 12260baebf9f828e9297fc794e911224b8dcd163
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jun 19 10:36:02 2011 -0400
+
+    Updated all man page dates/versions
+
+commit 8de0484eca09833aec9994cd89c3c7111ecfede3
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:20:13 2011 +0200
+
+    gsymcheck: g_rc_gsymcheck_version: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 799d67452921ed1447e8b030ee268fe8c34c5785
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jan 16 00:15:29 2011 -0500
 
     Updated version strings in all man pages
+
+commit 502ab80495c45e092eca6052edd6cf8e7ff55429
+Merge: 27f7a52 e1c3ba4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 13 19:59:35 2011 +0000
+
+    Merge branch 'stable-1.6'
+    
+    Conflicts:
+    	NEWS
+    	libgeda/include/prototype_priv.h
+    	libgeda/src/gdk-pixbuf-hacks.c
+    	libgeda/src/o_basic.c
+    	libgeda/src/o_complex_basic.c
+    	utils/src/gsch2pcb.c
+
+commit 7ca2b049dbcfb9f0eb8d3dd3fcf21cbd66c0ec95
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    Print message and exit if rc file load fails.
+    
+    Modifies g_rc_parse() to print useful messages to standard error and
+    exit with non-zero status if an error other than ENOENT occurs while
+    attempting to parse any configuration file.
+    
+    N.b. only copes with rc files loaded at startup; rc files loaded later
+    (e.g. a gafrc auto-loaded while loading a schematic using gschem
+    "File->Open") can't cause the application to die.
+    
+    Since this means that under some circumstances gschem and gattrib can
+    appear to do nothing silently (e.g. when launched from via a .desktop
+    file) subsequent patches need to make gschem and gattrib generate
+    appropriate warning and/or error message dialogs.
+    
+    Affects-bug: lp-698578
 
 commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
 Author: Peter TB Brett <peter@peter-b.co.uk>
@@ -16,6 +98,70 @@ Date:   Fri Jan 7 22:00:09 2011 +0000
     
     Only files remaining with old address are wiki files (although the
     wiki has now been updated) and PostScript files.
+
+commit 86c305d9a2c62f062cbd9b63810a0173e4855310
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 14:53:51 2011 +0000
+
+    Install HTML versions of manpages even without groff.
+    
+    If groff isn't available, try to install HTML manpages anyway.  This
+    allows users to install manpages even if they don't have groff as long
+    as they aren't compiling from git and don't edit the manpages.
+    
+    Closes-bug: lp-698586
+
+commit 0b94d2379a5bd5d14690f941690e0df761df13c9
+Merge: 63cd6d7 a33839a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 12 09:48:07 2010 +0000
+
+    Merge some changes from Peter Brett.
+    
+    Merge a series of more generally useful changes from Peter Brett's
+    `guile-scheme-api' branch, most of which remove uses of
+    TOPLEVEL.page_current from libgeda.
+
+commit 1cec80d84654293424a3c35bdca1878292033f4a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 09:26:14 2010 +0000
+
+    gsymcheck: Update canonical output for test suite.
+    
+    In f8f053afef5a3e6302e9ec4ed9efcd8f1bf07886, changes to libgeda
+    introduced a change in behaviour to gsymcheck, causing it to correctly
+    pick up on connections in a symbol which it failed to detect before.
+    
+    This commit updates the canonical outputs in the test suite.
+
+commit 3abdca2a4ee088184e976822c444069d67e20a20
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:25 2010 +0000
+
+    libgeda: Add PAGE argument to file load/save functions.
+
+commit 0e5defe4871370a93c6ccb8bbf4a10e5df098884
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 21:26:37 2010 -0500
+
+    Updated man page dates
+    
+    (cherry picked from commit 11921dc18209ed4ea12288114634bb94a5b9b8a9)
+    (from stable-1.6)
+
+commit c31d9a1a90db32dd1e1d41f9d3d5ef5888424ba1
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 17:09:45 2010 -0500
+
+    Updated copyright text/header in most source files.
+    
+    Updated all copyright text dates that should be updated for the new year.
+    Fixed a bunch of GNU text typos (these should have been either
+    GPL or gEDA).  Removed some $Id$ tags which are no longer used/needed.
+    Fixed a few file header that were just plain incorrect.
+    
+    (cherry picked from commit bd34cfde2450790b357e574281f9562adce64303)
+    (from stable-1.6 branch)
 
 commit 11921dc18209ed4ea12288114634bb94a5b9b8a9
 Author: Ales Hvezda <ahvezda@seul.org>
@@ -42,6 +188,31 @@ Date:   Fri Nov 20 16:23:15 2009 +0000
     
     Fixes undefined use of `l' macro, and incorrect uses of `-' character.
     (cherry picked from commit 93dd5a941f34d1dd58cf9a57a07dec1e01ce3afe)
+
+commit 93dd5a941f34d1dd58cf9a57a07dec1e01ce3afe
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@users.sourceforge.net>
+Date:   Fri Nov 20 16:23:15 2009 +0000
+
+    Fix for some manpage issues. [2901183]
+    
+    Fixes undefined use of `l' macro, and incorrect uses of `-' character.
+
+commit 858982a2a05ff3e128de3621f1d301ecd989f35c
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Changed message on failure to generate doxygen docs
+    
+    If --enable-doxygen was not a configure flag, change the error message
+    on an attempt to build doxygen documentation to suggest the configure
+    flag was the cause of the failure rather than the lack of a doxygen
+    install itself.
+
+commit 1248c66c7973f8d3835f6107d3f1ed9c5c880b43
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Added doxygen targets to remaining applications.
 
 commit 3fd50335ddfe0ed7f358d46a0fba23bff25073e6
 Author: Ales Hvezda <ahvezda@seul.org>

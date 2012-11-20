@@ -167,9 +167,9 @@ void i_show_state(GSCHEM_TOPLEVEL *w_current, const char *message)
   if(toplevel->show_hidden_text)
     array[i--] = _("Show Hidden");
   
-  if(toplevel->snap == SNAP_OFF)
+  if(w_current->snap == SNAP_OFF)
     array[i--] = _("Snap Off");
-  else if (toplevel->snap == SNAP_RESNAP)
+  else if (w_current->snap == SNAP_RESNAP)
     array[i--] = _("Resnap Active");
   
   if(message && message[0])
@@ -367,6 +367,22 @@ static void clipboard_usable_cb (int usable, void *userdata)
   x_menus_sensitivity (w_current, "_Edit/_Paste", usable);
 }
 
+static gboolean
+selected_at_least_one_text_object(GSCHEM_TOPLEVEL *w_current)
+{
+  OBJECT *obj;
+  TOPLEVEL *toplevel = w_current->toplevel;
+  GList *list = geda_list_get_glist(toplevel->page_current->selection_list);
+
+  while(list != NULL) {
+    obj = (OBJECT *) list->data;
+    if (obj->type == OBJ_TEXT)
+      return TRUE;
+    list = g_list_next(list);
+  }
+  return FALSE;
+}
+
 
 /*! \brief Update sensitivity of relevant menu items
  *
@@ -377,6 +393,7 @@ static void clipboard_usable_cb (int usable, void *userdata)
  */
 void i_update_menus(GSCHEM_TOPLEVEL *w_current)
 {
+  gboolean have_text_selected;
   TOPLEVEL *toplevel = w_current->toplevel;
   /* 
    * This is very simplistic.  Right now it just disables all menu
@@ -391,6 +408,8 @@ void i_update_menus(GSCHEM_TOPLEVEL *w_current)
   x_clipboard_query_usable (w_current, clipboard_usable_cb, w_current);
 
   if (o_select_selected (w_current)) {
+    have_text_selected = selected_at_least_one_text_object(w_current);
+
     /* since one or more things are selected, we set these TRUE */
     /* These strings should NOT be internationalized */
     x_menus_sensitivity(w_current, "_Edit/Cu_t", TRUE);
@@ -427,10 +446,10 @@ void i_update_menus(GSCHEM_TOPLEVEL *w_current)
     x_menus_sensitivity(w_current, "Hie_rarchy/D_ocumentation...", TRUE);
     x_menus_sensitivity(w_current, "A_ttributes/_Attach", TRUE);
     x_menus_sensitivity(w_current, "A_ttributes/_Detach", TRUE);
-    x_menus_sensitivity(w_current, "A_ttributes/Show _Value", TRUE);
-    x_menus_sensitivity(w_current, "A_ttributes/Show _Name", TRUE);
-    x_menus_sensitivity(w_current, "A_ttributes/Show _Both", TRUE);
-    x_menus_sensitivity(w_current, "A_ttributes/_Toggle Visibility", TRUE);
+    x_menus_sensitivity(w_current, "A_ttributes/Show _Value", have_text_selected);
+    x_menus_sensitivity(w_current, "A_ttributes/Show _Name", have_text_selected);
+    x_menus_sensitivity(w_current, "A_ttributes/Show _Both", have_text_selected);
+    x_menus_sensitivity(w_current, "A_ttributes/_Toggle Visibility", have_text_selected);
 
     /*  Menu items for hierarchy added by SDB 1.9.2005.  */
     x_menus_popup_sensitivity(w_current, "/Down Schematic", TRUE);
@@ -532,11 +551,9 @@ void i_set_filename(GSCHEM_TOPLEVEL *w_current, const gchar *string)
  *  The format is "Grid([SnapGridSize],[CurrentGridSize])"
  *
  *  \param [in] w_current GSCHEM_TOPLEVEL structure
- *  \param [in] visible_grid Visible grid size
  */
 void i_update_grid_info (GSCHEM_TOPLEVEL *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   gchar *print_string=NULL;
   gchar *snap=NULL;
   gchar *grid=NULL;
@@ -544,19 +561,19 @@ void i_update_grid_info (GSCHEM_TOPLEVEL *w_current)
   if (!w_current->grid_label)
     return;
 
-  switch (toplevel->snap) {
+  switch (w_current->snap) {
   case SNAP_OFF:
     snap = g_strdup(_("OFF"));
     break;
   case SNAP_GRID:
-    snap = g_strdup_printf("%d", toplevel->snap_size);
+    snap = g_strdup_printf("%d", w_current->snap_size);
     break;
   case SNAP_RESNAP:
-    snap = g_strdup_printf("%dR", toplevel->snap_size);
+    snap = g_strdup_printf("%dR", w_current->snap_size);
     break;
   default:
-    g_critical("i_set_grid: toplevel->snap out of range: %d\n", 
-               toplevel->snap);
+    g_critical("i_set_grid: w_current->snap out of range: %d\n",
+               w_current->snap);
   }
 
   if (w_current->grid == GRID_NONE) {

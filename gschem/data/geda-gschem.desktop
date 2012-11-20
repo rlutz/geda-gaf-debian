@@ -1,6 +1,5 @@
 [Desktop Entry]
 Version=1.0
-Encoding=UTF-8
 GenericName=gschem
 Name=gEDA Schematic Editor
 Name[af]=gEDA Stroombaandiagram Bewerker
@@ -13,7 +12,7 @@ Name[it]=Editor di schemi gEDA
 Name[nl]=gEDA schema bewerking
 Name[pl]=gEDA Edytor Schematów
 Name[pt_BR]=Editor de esquemas gEDA
-Name[ru]=gEDA редактор схем
+Name[ru]=Схемотехнический редактор gEDA
 Name[tr]=gEDA Şematik Editörü
 Comment=Create and edit electrical schematics and symbols with gschem
 Comment[af]=Skep en bewerk stroombaandiagramme en simbole met gschem

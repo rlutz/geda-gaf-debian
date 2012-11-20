@@ -17,12 +17,15 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with this program; if not, write to the Free Software
-;;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+;;; MA 02111-1301 USA.
 
 ;;  gsch2pcb format  (based on PCBboard format by JM Routoure & Stefan Petersen)
 ;;  Bill Wilson    billw@wt.net
 ;;  6/17/2003
 
+(use-modules (ice-9 popen))
+(use-modules (ice-9 syncase))
 
 ;;
 ;;
@@ -39,7 +42,7 @@
     (display "Thermal[0.500000]\n" port)
     (display "DRC[1000 1000 1000 1000 1500 1000]\n" port)
     (display "Flags(\"nameonpcb,uniquename,clearnew,snappin\")\n" port)
-    (display "Groups(\"1,c:2,s:3:4:5:6:7:8\")\n" port)
+    (display "Groups(\"1,c:2:3:4:5:6,s:7:8\")\n" port)
     (display "Styles[\"Signal,1000,3600,2000,1000:" port)
     (display "Power,2500,6000,3500,1000:" port)
     (display "Fat,4000,6000,3500,1000:" port)
@@ -50,14 +53,14 @@
 ;;
 (define gsch2pcb:write-bottom-footer
   (lambda (port)
-    (display "Layer(1 \"component\")\n(\n)\n" port)
-    (display "Layer(2 \"solder\")\n(\n)\n" port)
-    (display "Layer(3 \"outline\")\n(\n)\n" port)
-    (display "Layer(4 \"GND\")\n(\n)\n" port)
+    (display "Layer(1 \"top\")\n(\n)\n" port)
+    (display "Layer(2 \"ground\")\n(\n)\n" port)
+    (display "Layer(3 \"signal2\")\n(\n)\n" port)
+    (display "Layer(4 \"signal3\")\n(\n)\n" port)
     (display "Layer(5 \"power\")\n(\n)\n" port)
-    (display "Layer(6 \"signal1\")\n(\n)\n" port)
-    (display "Layer(7 \"signal2\")\n(\n)\n" port)
-    (display "Layer(8 \"signal3\")\n(\n)\n" port)
+    (display "Layer(6 \"bottom\")\n(\n)\n" port)
+    (display "Layer(7 \"outline\")\n(\n)\n" port)
+    (display "Layer(8 \"spare\")\n(\n)\n" port)
     (display "Layer(9 \"silk\")\n(\n)\n" port)
     (display "Layer(10 \"silk\")\n(\n)" port)
     (newline port)))
@@ -65,168 +68,142 @@
 ;;
 ;;
 
-;; Split string at current split-char and returns
-;; a pair with substrings. If string is not splitable
-;; it returns #f.
-(define (gsch2pcb:string-split the-string split-char)
-;;string-index is Guile specific
-  (let ((split-index (string-index the-string split-char))
-        (last-index (- (string-length the-string) 1)))
-;;Check if split-char happens to be in the beginning or end of the string
-    (cond ((not split-index)
-           #f)
-          ((= split-index 0)
-           (gsch2pcb:string-split
-            (substring the-string 1 (string-length the-string)) 
-            split-char))
-          ((= split-index last-index)
-           #f)
-          (split-index
-           (cons (substring the-string 0 split-index)
-                 (substring the-string (+ split-index 1) 
-                            (string-length the-string))))
-          (else
-           #f))))
-
 ;; Splits a string with space separated words and returns a list
 ;; of the words (still as strings).
 (define (gsch2pcb:split-to-list the-string)
-  (let ((the-list (gsch2pcb:string-split the-string #\space)))
-    (if the-list
-        (cons (car the-list) (gsch2pcb:split-to-list (cdr the-list)))
-        (list the-string))))
+  (filter!
+   (lambda (x) (not (string=? "" x)))
+   (string-split the-string #\space)))
 
-;; Joins the elements of a list of strings into a single string,
-;; with each element prefixed by a given prefix string.
-(define (gsch2pcb:list-join-with-prefixes the-list prefix)
-  (if (null? the-list)
-      ""
-      (string-append prefix (car the-list)
-                     (gsch2pcb:list-join-with-prefixes (cdr the-list) prefix))))
+;; Check if `str' contains only characters valid in an M4 function
+;; name.  Note that this *doesn't* check that str is a valid M4
+;; function name.
+(define gsch2pcb:m4-valid?
+  (let ((rx (make-regexp "^[A-Za-z0-9_]*$")))
+    (lambda (str)
+      (regexp-exec rx str))))
 
+;; Quote a string to protect from M4 macro expansion
+(define (gsch2pcb:m4-quote str)
+  (string-append "`" str "'"))
 
-(define gsch2pcb:write-value-footprint
-  (lambda (pipe ls)
-    (if (not (null? ls))
-;;       refdes contains the first element of ls        
-        (let* ((refdes (car ls))
-               (value (gnetlist:get-package-attribute refdes "value"))
-               (footprint (gsch2pcb:split-to-list
-                          (gnetlist:get-package-attribute refdes  "footprint") ) ) 
-	       (lquote (if gsch2pcb:use-m4 "`" ""))
-	       (rquote (if gsch2pcb:use-m4 "'" ""))
+;; Write the footprint for the package `refdes' to `port'.  If M4
+;; footprints are enabled, writes in a format suitable for
+;; macro-expansion by M4.  Any footprint names that obviously can't be
+;; M4 footprints are protected from macro-expansion.
+(define (gsch2pcb:write-value-footprint refdes port)
 
-	       )
+  (let* ((value (gnetlist:get-package-attribute refdes "value"))
+         (footprint (gsch2pcb:split-to-list
+                     (gnetlist:get-package-attribute refdes "footprint")))
+         (fp (car footprint))
+         (fp-args (cdr footprint))
 
-               (display (string-append "PKG_" (car footprint)) pipe)
-               (display (string-append "(" lquote (car footprint)) pipe)
-               (display (gsch2pcb:list-join-with-prefixes (cdr footprint) "-") pipe)
-               (display (string-append rquote "," lquote refdes rquote "," lquote ) pipe)
+         (nq (lambda (x) x)) ; A non-quoting operator
+         (q (if gsch2pcb:use-m4 gsch2pcb:m4-quote nq))) ; A quoting operator
 
-               (display value pipe)
-               (display (gsch2pcb:list-join-with-prefixes (cdr footprint) (string-append rquote "," lquote)) pipe)
-               (display (string-append rquote ")") pipe)
-               (newline pipe)
-               (gsch2pcb:write-value-footprint pipe (cdr ls))) )))
+    (format port "~A(~A,~A,~A~A)\n"
+            ;; If the footprint is obviously not an M4 footprint,
+            ;; protect it from macro-expansion.
+            ((if (gsch2pcb:m4-valid? fp) nq q) (string-append "PKG_" fp))
+            (q (string-join footprint "-"))
+            (q refdes)
+            (q value)
+            (string-join (map q fp-args) "," 'prefix))))
+
+;; Write the footprints for all the refdes' in `lst'.
+(define (gsch2pcb:write-value-footprints port lst)
+  (for-each (lambda (x) (gsch2pcb:write-value-footprint x port)) lst))
 
 ;;
 ;;
 
 (define gsch2pcb:use-m4 #f)
 
+;; Macro that defines and sets a variable only if it's not already defined.
+(define-syntax define-undefined
+  (syntax-rules ()
+    ((_ name expr)
+     (define name
+       (if (defined? (quote name))
+           name
+           expr)))))
 
 ;; Let the user override the m4 command, the directory
 ;; where pcb stores its m4 files and the pcb config directory.
-(if (not (defined? 'gsch2pcb:pcb-m4-command)) (define gsch2pcb:pcb-m4-command "@m4@"))
-(if (not (defined? 'gsch2pcb:pcb-m4-dir)) (define gsch2pcb:pcb-m4-dir "@pcbm4dir@"))
-(if (not (defined? 'gsch2pcb:pcb-m4-confdir)) (define gsch2pcb:pcb-m4-confdir "@pcbconfdir@"))
+(define-undefined gsch2pcb:pcb-m4-command "@m4@")
+(define-undefined gsch2pcb:pcb-m4-dir "@pcbm4dir@")
+(define-undefined gsch2pcb:m4-files "")
 
 ;; Let the user override the m4 search path
-(if (not (defined? 'gsch2pcb:pcb-m4-path))
-    (define gsch2pcb:pcb-m4-path (list gsch2pcb:pcb-m4-dir gsch2pcb:pcb-m4-confdir "$HOME/.pcb" "."))
-)
+(define-undefined gsch2pcb:pcb-m4-path '("$HOME/.pcb" "."))
 
 ;; Build up the m4 command line
-
-(define gsch2pcb:m4-command-line-tmp (string-append
-				  gsch2pcb:pcb-m4-command " -d ") )
-(define gsch2pcb:pcb-m4-path-str #f)
-(for-each (lambda (d)
-	    (set! gsch2pcb:m4-command-line-tmp (string-append
-						gsch2pcb:m4-command-line-tmp
-						" -I" d))
-	    (if gsch2pcb:pcb-m4-path-str
-		(set! gsch2pcb:pcb-m4-path-str (string-append
-						gsch2pcb:pcb-m4-path-str
-						"  " d) )
-		(set! gsch2pcb:pcb-m4-path-str d)
-		)
-	    )
-	  gsch2pcb:pcb-m4-path
-	  )
-
-
-
-(set! gsch2pcb:m4-command-line-tmp
-      ( string-append gsch2pcb:m4-command-line-tmp
-		      " " gsch2pcb:pcb-m4-dir "/common.m4 - >> "
-		      )
-      )
-
-(if (not (defined? 'gsch2pcb:pcb-m4-command-line))
-    (define gsch2pcb:pcb-m4-command-line
-      gsch2pcb:m4-command-line-tmp)
-    )
-
-(use-modules (ice-9 popen))
+(define (gsch2pcb:build-m4-command-line output-filename)
+  (string-append gsch2pcb:pcb-m4-command
+                 " -d"
+                 (string-join (cons gsch2pcb:pcb-m4-dir
+                                    gsch2pcb:pcb-m4-path)
+                              " -I" 'prefix)
+                 " " gsch2pcb:pcb-m4-dir "/common.m4"
+                 " " gsch2pcb:m4-files
+                 " - >> " output-filename))
 
 (define (gsch2pcb output-filename)
+  (define command-line (gsch2pcb:build-m4-command-line output-filename))
+
   (let ((port (open-output-file output-filename)))
     (gsch2pcb:write-top-header port)
     (close-port port)
     )
 
-  (set! gsch2pcb:pcb-m4-command-line (string-append
-				  gsch2pcb:pcb-m4-command-line
-				  output-filename))
-  (display (string-append
-	    "=====================================================\n"
-	    "gsch2pcb backend configuration:\n"
-	    "\n"
-	    "   ----------------------------------------\n"
-	    "   Variables which may be changed in gafrc:\n"
-	    "   ----------------------------------------\n"
-	    "   gsch2pcb:pcb-m4-command:    " gsch2pcb:pcb-m4-command "\n"
-	    "   gsch2pcb:pcb-m4-dir:        " gsch2pcb:pcb-m4-dir "\n"
-	    "   gsch2pcb:pcb-m4-confdir:    " gsch2pcb:pcb-m4-confdir "\n"
-	    "   gsch2pcb:pcb-m4-path:       " gsch2pcb:pcb-m4-path-str "\n"
-	    "   gsch2pcb:m4-command-line:   " gsch2pcb:pcb-m4-command-line  "\n"
-	    "\n"
-	    "   ---------------------------------------------------\n"
-	    "   Variables which may be changed in the project file:\n"
-	    "   ---------------------------------------------------\n"
-	    "   gsch2pcb:use-m4:            " (if gsch2pcb:use-m4 "yes" "no") "\n"
-	    "\n"
-	    "=====================================================\n"
-	    )
-	   )
+  (format #t
+"=====================================================
+gsch2pcb backend configuration:
+
+   ----------------------------------------
+   Variables which may be changed in gafrc:
+   ----------------------------------------
+   gsch2pcb:pcb-m4-command:    ~S
+   gsch2pcb:pcb-m4-dir:        ~S
+   gsch2pcb:pcb-m4-path:       ~S
+   gsch2pcb:m4-files:          ~S
+
+   ---------------------------------------------------
+   Variables which may be changed in the project file:
+   ---------------------------------------------------
+   gsch2pcb:use-m4:            ~A
+
+   ----------------
+   M4 command line:
+   ----------------
+   ~A
+
+=====================================================
+"
+   gsch2pcb:pcb-m4-command
+   gsch2pcb:pcb-m4-dir
+   gsch2pcb:pcb-m4-path
+   gsch2pcb:m4-files
+   (if gsch2pcb:use-m4 "yes" "no")
+   command-line)
 
   ;; If we have defined gsch2pcb:use-m4 then run the footprints
   ;; through the pcb m4 setup.  Otherwise skip m4 entirely
   (if gsch2pcb:use-m4
       ;; pipe with the macro define in pcb program
-      (let ((pipe (open-output-pipe gsch2pcb:pcb-m4-command-line))
+      (let ((pipe (open-output-pipe command-line))
 	    )
 	
 	(display "Using the m4 processor for pcb footprints\n")
 	;; packages is a list with the different refdes value
-	(gsch2pcb:write-value-footprint pipe packages)
+	(gsch2pcb:write-value-footprints pipe packages)
 	(close-pipe pipe)
 	)
       
       (let ((port  (open output-filename (logior O_WRONLY O_APPEND))))
 	(display "Skipping the m4 processor for pcb footprints\n")
-	(gsch2pcb:write-value-footprint port packages)
+	(gsch2pcb:write-value-footprints port packages)
 	(close-port port)
 	)
       )

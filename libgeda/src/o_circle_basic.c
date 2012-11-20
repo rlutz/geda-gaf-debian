@@ -32,9 +32,6 @@
 #include <dmalloc.h>
 #endif
 
-/*! Default setting for circle draw function. */
-void (*circle_draw_func)() = NULL;
-
 /*! \brief calculate the distance between two points
  *  \par Function Description
  *  This function calculates the distance between two points.
@@ -99,10 +96,7 @@ OBJECT *o_circle_new(TOPLEVEL *toplevel,
 		     END_NONE, TYPE_SOLID, 0, -1, -1);
   o_set_fill_options(toplevel, new_node,
 		     FILLING_HOLLOW, -1, -1, -1, -1, -1);
-  
-  new_node->draw_func = circle_draw_func;  
-  new_node->sel_func = select_func;  
-  
+
   /* compute the bounding box coords */
   o_circle_recalc(toplevel, new_node);
 
@@ -185,6 +179,8 @@ OBJECT *o_circle_copy(TOPLEVEL *toplevel, OBJECT *o_current)
 void o_circle_modify(TOPLEVEL *toplevel, OBJECT *object,
 		     int x, int y, int whichone)
 {
+  o_emit_pre_change_notify (toplevel, object);
+
   switch(whichone) {
     case CIRCLE_CENTER:
       /* modify the center of the circle */
@@ -205,7 +201,7 @@ void o_circle_modify(TOPLEVEL *toplevel, OBJECT *object,
 
   /* recalculate the boundings */
   o_circle_recalc(toplevel, object);
-  
+  o_emit_change_notify (toplevel, object);
 }
 
 /*! \brief Create circle OBJECT from character string.
@@ -224,10 +220,10 @@ void o_circle_modify(TOPLEVEL *toplevel, OBJECT *object,
  *  \param [in]  buf             Character string with circle description.
  *  \param [in]  release_ver     libgeda release version number.
  *  \param [in]  fileformat_ver  libgeda file format version number.
- *  \return A pointer to the new circle object.
+ *  \return A pointer to the new circle object, or NULL on error.
  */
-OBJECT *o_circle_read (TOPLEVEL *toplevel, char buf[],
-		      unsigned int release_ver, unsigned int fileformat_ver)
+OBJECT *o_circle_read (TOPLEVEL *toplevel, const char buf[],
+              unsigned int release_ver, unsigned int fileformat_ver, GError ** err)
 {
   OBJECT *new_obj;
   char type; 
@@ -246,7 +242,10 @@ OBJECT *o_circle_read (TOPLEVEL *toplevel, char buf[],
      * handle the line type and the filling of the box object. They are set
      * to default.
      */
-    sscanf(buf, "%c %d %d %d %d\n", &type, &x1, &y1, &radius, &color);
+    if (sscanf(buf, "%c %d %d %d %d\n", &type, &x1, &y1, &radius, &color) != 5) {
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse circle object"));
+      return NULL;
+    }
 
     circle_width = 0;
     circle_end   = END_NONE;
@@ -268,18 +267,22 @@ OBJECT *o_circle_read (TOPLEVEL *toplevel, char buf[],
      * list of characters and numbers in plain ASCII on a single line. The
      * meaning of each item is described in the file format documentation.
      */  
-    sscanf(buf, "%c %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-	   &type, &x1, &y1, &radius, &color,
-	   &circle_width, &circle_end, &circle_type,
-	   &circle_length, &circle_space, &circle_fill,
-	   &fill_width, &angle1, &pitch1, &angle2, &pitch2);
+    if (sscanf(buf, "%c %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+	       &type, &x1, &y1, &radius, &color,
+	       &circle_width, &circle_end, &circle_type,
+	       &circle_length, &circle_space, &circle_fill,
+	       &fill_width, &angle1, &pitch1, &angle2, &pitch2) != 16) {
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse circle object"));
+      return NULL;
+    }
   }
 
 
-  if (radius == 0) {
-    s_log_message(_("Found a zero radius circle [ %c %d %d %d %d ]\n"),
+  if (radius <= 0) {
+    s_log_message(_("Found a zero or negative radius circle [ %c %d %d %d %d ]\n"),
                   type, x1, y1, radius, color);
-	
+    s_log_message (_("Setting radius to 0\n"));
+    radius = 0;
   }
   
   if (color < 0 || color > MAX_COLORS) {
@@ -312,6 +315,7 @@ OBJECT *o_circle_read (TOPLEVEL *toplevel, char buf[],
  *  It follows the post-20000704 release file format that handle the line
  *  type and fill options.
  *
+ *  \param [in] toplevel  a TOPLEVEL structure.
  *  \param [in] object  Circle OBJECT to create string from.
  *  \return A pointer to the circle OBJECT character string.
  *
@@ -319,7 +323,7 @@ OBJECT *o_circle_read (TOPLEVEL *toplevel, char buf[],
  *  Caller must g_free returned character string.
  *
  */
-char *o_circle_save(OBJECT *object)
+char *o_circle_save(TOPLEVEL *toplevel, OBJECT *object)
 {
   int x,y;
   int radius;
@@ -371,8 +375,6 @@ char *o_circle_save(OBJECT *object)
 void o_circle_translate_world(TOPLEVEL *toplevel,
 			      int dx, int dy, OBJECT *object)
 {
-  if (object == NULL) printf("ctw NO!\n");
-
   /* Do world coords */
   object->circle->center_x = object->circle->center_x + dx;
   object->circle->center_y = object->circle->center_y + dy;

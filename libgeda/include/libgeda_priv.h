@@ -3,6 +3,7 @@
 #include <glib-object.h>
 #include <libguile.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
+#include <glib/gstdio.h>
 
 /* Public libgeda headers */
 #include "defines.h"
@@ -13,6 +14,7 @@
 #include "papersizes.h"
 #include "prototype.h"
 #include "funcs.h"
+#include "edaerrors.h"
 
 #include "geda_list.h"
 

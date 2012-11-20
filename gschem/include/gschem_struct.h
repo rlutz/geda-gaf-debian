@@ -1,4 +1,8 @@
+/*! \brief different kind of snapping mechanisms used in TOPLEVEL */
+typedef enum {SNAP_OFF, SNAP_GRID, SNAP_RESNAP, SNAP_STATE_COUNT} SNAP_STATE;
+
 typedef struct st_gschem_toplevel GSCHEM_TOPLEVEL;
+typedef struct st_stretch STRETCH;
 
 struct st_gschem_toplevel {
 
@@ -15,8 +19,8 @@ struct st_gschem_toplevel {
 
   GtkWidget *h_scrollbar;
   GtkWidget *v_scrollbar;
-  GtkObject *h_adjustment;
-  GtkObject *v_adjustment;
+  GtkAdjustment *h_adjustment;
+  GtkAdjustment *v_adjustment;
 
   GtkWidget *macro_box;
   GtkWidget *macro_entry;
@@ -32,6 +36,7 @@ struct st_gschem_toplevel {
 
   gchar *keyaccel_string;               /* visual feedback when pressing
                                            keyboard accelerators */
+  gboolean keyaccel_string_source_id;   /* event source ID used by above */
 
   /* ------------ */
   /* Dialog boxes */
@@ -52,7 +57,6 @@ struct st_gschem_toplevel {
   GtkWidget *tshowwindow;               /* text show window */
   GtkWidget *thidewindow;               /* text hide window */
   GtkWidget *tfindwindow;               /* text find window */
-  GtkWidget *abwindow;                  /* Help/About... dialog*/
   GtkWidget *hkwindow;                  /* Help/Hotkeys... dialog*/
   GtkWidget *clwindow;                  /* Color edit dialog */
   int edit_color;                         /* Used by the color edit dialog */
@@ -102,6 +106,11 @@ struct st_gschem_toplevel {
                                            Its range of values depends on the
                                            type of object being manipulated. */
   OBJECT *which_object;                 /* Object being manipulated */
+
+  /* ------------------ */
+  /* Rubberbanding nets */
+  /* ------------------ */
+  GList *stretch_list;
 
   /* --------------------- */
   /* Gschem internal state */
@@ -177,6 +186,9 @@ struct st_gschem_toplevel {
   int bus_ripper_rotation;  /* sets if the the bus ripper is symmetric or not */
   int magneticnet_mode; /* enables/disables the magnetic net mode ON/OFF */
 
+  SNAP_STATE snap;                      /* Whether/how to snap to grid */
+  int snap_size;                        /* Snap grid parameter */
+
   /* sets the mininum number of pixels necessary for the grid to be */
   /* displayed */
   int dots_grid_fixed_threshold;
@@ -190,7 +202,6 @@ struct st_gschem_toplevel {
   /* attributes when they are attached to vertical or horizontal nets */
   int add_attribute_offset;
 
-  int drag_can_move;      /* Controls if drag can move objects or not */
   int mousepan_gain;      /* Controls the gain of the mouse pan */
   int keyboardpan_gain;   /* Controls the gain of the keyboard pan */
   int select_slack_pixels; /* Number of pixels around an object we can still select it with */
@@ -198,5 +209,13 @@ struct st_gschem_toplevel {
   int scrollpan_steps;    /* Number of scroll pan events required to traverse the viewed area */
 
   char *print_command;    /* The command to send postscript to when printing */
+
+  SCM smob;               /* The Scheme representation of this window */
 };
 
+
+struct st_stretch
+{
+  OBJECT *object;
+  int whichone;
+};

@@ -1,12 +1,36 @@
+wikidir = $(docdir)/wiki
 
-docname=wiki
-docsdir = $(docdir)/$(docname)/
+# Copy wiki into distribution
+dist-hook:
+	@for dir in $$(cd $(srcdir) && find . -type d -print | sed -e's:^\./::' ); do \
+	  $(MKDIR_P) $(distdir)/$$dir; \
+	  list=`(cd $(srcdir)/$$dir && find . -maxdepth 1 -type f -print) | sed -e's:^\./::' | grep -v '\(Makefile\|\.gitignore\)'`; \
+	  for file in $$list; do \
+	    cp -p $(srcdir)/$$dir/$$file $(distdir)/$$dir || exit $$?; \
+	  done; \
+	done
 
-SUBDIRS = images media 
+# Install wiki
+install-data-local:
+	@for dir in $$(cd $(srcdir) && find . -type d -print | sed -e's:^\./::' ); do \
+	  d="$(DESTDIR)$(wikidir)/$$dir"; \
+	  $(MKDIR_P) $$d; \
+	  list=`(cd $(srcdir)/$$dir && find . -maxdepth 1 -type f -print) | sed -e's:^\./::' | grep -v '\(Makefile\|\.gitignore\)'`; \
+	  if test -n "$$list"; then \
+	    echo " ( cd $(srcdir)/$$dir && $(INSTALL_DATA)" $$list "'$$d' )"; \
+	    (cd $(srcdir)/$$dir && $(INSTALL_DATA) $$list "$$d") || exit $$?; \
+	  fi; \
+	done
 
-docs_DATA = geda-faq-gschem.html geda-experiences.html geda-icarus_xnf.html geda-verilog_netlister_readme.html geda-tragesym_tutorial.fr.html geda-ngnutmeg_mp.html wiki-syntax.html geda-ssan.html geda-example_usbjtag.html geda-gnetlist_scheme_tutorial.html geda-faq-gsch2pcb.fr.html geda-icarus_readme.html geda-gsch2pcb_tutorial.html geda-na_howto.html gsoc2009.html geda-example_hsm.html libgeda3_object_based_design.html geda-fc3.html geda-glossary.html geda-kig_howto.html geda-icarus_vvp_simulation.html geda-pcb_footprints.html geda-wip-clipboard.html geda-faq.html geda-faq-gsch2pcb.html geda-todos_historical.html geda-covered_mp.html geda-pcb_tips.html gsoc2009_projects.html geda-wcalc_mp.html best_practices.html index.html geda-syntax_features.html geda-icarus_opcodes.html geda-gparts_dd.html geda-gtkwave_vztminer_mp.html geda-grcsan.html geda-scg.fr.html geda-gsch2pcb_readme.html geda-debian.fr.html geda-gtkwave_vcd2vzt_mp.html geda-installation.fr.html geda-gtkwave_mp.html geda-format_translation.html geda-glossary.fr.html geda-ngsconvert_mp.html geda-documentation.fr.html geda-glossaire.fr.html geda-icarus_mp.html geda-icarus_vpi_mp.html geda-devel-tips.html geda-gschem_warmup.html geda-style_guide.html geda-fc1.html geda-transistor_guide.html geda-icarus_vvp_runtime.html geda-tragesym_tutorial.html start_fr.html geda-release_engineering.html gsoc2007_projects.html gsoc2007.html geda-gsymcheck_mp.html geda-gtkwave_mvl2vcd_mp.html design.css geda-ngspice_and_gschem.html gsoc2008_projects.html geda-data_plotting_improvements.html geda-tragesym_readme.html geda-suse_10.1.html geda-hse_howto.html style.css geda-eagle_pcb_netlister_readme.html geda-gattrib_readme.html geda-systemc_netlister_readme.html geda-spice_improvements.html geda-pcb_funding_sow-fwdann_ideas.html geda-faq-gschem.fr.html geda-ngspice_mp.html geda-version_control_migration.html geda-usage.fr.html geda-pcb-quick_reference.fr.html geda-olib_readme.html geda-wcalc_readme.html geda-sn_readme.html libgeda3.html geda-fedora_rpm_installation.html geda-gnetlist_ug.html wiki-dokuwiki.html geda-debian.html geda-gschem_ug.html geda-faq-attribs.fr.html geda-gtkwave_lxt2miner_mp.html geda-suse_10.0.html geda-design_flow_roadmap.html geda-faq-simulation.html geda-gtkwave_vcd2lxt_mp.html geda-master_attributes_list.html geda-pcb_tips.fr.html geda-gschem_ug.fr.html geda-icarus_vpi_within_vvp.html geda-gschem_mp.html geda-suse_rpm_installation.html geda-gnetlist_mp.html gsoc2008.html geda-installation.html geda-gerbv_pnp_readme.html geda-mcalc_readme.html geda-icarus_xilinx_hints.html geda-ubuntu.html geda-pcb_funding_sow-gui_ideas.html geda-todos.html geda-fbabgapp.html geda-fc4.html geda-pcb_footprint_naming_conventions.html geda-gtkwave_vcd2lxt2_mp.html geda-faq-attribs.html geda-pcb-quick_reference.html geda-xml_file_formats.html geda-icarus_extensions.html geda-pcb_funding_sow.html geda-scm.html geda-gtkwave_lxt2vcd_mp.html geda-faq-pcb.html geda-faq-simulation.fr.html geda-icarus_ieee1364.html geda-gtkwave_vzt2vcd_mp.html geda-grenum_mp.html geda-guile_scripting.html start_es.html geda-bom_readme.html geda-vhdl_netlister_readme.html geda-usage.html geda-gschem_symbol_creation.html geda-vams_netlister_readme.html geda-csygas.html geda-gfdl.html geda-devmacosx.html glue-projects.html geda-wcalc_stdio_mp.html geda-gerbv_mp.html geda-fc2.html geda-gedasuite_installation.html geda-igarus_fpga_lcg.html geda-installed_plugins.html geda-suse_9.3.html geda-faq-gnetlist.html gwave-projects.html geda-faq.fr.html gtkwave-projects.html geda-file_format_spec.html geda-faq-gnetlist.fr.html geda-icarus_anc.html print.css geda-gtkwave_tla2vcd_mp.html gschem-projects.html geda-gtkwave_mvl2lxt_mp.html start.html geda-design_flow_and_hierarchy_roadmap.html geda-start.html geda-tasks.html geda-gsch2pcb_tutorial_releasenotes.html geda-icarus_quick_start.html geda-data_structure_design_discussion.html geda-documentation.html geda-sdb_howto.html gerbv-projects.html geda-circuit_simulation_improvements.html pcb-projects.html geda-gtkwave_tex2vcd_mp.html geda-icarus_glossary.html geda-pcb_mp.html geda-cygwin.html geda-scg.html 
+# Uninstall wiki
+uninstall-local:
+	@for dir in $$(cd $(srcdir) && find . -type d -print | sed -e's:^\./::' ); do \
+	  d="$(DESTDIR)$(wikidir)/$$dir"; \
+	  list=`(cd $(srcdir)/$$dir && find . -maxdepth 1 -type f -print) | sed -e's:^\./::' | grep -v '\(Makefile\|\.gitignore\)'`; \
+	  if test -n "$$list"; then \
+	    echo " ( cd '$$d' && rm -f" $$list ")"; \
+	    (cd "$$d" && rm -f $$list) || exit $$?; \
+	  fi; \
+	done
 
-EXTRA_DIST = $(docs_DATA)
-
-MAINTAINERCLEANFILES = *.log core FILE *~ Makefile.in
-
+MAINTAINERCLEANFILES = Makefile.in

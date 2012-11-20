@@ -14,7 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02111-1301 USA.
  */
 
 #ifndef STRUCT_H
@@ -50,9 +51,6 @@ typedef struct st_bounds BOUNDS;
 
 typedef struct st_conn CONN;
 typedef struct st_bus_ripper BUS_RIPPER;
-
-/* Used when you move objects and you want the nets/pins to stretch */
-typedef struct st_stretch STRETCH;
 
 /* netlist structures (gnetlist) */
 typedef struct st_netlist NETLIST;
@@ -218,6 +216,8 @@ struct st_object {
   int sid;
   char *name;
 
+  PAGE *page; /* Parent page */
+
   int w_top;				/* Bounding box information */
   int w_left;				/* in world coords */
   int w_right;
@@ -256,14 +256,9 @@ struct st_object {
   gchar *complex_basename;              /* Component Library Symbol name */
   OBJECT *parent;                       /* Parent object pointer */
 
-  /* unused for now */
-  void (*action_func)();			/* Execute function */
-
-  void (*sel_func)();			/* Selected function */
-  void (*draw_func)();			/* Draw function */
-
   int color; 				/* Which color */
   int dont_redraw;			/* Flag to skip redrawing */
+  int selectable;			/* object selectable flag */
   int selected;				/* object selected flag */
   int locked_color; 			/* Locked color (used to save */
   /* the object's real color */
@@ -282,12 +277,25 @@ struct st_object {
   int whichend;    /* for pins only, either 0 or 1 */
   int pin_type;    /* for pins only, either NET or BUS */
 
+  /* Tracking total number of entities connected by this net */
+  int net_num_connected;          /* for nets only */
+  gboolean valid_num_connected;   /* for nets only */
+
   GList *attribs;       /* attribute stuff */
   int show_name_value;
   int visibility;
   OBJECT *attached_to;  /* when object is an attribute */
   OBJECT *copied_to;    /* used when copying attributes */
 
+  GList *weak_refs; /* Weak references */
+
+  /* Attribute notification handling */
+  int attrib_notify_freeze_count;
+  int attrib_notify_pending;
+
+  /* Connection notification handling */
+  int conn_notify_freeze_count;
+  int conn_notify_pending;
 }; 
 
 
@@ -319,14 +327,6 @@ struct st_bus_ripper
 {
   int x[2];
   int y[2];
-};
-
-struct st_stretch
-{
-  OBJECT *object;
-  CONN *connection;
-
-  int whichone;
 };
 
 struct st_bounds {
@@ -388,7 +388,6 @@ struct st_page {
   SELECTION *selection_list; /* new selection mechanism */
   GList *place_list;
   OBJECT *object_lastplace; /* the last found item */
-  GList *stretch_list;
 
   char *page_filename; 
   int CHANGED;			/* changed flag */
@@ -424,13 +423,23 @@ struct st_page {
   gint ops_since_last_backup;
   gchar do_autosave_backup;
 
+  GList *weak_refs; /* Weak references */
 };
-
-/*! \brief different kind of snapping mechanisms used in TOPLEVEL */
-typedef enum {SNAP_OFF, SNAP_GRID, SNAP_RESNAP, SNAP_STATE_COUNT} SNAP_STATE;
 
 /*! \brief Type of callback function for calculating text bounds */
 typedef int(*RenderedBoundsFunc)(void *, OBJECT *, int *, int *, int *, int *);
+
+/*! \brief Type of callback function for object damage notification */
+typedef int(*ChangeNotifyFunc)(void *, OBJECT *);
+
+/*! \brief Type of callback function for notification when a new TOPLEVEL is created */
+typedef void(*NewToplevelFunc)(TOPLEVEL *, void *);
+
+/*! \brief Type of callback function for notification when an object's attributes change */
+typedef void(*AttribsChangedFunc)(void *, OBJECT *);
+
+/*! \brief Type of callback function for notification when an object's connections change */
+typedef void(*ConnsChangedFunc)(void *, OBJECT *);
 
 /*! \brief Type of callback function for querying loading of backups */
 typedef gboolean(*LoadBackupQueryFunc)(void *, GString *);
@@ -444,8 +453,6 @@ struct st_toplevel {
   GList *RC_list;                       /* List of RC files which have been read in. */
 
   char *untitled_name;			/* untitled sch basename */
-  char *font_directory; 		/* path of the vector fonts */
-  char *scheme_directory; 		/* path of the scheme scripts */
   char *bitmap_directory; 		/* path of the bitmaps */
 
   int init_left, init_right; 		/* Starting values for above */
@@ -453,15 +460,9 @@ struct st_toplevel {
 
   int width, height;			/* height, width of window */
 
-  /*! \brief whether and how to snap to the current grid */
-  SNAP_STATE snap;
-
   int override_color;			/* used in doing selections */
 
   int last_ps_color;                    /* used in print code */
-
-  int DONT_REDRAW;			/* misc flags */
-  int ADDING_SEL;
 
   /* page system */
   PAGE *page_current;
@@ -476,9 +477,6 @@ struct st_toplevel {
   /* backup variables */
   int auto_save_interval;
   gint auto_save_timeout;
-
-  /* used by math funcs for the snapping */
-  int snap_size;		
 
   /* BLOCK SET IN GSCHEM, BUT USED IN LIBGEDA - NEEDS A RETHINK */
   int background_color;
@@ -527,6 +525,9 @@ struct st_toplevel {
   /* controls if invisible attribs are kept and not deleted */
   int keep_invisible;   
 
+  /* controls the generation of backup (~) files */
+  int make_backup_files;
+
   /* either window or limits */
   int print_output_type;
 
@@ -564,9 +565,20 @@ struct st_toplevel {
   RenderedBoundsFunc rendered_text_bounds_func;
   void *rendered_text_bounds_data;
 
+  /* Callback functions for object change notification */
+  GList *change_notify_funcs;
+
+  /* Callback functions for object attribute change notification */
+  GList *attribs_changed_hooks;
+
+  /* Callback functions for object connections change notification */
+  GList *conns_changed_hooks;
+
   /* Callback function for deciding whether to load a backup file. */
   LoadBackupQueryFunc load_newer_backup_func;
   void *load_newer_backup_data;
+
+  GList *weak_refs; /* Weak references */
 };
 
 /* structures below are for gnetlist */
@@ -675,5 +687,8 @@ typedef struct {
   int   m_val;
   char *m_str;
 } vstbl_entry;
+
+/* Used by g_rc_parse_handler() */
+typedef void (*ConfigParseErrorFunc)(GError **, void *);
 
 #endif

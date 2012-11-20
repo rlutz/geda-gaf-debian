@@ -121,10 +121,7 @@ char *s_slib_search_dirs(const char *basename)
 
     ptr = opendir(slib[i].dir_name);
 
-    if (ptr == NULL) {
-      fprintf(stderr, "Oops got a null dir_name!\n");
-      exit(-1);
-    }
+    g_return_val_if_fail ((ptr != NULL), NULL);
 
     dptr = readdir(ptr);
 
@@ -149,11 +146,6 @@ char *s_slib_search_dirs(const char *basename)
       ptr = NULL;
     }
 
-  }
-
-  if (ptr) {
-    closedir(ptr);
-    ptr = NULL;
   }
 
   return(NULL);
@@ -208,7 +200,6 @@ char *s_slib_search_lowlevel(const char *basename)
 char *s_slib_getbasename(const char *rawname)
 {
   char *return_filename;
-  char *copy;
   int i;
   int done=0;
   int lastchar;
@@ -232,10 +223,6 @@ char *s_slib_getbasename(const char *rawname)
 
 
   return_filename[i] = '\0';
-
-
-  /* keep filename for safe keeping */
-  copy = return_filename;
 
   /* skip null terminator */
   i--;
@@ -504,17 +491,13 @@ char *s_slib_getfiles(char *directory, int flag)
           break;
         }	
 
-        if (dptr->d_name != NULL) {
-          /* hack */
-          if (count < 256) {
+        /* hack */
+        if (count < 256) {
 
-            whole_dir[count] = g_strdup (dptr->d_name);
-            count++;
-          } else {
-            fprintf(stderr, 
-                    "uggg. too many files in s_slib_getfiles!\n");
-            exit(-1);
-          }
+          whole_dir[count] = g_strdup (dptr->d_name);
+          count++;
+        } else {
+          g_error ("uggg. too many files in s_slib_getfiles!\n");
         }
 
         dptr = readdir(ptr);

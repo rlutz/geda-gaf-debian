@@ -204,12 +204,12 @@ int snap_grid(GSCHEM_TOPLEVEL *w_current, int input)
   int p, m, n;
   int sign, value, snap_grid;
 
-  if (w_current->toplevel->snap == SNAP_OFF ||
-      w_current->toplevel->snap_size <= 0) {
+  if (w_current->snap == SNAP_OFF ||
+      w_current->snap_size <= 0) {
     return(input);
   }
 
-  snap_grid = w_current->toplevel->snap_size;
+  snap_grid = w_current->snap_size;
 
   /* this code was inspired from killustrator, it's much simpler than mine */
   sign = ( input < 0 ? -1 : 1 );
@@ -242,14 +242,13 @@ int snap_grid(GSCHEM_TOPLEVEL *w_current, int input)
  */
 int SCREENabs(GSCHEM_TOPLEVEL *w_current, int val)
 {
-  double fs,f0,f1,f;
+  double f0,f1,f;
 
   double i;
   int j;
 
   f0 = w_current->toplevel->page_current->left;
   f1 = w_current->toplevel->page_current->right;
-  fs = w_current->toplevel->width;
   f = w_current->toplevel->width / (f1 - f0);
   i = f * (double)(val);
 

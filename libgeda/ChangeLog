@@ -1,11 +1,2276 @@
-commit 48f3d8aedb5db6f5dfb6232565e65e03d45b5efb
+commit bbb663612afa98c274279edbe167f86dd7b3f6d8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 18 16:03:31 2012 +0000
+
+    Final .po file update before release.
+
+commit 7c9f572ccf61966f4e97377f892dbe76df760194
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 18 07:40:46 2012 +0000
+
+    scheme-api: Add unit test for connections to nets in symbols.
+    
+    Affects-bug: lp-994361
+
+commit b05cebd0abac635d91d680e43c6291a4739f5e9f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 17 21:38:44 2012 +0000
+
+    libgeda: Draw arrows on 'connected' dangling net ends.
+    
+    Follow-on patch from commit 1598b5884ba8, to add arrow endings on printed output.
+    
+    Affects-bug: lp-1014160
+
+commit 928786d234aa95d368fe3cc8c62783cc5717dfe2
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Nov 17 09:17:24 2012 +0000
+
+    Fix bad keyword in PostScript headers.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 91865f5d9ad9730ca62c75a29349b7ebd296ad74
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 16 21:28:10 2012 +0000
+
+    libgeda: Fix potential NULL dereference in o_read_buffer().
+    
+    In the case that a schematic file contained an embedded component
+    section start symbol before any object definitions, a segfault would
+    occur due to a NULL deference.
+    
+    Coverity-ID: 201783
+    
+    Closes-bug: lp-1079586
+
+commit e6cdf09ad9330c2066363809f7839f698ca2476b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 15 23:22:20 2012 +0000
+
+    Hand-merge Dutch translations from master branch.
+    
+    Merge Dutch translation improvements made by Bert Timmerman in from
+    the unstable branch (commits 4b17c888, f9bd70f6, and a164660f).
+
+commit f7fab3715f984c374f41d7c2d74fc2802bbb4e7a
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Nov 14 22:58:12 2012 +0000
+
+    Replace references to geda.seul.org with up-to-date URLs.
+    
+    Update lots of links to seul.org to www.geda-project.org, wiki.geda-project.org, gedasymbols.org and www.gnu.org as appropriate.
+
+commit b53f5f835abcaa8f8ff4b32cb650cfbb2e2da38c
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Mar 19 20:54:37 2012 +0000
+
+    libgeda: Remove redundant checks against NULL in s_encoding.c
+    
+    The variable dst can't be NULL (g_new() will terminate on error) so there is
+    no reason to repeatedly check it against NULL. Remove the checks.
+    
+    Coverity-ID: 201596
+    
+    Closes-bug: lp-959702
+
+commit ce0a9ee83906859b632e19a4c16f9ec0fa1f3958
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Mar 16 21:18:32 2012 +0000
+
+    libgeda: fix dereference after NULL check
+    
+    Retest for NULL before making a member comparison.
+    
+    Coverity-ID: 201599
+
+commit 9f3084edd1a6cf70bb6f4a6458d7caebce93a833
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Jul 2 22:13:32 2012 +0100
+
+    libgeda: only include top level glib header
+    
+    glib 2.0 does not permit the inclusion of glib/gmem.h, glib/gmessages.h etc. but only
+    the top level glib.h file. Remove references in s_path.c to the sub-files and only
+    include the top level file.
+    
+    Closes-bug: lp-934261
+
+commit f0923997c5ea727f6b73afad23ee2f974ac6b6b0
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Mar 18 11:36:59 2012 +0000
+
+    Update FSF mailing address.
+    
+    Change all references to the FSF mailing address to the new Franklin
+    Street location.
+    
+    Closes-bug: lp-934934
+
+commit 92ea83ad1e12f6e5150f956a0c12586b6187c455
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 14 17:08:57 2012 +0000
+
+    libgeda: Import translations from Launchpad
+    
+    N.b. Did not import DE, HU, PL, RU, or ZH_CN translations, as
+    Launchpad translations were less fully-translated than translations
+    already in tree.
+
+commit eee335e47010e24b309520c5d740ea542d9d60ce
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Feb 11 23:08:57 2012 +0000
+
+    libgeda: Correct 'const const' in header file.
+    
+    Reported-by: Dan McMahill <dan@mcmahill.net>
+
+commit f7ee97307f4fbb95f76b57611260f8eb4142a6af
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 12:44:43 2012 +0000
+
+    libgeda: Remove dead code.
+    
+    Coverity-ID: 201570
+
+commit 4aad1adbe2fe6da7b26013c97dd1359775008447
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 12:19:22 2012 +0000
+
+    libgeda: Fix explicit NULL dereference.
+    
+    In s_hierarchy_down_schematic_single(), NULL may be dereferenced if an
+    invalid flag argument is passed to the function.  Adding a default
+    branch to the switch statement should resolve this.
+    
+    Coverity-ID: 201600
+
+commit ab3a3cbcbf3000579504ac454698ea34e0eaf9e1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 11:59:16 2012 +0000
+
+    libgeda: Fix explicit NULL dereference.
+    
+    When printing a text OBJECT with an invalid show_name_value field,
+    o_text_print() could dereference NULL.  Adding a default case to the
+    switch statement should fix this.
+    
+    Coverity-ID: 201603
+
+commit 02b5c2057d616cce6f70fceed72f7105a1fc2bef
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 11:49:05 2012 +0000
+
+    libgeda: Fix dereferences after NULL checks.
+    
+    In some cases, it is actually correct to *remove* the NULL checks,
+    since the functions in question are internal libgeda implementations
+    and can assume that the caller has sanity checked arguments.
+    
+    Coverity-ID: 201604
+    Coverity-ID: 201605
+    Coverity-ID: 201606
+    Coverity-ID: 201607
+    Coverity-ID: 201608
+    Coverity-ID: 201609
+    Coverity-ID: 201610
+    Coverity-ID: 201611
+
+commit 7d75ec2492fba838f10f049966626189a7c1428d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 11:39:42 2012 +0000
+
+    libgeda: Fix comparison of array with NULL.
+    
+    Comparing arrays to NULL has no effect.
+    
+    Coverity-ID: 201622
+
+commit d5e24a5b478e74ce2a4d0220c882247f4ae4ad92
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 11:38:11 2012 +0000
+
+    libgeda: Fix dereferences before NULL checks.
+    
+    Coverity-ID: 201630
+    Coverity-ID: 201629
+
+commit 3a79b63d7b99b755ec42c6ec506181415eae321c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 11:27:44 2012 +0000
+
+    libgeda: Fix buffer overrun in s_menu_return_entry().
+    
+    Off-by-one error.
+    
+    Coverity-ID: 201626
+
+commit c17cb9cd38af503e681fc673145e3f10e3cb5249
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 11:27:38 2012 +0000
+
+    libgeda: Fix resource leak in f_print_header().
+    
+    f_print_header() leaked a file pointer to the PostScript prolog file.
+    
+    Coverity-ID: 201627
+
+commit 9dba58e5c846089e955b5fe992250d76e150831c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 11:27:31 2012 +0000
+
+    libgeda: Fix uninitialised scalar variables.
+    
+    Coverity-ID: 201659
+    Coverity-ID: 201660
+    Coverity-ID: 201661
+    Coverity-ID: 201662
+    Coverity-ID: 201663
+    Coverity-ID: 201664
+    Coverity-ID: 201665
+
+commit 05dbec381e6bf1cfba9bde7ce7039d5d3d098d13
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Feb 7 16:33:48 2012 +0400
+
+    Fixed wrong behaviour during gschem navigation
+    
+    If you go down the same symbol during navigation from different places
+    you always come back to the schematic where you've done this first. This
+    patch fixes such a wrong behaviour.
+    
+    Closes-bug: lp-698543
+
+commit bc18e318ca1314586fc8626fcb8bd1937c69c10d
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Jan 29 11:41:26 2012 +0400
+
+    libgeda: Fix incorrect Postscript output for missing pictures
+    
+    Closes-bug: lp-923257
+
+commit fce53e03ceeb12966ce53ae9116ddd9333791a50
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Thu Jan 19 00:02:21 2012 +0100
+
+    libgeda: rewrite s_cue_output_single
+    (cherry picked from commit b3dfc6c7124810598042a78fe2800f36699769c3)
+
+commit 61447f19df1a6549dcc68fa66cd8bc1aa1e3ac1d
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Wed Jan 18 23:57:19 2012 +0100
+
+    libgeda: fix printing of junction cues
+    
+    Closes bug "disappearing dots in gschem" reported by
+    Gabriel Paubert <paubert@iram.es>.  Issue was introduced in
+    commit 65c68f9.
+    
+    Additionally, now junction cues are also printed when 3 or
+    more pins are connected (same behavior as for net segments).
+    (cherry picked from commit f8a9c86e2e2fa7fa451cd504e62ebee6a3e73d2d)
+
+commit 7943b8a2c696265b334dbfa4dce1101e95754024
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Jan 15 19:24:45 2012 +0400
+
+    Updated Russian translation
+
+commit 59eafeb48043ec092e7b33017698a4ed10b0f5f6
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Jan 17 02:53:52 2012 +0400
+
+    libgeda,gschem: add three missing files to POTFILES.in
+    
+    Reported by Sergey Alyoshin
+
+commit 0b344aaa401513c5e9b075849358805ea8cb301d
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Thu Jan 12 20:28:17 2012 +0000
+
+    libgeda: fix potential memory leaks in Scheme API
+    
+    Add dynamic contexts and supporting unwind handlers to
+    g_rc_component_library() and g_rc_component_library_command() functions.
+
+commit 230241f2ae70b1a1eb91fa3ce766b4e18e1eec54
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 12 00:14:20 2012 +0000
+
+    libgeda: Fix incorrect variable type in o_net_refresh_conn_cache().
+
+commit 321c005a6170b34fc9f3e9f6ab1e4ab931120f81
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Jan 11 07:37:47 2012 +0000
+
+    gschem: display gschemrc filename properly on version failure
+    
+    Add a new Scheme function "rc-filename" to libgeda to extract the
+    filename of the Scheme file under evaluation, and use this in the
+    "gschem-version" Scheme function in gschem to show which file is
+    wrong.
+    
+    Closes-bug: lp-910663
+
+commit 684211777ffcf0414887f814207da97dc37dd5fa
+Merge: 72be40e cbdd5af
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 11 20:06:11 2012 +0000
+
+    Merge branch 'entropy_reduction' of git://github.com/gareth8118/geda-gaf into for-stable-1.8
+
+commit 933fe9c5c4b90998979cd2fafc12625e89c388d9
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Thu Sep 1 06:47:22 2011 +0100
+
+    libgeda: Add  doxygen definition to s_toplevel_new()
+
+commit cff8761501a0215ea2f152497d31760e1842f3d0
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Jan 4 19:11:09 2012 +0000
+
+    libgeda: Doxygen for g_rc.c.
+    
+    Add a brief doxygen comment for the g_rc.c file in the header. Also
+    added explanatory not to bug tag for g_rc_parse().
+
+commit 3671d4acdab78025b658cdba81f53c2ecec0208d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 10 09:20:26 2012 +0000
+
+    Update translations.
+
+commit 31440e054a54001bf462f7da9d31bfc0f0063d3f
+Merge: c6db159 0884425
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 9 20:13:41 2012 +0000
+
+    Merge branch 'bug-700448-load-error'.
+    
+    Eivind Kvedalen has provided some changes to libgeda and tools that
+    provide better error detection when loading schematic and symbol
+    files, and I have made a few improvements and bugfixes based on his
+    branch.
+    
+    Closes-bug: lp-700448
+    
+    Conflicts:
+    	libgeda/src/a_basic.c
+
+commit c6db15997c306c23c02dec9cc8f1e9a645f03fcb
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Mon Jan 9 02:26:35 2012 +0100
+
+    libgeda: check NULL pointers in o_net_refresh_conn_cache
+
+commit 2f30211e0b0ae7aaac0b57b50a73331e89402b4f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 6 21:32:43 2012 +0000
+
+    libgeda: Fix possible access-after-free in o_picture_read().
+
+commit f23d270aa84b07f2ce4336acc658eb9d070a8fbc
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 6 23:58:20 2012 +0000
+
+    libgeda: Messages in GErrors should not be newline-terminated.
+
+commit 8104930a0523c175987c35e80e33cd8dd4a4a97f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 7 00:19:39 2012 +0000
+
+    libgeda: More robust line ending detection when parsing.
+    
+    Correctly handle '\r', '\n', and '\r\n' line endings.
+
+commit 2c5ec1261714ff0a1157582ef0daead543c1da65
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 7 00:18:03 2012 +0000
+
+    libgeda: Remove s_textbuffer_seek().
+    
+    It's never been used anyway.
+
+commit f0ac4bcbc0fe5ab0c32e45875003f1be35a7bc1c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 7 00:00:20 2012 +0000
+
+    libgeda: Return a const string from s_textbuffer_next etc.
+    
+    Also constify everywhere that string is used.  This helped identify
+    several places to avoid unnecessary strdup()/free() pairs.
+
+commit 312cd9e728c04bf2e593a81a739a71443b420634
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 6 23:37:54 2012 +0000
+
+    libgeda: Another unit test for load errors.
+
+commit 5480167063451e1c6cf5701f1b198d896c6adf65
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 6 23:35:26 2012 +0000
+
+    libgeda: Report error on loading an unterminated attribute list.
+
+commit b8c34b0fda239294f449010c07e2077736b76c97
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 6 23:48:30 2012 +0000
+
+    libgeda: Don't repeatedly reverse new attribute list.
+    
+    Add a unit test to make sure this is done correctly.
+
+commit 7b64ae90034cf9a1e655259e071cc9e236b00ff2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 6 23:48:30 2012 +0000
+
+    libgeda: Correct error code numbering for EDA_ERRORs.
+
+commit d978cfae017194ffe79a37c69c7fc1befb727199
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 6 23:48:30 2012 +0000
+
+    libgeda: Fix attempt to free uninitialised pointer.
+
+commit 531a20a15301167d29012c44bfc2b1b0a837d7bb
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue May 3 23:18:29 2011 +0200
+
+    libgeda: use hooks to refresh conn cache
+    
+    Affects-bug: lp-707064
+
+commit 81d2d6019ecb4ef0b9f109153cd1c9803e39045a
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Mon May 2 20:33:21 2011 +0200
+
+    libgeda: add hook for TOPLEVEL object creation
+    
+    Affects-bug: lp-707064
+
+commit 0810ec21f6d50823664f872c735244fc29a6ed5b
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Apr 30 01:11:18 2011 +0200
+
+    libgeda: add hooks for connection change notification
+    
+    Affects-bug: lp-707064
+
+commit dafe58d7440161eadd4f524564fbe9e6e88ee65a
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat May 1 13:47:23 2010 +0100
+
+    Attribute change hooks
+    
+    Affects-bug: lp-707064
+
+commit 65c68f98cc4bf5d26a091abf336b2e00c7bbcabb
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sun Mar 13 01:10:08 2011 +0100
+
+    libgeda: skip printing endpoint cues on fully connected nets
+    
+    Affects-bug: lp-707064
+
+commit 042612a5cc35bfafbf0f862a6db78ec66cd022a7
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Mar 15 01:01:10 2011 +0100
+
+    libgeda: add functions to track net connectivity
+    
+    o_net_is_fully_connected can be used to check if the net is connected to
+    at least two separate endpoints - endpoint being a pin, bus or a named
+    net (through a netname attribute).
+    
+    o_net_refresh_conn_cache should be used to update cached state after
+    connectivity change.
+    
+    For each net segment the number of connected enpoints is cached in new
+    fields of OBJECT structure: net_num_connected and valid_num_connected.
+    
+    Affects-bug: lp-707064
+
+commit c90c6a2728179785c4da5241e043cdcbcf197915
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sun Jan 23 21:19:48 2011 +0100
+
+    libgeda: print unconnected pin ends as boxes
+    
+    Closes-bug: lp-706552
+
+commit e09936bfe0b2db080cab5376088f24656b0e2ad7
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Fri Jan 6 22:59:05 2012 +0100
+
+    Make sure attributes are stored internally in the same order as before, or
+    else the gsymcheck tests will fail.
+
+commit 80845206868cb5d5b70357a5ca23f8da07151fc2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 5 17:30:15 2012 +0000
+
+    scheme-api: Correct prototype of edascm_init_impl().
+    
+    Fixes bug introduced in commit 5cdf4de59028.
+
+commit c15feccddc359d1ac3e62ed3b2182c7cc3aa938a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 5 15:39:37 2012 +0000
+
+    scheme-api: Improve doxygen docs for C API functions.
+
+commit 5cdf4de59028fad80072611a1194a4a8e224c363
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 5 15:40:12 2012 +0000
+
+    scheme-api: Ensure init functions are called in Scheme mode.
+    
+    This patch makes sure that any libguile functions called by
+    edascm_init() are called in Guile mode, even if for some reason
+    edascm_init() is called from a thread that is not yet in Guile mode.
+
+commit 501d784118e135be1ead32b1233e64bc62e8d41e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 3 21:50:55 2012 +0000
+
+    scheme-api: Fix path operations involving curves.
+    
+    Curve control points were not being processed correctly, meaning that
+    it was not possible to insert a curve into a path.
+
+commit ded664073d4e32b087a55359e15a43c65a26a653
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 3 20:59:19 2012 +0000
+
+    scheme-api: Improve testsuite coverage.
+
+commit 206b5f430917287d4d1d46acd5af32ab8ea34877
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Tue Jan 3 00:31:13 2012 +0100
+
+    Updated error messages in o_picture_read, o_path_read, and o_text_read to
+    follow style of other similar error messages.
+
+commit 46ffae4667dda3520b31b92370dcafe1e24017a0
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Tue Jan 3 00:30:40 2012 +0100
+
+    Made edascm_string_format_sym local.
+
+commit 3ffd19131319cd74689dcb388e53cf12948c26d5
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Tue Jan 3 00:27:12 2012 +0100
+
+    Updated unit tests for scheme api (string->page function).
+
+commit 64a7d0283c3c15e1b27077ee5a9c1ec209c0a807
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Mon Jan 2 22:48:56 2012 +0100
+
+    Rebase fixes for o_picture.c.
+
+commit 2b025def49c1bfeedb0650b4c34d527fa29a5090
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Wed Sep 7 20:49:20 2011 +0200
+
+    Changed invalid-string -> string-format
+
+commit b0541a1258d82b40b7b604a15d177780fd1b7cf9
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Wed Sep 7 20:34:02 2011 +0200
+
+    Changed enum EDA_ERROR_READ -> EDA_ERROR_PARSE, and made replaced G_FILE_ERROR_FAILED by
+    EDA_ERROR_READ in appropriate places.
+
+commit d1305adf92982b3a159707c940bafb8c293223fe
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Tue Jun 28 21:43:13 2011 +0200
+
+    Partial fix for bug #700448.
+    
+    NULL is returned from o_*_read and o_read_buffer functions if parsing of the input buffer fails.
+    An error object is returned in these cases, describing in detail what error occured.
+    
+    gnetlist is updated to exit with status code 2 if the input file can't be read.
+    
+    gschem is updated to report errors when using o_read_buffer.
+    
+    TODO:
+    * Prone to segfaults on bad input files (separate patch)
+
+commit 2844f086d7df446674b659451b9f63865f715b6c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Jan 1 12:16:05 2012 +0000
+
+    scheme-api: Correctly export libgeda gettext function.
+    
+    Makes promote-attribs! work again.
+
+commit 46bfb5cf26f33947a2efc7522dabd1107ce0afe4
 Author: Ales Hvezda <ahvezda@seul.org>
-Date:   Fri Jan 14 23:18:41 2011 -0500
+Date:   Sat Dec 31 15:56:11 2011 -0500
+
+    Updated all po files in prep for a new release (1.7.2)
+
+commit ccb8478bc60b66797306b63db890348ccd0342fe
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Dec 31 14:43:13 2011 +0100
+
+    libgeda: updated the Dutch translation.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 0ef5b849452c0d9e93d00c4c5f12c01da1a4a747
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sat Dec 31 09:26:06 2011 +0400
+
+    libgeda: Update Russian translation.
+
+commit f07ea6693e22aa8e8895fe3026eafe424c87a585
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 28 17:34:30 2011 +0000
+
+    scheme-api: Properly clean up extra TOPLEVEL weakref in OBJECT smobs.
+    
+    Corrects mistake made in commit 78c8ee905dad.
+
+commit 78c8ee905dad0dbfde548debb2be5790d4b2fb71
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 28 13:55:18 2011 +0000
+
+    scheme-api: Store a TOPLEVEL pointer in OBJECT smobs.
+    
+    When an OBJECT smob is created in Scheme code, and then goes out of
+    scope without being added to a component or to a page, we need to be
+    able to delete the object from the Guile garbage collector.  This
+    deletion occurs in a smob free function.
+    
+    To delete an OBJECT, we need to call s_object_delete(), which requires
+    an additional TOPLEVEL argument.  Previously, we have obtained a
+    TOPLEVEL by using edascm_c_current_toplevel().  Unfortunately, this
+    (indirectly) calls scm_fluid_ref(), which is not permitted to be
+    called from a smob free function; if called in that context, it may
+    cause a deadlock.
+    
+    This patch alters OBJECT smobs to be double-length smobs, with the
+    current TOPLEVEL at the time the smob was created baked into the
+    second data word.  This avoids the need to use
+    edascm_c_current_toplevel() when garbarge-collecting an OBJECT, but
+    it's also somewhat hacky. :-(
+    
+    Closes-bug: lp-909358
+
+commit df9c96cc352c7723e5ba64cad7835c3972433556
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 24 01:00:56 2011 +0000
+
+    Update translation files.
+
+commit 07de7591c23c93efdb92012304dc7aaee1c66c04
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 23 21:57:52 2011 +0000
+
+    libgeda: Improvements to 'component-library-search'.
+    
+    Luigi Palese has supplied an improved Scheme version of the
+    'component-library-search' function for searching a directory tree for
+    symbol libraries.
+    
+    The new version:
+    
+    - Searches for directories recursively, rather than only searching the
+      top level of the provided directory.
+    - Only considers directories that actually contain symbol files as
+      libraries.
+    - Optionally adds a prefix to the library names shown in the gschem
+      library window.
+    
+    (I have made some adjustments to Luigi's original version of the
+    function).
+    
+    Closes-bug: lp-901222
+
+commit 33fee83f110c86bf014bd4fb460bb38bae626a10
+Author: Richard Barlow <richard@richardbarlow.co.uk>
+Date:   Wed Dec 21 14:33:45 2011 +0000
+
+    Add option to allow creation of backups to be disabled
+    
+    When using a version control system the backup (example.sch~) files
+    created by libgeda become annoying. They can be ignored by most
+    VCSs however they still sit there and don't serve any purpose; any
+    mistakes can be recovered from a previous version.
+    
+    This patch adds a configuration option "no-backup-files" which
+    suppresses the creation of backup files. It is disabled by default
+    so there is no change to the previous behaviour unless this option
+    is activated.
+    
+    Closes-bug: lp-762894
+
+commit c63deda32d9480e7b5b5597d3fb1fed8e6591805
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 15 09:34:24 2011 +0000
+
+    libgeda: Fix null dereference when fallback image not loaded.
+    
+    In commit bccf15c104d6, a bug was introduced whereby libgeda
+    dereferenced a NULL pointer.  If a picture object's image cannot be
+    loaded, libgeda attempts to load a fallback image, and on failure,
+    accesses a GError to retrieve the error message.  Unfortunately, the
+    GError was not being passed to the image loading function, and was
+    therefore uninitialised when it was dereferenced to obtain a message.
+    
+    Closes-bug: lp-904639
+
+commit 4a1b54fdf119538e90f5b0dbc73a5a9d8ddc56da
+Author: Luigi S. Palese <quadword@gmail.com>
+Date:   Tue Dec 13 11:20:34 2011 +0100
+
+    scheme-api: Added expand-env-variables function to the os module.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 4342002fa639bc2f18bc4f776920ea540c6d2de3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 18:58:03 2011 +0000
+
+    build-sys: Only look for Guile using pkg-config.
+    
+    This makes it possible for `pkg-config --libs libgeda' to give the
+    correct output.
+
+commit cee0d8874a0a3a3e76e247f1ebd4f999d7a0d1b0
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 18:45:15 2011 +0000
+
+    libgeda: List gio-2.0 as one of the pkg-config requirements.
+    
+    The new picture handling code uses GIO with GdkPixbuf to load images
+    from memory buffers.  We don't need to update the configure checks
+    because we already require a version of GdkPixbuf that requires GIO.
+
+commit 0e506ebd5d5cc87a7f373b83b24f2ad3c90fd18b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 14:13:22 2011 +0000
+
+    Remove per-tool INSTALL files.
+    
+    Only one top-level INSTALL file is needed, and that is provided by
+    automake.
+
+commit 8d4c574efc3a081324ef92d16e6feb6720c86c33
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 10:31:12 2011 +0000
+
+    scheme-api: Translate strings.
+    
+    Makes the messages emitted by Scheme API functions
+    internationalizable.  This required an update to the gnetlist
+    testsuite to set the library path for built-but-not-installed Scheme
+    modules.
+    
+    Closes-bug: lp-901013
+
+commit 2f36675adb75051526074f5bed7d18481e8c8159
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 11 20:04:24 2011 +0000
+
+    libgeda: Enable use from C++ programs.
+    
+    Use G_BEGIN_DECLS and G_END_DECLS to make sure function prototypes are
+    declared with C linkage where appropriate.
+    
+    Closes-bug: lp-698708
+
+commit 0b7b7616785d75eeda689ac9a33c9e99b4796d02
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 11 00:20:06 2011 +0000
+
+    libgeda: Correct prototype for s_clib_symbol_invalidate_data().
+    
+    Hurrah, rookie errors.
+
+commit ebfe6ae6a76b6a44a0bbe2d184bf99bfee7d97bf
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 11 00:11:59 2011 +0000
+
+    Add s_clib_symbol_invalidate_data().
+    
+    This allows a symbol's data to be reloaded from disk without
+    invalidating the full symbol data cache.
+    
+    Closes-bug: lp-698504
+
+commit 70536e15af56db31075d72bef6db37b84098d698
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 10 22:51:40 2011 +0000
+
+    scheme-api: Remove redundant checks in edascm_to_object_glist().
+    
+    These checks are repeated by edascm_to_object(), which
+    edascm_to_object_glist calls.
+
+commit 0fc87a9d985e8bd4f98f77d5130e2515c286518c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 4 17:37:34 2011 +0000
+
+    libgeda: Remove some exit() calls and assertions.
+    
+    Try to avoid assertions in libgeda; instead, emit "critical"-level log
+    messages and fail gently.  This patch removes a bunch of assertions
+    and calls to exit() from libgeda, in favour of trying to keep going
+    even in the face of programmer errors.
+    
+    Affects-bug: lp-698851
+
+commit cd203133272f0ef39629de5229eb54fdcf3178ae
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 4 17:34:19 2011 +0000
+
+    libgeda: Remove error_if_called().
+    
+    This silly function is no longer used (fortunately).
+    
+    Affects-bug: lp-698851
+
+commit 0f978cc519016ac1cbb56c772107e1f23c98c831
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 4 17:25:51 2011 +0000
+
+    Remove exit_if_null().
+    
+    Replace with g_return_if_fail(), g_return_val_if_fail(), etc.  We
+    shouldn't exit() from a shared library anyway.
+    
+    Also, this patch makes gschem *not* crash in a bunch of places where
+    it doesn't really make sense to just give up.
+    
+    Affects-bug: lp-698851
+
+commit 326a4eca0d36eed80a33b201bcbed4942046f61c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 9 21:09:45 2011 +0000
+
+    scheme-api: Create and manipulate picture objects.
+    
+    Closes-bug: lp-898379
+
+commit bccf15c104d64b33d33bb7167703469d75884a7e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 9 23:52:19 2011 +0000
+
+    General fixes for pictures, picture rendering and picture operations.
+    
+    Streamlined the API for picture objects to make it harder to leave a
+    picture object in an inconsistent state.  This is a prerequisite patch
+    to providing a Scheme API for working with picture objects.
+    
+    This patch also makes primitive transformations of pictures actually
+    work, and fixes rendering of pictures in gschem, because the changes
+    weren't really feasible to separate.
+
+commit e85e8c5843f23432cb03d4dd8c95fb34753f7801
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 9 21:07:48 2011 +0000
+
+    libgeda: Add missing pre change notify to o_box_modify_all().
+
+commit 648a418f99c337a185462525bbffa66b89786007
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 8 20:25:42 2011 +0000
+
+    libgeda: Clean up unneeded stuff now we have (geda os) module.
+    
+    Also a rather out-of-date comment.
+
+commit ae070b080856b6eef1059ee50dede82cc4f0afe8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 8 17:23:10 2011 +0000
+
+    scheme-api: Add (geda os) module.
+    
+    Add the (geda os) module, which provides operating system information
+    and services, including:
+    
+    - host operating system classification
+    - gEDA standard paths
+    - directory and search path separators
+
+commit eb1e773f3f95f99fcd6ac6d0d0ebc947102e60ab
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 8 17:23:10 2011 +0000
+
+    libgeda: Make sure paths are set up during initialisation.
+    
+    Until the s_path_*() functions are called, the GEDADATA and GEDADATARC
+    environment variables may not be set.  Make sure the environment
+    variables are set up during library startup.
+
+commit ec03489e1057f10a35a0877c52034dee99f50bc6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 30 21:39:52 2011 +0000
+
+    libgeda: Make f_normalize_pathname() behave correctly on Windows.
+    
+    On POSIX systems, f_normalize_pathname() emits a G_FILE_ERROR_NOENT
+    error if the file is missing.  This patch makes it behave in the same
+    way on Windows.
+    
+    This fixes some spurious "something went wrong in Scheme" error
+    messages on Windows.
+    
+    Reported-by: DJ Delorie <dj@delorie.com>
+
+commit e4dcffe27047d7a72698c331cfcc835d564b7ef4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 5 12:19:12 2011 +0000
+
+    libgeda: Add "deprecated" attribute to deprecated functions.
+
+commit bad14b02ef17c9118b17cb3345165e0cbddb9405
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 5 12:25:29 2011 +0000
+
+    scheme-api: Warn if edascm_to_object_glist() result is unused.
+
+commit 762a91e24ea91eeba8a67fab75071f9173bfaa6a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 5 12:12:16 2011 +0000
+
+    scheme-api: Clear all new path section fields.
+    
+    Fixes some unitialised variable warnings.
+
+commit abc0f07300a726eef628c74e8250f4f115dae987
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 5 11:47:46 2011 +0000
+
+    scheme-api: Add test for feeding back fill/stroke functions.
+
+commit 387394696a6d8191edd68f9aa2f208c736900d2f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 5 11:47:21 2011 +0000
+
+    scheme-api: Modifying object fill/stroke should dirty page.
+
+commit 76e13d2452d7d45dbc10993fae7e0d5d17929ff1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 5 11:00:19 2011 +0000
+
+    scheme-api: Update some doxygen comments.
+
+commit 5244f978119e23709ea794f69d095dd07d798a56
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 5 09:32:08 2011 +0000
+
+    scheme-api: edascm_c_set_gc() should be part of public API.
+    
+    The documentation for edascm_from_object() recommends using
+    edascm_c_set_gc() -- since its essential for safe garbage collector
+    behaviour -- so put edascm_c_set_gc() in the public Scheme API header
+    file.
+
+commit 1ceef2c85bdbc454205d7330c86498381f167cc0
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 4 22:22:53 2011 +0000
+
+    scheme-api: Add path manipulation functions.
+    
+    Closes-bug: lp-898377
+
+commit 057cab0629c92ab9bd207e49e082183ba481dc2d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 4 23:18:39 2011 +0000
+
+    libgeda: Empty paths should not have bounds.
+    
+    Paths containing no control points were returning uninitialised values
+    as their bounds.  Instead, they now have no bounds (like invisible
+    text objects).
+
+commit dc65cd116b28138f28c7823c908740d8129042d6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 4 18:11:30 2011 +0000
+
+    libgeda: Fix some "set but not used" warnings.
+
+commit 34d46a6158050b232f29e61d0cae8ac1aacca2a6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 28 13:28:55 2011 +0000
+
+    libgeda: Don't enable debugging when using Guile 2.
+    
+    Guile 2 always has debugging enabled, and emits a warning if you
+    attempt to enable it explicitly.  This patch therefore reduces tools'
+    verbosity on start-up.  Thanks to Ludovic Courtès for explaining the
+    fix.
+
+commit c9d4f6638bbc7ba84534c2460037f19915114a95
+Author: Karl Hammar <karl@aspodata.se>
+Date:   Tue Jul 26 16:08:01 2011 +0200
+
+    Correct SCM_ASSERT() usage with incorrect SCM_ARGx.
+    
+    From guile documentation:
+    
+     -- Macro: void SCM_ASSERT (int TEST, SCM OBJ, unsigned int POSITION,
+              const char *SUBR)
+    ...
+     -- Macro: int SCM_ARG1
+    ...
+     -- Macro: int SCM_ARG7
+         One of the above values can be used for POSITION to indicate the
+         number of the argument of SUBR which is being checked.
+    ...
+    
+    Some SCM_ASSERT() calls have the wrong SCM_ARGx for its TEST and OBJ.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 08f64a801c3af30ef54861f3549f3de6ea02b1b2
+Author: Karl Hammar <karl@aspodata.se>
+Date:   Tue Jul 26 09:40:52 2011 +0100
+
+    libgeda: g_access() needs <glib/gstdio.h>.
+    
+    Commit 22985618d999e1b54009b7a3e4f07b27b449f91d added g_access calls
+    in libgeda/src/f_basic.c, which is implicit unless glib/gstdio.h is
+    included.
+
+commit a2cdb3d2e2ed36be092f01a2c1c30de0eb095092
+Author: Karl Hammar <karl@aspodata.se>
+Date:   Tue Jul 26 09:40:52 2011 +0100
+
+    libgeda: Call g_dir_close() for pointers created with g_dir_open().
+    
+    In g_rc.c
+    
+     g_rc_component_library_search()
+     g_rc_source_library_search()
+    
+    calls g_dir_open(), but they never free the result with g_dir_close(),
+    giving us a memory leak. It seems to been this way since the first
+    commit.
+
+commit 22985618d999e1b54009b7a3e4f07b27b449f91d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jul 4 19:03:24 2011 +0100
+
+    libgeda: Make sure File->Save respects file permissions.
+    
+    Added g_access calls to f_save and o_save to abort saving if the
+    destination file is read-only.
+    
+    Closes-bug: lp-698565
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 19bf47f7ca84bb4a9a19460fff9bbbf378bc2dab
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sun Jul 3 16:18:41 2011 +0200
+
+    scheme-api: use attach-attribs! in promote-attribs!
+
+commit d01b5fefe19ac2cd1ce5e84b0a3b866ca42033e3
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sun Jul 3 14:11:48 2011 +0200
+
+    scheme-api: fix promote-attribs!
+
+commit d01e46055593990e918d94e4b30609df989561b4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jun 28 06:25:03 2011 +0100
+
+    build-sys: guile-snarf should use host CPP.
+    
+    Fix cross-compilation by making sure that guile-snarf uses the same C
+    preprocessor that will be later used for compilation.
+    
+    Reported-by: DJ Delorie <dj@delorie.com>
+
+commit dad94bf12c2ef120fae7a45a0020107815b84ef0
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jun 27 22:34:07 2011 +0100
+
+    build-sys: Use `clean-local' target instead of overriding `clean'.
+
+commit 31fcff837375b3db8649f1f1854dd0daa98e901a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 16 21:45:27 2011 +0100
+
+    scheme-api: Converting pages to/from strings.
+
+commit 71621e0f9d6ed201ac3968823b0b6b852fe3f070
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 25 11:57:55 2011 +0100
+
+    scheme-api: Add mirror-objects! function.
+
+commit 01e9ab2b42bff0de6386706ba3eb11e7a7c6f5e9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 25 11:19:20 2011 +0100
+
+    scheme-api: Add rotate-objects! function.
+
+commit 208984c6815066a90c7d1d3583f271524344797e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 25 10:14:03 2011 +0100
+
+    scheme-api: Add translate-objects! function.
+
+commit 3a47ea70adf7bae086b7d28455c2cacd707b434c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 25 10:51:55 2011 +0100
+
+    scheme-api: Shuffle some unit tests around.
+    
+    It turns out we need more test numbers for low-level object-related
+    functions, so shift some stuff about.
+
+commit 7c88e88e38bcd20f6ad3e46604f2b117b6fef0a6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 14:00:10 2011 +0100
+
+    scheme-api: Core API documentation (attributes).
+
+commit dd5b9c7c08307104ce360661f6e696ce87c77389
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 08:08:44 2011 +0100
+
+    scheme-api: Core API documentation (component objects).
+
+commit 224e3edec54febcf055810e6d4220369e50f1ade
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 22:02:55 2011 +0100
+
+    scheme-api: Core API documentation (text objects).
+
+commit 1e9d73ec74c6abd2ddfcf18cccadc9c0c44ff7ff
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 21:07:17 2011 +0100
+
+    scheme-api: Core API documentation (picture and path objects).
+
+commit be7d5d316bbf944f9e0a618ddff795a073de9183
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 19:47:20 2011 +0100
+
+    scheme-api: Core API documentation (circle objects).
+
+commit e7ed5291067d56419efe3764190d22fa7714937e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 18:44:07 2011 +0100
+
+    scheme-api: Core API documentation (box objects).
+
+commit b1ca0b60c9218db51132272ffdf0c1815d29b80f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 18:11:21 2011 +0100
+
+    scheme-api: Core API documentation (pin objects).
+
+commit 37338045adf382ecef00d5ee5f337c4da250b996
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 13:07:59 2011 +0100
+
+    scheme-api: Core API documentation (line objects).
+
+commit fd1e63aefad0097b1f99cf6cdb31998efec5c407
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 16:33:15 2011 +0100
+
+    scheme-api: Core API documentation (general objects).
+
+commit bcd036f9432335473d5ad64e18d83df669947eb3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jun 21 21:19:45 2011 +0100
+
+    scheme-api: Core API documentation (pages).
+
+commit 008ba78fc1a60641b620cabc9ecc198cd0a2225c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 19:03:54 2011 +0100
+
+    scheme-api: Make promote-attribs! return '() for non-components.
+
+commit c0125211b863d0d54554c39abda8c76f7ad27fae
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 15:09:38 2011 +0100
+
+    scheme-api: Make %detach-attrib! succeed when not attached.
+    
+    %detach-attrib! claims to succeed when attempting to detach an
+    attribute that's not attached to anything, but it lies.
+
+commit 1d97d6c9cad63a79bceaa9d599a757c01f1a60e7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 15:03:15 2011 +0100
+
+    scheme-api: Make %attach-attrib! succeed when already attached.
+    
+    Instead of raising an object-state exception when trying to create an
+    attribute attachment that already exists, succeed silently.
+
+commit dce70c5e826e2958d02a5bf8089b7dd1eb3a519f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 14:36:09 2011 +0100
+
+    scheme-api: Replace attach-attrib! and detach-attrib!.
+    
+    For consistency with the functions for adding and removing objects to
+    pages and components, this patch makes the following changes:
+    
+    - Replace attach-attrib! with attach-attribs! which takes multiple
+      attribute arguments.
+    
+    - Replace detach-attrib! with detach-attribs! which takes multiple
+      attribute arguments.
+    
+    - Make attach-attrib! and detach-attrib! return the target object
+      rather than the affected attributes.
+
+commit b5046514e8c4561de9a5a249624b23e003a2988a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 14:14:32 2011 +0100
+
+    scheme-api: Make parse-attrib stricter about input.
+    
+    parse-attrib now raises an attribute-format exception if input is a
+    text object but not in the correct format (i.e. it only returns on
+    success).
+
+commit 8b9f6235d72ad5be0fca53613e7ca77802543d58
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 14:08:12 2011 +0100
+
+    scheme-api: Make attribute? only return #t or #f.
+
+commit c6b89e3d030a6fa061598dd467f4bee9c147c28e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 09:38:27 2011 +0100
+
+    scheme-api: Allow fold-bounds to take any number of arguments.
+    
+    Also add a unit test.
+
+commit daaf7d90949a3ac7cfe2914aedd1bb5c170c375b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 09:14:20 2011 +0100
+
+    scheme-api: Allow %object-bounds to take no arguments.
+    
+    Allow %object-bounds to take an empty argument list and return #f.
+    
+    Since %object-bounds already returns #f in none of the object
+    arguments has any bounds, it's consistent to return #f in no arguments
+    are supplied.
+
+commit 7c759d21f74e89e41d08bbc871891554ec027607
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 09:19:02 2011 +0100
+
+    scheme-api: %object-type should raise errors on bad type.
+    
+    If %object-type encounters an object with an invalid type field,
+    %object-type should raise an error rather than logging a message and
+    returning #f.
+    
+    Since we can't actually create an object with an invalid type field
+    from the Scheme API, there's sadly no way of unit-testing this change.
+
+commit 9c540461df266e548684ab2f0bd3294605cf749e
+Merge: f7cc583 12260ba
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Jun 19 18:16:48 2011 +0100
+
+    Merge changes from main unstable branch
+
+commit f7cc58369760991eda968571d5677e97ca2092cd
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Jun 19 17:32:01 2011 +0100
+
+    scheme-api: Add the set-attrib-value! function.
+
+commit e6870ce5a1aac5f2da8d6bb53495d6a52967a538
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Jun 19 17:31:32 2011 +0100
+
+    scheme-api: Add the set-text-string! function.
+
+commit 7eb55e097bf26bef7a4c57753837ee69c5c3471e
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jun 19 10:33:58 2011 -0400
+
+    Updated all po files in prep for a release
+
+commit 22a146a4a8a221908ab531aafc1d901a3358c133
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 18 11:35:16 2011 +0100
+
+    scheme-api: Document object-bounds and add fold-bounds.
+    
+    Fold-bounds is a function for combining two bounds as returned by the
+    object-bounds function.
+
+commit 0a5ccba701c23e0dadee78e908e9f8f09c590340
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 16 20:05:27 2011 +0100
+
+    scheme-api: Add some more tests for copy-object.
+    
+    Add two tests for copy-object: whether copying an object breaks page,
+    component and attribute relationships, and whether copying a component
+    is a deep copy.
+
+commit 292c930244a9616642ade8a3afd4cc740c61d368
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 16 15:20:48 2011 +0100
+
+    scheme-api: Add attrib-inherited? function.
+
+commit db3b79c7659a7526acf726c457b1c2915254fc4b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 16 15:09:40 2011 +0100
+
+    scheme-api: Add object-component function.
+    
+    Add a Scheme function for obtaining an object's containing component.
+
+commit e21e30af19f0c32743dc4663c19d5672ef3e518f
+Merge: 8c66dc1 a2caee6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 16 15:39:47 2011 +0100
+
+    Merge changes from main unstable branch
+
+commit a2caee658af54b32ac3ad88564d8a04822db2fff
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 16 15:36:29 2011 +0100
+
+    libgeda: Add o_get_parent() function.
+    
+    Add a function to retrieve an OBJECT's containing complex OBJECT, if
+    present.
+
+commit 5cf897c1c107dc3d0b2e4ef82d1f15cbdeb76041
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jun 14 00:10:36 2011 +0100
+
+    scheme-api: Use missing.h to pull in SCM<->C string funcs.
+
+commit c603a85e1cdd63f770a19fb23d2fab49c14b3d0b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 13:41:53 2011 +0100
+
+    scheme-api: Add promote-attribs! function.
+    
+    Add a function to promote any promotable attributes from a component.
+
+commit cc1a3d0209a83aaa82404f41e42bb8a2c0c098b9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 14:02:57 2011 +0100
+
+    scheme-api: Add set-text-visibility! function.
+    
+    Helper function for toggling visibility of a text object.
+
+commit f5040254fe52ef181ff8bd205c33315b00e76c2c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 18:15:02 2011 +0100
+
+    scheme-api: Correct error messages from %set-text!
+
+commit 623341482a94b2f92e662dd8e9ff8f6a218f42cc
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 21:43:57 2011 +0100
+
+    Use UTF-8 instead of locale Scheme string functions.
+    
+    See commit 09c6613f93b6.
+
+commit 91865253d6e4422b06648fe5b0334a5013a7d08a
+Merge: 4bccef2 09c6613
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 21:42:48 2011 +0100
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	libgeda/src/g_register.c
+    	libgeda/src/g_smob.c
+
+commit 09c6613f93b65d3f9193e7dbc65bd696cf8a6b06
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 20:35:37 2011 +0100
+
+    libgeda: Use UTF-8 instead of locale Scheme string functions.
+    
+    Note that there are several places where locale string functions are
+    still used, because the input depends on the current locale
+    (e.g. strings obtained from command-line options or from the
+    filesystem).
+    
+    There are still a lot of places where we're still treating
+    locale-dependent strings as UTF-8 strings (and probably vice-versa).
+    Enough bugs for everybody to share!
+
+commit 259dc82a4115df0595b65542f8ab69add1946881
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 10 17:28:20 2011 +0100
+
+    libgeda: Guess system paths from libgeda location on Win32.
+    
+    Improve guessing the location to look for the gEDA shared data
+    directory on Windows by guessing based on the location of the libgeda
+    DLL.
+    
+    Closes-bug: lp-795545
+
+commit 4b8c6745629f7c316c7ff9f09e4a6301a8d20a74
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 10 15:57:13 2011 +0100
+
+    libgeda: Fix crash on startup on Windows.
+    
+    If the GEDADATA environment variable was not set on Windows, libgeda
+    was unable to determine the gEDA system data directory. It would then
+    attempt to make a Scheme string from the resulting NULL pointer,
+    causing a crash.
+    
+    This patch alters the behaviour on Windows. If GEDADATA is not set,
+    libgeda now guesses that the system data directory is the current
+    working directory.
+    
+    Unfortunately, this will still prevent most gEDA programs from working
+    due to not being able to locate data files, but it will prevent an
+    uninformative segfault on startup.
+    
+    Affects-bug: lp-795545
+
+commit 1121d83a5450ad9040cabb7ef9a8cfb6c2a395f3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 10 13:46:15 2011 +0100
+
+    scheme-api: Only use (ice-9 syncase) if define-syntax missing.
+    
+    In Guile 2.0, syntax-case is built in by default and importing the
+    (ice-9 syncase) module isn't required.
+
+commit cbdeedd05e825c0d11080392c16cd86a1968ba73
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 10 13:30:05 2011 +0100
+
+    scheme-api: Change format of unit test output.
+    
+    If running a test caused output to stdout or stderr, it was interposed
+    between the name of the test and the result.  This patch makes the
+    name and result of the test be printed together after the result has
+    been determined, resulting in tidier output.
+
+commit 14eab2daf97f03ef7cdb26c2c3e8969f99b22a70
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:28 2010 +0000
+
+    scheme-api: Add skip-test macro to unit-test.scm
+
+commit 2d1944bb44a2a6785f942e1d24999e64e7052f71
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 10 10:46:11 2011 +0100
+
+    libgeda: Remove some unused variables.
+
+commit 0344623ea013e54a15735988b75508c07469d4d8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 9 17:19:59 2011 +0100
+
+    scheme-api: Make tests work with Guile 2.0.
+    
+    #:use-syntax doesn't work with Guile 2.0, apparently.
+
+commit e67d080a7c48dd1300c90c93d8b1723958244a2d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 9 15:19:24 2011 +0100
+
+    libgeda: cleanfiles -> CLEANFILES
+    
+    Wrong case in automake input resulted in some generated files not
+    being removed during `make clean'.
+
+commit 694ccbdec90765ca4cb9b2dbcb1bbe7cdfba2f0b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 9 15:11:27 2011 +0100
+
+    scheme-api: OBJECT.sel_func doesn't exist any more.
+
+commit 1543eda1dbb823fd3052a3b831eae5b8316ed690
+Merge: 19963e9 014b30b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 9 15:06:46 2011 +0100
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	gschem/scheme/gschem.scm
+    	libgeda/include/prototype_priv.h
+    	libgeda/src/g_smob.c
+    	libgeda/src/o_basic.c
+
+commit 014b30b5f2475f89830fadd1eb4d8f9c2056e647
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sun Jun 5 22:11:35 2011 +0200
+
+    libgeda: smob free functions now return 0
+    
+    In past guile required to return the size of deallocated memory.  Since
+    commit 1735a9e0378290382ec9d0db83c76d039b0c5c7c memory for the smobs is
+    allocated from heap and not from guile memory pool. In such case
+    (and to be compliant with recent guile versions) the free functions must
+    return 0.
+
+commit d9e7c8f29bdef0913515649356f4b1d43a36fee6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 12:54:10 2011 +0100
+
+    libgeda: Silently skip missing/duplicate rc during schematic load.
+    
+    Affects-bug: lp-710587
+
+commit 84949b85df8e8ac1475ae8555bcffe060624d254
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 12:43:28 2011 +0100
+
+    Silently skip duplicate config files.
+    
+    Affects-bug: lp-710587
+
+commit 83777ec203d9dfcf6a257a0c92e2fe2a3deeb552
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 12:30:36 2011 +0100
+
+    Silently skip missing config files.
+    
+    Closes-bug: lp-710587
+
+commit a8723507d0f62c784289cd9785ef12e2c412da8a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 10:51:23 2011 +0100
+
+    libgeda: Fix error location information for scm_display_error().
+
+commit f649a5ac09d943889ac49e8a8a68e2b627391c1a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 22:11:44 2011 +0100
+
+    libgeda: Fix for running with Guile 2.x.
+    
+    scm_display_error() requires a stack as first argument in Guile 1.8.x,
+    and a frame as first argument in Guile 2.0.x.  Luckily, both versions
+    accept #f instead.
+
+commit 680dba23bb571f50b4dc9c04eb3e89bf25817478
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 16:33:11 2011 +0100
+
+    libgeda: Check argument type for g_attrib_is_inherited().
+
+commit e925ef237bb68b060c761dd2f45bf2370fbfedf8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 16:28:33 2011 +0100
+
+    libgeda: Use SCM_SMOB_PREDICATE to check smob type.
+    
+    Simplify smob type checks by using SCM_SMOB_PREDICATE. This also
+    removes the assumption that smob type tags are located in the car of
+    the smob cell.
+
+commit f19235afb1c964570f00ce6b5b80441cc95253b5
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 16:23:22 2011 +0100
+
+    libgeda: Use SCM_SMOB_DATA instead of SCM_CDR.
+    
+    SCM_CDR makes assumptions about the Guile SCM smob type's memory
+    layout that aren't necessarily true for all versions of Guile.
+    SCM_SMOB_DATA is the correct method for accessing the first word
+    stored in a smob type.
+
+commit 1735a9e0378290382ec9d0db83c76d039b0c5c7c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 16:09:22 2011 +0100
+
+    libgeda: Remove uses of deprecated scm_must_malloc.
+
+commit fb917f8b61f58b3cde5f1730b94c28c5992edea1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 15:58:31 2011 +0100
+
+    Remove uses of deprecated scm_makfrom0str.
+
+commit eb2eeee3626c6f127ba2790f708b03d06bb04122
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 15:29:46 2011 +0100
+
+    Remove uses of deprecated scm_num2double.
+
+commit 0737c34e057ed008a6c342238d21041a5cb200b5
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Wed May 25 01:52:13 2011 +0200
+
+    libgeda: add comparison function for page smob
+    
+    Page smobs are now compared using PAGE pointer equality.
+    This allows to use page smobs as keys in assoc lists in Scheme.
+    
+    Affects-bug: lp-787637
+
+commit 081767282d449c93c11e5f7ed91a88ad4ad4276c
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Thu May 26 01:17:55 2011 +0200
+
+    libgeda: add attrib-inherited? scheme procedure
+    
+    Affects-bug: lp-787637
+
+commit 962d859870fc45f741df478b000cbb435d422b84
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat May 21 01:13:10 2011 +0200
+
+    libgeda: update shared MIME info xml file
+    
+    For gschem versions released in 2010 and later, content of schematic and
+    symbol files begins with string "v 201".
+
+commit 5fa030a92ea9dfe72b9f3adede046d27183c5e5a
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Apr 8 00:37:42 2011 +0100
+
+    libgeda: Allow support for not printing the background
+    
+    If the colour map background is set to #f, don't print anything.
+    
+    This is handy if you wish to composite the resulting pdf file with
+    anything else, and don't want the opaque background.
+
+commit 980e933a85d180019152424023b879c39d7e4aff
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Mar 26 14:04:06 2011 +0000
+
+    gattrib: Preserve visibility of embedded component attributes
+    
+    gattrib was overriding the visibility of pin attributes to match the
+    visibility of the pin. This was not noticed for non-embedded complex
+    objects, as the edited pin attributes are not saved. For embedded
+    components, they are.
+
+commit 06692019e4c66e948cad3414ef92f188e9a38c98
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Mar 26 14:04:03 2011 +0000
+
+    libgeda: Fix primitive object load order of embedded objects
+    
+    We were missing a g_list_reverse() when assigning the loaded prim_objs.
+    This is necessary as for performance, we prepend to the object glist
+    when reading - then reverse the list as a final step.
+
+commit 0fffd6b16214cd05cba9de9e4d65d4e1ea2cf16a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Mar 21 19:53:29 2011 +0000
+
+    Remove draw funcs from libgeda.
+    
+    Removes all of the statically-registered draw functions from libgeda,
+    as well as the draw_func field from the OBJECT structure. Makes
+    o_redraw_single() dispatch to type-specific drawing functions
+    directly.
+    
+    Refreshed by Peter Clifton <pcjc2@cam.ac.uk>
+
+commit 41ae0eaa4d3b23702510d3d51bbfe4821166bc06
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Mar 21 19:52:18 2011 +0000
+
+    Remove unused OBJECT->action_func
+
+commit 82db4b3a104b722af13a24333f6f3f60c1f5549e
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Mar 21 19:49:37 2011 +0000
+
+    libgeda: Fix copying selectable flag in o_picture_copy()
+    
+    I dropped this from 7cc025db90267d5cb5b038e2cc39cb15544e0367 by accident.
+
+commit 7cc025db90267d5cb5b038e2cc39cb15544e0367
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Mar 21 19:21:49 2011 +0000
+
+    Remove OBJECT->sel_func in favour of an OBJECT->selectable flag
+    
+    Only gschem called OBJECT->sel_func anyway, so lets avoid passing vfunc
+    pointers everywhere as a flag. This has the added benefit of removing
+    some dummy functions from gattrib and gschlas which were only present
+    so the status of locked objects could be preserved across load/save.
+
+commit 0b49dd7aba9cbef87d765151adb728b781e4cf81
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Mar 12 16:13:21 2011 +0100
+
+    libgeda: report errors in f_save
+    
+    Affects-bug: lp-698566
+
+commit d506039d41aea6ecd9e15e62e7b79de8cca284bd
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Mar 12 16:07:34 2011 +0100
+
+    libgeda: add GError argument to f_save and o_save
+    
+    o_save and f_save now can report errors during file write using GLib
+    GError mechanism, similar to f_open.
+    
+    Affects-bug: lp-698566
+
+commit eee6b8c11a3bb73c5ea3dd21645c236205da0749
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Feb 15 08:08:30 2011 +0300
+
+    libgeda: fix unicode font printing -- step three
+    
+    Step three: eliminate twin glyphs, that is such glyphs whose names
+    specify the same unicode keys. (Leave only those glyph keys which are
+    mapping to present in AGLv1.2 names. If such names are missing for an
+    individual key in AGLv1.2 then leave only one key-name pair for each
+    such the key.)
+    
+    Closes-bug: lp-720218
+
+commit 65c0d6b84bab67df4f5772039b0dd651d4611717
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Feb 14 14:16:40 2011 +0300
+
+    libgeda: fix unicode font printing -- step two
+    
+    Step two: eliminate wrong keys for hebrew and arabic.
+    
+    f_print.c is supposed to support "Adobe Glyph List version 2.0", but it
+    interprets key sequences from that standard wrongly.
+    
+    It does not include "spacehackarabic" glyph name. That is no problem
+    since there is glyph "space" with the same key 0020.
+    
+    It breaks up key sequences of two or more keys for one name for hebrew
+    and arabic into separate pairs key-name and this is wrong.
+    
+    The table below summarizes differences between AGLv2.0 and f_print.c
+    interpretation.
+    
+    |                Glyph name |          AGLv2.0 key |f_print.c key |
+    -------------------------------------------------------------------
+    |           spacehackarabic |                0020  |              |
+    |           dalethatafpatah |            05B2 05D3 |         05B2 |
+    |           dalethatafpatah |                      |         05D3 |
+    |     dalethatafpatahhebrew |            05B2 05D3 |         05B2 |
+    |     dalethatafpatahhebrew |                      |         05D3 |
+    |           dalethatafsegol |            05B1 05D3 |         05B1 |
+    |           dalethatafsegol |                      |         05D3 |
+    |     dalethatafsegolhebrew |            05B1 05D3 |         05B1 |
+    |     dalethatafsegolhebrew |                      |         05D3 |
+    |                dalethiriq |            05B4 05D3 |         05B4 |
+    |                dalethiriq |                      |         05D3 |
+    |          dalethiriqhebrew |            05B4 05D3 |         05B4 |
+    |          dalethiriqhebrew |                      |         05D3 |
+    |                daletholam |            05B9 05D3 |         05B9 |
+    |                daletholam |                      |         05D3 |
+    |          daletholamhebrew |            05B9 05D3 |         05B9 |
+    |          daletholamhebrew |                      |         05D3 |
+    |                daletpatah |            05B7 05D3 |         05B7 |
+    |                daletpatah |                      |         05D3 |
+    |          daletpatahhebrew |            05B7 05D3 |         05B7 |
+    |          daletpatahhebrew |                      |         05D3 |
+    |               daletqamats |            05B8 05D3 |         05B8 |
+    |               daletqamats |                      |         05D3 |
+    |         daletqamatshebrew |            05B8 05D3 |         05B8 |
+    |         daletqamatshebrew |                      |         05D3 |
+    |               daletqubuts |            05BB 05D3 |         05BB |
+    |               daletqubuts |                      |         05D3 |
+    |         daletqubutshebrew |            05BB 05D3 |         05BB |
+    |         daletqubutshebrew |                      |         05D3 |
+    |                daletsegol |            05B6 05D3 |         05B6 |
+    |                daletsegol |                      |         05D3 |
+    |          daletsegolhebrew |            05B6 05D3 |         05B6 |
+    |          daletsegolhebrew |                      |         05D3 |
+    |                daletsheva |            05B0 05D3 |         05B0 |
+    |                daletsheva |                      |         05D3 |
+    |          daletshevahebrew |            05B0 05D3 |         05B0 |
+    |          daletshevahebrew |                      |         05D3 |
+    |                dalettsere |            05B5 05D3 |         05B5 |
+    |                dalettsere |                      |         05D3 |
+    |          dalettserehebrew |            05B5 05D3 |         05B5 |
+    |          dalettserehebrew |                      |         05D3 |
+    |            finalkafqamats |            05B8 05DA |         05B8 |
+    |            finalkafqamats |                      |         05DA |
+    |      finalkafqamatshebrew |            05B8 05DA |         05B8 |
+    |      finalkafqamatshebrew |                      |         05DA |
+    |             finalkafsheva |            05B0 05DA |         05B0 |
+    |             finalkafsheva |                      |         05DA |
+    |       finalkafshevahebrew |            05B0 05DA |         05B0 |
+    |       finalkafshevahebrew |                      |         05DA |
+    |          hamzadammaarabic |            064F 0621 |         064F |
+    |          hamzadammaarabic |                      |         0621 |
+    |       hamzadammatanarabic |            064C 0621 |         064C |
+    |       hamzadammatanarabic |                      |         0621 |
+    |          hamzafathaarabic |            064E 0621 |         064E |
+    |          hamzafathaarabic |                      |         0621 |
+    |       hamzafathatanarabic |            064B 0621 |         064B |
+    |       hamzafathatanarabic |                      |         0621 |
+    |       hamzalowkasraarabic |            0650 0621 |         0650 |
+    |       hamzalowkasraarabic |                      |         0621 |
+    |    hamzalowkasratanarabic |            064D 0621 |         064D |
+    |    hamzalowkasratanarabic |                      |         0621 |
+    |          hamzasukunarabic |            0652 0621 |         0652 |
+    |          hamzasukunarabic |                      |         0621 |
+    |                lamedholam |            05B9 05DC |         05B9 |
+    |                lamedholam |                      |         05DC |
+    |          lamedholamdagesh |       05BC 05DC 05B9 |         05BC |
+    |          lamedholamdagesh |                      |         05B9 |
+    |          lamedholamdagesh |                      |         05DC |
+    |    lamedholamdageshhebrew |       05BC 05DC 05B9 |         05BC |
+    |    lamedholamdageshhebrew |                      |         05B9 |
+    |    lamedholamdageshhebrew |                      |         05DC |
+    |          lamedholamhebrew |            05B9 05DC |         05B9 |
+    |          lamedholamhebrew |                      |         05DC |
+    |  lammeemjeeminitialarabic |       FEA0 FEDF FEE4 |         FEA0 |
+    |  lammeemjeeminitialarabic |                      |         FEDF |
+    |  lammeemjeeminitialarabic |                      |         FEE4 |
+    |  lammeemkhahinitialarabic |       FEA8 FEDF FEE4 |         FEA8 |
+    |  lammeemkhahinitialarabic |                      |         FEDF |
+    |  lammeemkhahinitialarabic |                      |         FEE4 |
+    |      noonhehinitialarabic |            FEEC FEE7 |         FEEC |
+    |      noonhehinitialarabic |                      |         FEE7 |
+    |             qofhatafpatah |            05B2 05E7 |         05B2 |
+    |             qofhatafpatah |                      |         05E7 |
+    |       qofhatafpatahhebrew |            05B2 05E7 |         05B2 |
+    |       qofhatafpatahhebrew |                      |         05E7 |
+    |             qofhatafsegol |            05B1 05E7 |         05B1 |
+    |             qofhatafsegol |                      |         05E7 |
+    |       qofhatafsegolhebrew |            05B1 05E7 |         05B1 |
+    |       qofhatafsegolhebrew |                      |         05E7 |
+    |                  qofhiriq |            05B4 05E7 |         05B4 |
+    |                  qofhiriq |                      |         05E7 |
+    |            qofhiriqhebrew |            05B4 05E7 |         05B4 |
+    |            qofhiriqhebrew |                      |         05E7 |
+    |                  qofholam |            05B9 05E7 |         05B9 |
+    |                  qofholam |                      |         05E7 |
+    |            qofholamhebrew |            05B9 05E7 |         05B9 |
+    |            qofholamhebrew |                      |         05E7 |
+    |                  qofpatah |            05B7 05E7 |         05B7 |
+    |                  qofpatah |                      |         05E7 |
+    |            qofpatahhebrew |            05B7 05E7 |         05B7 |
+    |            qofpatahhebrew |                      |         05E7 |
+    |                 qofqamats |            05B8 05E7 |         05B8 |
+    |                 qofqamats |                      |         05E7 |
+    |           qofqamatshebrew |            05B8 05E7 |         05B8 |
+    |           qofqamatshebrew |                      |         05E7 |
+    |                 qofqubuts |            05BB 05E7 |         05BB |
+    |                 qofqubuts |                      |         05E7 |
+    |           qofqubutshebrew |            05BB 05E7 |         05BB |
+    |           qofqubutshebrew |                      |         05E7 |
+    |                  qofsegol |            05B6 05E7 |         05B6 |
+    |                  qofsegol |                      |         05E7 |
+    |            qofsegolhebrew |            05B6 05E7 |         05B6 |
+    |            qofsegolhebrew |                      |         05E7 |
+    |                  qofsheva |            05B0 05E7 |         05B0 |
+    |                  qofsheva |                      |         05E7 |
+    |            qofshevahebrew |            05B0 05E7 |         05B0 |
+    |            qofshevahebrew |                      |         05E7 |
+    |                  qoftsere |            05B5 05E7 |         05B5 |
+    |                  qoftsere |                      |         05E7 |
+    |            qoftserehebrew |            05B5 05E7 |         05B5 |
+    |            qoftserehebrew |                      |         05E7 |
+    |       rehyehaleflamarabic |  0644 0631 FEF3 FE8E |         0644 |
+    |       rehyehaleflamarabic |                      |         0631 |
+    |       rehyehaleflamarabic |                      |         FE8E |
+    |       rehyehaleflamarabic |                      |         FEF3 |
+    |            reshhatafpatah |            05B2 05E8 |         05B2 |
+    |            reshhatafpatah |                      |         05E8 |
+    |      reshhatafpatahhebrew |            05B2 05E8 |         05B2 |
+    |      reshhatafpatahhebrew |                      |         05E8 |
+    |            reshhatafsegol |            05B1 05E8 |         05B1 |
+    |            reshhatafsegol |                      |         05E8 |
+    |      reshhatafsegolhebrew |            05B1 05E8 |         05B1 |
+    |      reshhatafsegolhebrew |                      |         05E8 |
+    |                 reshhiriq |            05B4 05E8 |         05B4 |
+    |                 reshhiriq |                      |         05E8 |
+    |           reshhiriqhebrew |            05B4 05E8 |         05B4 |
+    |           reshhiriqhebrew |                      |         05E8 |
+    |                 reshholam |            05B9 05E8 |         05B9 |
+    |                 reshholam |                      |         05E8 |
+    |           reshholamhebrew |            05B9 05E8 |         05B9 |
+    |           reshholamhebrew |                      |         05E8 |
+    |                 reshpatah |            05B7 05E8 |         05B7 |
+    |                 reshpatah |                      |         05E8 |
+    |           reshpatahhebrew |            05B7 05E8 |         05B7 |
+    |           reshpatahhebrew |                      |         05E8 |
+    |                reshqamats |            05B8 05E8 |         05B8 |
+    |                reshqamats |                      |         05E8 |
+    |          reshqamatshebrew |            05B8 05E8 |         05B8 |
+    |          reshqamatshebrew |                      |         05E8 |
+    |                reshqubuts |            05BB 05E8 |         05BB |
+    |                reshqubuts |                      |         05E8 |
+    |          reshqubutshebrew |            05BB 05E8 |         05BB |
+    |          reshqubutshebrew |                      |         05E8 |
+    |                 reshsegol |            05B6 05E8 |         05B6 |
+    |                 reshsegol |                      |         05E8 |
+    |           reshsegolhebrew |            05B6 05E8 |         05B6 |
+    |           reshsegolhebrew |                      |         05E8 |
+    |                 reshsheva |            05B0 05E8 |         05B0 |
+    |                 reshsheva |                      |         05E8 |
+    |           reshshevahebrew |            05B0 05E8 |         05B0 |
+    |           reshshevahebrew |                      |         05E8 |
+    |                 reshtsere |            05B5 05E8 |         05B5 |
+    |                 reshtsere |                      |         05E8 |
+    |           reshtserehebrew |            05B5 05E8 |         05B5 |
+    |           reshtserehebrew |                      |         05E8 |
+    |      shaddafathatanarabic |            064B 0651 |         064B |
+    |      shaddafathatanarabic |                      |         0651 |
+    |    tchehmeeminitialarabic |            FEE4 FB7C |         FEE4 |
+    |    tchehmeeminitialarabic |                      |         FB7C |
+    
+    So you can see that the glyph name "dalethatafpatah" maps to key pair
+    05B2 05D3, which is representation of two glyphs 05B2 ("hatafpatah") and
+    05D3 ("dalet"). f_print.c in such a case in addition to "hatafpatah" and
+    "dalet" introduces two new incorrect mappings of "dalethatafpatah" to
+    05B2 and 05D3 respectively.
+    
+    Real mappings of each key in such key sequences according to AGLv2.0 are
+    summarized in the table below.
+    
+    | key  | Glyph name                                         |
+    -------------------------------------------------------------
+    | 05B0 | afii57799, sheva, sheva115, sheva15, sheva22, sheva2e,
+    shevahebrew, shevanarrowhebrew, shevaquarterhebrew,
+    shevawidehebrew |
+    | 05B1 | afii57801, hatafsegol, hatafsegol17, hatafsegol24,
+    hatafsegol30, hatafsegolhebrew, hatafsegolnarrowhebrew,
+    hatafsegolquarterhebrew, hatafsegolwidehebrew |
+    | 05B2 | afii57800, hatafpatah, hatafpatah16, hatafpatah23,
+    hatafpatah2f, hatafpatahhebrew, hatafpatahnarrowhebrew,
+    hatafpatahquarterhebrew, hatafpatahwidehebrew |
+    | 05B4 | afii57793, hiriq, hiriq14, hiriq21, hiriq2d,
+    hiriqhebrew, hiriqnarrowhebrew, hiriqquarterhebrew,
+    hiriqwidehebrew |
+    | 05B5 | afii57794, tsere, tsere12, tsere1e, tsere2b,
+    tserehebrew, tserenarrowhebrew, tserequarterhebrew,
+    tserewidehebrew |
+    | 05B6 | afii57795, segol, segol13, segol1f, segol2c,
+    segolhebrew, segolnarrowhebrew, segolquarterhebrew,
+    segolwidehebrew |
+    | 05B7 | afii57798, patah, patah11, patah1d, patah2a,
+    patahhebrew, patahnarrowhebrew, patahquarterhebrew,
+    patahwidehebrew |
+    | 05B8 | afii57797, qamats, qamats10, qamats1a, qamats1c,
+    qamats27, qamats29, qamats33, qamatsde, qamatshebrew,
+    qamatsnarrowhebrew, qamatsqatanhebrew, qamatsqatannarrowhebrew,
+    qamatsqatanquarterhebrew, qamatsqatanwidehebrew,
+    qamatsquarterhebrew, qamatswidehebrew |
+    | 05B9 | afii57806, holam, holam19, holam26, holam32,
+    holamhebrew, holamnarrowhebrew, holamquarterhebrew,
+    holamwidehebrew |
+    | 05BB | afii57796, qubuts, qubuts18, qubuts25, qubuts31,
+    qubutshebrew, qubutsnarrowhebrew, qubutsquarterhebrew,
+    qubutswidehebrew |
+    | 05BC | afii57807, dagesh, dageshhebrew |
+    | 05D3 | afii57667, dalet, dalethebrew |
+    | 05DA | afii57674, finalkaf, finalkafhebrew |
+    | 05DC | afii57676, lamed, lamedhebrew |
+    | 05E7 | afii57687, qof, qofhebrew |
+    | 05E8 | afii57688, resh, reshhebrew |
+    | 0621 | afii57409 hamzaarabic hamzalowarabic |
+    | 0631 | afii57425 reharabic |
+    | 0644 | afii57444 lamarabic |
+    | 064B | afii57451 fathatanarabic |
+    | 064C | afii57452 dammatanaltonearabic dammatanarabic |
+    | 064D | afii57453 kasratanarabic |
+    | 064E | afii57454 fathaarabic fathalowarabic |
+    | 064F | afii57455 dammaarabic dammalowarabic |
+    | 0650 | afii57456 kasraarabic |
+    | 0651 | afii57457 shaddaarabic |
+    | 0652 | afii57458 sukunarabic |
+    | FB7C | tchehinitialarabic |
+    | FE8E | aleffinalarabic |
+    | FEA0 | jeemmedialarabic |
+    | FEA8 | khahmedialarabic |
+    | FEDF | laminitialarabic |
+    | FEE4 | meemmedialarabic |
+    | FEE7 | nooninitialarabic |
+    | FEEC | hehmedialarabic |
+    | FEF3 | alefmaksurainitialarabic |
+    | FEF3 | yehinitialarabic |
+    
+    From the tables above you can see that glyphs for hebrew and arabic
+    which are composite should be output exactly as key sequences of
+    ordinary keys.
+    
+    This patch eliminates the wrong key mappings from f_print.c.
+    
+    Affects-bug: lp-720218
+
+commit cf32c599c524b497737ebe1ab846311e32e852df
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Feb 7 12:36:28 2011 +0300
+
+    libgeda: fix unicode font printing -- step one
+    
+    Sorting out glyph_list struct according to gpointer keys.
+    
+    Affects-bug: lp-720218
+
+commit a04342c3f3a2c95db6dc43eeff92cc7840c002c5
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Jan 28 01:09:10 2011 +0000
+
+    libgeda: Attempt to speed up s_page_objects_in_regions ()
+    
+    Move object bounds retrival outside of inner loop, as the bounds
+    will not change whilst we iterate over the regions we are checking.
+
+commit c6f468849ffca1b1cc907d43a3ede1efcc82001c
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Jan 28 01:12:29 2011 +0000
+
+    libgeda: Don't unselect objects which are already unselected
+    
+    This should avoid doing work where it isn't needed.
+
+commit 3bc42a053d1a4e3588f6283ef611c5e5a873ea25
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Jan 28 01:12:29 2011 +0000
+
+    libgeda: Remove "object already selected == TRUE" printf
+    
+    This was presumably debug code which should not have been commited.
+
+commit 9b9080e184607b3cb449a1ccb6082207ed39738f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 20 16:45:48 2011 +0000
+
+    libgeda: Don't warn about finding zero length pins on load.
+    
+    There's no actual reason why zero length pins shouldn't be allowed;
+    they work fine in gnetlist, and they show up okay in gschem.
+    
+    Closes-bug: lp-705397
+
+commit b08d9d08ee4740884de97e87179a9809d6b3dba3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 18 21:05:47 2011 +0000
+
+    libgeda: Use new config parsing API for geda-shell.
+
+commit 9379c19a7563a02c271c8640fdb814ef0add5981
+Merge: f9156f1 23383c5
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 18 22:36:59 2011 +0000
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	gnetlist/src/gnetlist.c
+    	gschem/src/g_hook.c
+    	gschem/src/gschem.c
+    	libgeda/include/libgeda/prototype.h
+    	libgeda/src/g_basic.c
+    	libgeda/src/g_smob.c
+
+commit 157381108371cc25684293e935c36834bb98e0fd
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Jan 15 11:08:06 2011 +0100
+
+    libgeda: avoid double selection of objects
+    
+    In o_selection_add() check if object was already selected before
+    selecting it again.
+    
+    Closes-bug: lp-703204
+
+commit 2e2e2bf53458d6fea7e4c8dd7736818470fde248
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jan 16 00:12:48 2011 -0500
 
     Manually ran make update-po in order to prep for the make distcheck
+
+commit c5a0980c4cd20ffaa32d24635ff92ae99f17bec9
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Thu Jan 13 01:50:59 2011 +0100
+
+    libgeda: remove LEAVE_VISIBILITY_ALONE
     
-    This step is always done right before make distcheck is run to create
-    a release tarball.
+    Closes-bug: lp-701431
+    
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+
+commit 4a9536ce1da2bc715d4d308fdb2ee2037a7efac3
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Thu Jan 13 01:40:43 2011 +0100
+
+    libgeda: use visibility getter in o_text_basic.c
+    
+    Affects-bug: lp-701431
+    
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+
+commit 43251b8588235a7594a07ff083fbd18e5501c6d1
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Thu Jan 13 01:39:57 2011 +0100
+
+    libgeda: add TOPLEVEL* argument to o_XXX_save
+    
+    Affects-bug: lp-701431
+    
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+
+commit 97c5273a7ec9792a852f5193455a4c19ba6b6035
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 11 21:46:29 2011 +0100
+
+    libgeda: export accessors for object visibility
+    
+    o_is_visible and o_set_visibility are now in exported interface.
+    
+    Affects-bug: lp-701431
+    
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+
+commit 0f664b4c54ca3c38f31e169c642268091ae392f7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 13 20:56:47 2011 +0000
+
+    libgeda: Fix potential buffer overflow.
+    
+    Closes-bug: lp-702209
+
+commit 502ab80495c45e092eca6052edd6cf8e7ff55429
+Merge: 27f7a52 e1c3ba4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 13 19:59:35 2011 +0000
+
+    Merge branch 'stable-1.6'
+    
+    Conflicts:
+    	NEWS
+    	libgeda/include/prototype_priv.h
+    	libgeda/src/gdk-pixbuf-hacks.c
+    	libgeda/src/o_basic.c
+    	libgeda/src/o_complex_basic.c
+    	utils/src/gsch2pcb.c
+
+commit 8b4f5fc4444c93e922e38e97b3cc9ddbaf1ec7c6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:45 2011 +0000
+
+    libgeda: Add g_rc_parse_handler().
+    
+    Add an alternative to g_rc_parse() which accepts an optional error
+    handler function.
+
+commit 7ca2b049dbcfb9f0eb8d3dd3fcf21cbd66c0ec95
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    Print message and exit if rc file load fails.
+    
+    Modifies g_rc_parse() to print useful messages to standard error and
+    exit with non-zero status if an error other than ENOENT occurs while
+    attempting to parse any configuration file.
+    
+    N.b. only copes with rc files loaded at startup; rc files loaded later
+    (e.g. a gafrc auto-loaded while loading a schematic using gschem
+    "File->Open") can't cause the application to die.
+    
+    Since this means that under some circumstances gschem and gattrib can
+    appear to do nothing silently (e.g. when launched from via a .desktop
+    file) subsequent patches need to make gschem and gattrib generate
+    appropriate warning and/or error message dialogs.
+    
+    Affects-bug: lp-698578
+
+commit f82c6d0e497d7d18905d65b8499f33f3e7e3e073
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    Upgrade g_read_file() to support GError.
+    
+    Allow g_read_file() to return error information in a GError if an
+    error occurs while loading the requested rc file or Scheme script.
+
+commit d50f80399fc8de5bcc24723b87f9132324569fb9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    Invert g_read_file() return values.
+    
+    Make g_read_file() return TRUE on success and FALSE on failure.  It
+    turns out that not only had the return value on success been incorrect
+    for some time, there was only one use of g_read_file() that cared
+    about the return value anyway.
+
+commit 90f0f24ea7cb4c1d3f10f43ea6df813aa71bcde7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    libgeda: Whitespace changes to g_read_file().
+    
+    Redo indentation in g_read_file().
+
+commit 91e8f087d133320cafebd692a2ff0fe7f764fc4b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    libgeda: Add a function for turning a Guile error into a GError.
+    
+    Splits out the backtrace/error logging in g_basic.c into a static
+    function that can also populate a GError with the error details,
+    simplifying it greatly in the process by reusing libguile functions to
+    do most of the hard work.
+
+commit 717b5819e626d0b051ae9ff6bfd657c918b6d338
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    libgeda: Rework config file parsing API.
+    
+    Implement a new libgeda API for loading config files, which has the
+    following advantages:
+    
+    1) All error reporting happens via GError, for more informative error
+       messages.  The EDA_ERROR_RC_TWICE error code is added to indicate
+       that a config file has been prevented from being loaded twice.
+    
+    2) It is possible to load local config files without chdir() into
+       their directory, and to specify a target *file* to load
+       corresponding local config for.
+    
+    3) As many as possible of the bugs & corner cases that still
+       need fixing have been documented.
+
+commit 34290684615f5cf562d3be4f15a3ed2280f99bf1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:43 2011 +0000
+
+    libgeda: Add a GError domain for libgeda errors.
+    
+    This patch defines the EDA_ERROR domain for GErrors, and is required
+    in order to be able to return or handle libgeda-specific GErrors.  It
+    does not define any error codes yet.
+
+commit da0fbc2cc3317e6f5c995385f3986bb2e6689f1b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:43 2011 +0000
+
+    libgeda: Simplify g_scm_eval_string_protected().
+    
+    Instead of defining a body function and calling scm_c_catch()
+    ourselves, build a Scheme expression and evaluate it using
+    g_scm_eval_protected().
 
 commit e1c3ba4c453716f3b0cb475a9cc358f34a4683d9
 Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
@@ -68,6 +2333,59 @@ Date:   Tue Jan 11 01:26:24 2011 +0100
     
     (cherry picked from commit bb27719f730b078dc250196af40141ff7cac8636)
 
+commit 2d07ac4933633837fc394e5001a452c7db290d13
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 11 01:36:15 2011 +0100
+
+    libgeda: invalidate bounds in attribute promotion
+    
+    Call o_bounds_invalidate in o_complex_promote_attribs
+    and in o_complex_remove_promotable_attribs.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+    Closes-bug: lp-700841
+
+commit 45cb94eff246e342a0331bf8b0c908fdccda1359
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 11 08:37:07 2011 +0100
+
+    libgeda: getter for object visibility field
+    
+    Add method o_is_visible to query value of visibility field.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+    Affects-bug: lp-700841
+    Affects-bug: lp-701431
+
+commit 37f3c42bf3d509bde85dec3150bfdca0a3e81551
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 11 08:33:43 2011 +0100
+
+    libgeda: setter for object visibility field
+    
+    Add method o_set_visibility to change value of visibility field.
+    If object visibility is changed, mark its cached bounds as invalid.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+    Affects-bug: lp-700841
+    Affects-bug: lp-701431
+
+commit bb27719f730b078dc250196af40141ff7cac8636
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 11 01:26:24 2011 +0100
+
+    libgeda: add recursion in o_bounds_invalidate
+    
+    Instead of invalidating cached bounds for single object, follow the
+    hierarchy and invalidate cached bounds of all parents as well.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+    Affects-bug: lp-700841
+
 commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Fri Jan 7 22:00:09 2011 +0000
@@ -81,11 +2399,1128 @@ Date:   Fri Jan 7 22:00:09 2011 +0000
     Only files remaining with old address are wiki files (although the
     wiki has now been updated) and PostScript files.
 
+commit d8803215ea591b9349999c17c5a85aee7da473af
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 09:45:11 2011 +0000
+
+    Remove warnings when building with "--disable-nls".
+    
+    Closes-bug: lp-698450
+
+commit 69e7af1d627a4ce4e307b33b509715821d830412
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 23:43:22 2011 +0000
+
+    libgeda: Always add gEDA default Scheme directory to search path.
+    
+    Make sure that the default directory for gEDA Scheme files is added to
+    the Guile %load-path during libgeda initialisation.  This ensures that
+    even if there is a problem loading system-gafrc (for some reason),
+    gEDA Scheme code can still be found.
+    
+    Remove the current `scheme-directory' directive from system-gafrc, and
+    replace it with a commented-out example of its use.
+
+commit 7a3e9f294d12732cd6fb043412c1bf92eaf5b268
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 11:52:35 2011 +0000
+
+    Make `scheme-directory' rc function prepend to Guile load path.
+    
+    Guile already provides infrastructure for loading Scheme files from a
+    library, so this patch makes gEDA use it properly.  With this (fully
+    backward-compatible) patch it's now possible to load Scheme files,
+    including gnetlist backends, from more than one directory.
+    
+    Note: This commit makes the gnetlist test suite pass again.
+
 commit 8d708818425dea37690d739a5e9eaf26eb9cf46c
 Author: Patrick Bernaud <patrickb@chez.com>
 Date:   Tue Jan 4 15:37:48 2011 +0000
 
     libgeda: Check attribute string before requesting name/value [3032626]
+
+commit 1e93f7bea2cbe0fa8887337c261093b55c31dd6d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 3 23:07:25 2011 +0000
+
+    Revert "Remove some CVS keywords."
+    
+    This reverts commit f5ada1de1372bd3772b4f4bd33afa59803c1dade, which
+    was pushed to the repository in error.
+
+commit f5ada1de1372bd3772b4f4bd33afa59803c1dade
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Dec 21 12:37:10 2010 +0000
+
+    Remove some CVS keywords.
+
+commit f66597934bf8c88519396956637792533ba3a151
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 12 08:14:06 2010 +0000
+
+    Don't use page_current in hierarchy traversal.
+    
+    With this patch, the only remaining functions in libgeda which care
+    about the "current page" are:
+    
+    - o_get_page_compat() [deprecated]
+    - s_page_goto()
+    - s_page_delete()
+    - s_page_delete_list()
+    - s_toplevel_new()
+
+commit 4a2272be60b5e728a1e656dae1845f475fb44491
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 11 21:30:04 2010 +0000
+
+    libgeda: Pre-refactor cosmetic changes.
+    
+    This patch cleans up whitespace in s_hierarchy.c, and changes some
+    constructs of the form:
+    
+      for (x; y; z) {
+        if (!foo) {
+          if (!bar) {
+            /* Lots of stuff */
+          }
+        }
+      }
+    
+    to:
+    
+      for (x; y; z) {
+        if (foo) continue;
+        if (bar) continue;
+        /* Lots of stuff */
+      }
+
+commit 3d7719ca26bd4a77bce4f3ce3100c72d93d5e933
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 11 11:36:11 2010 +0000
+
+    Add PAGE argument to o_net_consolidate().
+
+commit b87d7edc2be45dab1e7cab8ec81cce2631377b4f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 11 11:29:04 2010 +0000
+
+    libgeda: Remove some more uses of page_current.
+    
+    Removes some uses of TOPLEVEL.page_current which were missed in
+    a33839adef1f.
+
+commit 0b94d2379a5bd5d14690f941690e0df761df13c9
+Merge: 63cd6d7 a33839a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 12 09:48:07 2010 +0000
+
+    Merge some changes from Peter Brett.
+    
+    Merge a series of more generally useful changes from Peter Brett's
+    `guile-scheme-api' branch, most of which remove uses of
+    TOPLEVEL.page_current from libgeda.
+
+commit 0db9dce07c52cb5f905c0c68d78b9d7656371c98
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 17 11:59:02 2010 +0000
+
+    Revert po file changes in previous commit.
+    
+    This reverts most of the incorrectly-commited po file updates in
+    commit 5cc5a1743e97.
+
+commit cb21936a1e620374a04c4f058458fa72f9933e67
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 17 11:45:03 2010 +0000
+
+    Make 7-byte SHA-1 prefix using %.7s format specifier.
+
+commit 5cc5a1743e97218325285975bfb68e090d382143
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 17 11:33:25 2010 +0000
+
+    gschem: Make 7-byte SHA-1 prefix using %.7s format specifier.
+    
+    This is slightly more elegant than using g_strndup().
+    
+    Suggested-by: Patrick Bernaud <patrickb@chez.com>
+
+commit b70513b5260d14e22dde1bc73c9f6c61dbbeb5ca
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 17 08:52:47 2010 +0000
+
+    Give geda-shell program -V argument to match gschem.
+
+commit 3940ee1a2704d07f7e6f9f2c71eb65346a709f46
+Merge: 8c4d33a ee7e4a8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 16 22:23:15 2010 +0000
+
+    Merge changes from main unstable branch
+
+commit ee7e4a8e823dd362bc0dc998cc584ab6ea84bdcd
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 13 17:42:14 2010 +0000
+
+    Remove DONT_REDRAW flag.
+    
+    Because we now use the GTK/Cairo renderer for gschem, we use the GTK
+    model for redrawing. In this model, objects are queued for redrawing
+    by invalidating them, and at some point later all invalidated regions
+    of the viewable area are drawn together.
+    
+    Due to this mechanism, the TOPLEVEL.DONT_REDRAW flag is redundant, as
+    it as always set and then restored without visiting the GTK main loop,
+    and thus no drawing would occur in that context anyway.
+    
+    This patch removes the now-useless TOPLEVEL.DONT_REDRAW flag entirely.
+
+commit 700d8c7bb6ed397185f4aee5e857979af07d2d96
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 13 13:12:03 2010 +0000
+
+    libgeda: Allow registration of multiple change notify functions.
+    
+    A mechanism for getting notifications when OBJECTs are changed was
+    added in commit 8b1faf85362b, but this only allowed one set of change
+    handlers to be added to a TOPLEVEL.  This patch allows the multiple
+    sets of handlers to be registered, and also fleshes out the API
+    documentation.
+
+commit a3433b6a4c088b8926f8768e20eff18d0dafea4b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:28 2010 +0000
+
+    Remove most legacy libgeda Scheme types & functions.
+    
+    Removes most of the legacy Scheme types, functions and definitions
+    from libgeda, replacing them with compatible equivalents based on the
+    new Scheme API.  The remaining Scheme functions are those for working
+    with the component and source libraries, the various rc functions, and
+    the eval-* functions, all of which need to be revisited at a later
+    date.
+    
+    Also removes set-attribute-value! from gschem and reimplements in
+    Scheme, since it was sole user of g_set_attrib_value_internal() and it
+    was easier to replace than rewrite.
+
+commit a0adbfc6bbc79cb7ac9cc2dd1c894ad0cdc0b872
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:28 2010 +0000
+
+    scheme-api: Add unit tests for legacy Scheme API.
+    
+    These will be used to verify that replacement functions based on new
+    Scheme API are compatible with the originals.
+
+commit fc8bcac43b6f3dd611f6030ffe36465d67be379d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:28 2010 +0000
+
+    scheme-api: Port legacy Scheme procedures in C to new smob system.
+    
+    Make all users of legacy Scheme smobs in libgeda use new Scheme smob
+    system.  This is a preliminary patch so that unit tests can be written
+    to verify that functions ported to new API work the same way as the
+    originals.
+
+commit a21ee2882d662a50418561f8de101d44bba7294c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:28 2010 +0000
+
+    scheme-api: Show "(null)" instead of "0" when printing deleted smobs.
+
+commit 7f85f28e67c59dbccb0f2a321794b0ddbb3e578f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:27 2010 +0000
+
+    Add e-mail address to copyright headers.
+
+commit 0a5c0a4f0d9e721bdf198c400db3cef607e72c33
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:27 2010 +0000
+
+    scheme-api: Multiple arguments for component & page append/remove.
+    
+    It's a lot more convenient to write:
+    
+      (component-append! component x y z ...)
+    
+    than:
+    
+      (for-each (lambda (x) (component-append! C x)) (list x y z ...))
+    
+    So this patch makes it possible.
+
+commit 6359f03b8615d707b122d84c6e73ae6bf99c097b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:27 2010 +0000
+
+    scheme_api: Give modifying functions _x suffixes in C.
+    
+    When Scheme functions modify their arguments or have side-effects,
+    they use a `!' at the end of the function name.  In C, this is
+    commonly represented with a _x suffix.  This patch adopts that
+    convention.
+
+commit 09ce403fef04ec9a77b611d248da20c375b1e100
+Merge: c7d44a2 41ea61b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 10:46:23 2010 +0000
+
+    Merge changes from main unstable branch
+
+commit 41ea61b2f156ec7b473863935410b5113aab1514
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 10:43:55 2010 +0000
+
+    libgeda: Correctly clear weak references.
+    
+    Fix a really really stupid logic bug introduced in commit
+    f8ddb85e74bb.
+
+commit c7d44a2507edb830e1592d9390cb32ad5fb658b4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 10 00:13:55 2010 +0000
+
+    scheme-api: Promote attributes from components.
+
+commit f8b371c8732f128c09fda366916f48d4a3ae8873
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 9 17:09:12 2010 +0000
+
+    scheme-api: Get inherited attribs from components.
+
+commit c397394b68b27672d1af14d777eea35636b3b365
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 10 09:30:02 2010 +0000
+
+    scheme-api: Make component/library test succeed for out-of-tree builds
+
+commit 780a175f4cff04a4f1b79332b6f604b7d95851ab
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 9 16:36:49 2010 +0000
+
+    scheme-api: Add missing unit test file.
+    
+    t0018-object-connections.scm was omitted from commit d8110db394f5.
+
+commit d8110db394f56139a4fb75c6447024a28fc12913
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 9 11:57:01 2010 +0000
+
+    scheme-api: Find connected objects.
+    
+    Adds a Scheme C procedure for accessing objects that are immediately
+    connected to an object.
+
+commit 7aff6e91ae4520072f4b0272a8fed56e27b82c0a
+Merge: e92b66a 03a529b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 21:02:16 2010 +0000
+
+    Merge changes from main unstable branch
+
+commit e92b66a8f48a565ae2b8de8d13601b7f54e84bad
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 16:33:52 2010 +0000
+
+    scheme-api: Get and set object fill parameters.
+
+commit 709b2707e3ec79422f0485b6e381b5cbc351905e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 16:32:00 2010 +0000
+
+    scheme-api: Simplify generation of unit test failure messages.
+    
+    Use (simple-format #f msg ...) instead of (with-output-to-string
+    thunk) to generate unit test failure messages.
+
+commit 64fc02d71b235f5b1b5a5640f15d9cf3270672a6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 10:40:24 2010 +0000
+
+    desktop-i18n: Don't have misleading ".h" suffixes in .po files.
+
+commit 803ea8cd6ee3203559d99fbaa178a869c2046d38
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 13:54:15 2010 +0000
+
+    Update po files, fixing Language and Language-Team strings.
+    
+    Updates all po files using update-po, making sure all po files have
+    their Language string set, and set all Language-Team strings to
+    geda-dev@seul.org.
+
+commit 5ee02960cb8cc90c6c6fd946c53cdf94b0b46b0e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 12:11:03 2010 +0000
+
+    Make new C files translatable.
+    
+    Also marks an new error message in gschem as translatable.
+
+commit d1794e3a90d0774782d3ae37101db984db1038db
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 6 00:32:35 2010 +0000
+
+    scheme-api: Get and set object stroke parameters.
+
+commit 68ea0f2273be05499512a1b2a3e557e93c049724
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 17:19:14 2010 +0000
+
+    scheme-api: Get object bounds.
+
+commit 51afd1e9f5ff6d09e9066e2cc0f7eefab3a79002
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 16:45:15 2010 +0000
+
+    scheme-api: Change page filenames.
+
+commit bb9e4bcd4d3e5b9b598105f7f6f1aecae880783b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 6 09:22:02 2010 +0000
+
+    Delete guile-snarf output files during distclean.
+
+commit 420c5126609f2f2f409cbfad50afd2949836fe6e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 19:05:15 2010 +0000
+
+    libgeda: Calculate bounds correctly for empty components.
+
+commit 9042448ea44521adc53375fdfc3d50641da0565a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 11:52:15 2010 +0000
+
+    scheme-api: Make object & attrib modifications dirty current page.
+
+commit b1056b243513171194ad2e68894d2f618eef6d76
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 11:05:05 2010 +0000
+
+    scheme-api: Improve unit tests for attribute attachment/detachment.
+
+commit d72e2913f90edf2c02df614fa140c7d13c252362
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 10:19:35 2010 +0000
+
+    scheme-api: Remove primitives from components that are in pages.
+    
+    The API currently erroneously throws an error when attempting to
+    remove a primitive object from a component that is attached to a page.
+
+commit 6eb023e46dc54a0b702cc9d9616325bf4e25ead4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 09:01:26 2010 +0000
+
+    scheme-api: Inspect and modify a page's `CHANGED' flag.
+
+commit c759a14672a1ee047c8d27f2d9c39339c88da18e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 08:00:19 2010 +0000
+
+    scheme-api: Closing pages.
+    
+    Since it's possible to create new pages from the Scheme API, it's also
+    useful to be able to close them.  This patch adds the close-page!
+    function to the (geda page) module.
+    
+    It's necessary for gschem to provide a slightly different
+    implementation of close-page! which allows for the GUI to be updated
+    and for the user to be prompted to save changes.  To do this, gschem
+    uses Guile module reflection to change the binding of the close-page!
+    function during startup.
+
+commit 5d9ca02072ba4309352e39d209f252142a96e0af
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 01:56:30 2010 +0000
+
+    scheme-api: Translate primitive objects in %complex-set!
+    
+    %complex-set! needs to translate the primitive objects that make up a
+    complex when its position changes.
+
+commit ee046f0a7c277d65ecb9edad6de5aeac0b81ba52
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 01:09:15 2010 +0000
+
+    scheme-api: Create components from the component library.
+
+commit 662b15fd2dfa47d48410bcd42c75b461ab5f21bd
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 4 12:30:42 2010 +0000
+
+    scheme-api: Attributes.
+    
+    Adds support for attributes.  In order to make the API safe to use
+    without memory corruption, there are significant restrictions on the
+    context in which attribute attachments can be made.  Most importantly,
+    both target and attribute must be part of the same page, or of the
+    same component, and objects which have attribute attachments cannot be
+    removed from a page or component's contents.
+
+commit c8140254f0821bd28f84040939329aaf0e744a9a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 4 20:34:19 2010 +0000
+
+    scheme-api: Basic page procedures.
+    
+    This patch implements support for creating and modifying
+    schematic/symbol pages.  It does not yet support file loading/saving,
+    printing, or closing pages.
+
+commit 83e845d1ec88528eb94e58105bf62cb1f5742218
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 4 07:31:46 2010 +0000
+
+    scheme-api: Complex objects.
+    
+    Support for working with complex objects.  Because Guile supports
+    complex numbers natively, using the word "complex" in function names
+    etc. is confusing.  In the public Scheme API the word "component" is
+    used instead.
+    
+    This patch implements support for inspecting and modifying components,
+    as well as for creating new, empty embedded components.  It does not
+    include support for creating components from files or from the
+    component library.
+
+commit e70250b1f7776e40dcada0d2c0bc3d9d8bc9a8df
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 3 17:50:07 2010 +0000
+
+    scheme-api: Text objects.
+    
+    Basic support for text objects.
+
+commit 810d1982d5b9fcd5d73037292df0be090ce18d84
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 3 17:19:06 2010 +0000
+
+    scheme-api: Path and picture objects.
+    
+    Just add some predicates for now.
+
+commit e461ca858a2d127c17bba84e17c31b626937ee00
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 3 16:33:54 2010 +0000
+
+    scheme-api: Arc objects.
+
+commit 2d9bb54a420197facfe93712fa0e60c6ef35bdf9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 3 12:36:52 2010 +0000
+
+    scheme-api: Pin objects.
+    
+    Re-uses the line modification routines for working on pins.  Note that
+    the libgeda C API provides a flag for choosing which end of a pin
+    should be connectable, but the Scheme API hides this flag, and from
+    the point of view of Scheme code the connectable end of a pin is
+    always the start.
+
+commit a0f0f9c672a5f8955aaf6c37ec509484d9b08714
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 3 11:07:17 2010 +0000
+
+    scheme-api: Circle objects.
+
+commit 2010a33b32dacaf660145b44ad7e93c566a0e9df
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:26 2010 +0000
+
+    scheme-api: Box objects.
+
+commit f0d9875a2eee566cf75b340a98a9471d65fc8ad7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 3 12:00:33 2010 +0000
+
+    scheme-api: Line, net and bus objects.
+
+commit 91d3e917cd11d4c304c84f95431c08210b867a4c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:26 2010 +0000
+
+    scheme-api: Get/set the color of objects, and copy them.
+
+commit 1acff2a3f952b291cbae4e293f9cf703b99645de
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:26 2010 +0000
+
+    scheme-api: Get the type of an object.
+    
+    Adds a function to the Scheme API for obtaining a symbol indicating
+    the type of schematic object contained in a Scheme value.
+
+commit 4b52e3e739dca7b880f6909110b0225b2a7d6ea4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 4 11:52:15 2010 +0000
+
+    scheme-api: Convert Scheme object lists to GLists and vice versa.
+    
+    The libgeda C API makes extensive use of GLists (doubly-linked lists
+    from GLib).  Since the Scheme API will frequently need to convert back
+    and forth between these and native Scheme cons-based singly-linked
+    lists, provide some utility functions for doing this conversion.
+
+commit feefbf9f0746f23c3d388d075c7c5d9c38d91afc
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:23 2010 +0000
+
+    scheme-api: Test suite based on geda-shell program.
+    
+    Adds a test suite for libgeda's Scheme API.  This is run using the
+    geda-shell REPL.
+
+commit 4e1f04c285a0a66f56c027a38709d0b3ec205c65
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:38:42 2010 +0000
+
+    libgeda: Add geda-shell program.
+    
+    Adds a minimal Scheme REPL program to libgeda.  This is not installed,
+    but is useful for debugging issues with libgeda's Scheme API.
+
+commit 4203e5e08b5341613ad6de08191f4feafb243687
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:24 2010 +0000
+
+    scheme-api: Basic smob predicates.
+
+commit b235a037d0ce1c525195141d77fd7b8cae85e8be
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 4 18:26:55 2010 +0000
+
+    scheme-api: Basic smob definitions & TOPLEVEL fluid.
+    
+    Adds a new smob type for gEDA objects (TOPLEVEL, PAGE and OBJECT, at
+    least initially), along with C functions for creating smobs.  Weak
+    references are used to ensure that smobs pointing to dead objects are
+    invalidated.
+    
+    Additionally, defines a fluid which contains the current TOPLEVEL.
+    This is used by the Scheme API to obtain the TOPLEVEL needed for
+    calling much of the libgeda API.
+
+commit 0460b8f476066ee471b4f8a79176e3a1fbbbfc55
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 4 09:25:57 2010 +0000
+
+    libgeda: Define non-NULL default for select_func.
+    
+    The code for loading/saving complex objects uses the nullity of
+    OBJECT.sel_func to determine whether or not a complex object should be
+    flagged as selectable or not.  So that libgeda applications that do
+    not define their own select_func can safely load, modify and save
+    schematic files, it's necessary to have a non-NULL default
+    select_func.
+
+commit 57f5e1eb96577f439840afb5c008ba739055d249
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:23 2010 +0000
+
+    scheme-api: Build infrastructure in libgeda.
+
+commit a33839adef1f8c7239e5b291baef667b9046d91f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:25 2010 +0000
+
+    libgeda: Get rid of some uses of page_current.
+    
+    Remove some uses of page_current from functions used only by libgeda.
+    This will make it more painless to remove page_current completely.
+
+commit e883ed4bf0681db9e67da5e176d2caa6d8876f4c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:24 2010 +0000
+
+    libgeda: Remove o_save_curr_page().
+
+commit 3abdca2a4ee088184e976822c444069d67e20a20
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:25 2010 +0000
+
+    libgeda: Add PAGE argument to file load/save functions.
+
+commit 4a3a3d9e4cc72fa94165306c5b8d411d47812d45
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:24 2010 +0000
+
+    libgeda: Add PAGE argument to print functions.
+
+commit c26ed9d5b126f7e2b67285e465438aa9b5ee4ffd
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:23 2010 +0000
+
+    libgeda: Make g_read_file() take a TOPLEVEL argument.
+
+commit 019990c574e3806c566d18ad1548c76d979eb37f
+Author: Patrick Bernaud <patrickb@chez.com>
+Date:   Sun Oct 31 19:50:59 2010 +0000
+
+    libgeda: Check attribute string before requesting name/value [3032626]
+
+commit 9d129b1ed3f923f6357c4afd410e576782dc00e3
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Sun Oct 10 18:24:56 2010 -0700
+
+    Added build directory variables to libgeda.pc.in.
+
+commit cfa5600cd838b791aecc6a1e86cb4f4bfd113195
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Mar 12 02:08:35 2010 +0000
+
+    libgeda: Remove f_save_close().
+    
+    This function is not currently used, and relies on
+    TOPLEVEL.page_current.
+
+commit 82edfe8fd716cbaeba6e979c6233f73801117b1c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Mar 12 02:08:34 2010 +0000
+
+    libgeda: Misc. doxygen fixes.
+
+commit 923116bc968ff32ed2c997afa596af59ce9752ce
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Mar 7 23:16:03 2010 +0000
+
+    libgeda: Add PAGE argument to tile functions.
+    
+    With this patch, the tile system no longer uses TOPLEVEL.page_current
+    anywhere.
+
+commit 2c445565d558f079e54f2508b35f734c58abab32
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Mar 7 23:16:03 2010 +0000
+
+    libgeda: Add o_box_modify_all().
+    
+    o_box_modify() allows one corner of a box to be moved.  Unfortunately,
+    it swaps the internal coordinates of the BOX structure around in a way
+    that could potentially cause unexpected behaviour.  For instance,
+    suppose you wish to modify a box as shown below:
+    
+       ^                          ^
+       |                          |
+      4|                         4|       +-----+
+       |                          |       |     |
+      3|                         3|       |     |
+       |                          |       |     |
+      2| +--+                    2|       +-----+
+       | |  |                     |
+      1| |  |                    1|
+       | |  |                     |
+      0| +--+                    0|
+       |                          |
+       +--------------->          +--------------->
+         0  1  2  3  4              0  1  2  3  4
+    
+       (A) Original box           (B) Desired box
+    
+    Calling o_box_modify() as follows will not work as expected:
+    
+      o_box_modify (toplevel, box, 2, 4, BOX_UPPER_LEFT);
+      o_box_modify (toplevel, box, 4, 2, BOX_LOWER_RIGHT);
+    
+    It will instead result in the transformations below:
+    
+       ^                          ^
+       |                          |
+      4|    +--+                 4|    +--------+
+       |    |  |                  |    |        |
+      3|    |  |                 3|    |        |
+       |    |  |                  |    |        |
+      2|    |  |                 2|    +--------+
+       |    |  |                  |
+      1|    |  |                 1|
+       |    |  |                  |
+      0|    +--+                 0|
+       |                          |
+       +--------------->          +--------------->
+         0  1  2  3  4              0  1  2  3  4
+    
+       (C) After first call       (D) After second call
+    
+    This is due to the fact o_box_modify() behaves as though the corner
+    specified by the whichone argument had been dragged.
+    
+    This patch adds the o_box_modify_all() function, which allows all four
+    corners of the box to be modified at once, avoiding the problems
+    inherent in repeated o_box_modify() calls.
+
+commit 83530e16e28ebba72d7dc1f509d0005ea30c26f2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Mar 7 23:16:03 2010 +0000
+
+    libgeda: Remove uses of deprecated SCM_STRING_CHARS.
+
+commit 9c42a66c0a985ef424f35ac93a289e82ef88b32b
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Mar 7 19:00:01 2010 +0000
+
+    Move STRETCH structure and s_stretch.c from libgeda to gschem
+    
+    This structure and related functions deal with rubberbanding nets during
+    move operations. They are only used from within gschem, although there
+    is of course setup and tear-down in libgeda. Move this all to gschem.
+    
+    This isn't a 1-1 move, since various headers and structures needed to
+    be fixed up in the process. The stretch_list now lives in the
+    GSCHEM_TOPLEVEL, not the PAGE, matching the fact that we don't allow
+    action state to persist when a GSCHEM_TOPLEVEL changes active PAGE.
+    
+    A free of the stretch list is removed from s_page_delete(), but no
+    equivalent is re-added in gschem. Action state is torn down when an
+    action is cancelled, which is done before deleting any GSCHEM_TOPLEVEL.
+
+commit f8ddb85e74bbf05a6901365527d27d3e2914ccec
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Mar 7 13:03:15 2010 +0000
+
+    libgeda: Add weak refs to OBJECT/PAGE/TOPLEVEL.
+    
+    Weak references are useful when you want to keep an eye on an object
+    but not necessarily hang on to it when it comes to its useful life.
+    
+    This patch adds an internal libgeda API for using weak references.
+    There are two types of weak references implemented by this patch:
+    
+    * full-powered weak references, where an arbitrary callback function
+      can be registered on an object to be notified when an object is
+      destroyed
+    
+    * weak pointers, which are set to NULL when the object is destroyed.
+    
+    This functionality will hopefully allow several pieces of housekeeping
+    code in libgeda to be simplified.
+    
+    The API is designed to be as close as possible to the GObject weak ref
+    API. See e.g. g_object_weak_ref().
+
+commit 1126d3899e03492d5f2f41b244cd685e257792f6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Mar 3 09:02:47 2010 +0000
+
+    libgeda: Add s_page_replace().
+    
+    Add a function to replace one object in the PAGE object list with
+    another while preserving its position in the list.
+
+commit b59058138ce5057b3520f70754a610a99fb440a7
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Feb 24 16:33:08 2010 +0000
+
+    Use change notification to redraw objects when connectivity changes
+    
+    Emit change notifications in the connectivity tracking functions
+    s_conn_remove_other() and s_conn_update_line_object(). This frees
+    gschem from the somewhat complex task of tracking which objects were
+    connected to a given object before and after a particular set of
+    operations.
+    
+    This change leads to a significant simplification of many operations,
+    and removes quantities of code from:
+    
+      o_pin_end()
+      o_net_end()
+      o_move_end()
+      o_move_end_rubberband()
+      o_move_end_lowlevel()
+      o_mirror_world_update()
+      o_rotate_world_update()
+      o_grips_end_bus()
+      o_grips_end_pin()
+      o_grips_end_net()
+      o_delete()
+
+commit cf6ea830c56a04ebb47e958dc1f8895dcc8f60e7
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:23 2010 +0000
+
+    Use change notification to redraw when a pin's type is modified
+    
+    Emit change notifications in o_pin_set_type(), and remove
+    o_invalidate() calls where this function is used in gschem.
+
+commit 5e43eb790eee741c861862d27435fac0cca55df2
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Mar 3 00:34:35 2010 +0000
+
+    Add change notification when objects are modified via o_*_modify()
+    
+    Emit change notification in the o_*_modify() functions, and remove
+    some o_invalidate() calls where o_arc_modify() is also used in
+    gschem's arc editing dialog.
+    
+    The o_*_modify() routines are also used in o_grips.c, where there
+    is no explicit o_invalidate() call after them. o_grips_end() calls
+    o_invalidate(), which is strictly un-necessary, but I've left it for
+    clarity, as it comes after resetting the OBJECT's dont_redraw flag.
+
+commit 51461b59d30487e9c1c2dbf3beb6883bd66314e1
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:23 2010 +0000
+
+    Use change notification to redraw when an object's fill properties change
+    
+    Emit change notifications in o_set_fill_options(), and remove
+    o_invalidate() calls where this function is used in gschem.
+
+commit ca60bcbdab636a6ee28a004d5ce802a57933e6bb
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:22 2010 +0000
+
+    Use change notification to redraw when an object's line properties change
+    
+    Emit change notification in o_set_line_options(), and remove
+    o_invalidate() calls where this function is used in gschem.
+
+commit 51c180d137513668925fe2f5834f8ec5cb1d4563
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:22 2010 +0000
+
+    Use change notifications to redraw objects with selection changes
+    
+    Emit change notifications when an OBJECT's selected flag is changed,
+    and removes o_invalidate() calls where the selection is manipulated
+    in gschem.
+
+commit 47ebe0bb0145d95946d05fa1fd8d9bab7bd08175
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:22 2010 +0000
+
+    Use change notifications for redraw when text is recreated
+    
+    Emit change notifications in the o_text_recreate() function, and
+    remove o_invalidate() calls from gschem where o_text_recreate(),
+    or other functions calling it are made.
+
+commit 5c14a649bd633950624dfda4128bd83ed77ef4bc
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:21 2010 +0000
+
+    Use change notifications for objects added / removed from the page
+    
+    Adds emission of the change and pre-change notify events for adding
+    and removing objects from the page respectively.
+    
+    Remove explicit invalidation calls after performing these actions
+    in gschem.
+
+commit 0a93ef44cea25ec2bed559d8a05488fd3badd63c
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:21 2010 +0000
+
+    libgeda: Process updates prior to removing an object from the page.
+    
+    Renames the private function object_removed to pre_object_removed,
+    and moves its calls prior to removing the object from the page.
+    
+    For the existing  updates, the order doesn't matter, however other
+    things we might like to do per-object when removing them from the
+    page, such as emitting notifications of what we're about to do,
+    must be done before the object is actually removed.
+
+commit 8b1faf85362bb30c392e2b9ebc5d8ccb800b85f2
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:20 2010 +0000
+
+    libgeda: Add mechanism to call hook function when an object changes.
+    
+    Introduces two new functions wihin libgeda, o_emit_pre_change_notify()
+    and o_emit_change_notify(), intended to be called prior to and after
+    an object being modified, respectively. This mechanism is primarily
+    intended as a means for libgeda to trigger on-screen updates when
+    objects are changed, and as such - at present, only a single pair of
+    call-backs can be registered (per TOPLEVEL). These call-backs are
+    registered via the new public function o_set_change_notify_funcs().
+    
+    The o_emit_pre_change_notify() function gives the GUI an opportunity to
+    queue a redraw for the screen region where an object used to reside,
+    prior to operations which change its bounding box, and similarly, the
+    o_emit_change_notify() allows the GUI to trigger a redraw of the
+    modified object.
+
+commit 9aa23d8ec9319639b505b30d8a7754af9311beca
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Feb 24 16:30:49 2010 +0000
+
+    libgeda: Better match on-screen text height when printing
+
+commit f1a4a40d964c7ea32404cd2ac888609ef89935a7
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:33:06 2010 +0000
+
+    libgeda: Remove unused gdk-pixbuf-hacks.c and prototypes
+    
+    These were unused since switching to cairo rendering of pictures.
+    gdk_pixbuf_rotate(), gdk_pixbuf_add() and gdk_pixbuf_mirror_flip}()
+    all bite the dust.
+
+commit 331b9111417cf6297fa8f188b81a67d2caf2b963
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 20 14:36:57 2010 +0000
+
+    libgeda: Re-indent o_line_modify()
+    
+    Keeps this NOP change separate from a more functional change one
+    of my branches.
+
+commit fc0d1ec31bc40dce2a511efae25530c32533fb2e
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 20 00:05:28 2010 +0000
+
+    libgeda: Remove unused variables from o_text_{new,recreate}()
+    
+    These were left-over from factoring out update_disp_string().
+
+commit 351bdfd3b45c8283c5dd9b9e903edf648fa5df00
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 19 23:08:43 2010 +0000
+
+    Move o_text_recreate() call inside o_text_set_string()
+    
+    All callers of o_text_set_string() call o_text_recreate() to update
+    the text object. o_text_set_string() should call it directly.
+    
+    Despite being a hold over from the old "prim_objs" based text rendering
+    system, this function still does useful work preparing the string to be
+    displayed on screen.
+
+commit e5aecb64ebaa24e9511a7f814aeffc2a334d563f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Feb 17 18:24:13 2010 +0000
+
+    Kill ADDING_SEL flag with FIRE!
+    
+    The TOPLEVEL.ADDING_SEL flag has long preyed upon intrepid programmers
+    venturing into the labyrinthine and treacherous depths of the gEDA
+    source code, introducing strange and hard-to-trace logic errors and
+    segmentation faults to hinder them on their various quests to fix bugs
+    and add features.
+    
+    But no more! The beast lies slain! No more will developers need to
+    perform the dance of "flag save and restore" to placate the ravening
+    beast! No more will they mutter strange incantations for hours as they
+    seek to determine whether the flag should be set or unset!
+    
+    
+    
+    In serious terms: the flag was only used for controlling whether or
+    not objects should be added to the tile system.  By ensuring that
+    objects are only added to or removed from the tile system when added
+    to or removed from the tile's corresponding page, it's then possible
+    to replace the flag check by checking whether the OBJECT is currently
+    part of a PAGE.
+
+commit 76010e59b8a1495eaaaa12688b8e70c30827503f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Feb 17 17:41:48 2010 +0000
+
+    libgeda: Remove some uses of page_current.
+    
+    Change some places that use page_current to use o_get_page() or
+    o_get_page_compat() instead.
+
+commit f8f053afef5a3e6302e9ec4ed9efcd8f1bf07886
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Feb 17 16:33:02 2010 +0000
+
+    libgeda: Link tile system contents to page contents.
+    
+    Instead of adding objects to tile system on object creation and
+    removing them on object deletion, add and remove objects from tile
+    system at the same time as they are added to/removed from a page.
+    
+    This makes more sense, since each page has a separate tile structure.
+    And has the added advantage of getting rid of a place where the
+    ADDING_SEL flag is needed!
+
+commit a25595e2e628c2dec91cc1b045fc18ec34b16fc2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Feb 17 20:48:39 2010 +0000
+
+    libgeda: Hide some s_conn_* functions from public API.
+
+commit f21bae619b0df02e6024fb9dd23397d5698ed47e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Feb 17 16:24:02 2010 +0000
+
+    libgeda: Hide some s_tile_* functions from public API.
+
+commit e19d39a3125cb336da4d8fbbad51a23068e5da4d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Feb 17 12:18:58 2010 +0000
+
+    libgeda: Fix build.
+    
+    Commit 9b24bf40 introduces a stupid error.
+
+commit 42c4df51736485b164323304f59bcdb0f18fef61
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Feb 17 11:45:39 2010 +0000
+
+    libgeda: Clear PAGE.object_lastplace on OBJECT removal.
+    
+    Clear the current page's object_lastplace magic pointer (which
+    actually should be in gschem somewhere) when removing an OBJECT from
+    the page, instead of doing it on OBJECT deletion.
+
+commit 9b24bf40fd35e0954acaa89a1aa8f73ce4f3233a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Feb 17 11:45:39 2010 +0000
+
+    libgeda: Add parent PAGE pointer to OBJECT structure.
+    
+    There are numerous examples of libgeda & gschem code that assumes,
+    when operating on an OBJECT, that it is part of the "current" PAGE as
+    set in the TOPLEVEL structure.  This has a number of disadvantages,
+    including the need for regular frobbing of the ADDING_SEL flag and
+    page_current pointers, but most importantly restricting the ability to
+    work with more than one PAGE at once. Furthermore, it is not
+    convenient or practical to add a PAGE argument to all functions that
+    may eventually need to manipulate or update the current page based on
+    changes to OBJECTs.
+    
+    Instead, this patch adds a parent PAGE pointer that is updated *only*
+    when adding or removing an OBJECT to a PAGE.
+    
+    In order to ensure consistency in the case of compound objects, only
+    the "top-level" compound object has its page pointer set; in general,
+    *either* OBJECT.parent *or* OBJECT.page may be non-NULL.
+
+commit e85bf2f103667368768939dfc2c40484be8abf8f
+Merge: 0e5defe 93b0370
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Feb 15 20:30:22 2010 +0000
+
+    Merge translations from the stable-1.6 branch
+    
+    NB: Translations were merged manually
+
+commit c31d9a1a90db32dd1e1d41f9d3d5ef5888424ba1
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 17:09:45 2010 -0500
+
+    Updated copyright text/header in most source files.
+    
+    Updated all copyright text dates that should be updated for the new year.
+    Fixed a bunch of GNU text typos (these should have been either
+    GPL or gEDA).  Removed some $Id$ tags which are no longer used/needed.
+    Fixed a few file header that were just plain incorrect.
+    
+    (cherry picked from commit bd34cfde2450790b357e574281f9562adce64303)
+    (from stable-1.6 branch)
+
+commit 5df2c5c6f400facb3f81963d6fb0332832cc9e6b
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Feb 15 19:26:10 2010 +0000
+
+    Make update-po
 
 commit bd34cfde2450790b357e574281f9562adce64303
 Author: Ales Hvezda <ahvezda@seul.org>
@@ -122,6 +3557,55 @@ Date:   Mon Feb 8 16:31:00 2010 +0000
 
     Merge translations with those exported from launchpad
 
+commit 99c5e8ce7cb7d2f06d3da3c3b841b0d40c583583
+Merge: 89ad783 d3b0112
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 6 21:36:08 2010 +0000
+
+    Manually merge translations from the stable-1.6 branch
+    
+    For newly translated languages, this was fairly simple, using msgmerge
+    to update the stable-1.6 "$LANG.po" files with the current git HEAD
+    translation template ".pot" files.
+    
+    For existing languages, I used msgcat to combine the two, allowing it
+    to choose the "newer" translation - ie.. the one on the stable-1.6
+    branch if there were any conflicts.
+    
+    To assist, I used the following short script:
+    
+    \#!/bin/sh
+    
+    LINGUAS=`cat LINGUAS`
+    TEMPLATE="geda-gschem.pot"
+    NEW_DIR="stable-1.6"
+    OLD_DIR="HEAD"
+    
+    for TR_LANG in $LINGUAS
+    do
+      echo "Attempting to merge for language ${TR_LANG}"
+      if [ -e ${OLD_DIR}/${TR_LANG}.po ]; then
+        echo -n "Old translation exists.. merging"
+        msgcat --use-first ${NEW_DIR}/${TR_LANG}.po ${OLD_DIR}/${TR_LANG}.po -o merge_tmp.po
+        msgmerge merge_tmp.po ${TEMPLATE} -o ${TR_LANG}.po
+      else
+        echo -n "Translation is new, updating"
+        msgmerge ${NEW_DIR}/${TR_LANG}.po ${TEMPLATE} -o ${TR_LANG}.po
+      fi
+    done
+    
+    (Modified appropriately for each */po/ directory.)
+    
+    The current translations were placed in po/HEAD/ and the (newer)
+    stable-1.6 translations were placed in po/stable-1.6/
+    
+    The script requires the LINGUAS file to be updated to include all
+    new languages before it is run.
+    
+    The resulting changes have been reviewed to ensure nothing
+    massively broken happened during the merge, and committed as a merge
+    to show the origin of the translations.
+
 commit 575bca9da7f38599c4c7b06b38d186ea0ad11f00
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Sat Feb 6 20:14:51 2010 +0000
@@ -134,6 +3618,12 @@ Date:   Sat Feb 6 18:54:33 2010 +0000
 
     libgeda: Import translations from Launchpad
 
+commit 7b97171ff386bb96e16dbd879aed45b8da908efe
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 11:09:45 2010 +0000
+
+    Update en_GB translation
+
 commit fd66d4de4dd32b4d080a9cbd4f53f2a598269b63
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Sun Jan 31 11:08:04 2010 +0000
@@ -145,6 +3635,48 @@ Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Sun Jan 31 10:27:32 2010 +0000
 
     Run make update-po in all */po/ directories
+
+commit bf82ca8680254c7752fed304fb67716fcc0f6023
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 10:45:01 2010 +0000
+
+    Run make update-po in the */po/ directories
+
+commit cce79ff0e9cd2be1bdb9f9883317f5eadfa41c03
+Author: Peter Brett <ptbb2@cam.ac.uk>
+Date:   Sun Jan 31 10:01:03 2010 +0000
+
+    libgeda: Remove unused variable.
+
+commit ce53e956128a330f7c13e1953cad937b27027323
+Author: Peter Brett <ptbb2@cam.ac.uk>
+Date:   Sun Jan 31 10:01:02 2010 +0000
+
+    Move snap state tracking out of libgeda.
+    
+    Since snapping is only relevant to gschem, store snap state in the
+    GSCHEM_TOPLEVEL structure.
+
+commit b50377f6c0438e49b9dff0a2be8dc01df51dfd55
+Author: Peter Brett <ptbb2@cam.ac.uk>
+Date:   Sat Jan 30 15:54:34 2010 +0000
+
+    Don't use %-style patterns in Makefiles.
+    
+    %-style patterns are a GNU make extension.
+
+commit 7cf778da5905cf4189eeb043c1b98cb0efa2b305
+Author: Peter Brett <ptbb2@cam.ac.uk>
+Date:   Sat Jan 30 15:54:28 2010 +0000
+
+    Add --from-code=UTF-8 to XGETTEXT_OPTIONS.
+    
+    Some of the translatable strings in the source code contain UTF-8
+    encoded characters.  Without setting the --from-code argument
+    appropriately, xgettext chokes on these strings, which can result in
+    an infinitely-recursing build.
+    
+    Reported-by: Peter <link@penguindevelopment.org>
 
 commit 1d3486d420ff603548697f4fcb553776d2cea62f
 Author: Peter Clifton <pcjc2@cam.ac.uk>
@@ -169,6 +3701,44 @@ Date:   Wed Jan 27 18:17:45 2010 +0000
     Reported-by: Donald Tillman <don@till.com>
     (cherry picked from commit 012a3c3ddf55b0260b296476fa7d047af88818f7)
 
+commit 39209cd034abc4059e4cda6590be158dc366e787
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Jan 30 15:34:47 2010 +0000
+
+    libgeda: Fix postscript output issue with unclosed paths
+    
+    Continues the fix from commit 012a3c3ddf55b0260b296476fa7d047af88818f7
+    
+    Ensure we always have a space before the "fill" command in the output
+    postscript.
+
+commit 03acdbfaadaa35d11cf510ea4651b47584178514
+Author: Peter Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 30 13:37:17 2010 +0000
+
+    Clean up some left-over font directory cruft.
+
+commit 012a3c3ddf55b0260b296476fa7d047af88818f7
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Jan 27 18:17:45 2010 +0000
+
+    libgeda: Fix postscript output issue with certain paths
+    
+    Ensure we always have a space before the "stroke" command.
+    
+    Reported-by: Donald Tillman <don@till.com>
+
+commit f30b66a2d02592c907b1ac15270f34d8f62f1327
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 22:17:52 2009 +0000
+
+    libgeda: clean up doxygen warnings [2899355]
+    
+    Some of the doxygen comments for libgeda have
+    fallen into bitrot, particularly around parameter names and lists.
+    This patch updates doxygen comments to fix almost all warnings generated
+    in the libgeda doxygen run.
+
 commit 923a59b1f9c6399f9cb280da57d5eaa6edd26f74
 Author: Werner Hoch <werner.ho@gmx.de>
 Date:   Fri Nov 20 06:58:54 2009 +0000
@@ -178,6 +3748,58 @@ Date:   Fri Nov 20 06:58:54 2009 +0000
 commit da2510c304cc6d62dba465c396a19fc91ed7b506
 Author: Bert Timmerman <bert.timmerman@xs4all.nl>
 Date:   Fri Nov 20 06:58:53 2009 +0000
+
+    Updated the Dutch translations for libgeda.
+
+commit 858982a2a05ff3e128de3621f1d301ecd989f35c
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Changed message on failure to generate doxygen docs
+    
+    If --enable-doxygen was not a configure flag, change the error message
+    on an attempt to build doxygen documentation to suggest the configure
+    flag was the cause of the failure rather than the lack of a doxygen
+    install itself.
+
+commit ea34de8e761f40b697fc4800375ab8c5ef642c60
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Don't drop a file called "doxygen"
+    
+    Remove the file redirection that causes a file called "doxygen"
+    to be created in the */docs/ directories if --enable-doxygen
+    is *not* one of the configure flags.
+
+commit e1c4dab66eea9b253b3be4e006e4ab741b62024e
+Author: Jason Childs <oblivian@users.sourceforge.net>
+Date:   Thu Nov 12 18:33:55 2009 +0000
+
+    libgeda: Use g_file_set_contents() to write files atomically.
+    
+    (One half of patch #2628677; crediting Jason because this part of
+    the patch was applied unmodified. -- Peter)
+
+commit e9355f593ea77d83211f058f6a38b23b3a2a3243
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Thu Nov 12 14:29:47 2009 +0000
+
+    libgeda doxygen: Corrected images make target [#2889717]
+    
+    The doxygen target under libgeda/docs was not calling the correct
+    target in the images/ subdirectory at the start of the documentation
+    build. Changed from 'make' to 'make images'.
+
+commit 015c118098009694068c481be704de2078e53e00
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Sat Oct 17 11:29:26 2009 +0200
+
+    updated german translation for libgeda
+
+commit 1928bfe038ce99bd83a725c439a56f2458f2172c
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Oct 17 10:13:15 2009 +0200
 
     Updated the Dutch translations for libgeda.
 

@@ -14,7 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02111-1301 USA.
  */
 
 /*! \file defines.h
@@ -60,7 +61,7 @@
 /* for visibility in st_objects */
 #define INVISIBLE               0
 #define VISIBLE                 1
-#define LEAVE_VISIBILITY_ALONE -1
+#define LEAVE_VISIBILITY_ALONE  -1
 
 /* For pin and net styles */
 #define THIN            0     
@@ -120,9 +121,6 @@
 /* one character string used to calculate tab's width */
 /* Warning: it MUST be a string. */
 #define TAB_CHAR_MODEL "b"
-
-/* multi text line spacing (multipled times character height) */
-#define LINE_SPACING    2.0
 
 /* The conn modes for type */
 #define CONN_NULL               0

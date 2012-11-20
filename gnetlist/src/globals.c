@@ -44,27 +44,27 @@ char *guile_proc=NULL;
 
 
 /* command line arguments */
+int list_backends=FALSE;
 int verbose_mode=FALSE;
 int interactive_mode=FALSE;
 int quiet_mode=FALSE;
-int sort_mode=FALSE;
-int include_mode=FALSE;
-int embedd_mode=FALSE;
-int nomunge_mode = FALSE;
 
 /* what kind of netlist are we generating? see define.h for #defs */
 int netlist_mode=gEDA;
 char *output_filename=NULL;
 
-/* list of filenames to load before loading of the backend */
-GSList *pre_backend_list=NULL;
+/* scheme expression to evaluate before loading of rc files */
+SCM pre_rc_list = SCM_EOL;
 
-/* list of filenames to load after loading of the backend but before the */
-/* execution of the backend procedure */
-GSList *post_backend_list=NULL;
+/* scheme expression to evaluate before loading of the backend */
+SCM pre_backend_list = SCM_EOL;
 
-/* String holding command line */
-char *command_line;
+/* scheme expression to evaluate after loading of the backend but
+ * before the execution of the backend procedure */
+SCM post_backend_list = SCM_EOL;
+
+/* List of input filenames */
+GSList *input_files;
 
 /* Parameters passed to the backend from the command line */
 GSList *backend_params = NULL;  

@@ -58,9 +58,6 @@
 #include <dmalloc.h>
 #endif
 
-/*! Default setting for object selection function. */
-void (*select_func)() = NULL;
-
 
 /*! \brief Check if point is inside a region
  *  \par Function Description
@@ -216,6 +213,8 @@ void o_set_line_options(TOPLEVEL *toplevel, OBJECT *o_current,
     break;
   }
   
+  o_emit_pre_change_notify (toplevel, o_current);
+
   o_current->line_width = width;
   o_current->line_end   = end;
   o_current->line_type  = type;
@@ -225,6 +224,8 @@ void o_set_line_options(TOPLEVEL *toplevel, OBJECT *o_current,
 
   /* Recalculate the object's bounding box */
   o_recalc_single_object( toplevel, o_current );
+  o_emit_change_notify (toplevel, o_current);
+
 }
 
 /*! \brief get #OBJECT's line properties.
@@ -286,6 +287,8 @@ void o_set_fill_options(TOPLEVEL *toplevel, OBJECT *o_current,
     return;
   }
 
+  o_emit_pre_change_notify (toplevel, o_current);
+
   o_current->fill_type = type;
   o_current->fill_width = width;
 
@@ -294,7 +297,8 @@ void o_set_fill_options(TOPLEVEL *toplevel, OBJECT *o_current,
 
   o_current->fill_pitch2 = pitch2;
   o_current->fill_angle2 = angle2;
-	
+
+  o_emit_change_notify (toplevel, o_current);
 }
 
 /*! \brief get #OBJECT's fill properties.
@@ -585,6 +589,206 @@ void o_set_color (TOPLEVEL *toplevel, OBJECT *object, int color)
     o_glist_set_color (toplevel, object->complex->prim_objs, color);
 }
 
+
+/*! \brief Get an object's parent PAGE.
+ *
+ * \par Function Description
+ * Returns the PAGE structure which owns \a object. If \a object is
+ * not currently associated with a PAGE, returns NULL. If \a object is
+ * part of a compound object, recurses upward.
+ *
+ * \param [in] toplevel  The TOPLEVEL structure.
+ * \param [in] object    The OBJECT for which to retrieve the parent PAGE.
+ * \return The PAGE which owns \a object or NULL.
+ *
+ * \sa s_page_append_object() s_page_append() s_page_remove()
+ */
+PAGE *
+o_get_page (TOPLEVEL *toplevel, OBJECT *object)
+{
+  if (object->parent != NULL) {
+    return o_get_page (toplevel, object->parent);
+  }
+  return object->page;
+}
+
+/*! \brief Get an object's parent PAGE, or fall back to global current page.
+ *
+ * \par Function Description
+ * If set, returns the PAGE structure which owns \a object.  If \a
+ * object does not have a parent page set, returns the global current
+ * page from \a toplevel.  If the object parent page is inconsistent
+ * with the global current page, a critical-level error message is
+ * emitted.
+ *
+ * \warning This function is primarily intended to assist in the
+ * migration of code from using the TOPLEVEL current page to using the
+ * o_get_page().  It should not be used in new code.
+ *
+ * \deprecated Use o_get_page() in new code.
+ *
+ * \param [in] toplevel  The TOPLEVEL structure.
+ * \param [in] object    The OBJECT for which to retrieve the parent PAGE.
+ * \return The PAGE which owns \a object, the global current PAGE, or NULL.
+ */
+PAGE *
+o_get_page_compat (TOPLEVEL *toplevel, OBJECT *object) {
+  PAGE *page = o_get_page (toplevel, object);
+  if (page != toplevel->page_current) {
+    g_critical ("o_get_page_compat: OBJECT.page = %p, TOPLEVEL.page_current = %p",
+                page, toplevel->page_current);
+    return toplevel->page_current;
+  } else {
+    return page;
+  }
+}
+
+/*! \brief Get an object's containing complex object.
+ *
+ * \par Function Description
+ * If \a object is part of a complex #OBJECT, returns that
+ * #OBJECT. Otherwise, returns NULL.
+ *
+ * \param [in] toplevel  The TOPLEVEL structure.
+ * \param [in] object    The OBJECT for which to get the containing OBJECT.
+ * \return The complex OBJECT which owns \a object, or NULL.
+ */
+OBJECT *
+o_get_parent (TOPLEVEL *toplevel, OBJECT *object)
+{
+  g_return_val_if_fail ((object != NULL), NULL);
+
+  if (object->parent != NULL) {
+    return object->parent;
+  }
+  return NULL;
+}
+
+/* Structure for each entry in a TOPLEVEL's list of registered change
+ * notification handlers */
+struct change_notify_entry {
+  ChangeNotifyFunc pre_change_func;
+  ChangeNotifyFunc change_func;
+  void *user_data;
+};
+
+/*! \brief Add change notification handlers to a TOPLEVEL.
+ * \par Function Description
+ * Adds a set of change notification handlers to a #TOPLEVEL instance.
+ * \a pre_change_func will be called just before an object is
+ * modified, and \a change_func will be called just after an object is
+ * modified, with the affected object and the given \a user_data.
+ *
+ * \param toplevel #TOPLEVEL structure to add handlers to.
+ * \param pre_change_func Function to be called just before changes.
+ * \param change_func Function to be called just after changes.
+ * \param user_data User data to be passed to callback functions.
+ */
+void
+o_add_change_notify (TOPLEVEL *toplevel,
+                     ChangeNotifyFunc pre_change_func,
+                     ChangeNotifyFunc change_func,
+                     void *user_data)
+{
+  struct change_notify_entry *entry = g_new0 (struct change_notify_entry, 1);
+  entry->pre_change_func = pre_change_func;
+  entry->change_func = change_func;
+  entry->user_data = user_data;
+  toplevel->change_notify_funcs =
+    g_list_prepend (toplevel->change_notify_funcs, entry);
+}
+
+/*! \brief Remove change notification handlers from a TOPLEVEL.
+ * \par Function Description
+ * Removes a set of change notification handlers and their associated
+ * \a user_data from \a toplevel.  If no registered set of handlers
+ * matches the given \a pre_change_func, \a change_func and \a
+ * user_data, does nothing.
+ *
+ * \see o_add_change_notify()
+ *
+ * \param toplevel #TOPLEVEL structure to remove handlers from.
+ * \param pre_change_func Function called just before changes.
+ * \param change_func Function called just after changes.
+ * \param user_data User data passed to callback functions.
+ */
+void
+o_remove_change_notify (TOPLEVEL *toplevel,
+                        ChangeNotifyFunc pre_change_func,
+                        ChangeNotifyFunc change_func,
+                        void *user_data)
+{
+  GList *iter;
+  for (iter = toplevel->change_notify_funcs;
+       iter != NULL; iter = g_list_next (iter)) {
+
+    struct change_notify_entry *entry =
+      (struct change_notify_entry *) iter->data;
+
+    if ((entry != NULL)
+        && (entry->pre_change_func == pre_change_func)
+        && (entry->change_func == change_func)
+        && (entry->user_data == user_data)) {
+      g_free (entry);
+      iter->data = NULL;
+    }
+  }
+  toplevel->change_notify_funcs =
+    g_list_remove_all (toplevel->change_notify_funcs, NULL);
+}
+
+/*! \brief Emit an object pre-change notification.
+ * \par Function Description
+ * Calls each pre-change callback function registered with #TOPLEVEL
+ * to notify listeners that \a object is about to be modified.  All
+ * libgeda functions that modify #OBJECT structures should call this
+ * just before making a change to an #OBJECT.
+ *
+ * \param toplevel #TOPLEVEL structure to emit notifications from.
+ * \param object   #OBJECT structure to emit notifications for.
+ */
+void
+o_emit_pre_change_notify (TOPLEVEL *toplevel, OBJECT *object)
+{
+  GList *iter;
+  for (iter = toplevel->change_notify_funcs;
+       iter != NULL; iter = g_list_next (iter)) {
+
+    struct change_notify_entry *entry =
+      (struct change_notify_entry *) iter->data;
+
+    if ((entry != NULL) && (entry->pre_change_func != NULL)) {
+      entry->pre_change_func (entry->user_data, object);
+    }
+  }
+}
+
+/*! \brief Emit an object change notification.
+ * \par Function Description
+ * Calls each change callback function registered with #TOPLEVEL to
+ * notify listeners that \a object has just been modified.  All
+ * libgeda functions that modify #OBJECT structures should call this
+ * just after making a change to an #OBJECT.
+ *
+ * \param toplevel #TOPLEVEL structure to emit notifications from.
+ * \param object   #OBJECT structure to emit notifications for.
+ */
+void
+o_emit_change_notify (TOPLEVEL *toplevel, OBJECT *object)
+{
+  GList *iter;
+  for (iter = toplevel->change_notify_funcs;
+       iter != NULL; iter = g_list_next (iter)) {
+
+    struct change_notify_entry *entry =
+      (struct change_notify_entry *) iter->data;
+
+    if ((entry != NULL) && (entry->change_func != NULL)) {
+      entry->change_func (entry->user_data, object);
+    }
+  }
+}
+
 /*! \brief Query visibility of the object.
  *  \par Function Description
  *  Attribute getter for the visible field within the object.
@@ -613,8 +817,6 @@ void
 o_set_visibility (TOPLEVEL *toplevel, OBJECT *object, int visibility)
 {
   g_return_if_fail (object != NULL);
-  if (visibility == LEAVE_VISIBILITY_ALONE)
-    return;
   if (object->visibility != visibility) {
     object->visibility = visibility;
     o_bounds_invalidate (toplevel, object);

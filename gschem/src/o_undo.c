@@ -104,7 +104,7 @@ void o_undo_savestate(GSCHEM_TOPLEVEL *w_current, int flag)
      * triggered before it was removed from o_save_buffer().
      */
     if (toplevel->net_consolidate == TRUE)
-      o_net_consolidate (w_current->toplevel);
+      o_net_consolidate (toplevel, toplevel->page_current);
   }
 
   if (w_current->undo_type == UNDO_DISK && flag == UNDO_ALL) {
@@ -117,12 +117,12 @@ void o_undo_savestate(GSCHEM_TOPLEVEL *w_current, int flag)
     /* f_save manages the creaton of backup copies. 
        This way, f_save is called only when saving a file, and not when
        saving an undo backup copy */
-    o_save_curr_page (toplevel, filename);
+    o_save (toplevel, s_page_objects (toplevel->page_current), filename, NULL);
 
   } else if (w_current->undo_type == UNDO_MEMORY && flag == UNDO_ALL) {
     object_list = o_glist_copy_all (toplevel,
                                     s_page_objects (toplevel->page_current),
-                                    object_list, SELECTION_FLAG);
+                                    object_list);
   }
 
   /* Clear Anything above current */
@@ -189,7 +189,12 @@ void o_undo_savestate(GSCHEM_TOPLEVEL *w_current, int flag)
 #endif
 
     u_current = toplevel->page_current->undo_bottom;
-    while(u_current && levels > 0) {
+
+    while (levels > 0) {
+      /* Because we use a pad you are always guaranteed to never */
+      /* exhaust the list */
+      g_assert (u_current != NULL);
+
       u_current_next = u_current->next;
 
       if (u_current->filename) {
@@ -213,8 +218,7 @@ void o_undo_savestate(GSCHEM_TOPLEVEL *w_current, int flag)
       levels--;
     }
 
-    /* Because we use a pad you are always garanteed to never */
-    /* exhaust the list */
+    g_assert (u_current != NULL);
     u_current->prev = NULL;
     toplevel->page_current->undo_bottom = u_current;
 
@@ -296,7 +300,6 @@ void o_undo_callback(GSCHEM_TOPLEVEL *w_current, int type)
   UNDO *save_current;
   int save_logging;
   int find_prev_data=FALSE;
-  int prev_status;
 
   char *save_filename;
 
@@ -360,13 +363,11 @@ void o_undo_callback(GSCHEM_TOPLEVEL *w_current, int type)
 
   /* temporarily disable logging */
   save_logging = do_logging;
-  prev_status = toplevel->DONT_REDRAW;
-  toplevel->DONT_REDRAW = 1;
   do_logging = FALSE;
 
   if (w_current->undo_type == UNDO_DISK && u_current->filename) {
 
-    f_open(toplevel, u_current->filename, NULL);
+    f_open(toplevel, toplevel->page_current, u_current->filename, NULL);
 
     x_manual_resize(w_current);
     toplevel->page_current->page_control = u_current->page_control;
@@ -379,7 +380,7 @@ void o_undo_callback(GSCHEM_TOPLEVEL *w_current, int type)
 
     s_page_append_list (toplevel, toplevel->page_current,
                         o_glist_copy_all (toplevel, u_current->object_list,
-                                          NULL, NORMAL_FLAG));
+                                          NULL));
 
     x_manual_resize(w_current);
     toplevel->page_current->page_control = u_current->page_control;
@@ -406,12 +407,7 @@ void o_undo_callback(GSCHEM_TOPLEVEL *w_current, int type)
   x_multiattrib_update (w_current);
 
   /* Let the caller to decide if redraw or not */
-  /* toplevel->DONT_REDRAW = 0; */
-  toplevel->DONT_REDRAW = prev_status;
-
-  if (!toplevel->DONT_REDRAW) {
-    o_invalidate_all (w_current);
-  }
+  o_invalidate_all (w_current);
   i_update_menus(w_current);
 
   /* restore saved undo structures */

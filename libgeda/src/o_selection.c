@@ -43,6 +43,7 @@ SELECTION *o_selection_new( void )
 /*! \brief Selects the given object and adds it to the selection list
  *  \par Selects the given object and does the needed work to make the
  *  object visually selected.
+ *  Skip objects that are already selected.
  *
  *  \param [in] toplevel   The TOPLEVEL object
  *  \param [in] selection  Pointer to the selection list
@@ -50,8 +51,11 @@ SELECTION *o_selection_new( void )
  */
 void o_selection_add (TOPLEVEL *toplevel, SELECTION *selection, OBJECT *o_selected)
 {
-  o_selection_select (toplevel, o_selected);
-  geda_list_add( (GedaList *)selection, o_selected );
+  if (o_selected->selected == FALSE)
+  {
+    o_selection_select (toplevel, o_selected);
+    geda_list_add( (GedaList *)selection, o_selected );
+  }
 }
 
 /*! \brief Removes the given object from the selection list
@@ -109,12 +113,12 @@ void o_selection_print_all(const SELECTION *selection)
  */
 void o_selection_select(TOPLEVEL *toplevel, OBJECT *object)
 {
-  if (object->selected == TRUE) {
-    printf("object already selected == TRUE\n");
+  if (object->selected == TRUE)
     return;
-  }
 
+  o_emit_pre_change_notify (toplevel, object);
   object->selected = TRUE;
+  o_emit_change_notify (toplevel, object);
 }
 
 /*! \brief Unselects the given object.
@@ -127,6 +131,11 @@ void o_selection_select(TOPLEVEL *toplevel, OBJECT *object)
  */
 void o_selection_unselect (TOPLEVEL *toplevel, OBJECT *object)
 {
+  if (object->selected == FALSE)
+    return;
+
+  o_emit_pre_change_notify (toplevel, object);
   object->selected = FALSE;
+  o_emit_change_notify (toplevel, object);
 }
 

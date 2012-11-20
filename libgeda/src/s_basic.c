@@ -34,34 +34,18 @@
 #include <dmalloc.h>
 #endif
 
+#ifdef G_OS_WIN32
+#  define STRICT
+#  include <windows.h>
+#  undef STRICT
+#  ifndef GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
+#    define GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT 2
+#    define GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS 4
+#  endif
+#endif
+
 /*! this is modified here and in o_list.c */
 int global_sid=0;
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-void error_if_called(void)
-{
-	fprintf(stderr, "Somebody called error_if_called!\n");
-	g_assert(0);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-void exit_if_null(void *ptr) 
-{
-  if (ptr == NULL) {
-    fprintf(stderr, "gEDA: Got NULL ptr!, please e-mail maintainer\n");
-    g_assert(0);
-    exit(-1);
-  }	
-}
-
 
 /*! \brief Initialize an already-allocated object.
  *  \par Function Description
@@ -80,6 +64,9 @@ OBJECT *s_basic_init_object(OBJECT *new_node, int type, char const *name)
 
   /* Setup the name */
   new_node->name = g_strdup_printf("%s.%d", name, new_node->sid);
+
+  /* Don't associate with a page, initially */
+  new_node->page = NULL;
 
   /* Setup the bounding box */
   new_node->w_top = 0;
@@ -107,15 +94,12 @@ OBJECT *s_basic_init_object(OBJECT *new_node, int type, char const *name)
 		
   /* Setup the color */
   new_node->color = DEFAULT_COLOR;
-  new_node->selected = FALSE;
   new_node->dont_redraw = FALSE;
+  new_node->selectable = TRUE;
+  new_node->selected = FALSE;
   new_node->locked_color = -1;
 
   new_node->bus_ripper_direction = 0;
-
-  new_node->action_func = error_if_called; 
-  new_node->sel_func = error_if_called; 
-  new_node->draw_func = error_if_called; 
 
   new_node->line_end = END_NONE;
   new_node->line_type = TYPE_SOLID;
@@ -136,6 +120,17 @@ OBJECT *s_basic_init_object(OBJECT *new_node, int type, char const *name)
 
   new_node->pin_type = PIN_TYPE_NET;
   new_node->whichend = -1;
+
+  new_node->net_num_connected = 0;
+  new_node->valid_num_connected = FALSE;
+
+  new_node->weak_refs = NULL;
+
+  new_node->attrib_notify_freeze_count = 0;
+  new_node->attrib_notify_pending = 0;
+
+  new_node->conn_notify_freeze_count = 0;
+  new_node->conn_notify_pending = 0;
 
   return(new_node);
 }
@@ -222,6 +217,11 @@ void
 s_delete_object(TOPLEVEL *toplevel, OBJECT *o_current)
 {
   if (o_current != NULL) {
+    /* If currently attached to a page, remove it from the page */
+    if (o_current->page != NULL) {
+      s_page_remove (toplevel, o_current->page, o_current);
+    }
+
     s_conn_remove_object (toplevel, o_current);
 
     if (o_current->attached_to != NULL) {
@@ -229,16 +229,15 @@ s_delete_object(TOPLEVEL *toplevel, OBJECT *o_current)
       o_attrib_remove(toplevel, &o_current->attached_to->attribs, o_current);
     }
 
-    if (toplevel->page_current->object_lastplace == o_current) {
-      toplevel->page_current->object_lastplace = NULL;
-    }
+    /* Don't bother with hooks for this dying object,
+     * leak the freeze count, so the object dies frozen.
+     */
+    o_attrib_freeze_hooks (toplevel, o_current);
+    o_attrib_detach_all (toplevel, o_current);
 
     if (o_current->line) {
       /*	printf("sdeleting line\n");*/
       g_free(o_current->line);
-
-      /* yes this object might be in the tile system */
-      s_tile_remove_object(o_current);
     }
     o_current->line = NULL;
 
@@ -302,7 +301,7 @@ s_delete_object(TOPLEVEL *toplevel, OBJECT *o_current)
       o_current->complex = NULL;
     }
 
-    o_attrib_detach_all (toplevel, o_current);
+    s_weakref_notify (o_current, o_current->weak_refs);
 
     g_free(o_current);	/* assuming it is not null */
 
@@ -333,6 +332,83 @@ s_delete_object_glist(TOPLEVEL *toplevel, GList *list)
   g_list_free(list);
 }
 
+/*! \brief Add a weak reference watcher to an OBJECT.
+ * \par Function Description
+ * Adds the weak reference callback \a notify_func to \a object.  When
+ * \a object is destroyed, \a notify_func will be called with two
+ * arguments: the \a object, and the \a user_data.
+ *
+ * \sa s_object_weak_unref
+ *
+ * \param [in,out] object     Object to weak-reference.
+ * \param [in] notify_func    Weak reference notify function.
+ * \param [in] user_data      Data to be passed to \a notify_func.
+ */
+void
+s_object_weak_ref (OBJECT *object,
+                   void (*notify_func)(void *, void *),
+                   void *user_data)
+{
+  g_return_if_fail (object != NULL);
+  object->weak_refs = s_weakref_add (object->weak_refs, notify_func, user_data);
+}
+
+/*! \brief Remove a weak reference watcher from an OBJECT.
+ * \par Function Description
+ * Removes the weak reference callback \a notify_func from \a object.
+ *
+ * \sa s_object_weak_ref()
+ *
+ * \param [in,out] object     Object to weak-reference.
+ * \param [in] notify_func    Notify function to search for.
+ * \param [in] user_data      Data to to search for.
+ */
+void
+s_object_weak_unref (OBJECT *object,
+                     void (*notify_func)(void *, void *),
+                     void *user_data)
+{
+  g_return_if_fail (object != NULL);
+  object->weak_refs = s_weakref_remove (object->weak_refs,
+                                        notify_func, user_data);
+}
+
+/*! \brief Add a weak pointer to an OBJECT.
+ * \par Function Description
+ * Adds the weak pointer at \a weak_pointer_loc to \a object. The
+ * value of \a weak_pointer_loc will be set to NULL when \a object is
+ * destroyed.
+ *
+ * \sa s_object_remove_weak_ptr
+ *
+ * \param [in,out] object        Object to weak-reference.
+ * \param [in] weak_pointer_loc  Memory address of a pointer.
+ */
+void
+s_object_add_weak_ptr (OBJECT *object,
+                       void *weak_pointer_loc)
+{
+  g_return_if_fail (object != NULL);
+  object->weak_refs = s_weakref_add_ptr (object->weak_refs, weak_pointer_loc);
+}
+
+/*! \brief Remove a weak pointer from an OBJECT.
+ * \par Function Description
+ * Removes the weak pointer at \a weak_pointer_loc from \a object.
+ *
+ * \sa s_object_add_weak_ptr()
+ *
+ * \param [in,out] object        Object to weak-reference.
+ * \param [in] weak_pointer_loc  Memory address of a pointer.
+ */
+void
+s_object_remove_weak_ptr (OBJECT *object,
+                          void *weak_pointer_loc)
+{
+  g_return_if_fail (object != NULL);
+  object->weak_refs = s_weakref_remove_ptr (object->weak_refs,
+                                            weak_pointer_loc);
+}
 
 /*! \todo Finish function documentation!!!
  *  \brief
@@ -477,6 +553,41 @@ s_expand_env_variables (const gchar *string)
 
 /* -------------------------------------------------- */
 
+#ifdef G_OS_WIN32
+
+/* Get a module handle for the libgeda DLL.
+ *
+ * Adapted from GLib, originally licensed under LGPLv2+. */
+static gpointer
+libgeda_module_handle ()
+{
+  typedef BOOL (WINAPI *t_GetModuleHandleExA) (DWORD, LPCTSTR, HMODULE *);
+  static t_GetModuleHandleExA p_GetModuleHandleExA = NULL;
+  static gconstpointer address = (void (*)(void)) &libgeda_module_handle;
+  static HMODULE hmodule = NULL;
+
+  if (hmodule != NULL) return (gpointer) hmodule;
+
+  if (p_GetModuleHandleExA == NULL) {
+    p_GetModuleHandleExA =
+      (t_GetModuleHandleExA) GetProcAddress (GetModuleHandle ("kernel32.dll"),
+                                             "GetModuleHandleExA");
+  }
+
+  if (p_GetModuleHandleExA == NULL ||
+      !(*p_GetModuleHandleExA) (GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT |
+                                GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+                                address, &hmodule)) {
+    MEMORY_BASIC_INFORMATION mbi;
+    VirtualQuery (address, &mbi, sizeof (mbi));
+    hmodule = (HMODULE) mbi.AllocationBase;
+  }
+
+  return (gpointer) hmodule;
+}
+
+#endif /* G_OS_WIN32 */
+
 /*! \brief Get the directory with the gEDA system data.
  *  \par Function description
  *  Returns the path to be searched for gEDA data shared between all
@@ -489,19 +600,31 @@ s_expand_env_variables (const gchar *string)
  *  \warning The returned string is owned by libgeda and should not be
  *  modified or free'd.
  *
+ *  \todo On UNIX platforms we should follow the XDG Base Directory
+ *  Specification.
+ *
  *  \return the gEDA shared data path, or NULL if none could be found.
  */
 const char *s_path_sys_data () {
   static const char *p = NULL;
+  /* If GEDADATA is set in the environment, use that path */
   if (p == NULL) {
     p = g_getenv ("GEDADATA");
   }
-# if !defined (_WIN32)
   if (p == NULL) {
+# if defined (G_OS_WIN32)
+    /* On Windows, guess the path from the location of the libgeda
+     * DLL. */
+    gchar *d =
+      g_win32_get_package_installation_directory_of_module (libgeda_module_handle ());
+    p = g_build_filename (d, "share", "gEDA", NULL);
+    g_free (d);
+# else
+    /* On other platforms, use the compiled-in path */
     p = GEDADATADIR;
+# endif
     g_setenv ("GEDADATA", p, FALSE);
   }
-# endif
   return p;
 }
 
@@ -515,6 +638,9 @@ const char *s_path_sys_data () {
  *  \warning The returned string is owned by libgeda and should not be
  *  modified or free'd.
  *
+ *  \todo On UNIX platforms we should follow the XDG Base Directory
+ *  Specification.
+ *
  *  \return the gEDA shared config path, or NULL if none could be
  *  found.
  */
@@ -526,7 +652,7 @@ const char *s_path_sys_config () {
     p = g_getenv ("GEDADATARC");
   }
   if (p == NULL) {
-#ifdef GEDARCDIR
+#if defined (GEDARCDIR) && !defined(_WIN32)
     /* If available, use the rc directory set during configure. */
     p = GEDARCDIR;
 #else
@@ -548,6 +674,9 @@ const char *s_path_sys_config () {
  *  modified or free'd.
  *
  *  \todo On Windows, we should use APPDATA.
+ *
+ *  \todo On UNIX platforms we should follow the XDG Base Directory
+ *  Specification.
  */
 const char *s_path_user_config () {
   static const char *p = NULL;

@@ -1,8 +1,990 @@
-commit a30f00bbee18ad5140616ad6459365cb48b03ee7
+commit 87f1e0e76965a514277c949dbf2191993962cb88
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 18 15:26:09 2012 +0000
+
+    Update version numbers to 1.8.0-20121118.
+
+commit 67c6022ba512e33b242aa62d0448385893471554
+Author: Jeff Mallatt <jjm@codewell.com>
+Date:   Fri May 25 18:31:49 2012 -0400
+
+    gnetlist: Stop drc2 backend from crashing when output is to stdout.
+    
+    Fixes bug where emitting to stdout (-o -) and finding errors/warnings
+    caused crash attempting to emit final 'See output file' message.
+    
+    Closes-bug: lp-1004757
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 5c2c75614ee878fc792aaa6407aecc030cfd95dc
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 16 23:04:09 2012 +0000
+
+    gnetlist: Add -o option to --help output.
+    
+    Closes-bug: lp-1079714
+
+commit f7fab3715f984c374f41d7c2d74fc2802bbb4e7a
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Nov 14 22:58:12 2012 +0000
+
+    Replace references to geda.seul.org with up-to-date URLs.
+    
+    Update lots of links to seul.org to www.geda-project.org, wiki.geda-project.org, gedasymbols.org and www.gnu.org as appropriate.
+
+commit 7a68dc68dd3ccbf4d4b2b2056cefc573152cfa92
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Thu Nov 15 08:32:50 2012 +0000
+
+    gnetlist: Updated bug filing and homepage URLs in usage message
+
+commit 098044feb4e53d9cc49a57a0071e36b62d6c9d9f
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Mar 19 21:45:11 2012 +0000
+
+    gnetlist: remove unused pointer value from s_traverse_component()
+    
+    The value 'nets' used to store the result of s_traverse_net() is never used,
+    to cast function value to (void) to explicitly show that.
+    
+    Coverity-ID: 201679
+
+commit 85113c7d1245ca1b3aed45a7fc4cf771b5795f40
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Mar 19 21:38:42 2012 +0000
+
+    gnetlist: cleanly discard unused power tag in s_netattrib.c
+    
+    In the function s_netattrib_return_netname(), cast the first call to
+    strtok (which is discarding the power tag) to (void) rather than storing
+    it and never using it in the current_pin pointer.
+    
+    Coverity-ID: 201678
+
+commit f0923997c5ea727f6b73afad23ee2f974ac6b6b0
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Mar 18 11:36:59 2012 +0000
+
+    Update FSF mailing address.
+    
+    Change all references to the FSF mailing address to the new Franklin
+    Street location.
+    
+    Closes-bug: lp-934934
+
+commit a110456ce03822ed543efd27e827d497076ebf41
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 12:11:46 2012 +0000
+
+    gnetlist: Fix dereference after NULL check.
+    
+    Replace the NULL check with an assertion.
+    
+    Coverity-ID: 201601
+
+commit 133970aaf70c1ed864765fdf51bbe165cb16337f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 11:45:50 2012 +0000
+
+    gnetlist: Fix missing break in switch.
+    
+    This was clearly an error, since in the APPEND case the built value
+    would would be leaked.
+    
+    Coverity-ID: 201618
+
+commit 29b8540801de26686e9b282db5f987181aab2130
+Author: Dan White <dan@whiteaudio.com>
+Date:   Sat Dec 10 17:01:16 2011 -0600
+
+    gnetlist: makedepend documentation
+
+commit fac4d11b8c7beb6a711a83ba002682bab0168816
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 9 21:05:55 2012 +0000
+
+    gnetlist: Output refdes when g_get_nets() fails.
+    
+    Affects-bug: lp-912976
+
+commit d207c8af8e1928b26a1f30deabb3e71f9e8ff507
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 9 20:33:14 2012 +0000
+
+    gnetlist: Clean up g_get_nets() control flow.
+    
+    Reorganise things to reduce insane nesting depth.
+
+commit ddddb8fafd9c2598e8b9697adc6dda8bb71bed6d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 9 20:30:16 2012 +0000
+
+    gnetlist: Re-indent g_get_nets() function. [whitespace]
+
+commit 815eef2cb1f35519633e6fe93332f39e9743ae6c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 9 19:36:47 2012 +0000
+
+    gnetlist: Make file load error message clearer.
+
+commit d1305adf92982b3a159707c940bafb8c293223fe
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Tue Jun 28 21:43:13 2011 +0200
+
+    Partial fix for bug #700448.
+    
+    NULL is returned from o_*_read and o_read_buffer functions if parsing of the input buffer fails.
+    An error object is returned in these cases, describing in detail what error occured.
+    
+    gnetlist is updated to exit with status code 2 if the input file can't be read.
+    
+    gschem is updated to report errors when using o_read_buffer.
+    
+    TODO:
+    * Prone to segfaults on bad input files (separate patch)
+
+commit e2eda476fb8f3a16aeba8eab0cc8b7fa12e37d6b
 Author: Ales Hvezda <ahvezda@seul.org>
-Date:   Fri Jan 14 23:21:56 2011 -0500
+Date:   Sat Dec 31 16:00:23 2011 -0500
+
+    Updated man page date and version in prep for a new release (1.7.2)
+
+commit 14b0299cac74632fd12026bbde5e9a1ad458df53
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 30 23:12:28 2011 +0000
+
+    gnetlist: Fix premature free in g_get_nets().
+
+commit de82b5d95ac7a1527f2347f5e6c836c1b2ff2a0d
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Dec 23 19:08:19 2011 +0000
+
+    Don't install sch2eaglepos.sh
+    
+    sch2eaglepos.sh is already distributed to the examples and doesn't
+    need to be in $prefix/bin as well. Follow the Debian packager's lead
+    by not installing it.
+    
+    Affects-bug: lp-698849
+
+commit 77e61fd5cf2526f1446985676ddc04fcb3d9f4de
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Dec 18 18:31:04 2011 +0000
+
+    Expand html man page names properly.
+    
+    Fixes an issue in 7d0ed87ac where the expansion of filenames was not
+    happening properly due to a typo in the make subsitution macro.
+
+commit d046a1d95d549283c362fd4dcfa9320bc30eafec
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Dec 18 12:00:32 2011 +0000
+
+    Add manpage for mk_verilog_syms.
+    
+    Add manpage for mk_verilog_syms, add to build targets and gitignore,
+    but don't install it. Also, determine html targets for manpages
+    automatically from the list of manpages.
+    
+    Affects-bug: lp-698849
+
+commit 7a17bc39a023245325343459429345eb0c623f5c
+Author: Dan McMahill <dan@mcmahill.net>
+Date:   Sun Dec 18 09:03:02 2011 -0500
+
+    Finish the delete as part of moving sw2asc.in over to utils from gnetlist.
+
+commit 44c8ea19dd71d3ae9757a5f9161c09bcaa47eebf
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 18 09:34:42 2011 +0000
+
+    Update .gitignore files for sw2asc move.
+
+commit 6db1ebe332d3dd78367459dc4676af6fcce8b330
+Author: Dan McMahill <dan@mcmahill.net>
+Date:   Sat Dec 17 12:14:37 2011 -0500
+
+    Move the sw2asc script out of the gnetlist tree and into the utils tree where it belongs.
+    
+    This script is not really a gnetlist utility but rather one used to help extract
+    some simulation results.  It is used with the SWITCAP2 switched capacitor circuit
+    simulator which is supported by a gnetlist backend and gschem library.
+
+commit 8741d194a6c2fa304d15123d398a9c3758169e6e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 14 12:27:26 2011 +0000
+
+    gnetlist: Add basic concatenated net support for verilog.
+    
+    Frank Thomson says: "I modified gnet-verilog.scm to support the basic
+    verilog format concatenated net naming like {a,b,c[3:0]}."
+    
+    Closes-bug: lp-821618
+
+commit ba144aca892cef5841de2009b094d08fa11a0b6b
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Dec 14 00:02:09 2011 +0400
+
+    gnetlist: Fixed typos in comments/debug output of spice-sdb backend.
+    
+    Closes-bug: lp-904104
+
+commit 523f5bd65a7cea56bdfca7cab5650832273e24bc
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 21:58:11 2011 +0000
+
+    gnetlist: Fix tests for internationalised Scheme API.
+    
+    Missed some places where the Scheme load path needed extending in
+    commit 8d4c574efc3a.  This broke distcheck.
+
+commit 0e506ebd5d5cc87a7f373b83b24f2ad3c90fd18b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 14:13:22 2011 +0000
+
+    Remove per-tool INSTALL files.
+    
+    Only one top-level INSTALL file is needed, and that is provided by
+    automake.
+
+commit 8d4c574efc3a081324ef92d16e6feb6720c86c33
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 10:31:12 2011 +0000
+
+    scheme-api: Translate strings.
+    
+    Makes the messages emitted by Scheme API functions
+    internationalizable.  This required an update to the gnetlist
+    testsuite to set the library path for built-but-not-installed Scheme
+    modules.
+    
+    Closes-bug: lp-901013
+
+commit c5b473354b2340b42d1a48436fb4da113b34657f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 11 22:18:22 2011 +0000
+
+    gsch2pcb: Make --m4-file and -m4-pcbdir arguments work again.
+    
+    These options were broken in commit 6d935086d299, and haven't worked
+    since before 1.6.x.  Since no-one had reported it a bug in all that
+    time, it's obvious that no-one was actually using them, and we could
+    probably get away with just deleting them.  But making them work again
+    will work as well.
+    
+    Closes-bug: lp-897661
+
+commit 50e6718b8484a737a2092af97132f8785b6c6137
+Author: Dan White <dan@whiteaudio.com>
+Date:   Sun Jan 2 12:49:58 2011 -0600
+
+    gnetlist: spice-sdb "no_end_card" option suppresses ".end"
+    
+    Add the option "no_end_card" to suppress the ".end" for netlists destined to
+    be .include'd in other files.
+    
+    Closes-bug: 698735
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 574c85ad6decf49fc64bad0214f045a69fe1d1c3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 11 01:29:44 2011 +0000
+
+    gsch2pcb: Fix broken gnetlist backend.
+    
+    Fix breakage to gsch2pcb backend introduced in commit 579fbb4828a7.
+
+commit fbb3b8c871116fe5e0b29140d92b15ecc9a6f8e1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 4 18:49:51 2011 +0000
+
+    gnetlist: Fix some "set but not used" warnings.
+
+commit 579fbb4828a71ae2c78f270c3e7d1779c52e8997
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 29 13:23:33 2011 +0000
+
+    gsch2pcb: Remove "m4-command" project file option.
+    
+    The "m4-command" option permitted in gsch2pcb project files allows the
+    M4 command line generated by gsch2pcb to be replaced by an arbitrary
+    command line.  This patch removes the option.
+
+commit 50867f1f01c6fe2aaf20180db6d2626acbd3c8a0
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 29 13:18:27 2011 +0000
+
+    gnetlist: Correct comment typo in backend-getopt module.
+
+commit 2171faf3ba82744a32aa17c0722262dc42bd062d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 29 13:47:05 2011 +0000
+
+    build-sys: Correct `dist-hook' for gnetlist common tests.
+    
+    In commit b0613e375ab8, it became valid for some common tests not to
+    generate output, and subsequently in commit fde0b77b96ef, some `bom2'
+    and `bom' backend golden files were removed to make use of this.
+    However, the `dist-hook' rule in the gnetlist common test Makefile.am
+    still assumed that all tests needed golden output files.  This patch
+    corrects this, and un-breaks `make distcheck'.
+
+commit fde0b77b96ef92d5e220dafeb31c92c03f7df0bf
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 29 09:32:17 2011 +0000
+
+    gnetlist: Regenerate `bom' and `bom2' test results.
+    
+    In commit 76bc345ee043, the `bom' and `bom2' backends were modified to
+    be more informative about attribute list specifications.  As a
+    side-effect of this work, the backend options for these backends are
+    now much more strictly validated.  Tests which pass `-O include_mode'
+    or `-O sort_mode' to gnetlist therefore now fail for the BOM backends,
+    and this patch updates the golden files appropriately.
+    
+    Affects-bug: lp-810202
+    Reported-by: Dan McMahill <dan@mcmahill.net>
+
+commit b0613e375ab887d4a5ed5c3022a12c485cad1ab2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 29 09:52:30 2011 +0000
+
+    gnetlist: Make common tests cope with no output.
+    
+    Some gnetlist backends may fail, expectedly, without generating
+    output.  Update common gnetlist test harness to cope with this.
+
+commit f42bdab5a5db15c80fa704fe37a62f602c188d9f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 28 10:26:33 2011 +0000
+
+    gnetlist: Add ewnet backend to man page.
+
+commit f2aae0e26fefb8db388ac9d74a8c14921f116a0b
+Author: Dan McMahill <dan@mcmahill.net>
+Date:   Sat Nov 19 03:10:35 2011 -0500
+
+    Add ULTIboard backend.  This is the electroncs workbench layout tool
+    currently sold by National Instruments.
+
+commit 1ca1d9b32c62d0563bbe2169aa3764fe03cf86d8
+Author: Dan McMahill <dan@mcmahill.net>
+Date:   Sat Nov 19 02:46:18 2011 -0500
+
+    Add the ewnet backend to the tests.
+
+commit c9d4f6638bbc7ba84534c2460037f19915114a95
+Author: Karl Hammar <karl@aspodata.se>
+Date:   Tue Jul 26 16:08:01 2011 +0200
+
+    Correct SCM_ASSERT() usage with incorrect SCM_ARGx.
+    
+    From guile documentation:
+    
+     -- Macro: void SCM_ASSERT (int TEST, SCM OBJ, unsigned int POSITION,
+              const char *SUBR)
+    ...
+     -- Macro: int SCM_ARG1
+    ...
+     -- Macro: int SCM_ARG7
+         One of the above values can be used for POSITION to indicate the
+         number of the argument of SUBR which is being checked.
+    ...
+    
+    Some SCM_ASSERT() calls have the wrong SCM_ARGx for its TEST and OBJ.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 76bc345ee043764b919980c3de6d27f78546cf73
+Author: Jared Casper <jaredcasper@gmail.com>
+Date:   Fri Jul 15 12:18:07 2011 +0100
+
+    gnetlist: bom/bom2 backend attribute list improvements
+    
+    - Checks for the existence of the attribute file, gives a helpful error
+      message if none is found (no default)
+    
+    - Adds an attrib_file command line option to the backend for
+      specifying an alternate attribute file
+    
+    - Adds an attribs command line option for specifying the attributes
+      directly from the command line
+    
+    Closes-bug: lp-810202
+
+commit 9c540461df266e548684ab2f0bd3294605cf749e
+Merge: f7cc583 12260ba
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Jun 19 18:16:48 2011 +0100
+
+    Merge changes from main unstable branch
+
+commit 12260baebf9f828e9297fc794e911224b8dcd163
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jun 19 10:36:02 2011 -0400
+
+    Updated all man page dates/versions
+
+commit e4872a662d21173526f9fe486d45d33877494035
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:53:57 2011 +0200
+
+    gnetlist: g_graphical_objs_in_net...: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 92b4b15049eaaab356e738a6e9f8acd9ca3e7320
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:48:16 2011 +0200
+
+    gnetlist: g_get_attribute_by_pinnumber: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 7c1670feb3f8879e5c6ef0fd9cdb3f9679e98482
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:46:41 2011 +0200
+
+    gnetlist: g_get_attribute_by_pinseq: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 37b429e766bf17517bd22a80bfa83281260abae9
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:42:05 2011 +0200
+
+    gnetlist: g_get_nets: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 971d122c1c17189dbf33d0d92de3cefb27fc0b97
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 23:00:25 2011 +0200
+
+    gnetlist: remove remaining use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit eddb9a7f7a6852a46db1ed0ff6a5c74516ff664a
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:57:58 2011 +0200
+
+    gnetlist: g_rc_gnetlist_version: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 3a1cb7a8c532c32138b2f5b39d2ca49fcbd3bd31
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:49:34 2011 +0200
+
+    gnetlist: g_get_toplevel_attribute: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 407210c4c308f6c71004971a33c758b5e235e6de
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:43:43 2011 +0200
+
+    gnetlist: g_get_pins_nets: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 1139c095be36fd5041875917aaf3c972335de1f2
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:38:21 2011 +0200
+
+    gnetlist: g_get_all_connections: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 8cc6911684a66ba4c8bfebc5407d0f917578d6e1
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:31:19 2011 +0200
+
+    gnetlist: g_get_pins: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit b60e14588df1d5c45f1ed2751786f7062b709729
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 16 22:31:21 2011 +0100
+
+    gnetlist: Add new `makedepend' backend to NEWS and tests.
+    
+    Closes-bug: lp-698740
+
+commit 8c66dc1b9545ed60d25fe7fa2a7f9aa95c2b4a92
+Merge: 25952c3 5f4308e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jun 15 18:12:44 2011 +0100
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	gschem/src/g_funcs.c
+
+commit d5d1a98f0e95589c33bff881198cca01a1b08c7e
+Author: Clif Cox <clif@eugeneweb.com>
+Date:   Mon Jun 13 13:38:39 2011 +0100
+
+    Updated the problematic name attributes in some symbols
+    
+    In some gnetlist backends the name=? attributes cause problems because
+    they look like valid attribute values. eg file=? may be mistaken for a
+    valid filepath, and value=? for an actual value. Changing them to
+    name=unknown is one way to solve this problem in the interim. It's now
+    safe to remove the special checks for these "?" like the one in
+    spice-sdb. This patch updates these problematic name=? attributes in
+    some symbols to name=unknown, and removes FIXME code snipit that
+    checked for the ? value in spice-sdb.
+    
+    It also updates gnetlist tests to reflect these changes. Turns out
+    that the test input file TwoStageAmp.sch had a ? in it, which of couse
+    caused problems.  Then when it was removed vams's output changed so it
+    had to be fixed, which wasn't a very clever fix but seems to work.
+    
+    Closes-bug: lp-698741
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit cb7a91bc125926f13c23fdfe67fc26e992015a95
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jun 13 13:19:02 2011 +0100
+
+    gnetlist: Update golden files.
+
+commit b6bc950edee6e2e3baa7906f75ebb29c08dac2c8
+Author: Clif Cox <clif@eugeneweb.com>
+Date:   Fri Jan 14 09:50:46 2011 -0800
+
+    gnetlist: flexable netlisting for NGspice Code Models
+    
+    Closes-bug: lp-702752
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 1295421746393d17405b3c4bf37b96caac5f44d0
+Author: Clif Cox <clif@eugeneweb.com>
+Date:   Mon Jun 13 09:07:24 2011 +0100
+
+    gnetlist: Add some comments to spice-sdb backend.
+    
+    Affects-bug: lp-702752
+
+commit 91865253d6e4422b06648fe5b0334a5013a7d08a
+Merge: 4bccef2 09c6613
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 21:42:48 2011 +0100
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	libgeda/src/g_register.c
+    	libgeda/src/g_smob.c
+
+commit 09c6613f93b65d3f9193e7dbc65bd696cf8a6b06
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 20:35:37 2011 +0100
+
+    libgeda: Use UTF-8 instead of locale Scheme string functions.
+    
+    Note that there are several places where locale string functions are
+    still used, because the input depends on the current locale
+    (e.g. strings obtained from command-line options or from the
+    filesystem).
+    
+    There are still a lot of places where we're still treating
+    locale-dependent strings as UTF-8 strings (and probably vice-versa).
+    Enough bugs for everybody to share!
+
+commit 1121d83a5450ad9040cabb7ef9a8cfb6c2a395f3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 10 13:46:15 2011 +0100
+
+    scheme-api: Only use (ice-9 syncase) if define-syntax missing.
+    
+    In Guile 2.0, syntax-case is built in by default and importing the
+    (ice-9 syncase) module isn't required.
+
+commit 9538145da79933763ed79eae6869f92d467e10d0
+Author: Dan White <dan@whiteaudio.com>
+Date:   Sat May 28 09:50:41 2011 -0500
+
+    gnetlist: makedepend backend
+    
+    Gnetlist backend to determine a schematic's dependencies.  Output
+    is in the form of:
+    
+    source.sch: depend1.sch depend2.sch
+    source.cir: source.sch depend1.cir depend2.cir other.inc
+    
+    ...written to "source.d" file for inclusion into a project's
+    Makefile.
+    
+    First line collects all source= attributes in the input pages.  Second
+    line lists transformed source='s/sch/cir/' and file= attributes
+    (.include files).
+    
+    Affects-bug: lp-698740
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 220ecbd09393ae0d8cc43d26cfe7c8427888c744
+Author: Dan White <dan@whiteaudio.com>
+Date:   Tue Jun 7 13:08:29 2011 -0500
+
+    Add gnetlist:get-input-files scheme function.
+    
+    Returns the list of files loaded by gnetlist.  This returns the last elements
+    of gnetlist:get-command-line not consumed by getopt.
+    
+    Affects-bug: lp-698740
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 9415bf958a9cf16461733be58d0f8f257b5b4726
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 9 15:59:34 2011 +0100
+
+    gnetlist: Fix up tests to work with new Scheme API.
+    
+    Now that gnetlist supports the -L <path> option to add to the Guile
+    load path, it's possible to make in-tree and out-of-tree builds pass
+    `make check'.
+
+commit 1543eda1dbb823fd3052a3b831eae5b8316ed690
+Merge: 19963e9 014b30b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 9 15:06:46 2011 +0100
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	gschem/scheme/gschem.scm
+    	libgeda/include/prototype_priv.h
+    	libgeda/src/g_smob.c
+    	libgeda/src/o_basic.c
+
+commit e89ef317e6603e41f2fde56ec02cf98775e51b27
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 09:36:01 2011 +0100
+
+    Use scm_is_false instead of comparing with SCM_BOOL_F.
+
+commit 6bc584e027a6a4c7df5c87c03ac6cbcb0284db8b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 01:14:33 2011 +0100
+
+    gnetlist: Properly check pintype-can-drive variable in drc2 backend.
+    
+    Fixes a minor regression introduced in commit 7fe9484b2913.
+
+commit 7fe9484b291373e0f47c201b793d0a9f994317b6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 00:51:44 2011 +0100
+
+    gnetlist: Make drc2 backend work with Guile 2.0.
+
+commit 053960f4f5c2c05ca0676fd74b6c5feea3b1b5d6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 22:43:20 2011 +0100
+
+    gnetlist: Make vams backend worke with Guile 2.0.
+
+commit 7c203900136fb3f5cfdc70053aa52e87326226f4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 22:31:47 2011 +0100
+
+    gnetlist: Make gsch2pcb backend work with Guile 2.0.
+
+commit 5785b75e225b1876453a67799a0184830584e77a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 17:33:32 2011 +0000
+
+    gnetlist: Add convenience library to help backends parse `-O' options.
+    
+    Based on a suggestion by Patrick Bernaud that it would be useful for
+    gnetlist backends to be able to accept more complex options on the
+    gnetlist command line, this patch adds the (gnetlist backend-getopt)
+    Scheme module to gnetlist.
+    
+    This provides convenience functions that allow a backend to easily
+    handle several different types of `-O' backend option: flag options,
+    options with arguments, and options with optional arguments.
+
+commit 0348b21c1e4772774c239da706736764df8805ca
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 20:32:54 2011 +0000
+
+    gnetlist: Refactor `gnetlist:get-calling-flags'.
+    
+    Reimplement `gnetlist:get-calling-flags' in Scheme, based on a new
+    `gnetlist:backend-arguments' function.
+
+commit 7bd75fad7cbd3b0e3520cf40ac64cf0986b16c84
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 16:42:55 2011 +0100
+
+    gnetlist: Remove dead code.
+    
+    Remove some dead legacy code from gnetlist that was hidden in an #if 0
+    block.
+
+commit fb917f8b61f58b3cde5f1730b94c28c5992edea1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 15:58:31 2011 +0100
+
+    Remove uses of deprecated scm_makfrom0str.
+
+commit 4d566fcde7d57daeac1ad5629b5bb1baacc3a030
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 18:21:15 2011 +0100
+
+    Update gsch2pcb backend golden files.
+    
+    gsch2pcb backend output was altered in commit dc5914e6538a, but the
+    testsuite golden files were not updated.
+    
+    Correct version of 5a5fe91b382b.
+
+commit 43c59a0c55c94a499aea448785b62ab1242e8da7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 18:18:35 2011 +0100
+
+    Revert "Update gsch2pcb backend golden files."
+    
+    This reverts commit 5a5fe91b382be44b07f02ca229d751a7fb225838.
+
+commit 5a5fe91b382be44b07f02ca229d751a7fb225838
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 18:07:31 2011 +0100
+
+    Update gsch2pcb backend golden files.
+    
+    gsch2pcb backend output was altered in commit dc5914e6538a, but the
+    testsuite golden files were not updated.
+
+commit dc5914e6538ad26336e6f3637609b1edf61413f8
+Author: DJ Delorie <dj@delorie.com>
+Date:   Mon Apr 11 20:06:48 2011 -0400
+
+    Update default layer stack.
+    
+    Changes to layer stack and names to match PCB.
+
+commit dbb2d15d8d477ace013d0ddadea7e34f5d777b31
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Mar 26 12:50:42 2011 +0000
+
+    Remove pcbconfdir configure option and its use in gsch2pcb's m4 path
+    
+    PCB doesn't use this path, so remove it.
+
+commit 06925a44059c630ed99aa25ebebce8146cc56e47
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sun Mar 20 01:56:49 2011 +0100
+
+    gnetlist: fix multiple renames for same source net
+    
+    It might happen an existing rename for A->B exists when a new rename
+    A->C is added. This means B and C should be made equivalent.
+    
+    This patch arbitrarily choses one of these nets by renaming C->B instead
+    of originally requested A->C.
+    
+    Closes-bug: lp-698570
+    Closes-bug: lp-698395
+
+commit de856e25a83158237aaf33f29f024b72944a60fe
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 28 14:12:30 2011 +0000
+
+    Fix compilation with Guile 1.9.x.
+
+commit eb2a355b688053d917dcb85981062451b27c5e8f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 24 08:37:46 2011 +0000
+
+    gsch2pcb: Don't pass invalid function names to m4.
+    
+    This fixes a long-standing bug with gsch2pcb.  gsch2pcb expects
+    `footprint' attributes to be of the form:
+    
+      footprint=NAME ARG1 ARG2
+    
+    This gets transformed to:
+    
+      PKG_NAME (`NAME-ARG1-ARG2',`refdes',`value',`ARG1',`ARG2')
+    
+    for macro-expansion by M4.  For this to work, it requires that NAME
+    matches the regular expression ^[A-Za-z0-9_]$ so that PKG_NAME is a
+    valid M4 function name.
+    
+    It is quite common for users (especially those using John Luciani's
+    footprint library) to define and wish to use footprint names which
+    contain hyphens '-'.  Since this character is not valid in M4 function
+    names, this practice causes non-obvious breakage to occur.
+    
+    This patch stops gsch2pcb from ever attempting to macro-expand a
+    footprint NAME which is obviously not valid as part of an M4 function
+    name.
+    
+    Closes-bug: lp-698806
+
+commit ef5108e96d5745746c2820290738fa2740320e48
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 24 08:35:58 2011 +0000
+
+    gnetlist: Use `string-join' in gsch2pcb backend.
+    
+    The gsch2pcb backend for gnetlist has its own version of the
+    `string-join' function from the Guile standard library.
+
+commit 0255a45d7a06830c5b7a6e927a6cbdde5083ba33
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 24 08:28:31 2011 +0000
+
+    gnetlist: Use `string-split' in gsch2pcb backend.
+    
+    The gsch2pcb backend for gnetlist has its own version of string-split.
+    Use the Guile standard library version instead.
+
+commit 19963e962d5baf1cad6de44a2e411f7e5610159c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 18 21:48:52 2011 +0000
+
+    gnetlist: Fix testsuite for Scheme API branch.
+    
+    Some Scheme procedures used by gnetlist were moved to the (geda
+    deprecated) module, but the relevant Scheme files couldn't be found by
+    the gnetlist testsuite.  This patch makes sure the gnetlist
+    environment gets set up correctly.
+
+commit 9379c19a7563a02c271c8640fdb814ef0add5981
+Merge: f9156f1 23383c5
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 18 22:36:59 2011 +0000
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	gnetlist/src/gnetlist.c
+    	gschem/src/g_hook.c
+    	gschem/src/gschem.c
+    	libgeda/include/libgeda/prototype.h
+    	libgeda/src/g_basic.c
+    	libgeda/src/g_smob.c
+
+commit 23383c5d04f17d5fd7491f2c631bfc1e3f15e96f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 18 22:29:08 2011 +0000
+
+    Revert "Updated the problematic name attribute in some symbols"
+    
+    This reverts commit 5b1ee0d69f2fad7400f34543c482d51a55ce08c3.
+    
+    This commit broke the gnetlist testsuite, and another approach will
+    need to be found.
+
+commit 5b1ee0d69f2fad7400f34543c482d51a55ce08c3
+Author: Clif Cox <clif@eugeneweb.com>
+Date:   Mon Jan 17 13:15:50 2011 -0800
+
+    Updated the problematic name attribute in some symbols
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Closes-bug: lp-698741
+
+commit b9c8d80db3e471adf6984318868b95a4b0d83192
+Author: Dan White <dan@whiteaudio.com>
+Date:   Mon Jan 17 20:25:56 2011 +0000
+
+    gnetlist: spice-sdb MOS subcircuits
+    
+    Device=SUBCKT_{N,P}MOS are written almost like the corresponding normal
+    device except the model is implmented as a subcircuit.
+    
+    Closes-bug: lp-698737
+
+commit 799d67452921ed1447e8b030ee268fe8c34c5785
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jan 16 00:15:29 2011 -0500
 
     Updated version strings in all man pages
+
+commit 502ab80495c45e092eca6052edd6cf8e7ff55429
+Merge: 27f7a52 e1c3ba4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 13 19:59:35 2011 +0000
+
+    Merge branch 'stable-1.6'
+    
+    Conflicts:
+    	NEWS
+    	libgeda/include/prototype_priv.h
+    	libgeda/src/gdk-pixbuf-hacks.c
+    	libgeda/src/o_basic.c
+    	libgeda/src/o_complex_basic.c
+    	utils/src/gsch2pcb.c
+
+commit 7ca2b049dbcfb9f0eb8d3dd3fcf21cbd66c0ec95
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    Print message and exit if rc file load fails.
+    
+    Modifies g_rc_parse() to print useful messages to standard error and
+    exit with non-zero status if an error other than ENOENT occurs while
+    attempting to parse any configuration file.
+    
+    N.b. only copes with rc files loaded at startup; rc files loaded later
+    (e.g. a gafrc auto-loaded while loading a schematic using gschem
+    "File->Open") can't cause the application to die.
+    
+    Since this means that under some circumstances gschem and gattrib can
+    appear to do nothing silently (e.g. when launched from via a .desktop
+    file) subsequent patches need to make gschem and gattrib generate
+    appropriate warning and/or error message dialogs.
+    
+    Affects-bug: lp-698578
+
+commit de3e47e27d27cd745afafce54541fc12ef71244e
+Author: Alan Somers <asomers@gmail.com>
+Date:   Sun Jan 9 13:35:44 2011 -0700
+
+    gnetlist: Fix spelling errors in run_tests.sh
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Closes-bug: lp-700795
+
+commit 536a3a5148d0b13cc2a45c21af299e2f16611b92
+Author: Alan Somers (none) <somers@tryptophan>
+Date:   Sun Jan 9 13:22:27 2011 -0700
+
+    gnetlist: Fixed tests for new connected-noconnects DRC2 option.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Closes-bug: lp-698743
+
+commit 5dfbb76b54a70f2f3c0fc90752326ec3855bb9a7
+Author: Alan Somers (none) <somers@tryptophan>
+Date:   Thu Jan 6 18:18:16 2011 -0700
+
+    gnetlist: Added testcase for connected noconnects in drc2
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Affects-bug: lp-698743
+
+commit b8d3805b22aab292f0b07ab45c4ab019545c8fbc
+Author: Alan Somers <asomers@gmail.com>
+Date:   Wed Jan 5 23:14:04 2011 -0700
+
+    gnetlist: NoConnection nets with more than 1 pin are an error in drc2 backend.
+    
+    Adding the NoConnection DRC attribute to a net causes the drc2 backend
+    to ignore it when checking for unconnected nets. However, drc2
+    currently doesn't enforce that the net is actually unconnected. It's
+    possible to mark two pins as NoConnection and then accidentally wire
+    them together. This patch to gnet-drc2.scm checks for that case.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Affects-bug: lp-698743
 
 commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
 Author: Peter TB Brett <peter@peter-b.co.uk>
@@ -16,6 +998,195 @@ Date:   Fri Jan 7 22:00:09 2011 +0000
     
     Only files remaining with old address are wiki files (although the
     wiki has now been updated) and PostScript files.
+
+commit 86c305d9a2c62f062cbd9b63810a0173e4855310
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 14:53:51 2011 +0000
+
+    Install HTML versions of manpages even without groff.
+    
+    If groff isn't available, try to install HTML manpages anyway.  This
+    allows users to install manpages even if they don't have groff as long
+    as they aren't compiling from git and don't edit the manpages.
+    
+    Closes-bug: lp-698586
+
+commit cc2ea46161c1994b3cb294c81154be3656f7c81e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 14:02:10 2011 +0000
+
+    gnetlist: Remove options specific to `spice-sdb' backend.
+    
+    The gnetlist `-e', `-I', `-n' and `-s' command-line options are only
+    used by the `spice-sdb' backend.  They have equivalents based on the
+    `-O' option.  Remove them.
+    
+    Acked-by: Stuart Brorson <sdb@cloud9.net>
+
+commit 9e18ec2b836e1c5729b5d7381ed3e545ab5aab1a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 18:29:13 2011 +0000
+
+    gnetlist: Exit if a Scheme error occurs.
+    
+    If a Scheme error occurs, gnetlist ignores it silently apart from
+    printing a message to the log file.  This is not a good thing.
+    
+    This patch makes Scheme errors stop gnetlist noisily.  The error
+    messages could be improved, but they're better than nothing.
+
+commit 77621ac14298e1ec41a994a47ce10e1104fa5cc4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 17:14:49 2011 +0000
+
+    gnetlist: Fail more usefully if backend can't be found in load path.
+
+commit 942226e52f706afd9c0c130672c89e169510e794
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 16:41:34 2011 +0000
+
+    gnetlist: Fail more usefully if no schematics specified.
+    
+    Make sure exit status if no schematics are specified is non-zero, and
+    make it more obvious why things have failed.
+
+commit ae45df48397e579284a1591bb0ff350b5f3f287a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 16:04:26 2011 +0000
+
+    gnetlist: Add `--list-backends' option. Remove `-g help'.
+    
+    Instead of overloading the `-g' option to obtain a list of available
+    backends, provide a distinct option.
+
+commit ca2741e817c3f8b16e396de9eae1676bc1c612c1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 13:37:05 2011 +0000
+
+    gnetlist: Add `-L' option for adding to Guile load path.
+
+commit 53185307c7a707b0ab6ff7a9bf73c3d83bf8d988
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 01:17:16 2011 +0000
+
+    gnetlist: Build Scheme expressions instead of listing Scheme scripts.
+    
+    Instead of making lists of Scheme scripts to load from the `-l' and
+    `-m' command-line options, build Scheme expressions which do the same
+    thing.
+
+commit 571bcba5610c9002efd69a0cb7f2729e8ac71767
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 17:35:17 2011 +0000
+
+    gnetlist: Behave more usefully with bad arguments.
+    
+    At the moment gnetlist exits with status 0 (success) when it receives
+    bad command line arguments.  Correct this, and make it more obvious
+    why things have failed.
+
+commit 8029e76df046b392876f1997960fd7fd7d293bc2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 17:17:23 2011 +0000
+
+    gnetlist: Clean up formatting of `parsecmd.c'.
+
+commit f6d5b71a26b2f6877d9daffbe150f41d233e501a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 17:26:09 2011 +0000
+
+    gnetlist: Add `-V', `--version' argument.
+
+commit b2f24756d4d53df1cc73e1588b592d0c4c4f8166
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 16:57:09 2011 +0000
+
+    gnetlist: Improve `--help' usage message.
+
+commit 19dcc79af1e7a43e1b28e8378a5c1cd4392137f2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 15:05:17 2011 +0000
+
+    gnetlist: Update man page.
+
+commit cb47d3a0c3a5ac2b5b6ea9f94b66a2b5735de7e0
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 16:08:35 2011 +0000
+
+    gnetlist: Rename partslist backends' common functions file.
+    
+    Rename partslist backend common functions file so it doesn't show up
+    in the output of `gnetlist -ghelp'.
+
+commit 7a3e9f294d12732cd6fb043412c1bf92eaf5b268
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 11:52:35 2011 +0000
+
+    Make `scheme-directory' rc function prepend to Guile load path.
+    
+    Guile already provides infrastructure for loading Scheme files from a
+    library, so this patch makes gEDA use it properly.  With this (fully
+    backward-compatible) patch it's now possible to load Scheme files,
+    including gnetlist backends, from more than one directory.
+    
+    Note: This commit makes the gnetlist test suite pass again.
+
+commit 258eb0591088a064631c1736b2c3f86aa9e07856
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 10:42:42 2011 +0000
+
+    gnetlist: Load Scheme from Guile load path, not `scheme-directory'.
+    
+    gnetlist now searches for Scheme files to load using the Guile load
+    path, rather than TOPLEVEL.scheme_directory.
+    
+    Additionally, the `-g help' option now outputs the list of know
+    backends in a single column rather than in three columns.
+    
+    Note: in this commit the gnetlist testsuite does not pass.
+
+commit 3f8480f6a2b9674e904d1f50c1788bdf79b539bc
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 4 22:28:40 2011 +0000
+
+    gnetlist: Don't install `mk_verilog_syms' program.
+    
+    `mk_verilog_syms' totally undocumented, and is also only used for
+    generating the symbols installed as the `verilog' symbol library.  It
+    doesn't need to be installed in the system $PATH.
+
+commit 8bef5cf39dce867509d77d9ab6794f17f27d2216
+Author: Patrick Bernaud <patrickb@chez.com>
+Date:   Tue Jan 4 19:08:02 2011 +0100
+
+    gnetlist: Set Guile's program arguments from command line.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit f86eecd36a603fd3b51ce926de605bbdb3d6caaf
+Author: Patrick Bernaud <patrickb@chez.com>
+Date:   Tue Jan 4 19:07:57 2011 +0100
+
+    gnetlist: Translate 'gnetlist:get-slots/get-unique-slots' from C into Scheme.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit a0f88128241e9b8e5138ccf7bcc862b4f9ff638f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 4 19:05:04 2011 +0000
+
+    gnetlist: Convert protelII test golden files to DOS line endings.
+    
+    Convert golden files that were missed in commit 007feece464d.
+
+commit 007feece464d1b07e45bfd66b5d9b07be5b77c00
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 4 17:17:18 2011 +0000
+
+    gnetlist: Make protelII backend output Windows line-endings. [2902321]
+    
+    This removes the need to run `unix2dos' (or similar) on a
+    gnetlist-generated netlist before loading into Protel.
 
 commit 91e46719dcf1722db86c527eebd3f32b696ce06b
 Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@sabily.org>
@@ -62,6 +1233,288 @@ Date:   Tue Jan 4 15:37:47 2011 +0000
     before 1.10 didn't define it.  Should fix build problems noted by
     Stuart Brorson and John Griessen.
 
+commit 1e93f7bea2cbe0fa8887337c261093b55c31dd6d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 3 23:07:25 2011 +0000
+
+    Revert "Remove some CVS keywords."
+    
+    This reverts commit f5ada1de1372bd3772b4f4bd33afa59803c1dade, which
+    was pushed to the repository in error.
+
+commit f5ada1de1372bd3772b4f4bd33afa59803c1dade
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Dec 21 12:37:10 2010 +0000
+
+    Remove some CVS keywords.
+
+commit 9a141d60f045c620ce647fa0efe522593f46880b
+Author: Clif Cox <clif@eugeneweb.com>
+Date:   Mon Jan 3 21:58:22 2011 +0000
+
+    gnetlist: Cleaned up several routines in spice-sdb. [3117075]
+    
+    Combine write-ic and write-subcircuit with a fix to the unbound type
+    variable.  Fully document a check for the special "?" value explaining
+    why it fails silently.  Clean up write-net-names-on-component to make
+    it a bit more flexible.  Combine write-probe-item and
+    write-net-names-on-component.  Add a range utility function.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 746737d8bff55ce807b12d62b3a665f7843b5965
+Author: Clif Cox <clif@eugeneweb.com>
+Date:   Sun Dec 26 23:08:11 2010 -0800
+
+    gnetlist: White space consistancy cleanup in spice-sdb. [3117075]
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit fda647ce9ff7b57c465382c55a47304183766a0b
+Author: Patrick Bernaud <patrickb@chez.com>
+Date:   Mon Jan 3 09:55:19 2011 +0100
+
+    gnetlist: Silence warning in drc2 backend for multiple slot attributes.
+    
+    Slot attributes have different values across symbol instances of a same
+    package. But 'gnetlist:get-package-attribute' does not like that. So the
+    value has to get directly extracted from the list returned by
+    'gnetlist:get-all-package-attributes'.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit a834442e3296bb6a0331ae10610f302006b2c3ea
+Author: Patrick Bernaud <patrickb@chez.com>
+Date:   Mon Jan 3 09:55:13 2011 +0100
+
+    gnetlist: Add access to all attributes from components with multiple symbol instances.
+    
+    This commit introduces 'gnetlist:get-all-package-attributes' to
+    retrieve every first attribute value for package consisting of
+    multiple symbol instances.
+    
+    'gnetlist:get-package-attribute' gets redefined to use the above
+    procedure. To preserve backward compatibility, it returns the first
+    value found in file order and warns when detecting different, possibly
+    conflicting values. This behavior is configurable.
+    
+    Derived from patch #3071482, C code by Sebastian Gieltjes.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 5ce6132459b30cd8c228c71797ea04b90e9018d9
+Author: Patrick Bernaud <patrickb@chez.com>
+Date:   Sun Jan 2 18:19:29 2011 +0100
+
+    gnetlist: Fix memory leak in g_get_package_attribute().
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit d5860bb3620502efcea4185380a6945d0c5eab41
+Author: John Doty <jpd@noqsi.com>
+Date:   Sun Dec 12 19:29:46 2010 -0700
+
+    gnetlist: Refactor 'osmond' backend for simplicity.
+    
+    As I said on the chat, I've refactored gnet-osmond. Only four
+    functions. The longest is five lines, the deepest is only three
+    parentheses deep. No recursion needed. Much simpler than the original
+    "cargo cult" version.
+    
+    Signed-off-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit f66597934bf8c88519396956637792533ba3a151
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 12 08:14:06 2010 +0000
+
+    Don't use page_current in hierarchy traversal.
+    
+    With this patch, the only remaining functions in libgeda which care
+    about the "current page" are:
+    
+    - o_get_page_compat() [deprecated]
+    - s_page_goto()
+    - s_page_delete()
+    - s_page_delete_list()
+    - s_toplevel_new()
+
+commit 0b94d2379a5bd5d14690f941690e0df761df13c9
+Merge: 63cd6d7 a33839a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 12 09:48:07 2010 +0000
+
+    Merge some changes from Peter Brett.
+    
+    Merge a series of more generally useful changes from Peter Brett's
+    `guile-scheme-api' branch, most of which remove uses of
+    TOPLEVEL.page_current from libgeda.
+
+commit 63cd6d754fce280800eac55c6cafa21888942f96
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 11 00:59:33 2010 +0000
+
+    gnetlist: Fix some stack overflow problems in vipec backend.
+
+commit 972c793b9df047af5924609ae1038b411c3fd2f5
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 11 01:09:05 2010 +0000
+
+    gnetlist: Fix some stack overflow problems in gnetlist core.
+
+commit 6f0827327fc951b3fd6e8d2fa9278103f4f0f626
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 11 00:39:17 2010 +0000
+
+    gnetlist: Fix some stack overflow problems with vams backend.
+
+commit c73f2b33e05e5d0c8120871797fa0baa9edc02da
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 11 00:24:44 2010 +0000
+
+    gnetlist: Fix some stack overflow problems with spice backend.
+
+commit cd4a6d9bb44b7ebc5f55bd31af07d2110b99f850
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 10 23:10:08 2010 +0000
+
+    gnetlist: Fix some stack overflow problems with drc2 backend.
+
+commit 0cc44928d36699cb04401db91719ae4a05b17c65
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 10 22:39:37 2010 +0000
+
+    gnetlist: Add stack torture test.
+    
+    This exposes stack exhaustion failures in drc2, spice-sdb, spice,
+    vams, and vipec backends.
+
+commit fc8bcac43b6f3dd611f6030ffe36465d67be379d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:28 2010 +0000
+
+    scheme-api: Port legacy Scheme procedures in C to new smob system.
+    
+    Make all users of legacy Scheme smobs in libgeda use new Scheme smob
+    system.  This is a preliminary patch so that unit tests can be written
+    to verify that functions ported to new API work the same way as the
+    originals.
+
+commit a61805445c844b30f0e9de1c8003249fdedeee66
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:38:29 2010 +0000
+
+    gnetlist: Use TOPLEVEL fluid.
+    
+    Modifies gnetlist to use edascm_c_current_toplevel() instead of a
+    global variable to allow Scheme functions to access the global libgeda
+    state.
+
+commit 3abdca2a4ee088184e976822c444069d67e20a20
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:25 2010 +0000
+
+    libgeda: Add PAGE argument to file load/save functions.
+
+commit c26ed9d5b126f7e2b67285e465438aa9b5ee4ffd
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:23 2010 +0000
+
+    libgeda: Make g_read_file() take a TOPLEVEL argument.
+
+commit 9410bf545fce0db3bdeb4bee547d855b09c9c671
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@sabily.org>
+Date:   Sun Oct 31 19:32:13 2010 +0000
+
+    gnetlist: Fix bashism in sch2eaglepos.sh [2999951]
+    
+    Note that even with #!/bin/bash the original code gave the error that 3 is an
+    invalid file descriptor.
+
+commit e25d29875ecd1438926d0ec79279c177edcf99f0
+Author: Richard Barlow <richardbarlow@users.sourceforge.net>
+Date:   Sun Oct 31 19:21:34 2010 +0000
+
+    gnetlist: Handle hierarchy refdes correctly in partslist*. [3044478]
+    
+    When producing a part list with the partslist[1-3] backend the refdes
+    values output to the file do not contain the prepended refdeses of the
+    parent component.
+    
+    E.g.
+    
+    Master schematic with symbol 'S1' (representing sub-schematic) and a
+    resistor 'R1' Sub-schematic containing resistor 'R1'
+    
+    The geda backend produces a netlist containing two resistors 'R1' and
+    'S1/R1', they're unique and everything is fine and dandy.  The
+    partslist[1-3] backends contain two components with the refdes 'R1'
+    which then causes problems when processing this file further.
+    
+    This is caused by the partslist[1-3] backends adding the value of the
+    refdes attribute to the file rather than the value returned by the
+    'packages' function.
+    
+    The supplied patch alters the backends to use the value from the
+    packages function directly, rather than looking up the refdes
+    attribute of the component.
+
+commit af272ebddf16808aa948378d269a1f5c19220754
+Author: Sebastian Gieltjes <bas@gieltjes.dds.nl>
+Date:   Sun Oct 31 19:04:39 2010 +0000
+
+    gnetlist: Modified commandline string generation [3071449]
+    
+    Every netlister is able to request the invoked commandline and
+    now gets a valid string in return. Removed a debug output command.
+
+commit 8d05ef23b0bb7675d95362e539f3cae730c0a268
+Author: Carlos Nieves Onega <cnieves@iespana.es>
+Date:   Sat Oct 2 01:15:55 2010 +0200
+
+    Do drc-matrix lower triangular instead of simetric.
+    
+    Applied patch from Karl Hammar. Since drc-matrix is simetric (connection
+    a->b is the same as connection b-> a), do drc-matrix lower triangular and
+    let get-drc-matrixelement swap row/column if row < column.
+    drc2:is_simetric-drc-matrix check can now be removed.
+
+commit 7de00720bc4ca441deca49bdee6597c3f8ca1331
+Author: Dan McMahill <dan@mcmahill.net>
+Date:   Mon Apr 12 20:29:14 2010 -0400
+
+    Use @builddir@ instead of $(builddir) because versions of automake
+    before 1.10 didn't define it.  Should fix build problems noted by
+    Stuart Brorson and John Griessen.
+
+commit 7bf44da290d1a3a6761b60739b4ce3561ad0c152
+Author: Stuart Brorson <sdb@cloud9.net>
+Date:   Sat Apr 3 14:47:58 2010 -0500
+
+    Apply patch from agaran, which implements probes in spice-sdb.
+
+commit 0e5defe4871370a93c6ccb8bbf4a10e5df098884
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 21:26:37 2010 -0500
+
+    Updated man page dates
+    
+    (cherry picked from commit 11921dc18209ed4ea12288114634bb94a5b9b8a9)
+    (from stable-1.6)
+
+commit c31d9a1a90db32dd1e1d41f9d3d5ef5888424ba1
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 17:09:45 2010 -0500
+
+    Updated copyright text/header in most source files.
+    
+    Updated all copyright text dates that should be updated for the new year.
+    Fixed a bunch of GNU text typos (these should have been either
+    GPL or gEDA).  Removed some $Id$ tags which are no longer used/needed.
+    Fixed a few file header that were just plain incorrect.
+    
+    (cherry picked from commit bd34cfde2450790b357e574281f9562adce64303)
+    (from stable-1.6 branch)
+
 commit 11921dc18209ed4ea12288114634bb94a5b9b8a9
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Feb 14 21:26:37 2010 -0500
@@ -87,6 +1540,37 @@ Date:   Fri Nov 20 16:23:15 2009 +0000
     
     Fixes undefined use of `l' macro, and incorrect uses of `-' character.
     (cherry picked from commit 93dd5a941f34d1dd58cf9a57a07dec1e01ce3afe)
+
+commit 03acdbfaadaa35d11cf510ea4651b47584178514
+Author: Peter Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 30 13:37:17 2010 +0000
+
+    Clean up some left-over font directory cruft.
+
+commit 93dd5a941f34d1dd58cf9a57a07dec1e01ce3afe
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@users.sourceforge.net>
+Date:   Fri Nov 20 16:23:15 2009 +0000
+
+    Fix for some manpage issues. [2901183]
+    
+    Fixes undefined use of `l' macro, and incorrect uses of `-' character.
+
+commit 858982a2a05ff3e128de3621f1d301ecd989f35c
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Changed message on failure to generate doxygen docs
+    
+    If --enable-doxygen was not a configure flag, change the error message
+    on an attempt to build doxygen documentation to suggest the configure
+    flag was the cause of the failure rather than the lack of a doxygen
+    install itself.
+
+commit 1248c66c7973f8d3835f6107d3f1ed9c5c880b43
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Added doxygen targets to remaining applications.
 
 commit 3fd50335ddfe0ed7f358d46a0fba23bff25073e6
 Author: Ales Hvezda <ahvezda@seul.org>

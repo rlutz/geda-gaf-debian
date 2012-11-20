@@ -28,6 +28,8 @@ EXTRA_DIST = duplicated-refdes.sch duplicated-refdes.drc2 \
 	     slot-not-defined.drc2 \
 	     slot_out_of_range.sch \
 	     slot_out_of_range.drc2 \
+			 connected-noconnects.sch \
+			 connected-noconnects.drc2 \
 	     unconnected-pin.sch \
 	     unconnected-pin.drc2 \
 	     unconnected-pin-with-drc-directive.sch \
@@ -63,8 +65,11 @@ tests:
 	    GEDADATARC=$(top_builddir)/gnetlist/lib \
 	    SCMDIR=${top_builddir}/gnetlist/scheme \
 	    SYMDIR=${top_srcdir}/symbols \
-	    $(GNETLIST) -g drc2 -o $(BUILDDIR)/new_$$file_basename.drc2 \
-            $$file ); \
+	    $(GNETLIST) -L$(top_srcdir)/libgeda/scheme \
+	                -L$(top_builddir)/libgeda/scheme \
+	                -g drc2 \
+	                -o $(BUILDDIR)/new_$$file_basename.drc2 \
+	                $$file ); \
           diff $(SRCDIR)/$$file_basename.drc2 \
                  $(BUILDDIR)/new_$$file_basename.drc2; \
           if [ $$? -ne 0 ]; then \

@@ -19,6 +19,7 @@
  */
 
 #include <config.h>
+#include <missing.h>
 
 #include <stdio.h>
 #ifdef HAVE_STRING_H
@@ -196,7 +197,7 @@ s_traverse_sheet (TOPLEVEL * pr_current, const GList *obj_list, char *hierarchy_
       scm_uref = g_scm_c_get_uref(pr_current, o_current);
 
       if (scm_is_string( scm_uref )) {
-        temp_uref = scm_to_locale_string( scm_uref );
+        temp_uref = scm_to_utf8_string (scm_uref);
         netlist->component_uref =
           s_hierarchy_create_uref(pr_current, temp_uref, hierarchy_tag);
         g_free(temp_uref);
@@ -299,7 +300,7 @@ CPINLIST *s_traverse_component(TOPLEVEL * pr_current, OBJECT * component,
 
     /* This avoids us adding an unnamed net for an unconnected pin */
     if (o_current->conn_list != NULL) {
-      nets = s_traverse_net (pr_current, nets, TRUE,
+      (void) s_traverse_net (pr_current, nets, TRUE,
                              o_current, hierarchy_tag, cpins->type);
       s_traverse_clear_all_visited (s_page_objects (pr_current->page_current));
     }

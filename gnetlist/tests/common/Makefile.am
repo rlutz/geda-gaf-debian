@@ -9,6 +9,7 @@ input_files = \
 	inputs/netattrib.sch \
 	inputs/powersupply.sch \
 	inputs/singlenet.sch \
+	inputs/stack-torture.sch \
 	inputs/attribs \
 	\
 	inputs/models/2N3904.mod \
@@ -37,9 +38,12 @@ dist-hook: tests.list backends.list
 	  dir=outputs/$$backend; \
 	  $(MKDIR_P) $(distdir)/$$dir; \
 	  for test in $$tests; do \
-	    cp -p $(srcdir)/$$dir/$$test.retcode \
-	          $(srcdir)/$$dir/$$test-output.net \
-	          $(distdir)/$$dir || exit $$?; \
+	    cp -p $(srcdir)/$$dir/$$test.retcode $(distdir)/$$dir \
+	      || exit $$?; \
+	    if test -f $(srcdir)/$$dir/$$test-output.net ; then \
+	      cp -p $(srcdir)/$$dir/$$test-output.net $(distdir)/$$dir \
+	        || exit $$?; \
+	    fi; \
 	  done; \
 	done;
 

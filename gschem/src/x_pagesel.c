@@ -166,17 +166,11 @@ static void pagesel_callback_selection_changed (GtkTreeSelection *selection,
                       COLUMN_PAGE, &page,
                       -1);
 
-  /* temp */
-  s_page_goto (w_current->toplevel, page);
-  i_set_filename (w_current, w_current->toplevel->page_current->page_filename);
-  x_scrollbars_update (w_current);
-  o_invalidate_all (w_current);
-
-  /* We would like to use the following call, but since it calls 
-   * x_pagesel_update() it would cause an infinite loop.
-   */
-  /*  x_window_set_current_page (toplevel, page); */
-
+  /* Since setting the current page may call x_pagesel_update(), which
+   * might change the current page selection, make sure we do nothing
+   * if the newly-selected page is already the current page. */
+  if (page == w_current->toplevel->page_current) return;
+  x_window_set_current_page (w_current, page);
 }
 
 /*! \todo Finish function documentation!!!
@@ -274,7 +268,7 @@ static void pagesel_popup_menu (Pagesel *pagesel,
   menu = gtk_menu_new();
   for (tmp = menuitems; tmp->label != NULL; tmp++) {
     GtkWidget *menuitem;
-    if (g_strcasecmp (tmp->label, "-") == 0) {
+    if (g_utf8_collate (tmp->label, "-") == 0) {
       menuitem = gtk_separator_menu_item_new ();
     } else {
       menuitem = gtk_menu_item_new_with_label (_(tmp->label));
@@ -301,8 +295,8 @@ static void pagesel_popup_menu (Pagesel *pagesel,
  *  When the gschem-toplevel property is set on the parent GschemDialog,
  *  we should update the pagesel dialog.
  *
- *  \param [in] pspec      the GParamSpec of the property which changed
  *  \param [in] gobject    the object which received the signal.
+ *  \param [in] arg1      the GParamSpec of the property which changed
  *  \param [in] user_data  user data set when the signal handler was connected.
  */
 static void notify_gschem_toplevel_cb (GObject    *gobject,
@@ -372,7 +366,6 @@ static void pagesel_init (Pagesel *pagesel)
                 /* GtkContainer */
                 "border-width",    0,
                 /* GtkWindow */
-                "type",            GTK_WINDOW_TOPLEVEL,
                 "title",           _("Page Manager"),
                 "default-height",  180,
                 "default-width",   515,

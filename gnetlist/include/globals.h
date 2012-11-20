@@ -28,18 +28,15 @@ extern NETLIST *netlist_head;
 extern NETLIST *graphical_netlist_head; /* Special objects with 
 					   graphical=1 attribute */
 extern char *guile_proc;
+extern int list_backends;
 extern int verbose_mode;
 extern int interactive_mode;
-extern int include_mode;
 extern int quiet_mode;
 extern int netlist_mode;
-extern int sort_mode;
-extern int embedd_mode;
-extern int nomunge_mode;
 extern char *output_filename;
-extern GSList *pre_backend_list;  /* before backend loaded */
-extern GSList *post_backend_list; /* after backend loaded, before execute */
+extern SCM pre_rc_list;       /* before rc loaded */
+extern SCM pre_backend_list;  /* before backend loaded */
+extern SCM post_backend_list; /* after backend loaded, before execute */
 extern GSList *backend_params;  /* Parameters passed to the backend from the command line */
 
-/* stuff to pass command line to Scheme back end */
-extern char *command_line;
+extern GSList *input_files;

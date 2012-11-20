@@ -32,6 +32,7 @@
 #endif
 
 #include "libgeda_priv.h"
+#include "libgeda/libgedaguile.h"
 
 #ifdef HAVE_LIBDMALLOC
 #include <dmalloc.h>
@@ -46,25 +47,29 @@
  */
 void libgeda_init(void)
 {
+#ifdef ENABLE_NLS
   /* Initialise gettext */
   bindtextdomain (LIBGEDA_GETTEXT_DOMAIN, LOCALEDIR);
   bind_textdomain_codeset(LIBGEDA_GETTEXT_DOMAIN, "UTF-8");
+#endif
 
   /* Initialise gobject */
   g_type_init ();
+
+  s_path_sys_data ();
+  s_path_sys_config ();
 
   s_clib_init();
   s_slib_init();
   s_menu_init();
   s_attrib_init();
   s_color_init();
+  s_conn_init();
 
   g_register_libgeda_funcs();
-  g_register_libgeda_vars();
+  g_register_libgeda_dirs();
 
-  g_init_object_smob();
-  g_init_attrib_smob();
-  g_init_page_smob();
+  edascm_init ();
 }
 
 

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,21 +114,6 @@ void o_slot_end(GSCHEM_TOPLEVEL *w_current, OBJECT *object, const char *string)
 
   if (o_slot != NULL && !o_attrib_is_inherited (o_slot)) {
     o_text_set_string (toplevel, o_slot, string);
-
-    if (o_slot->visibility == VISIBLE ||
-        (o_slot->visibility == INVISIBLE && toplevel->show_hidden_text)) {
-      o_invalidate (w_current, o_slot);
-    }
-
-    o_text_recreate (toplevel, o_slot);
-
-    /* this doesn't deal with the selection list
-     * item */
-    if (o_slot->visibility == VISIBLE ||
-        (o_slot->visibility == INVISIBLE && toplevel->show_hidden_text)) {
-      o_invalidate (w_current, o_slot);
-    }
-
   } else {
     /* here you need to do the add the slot
        attribute since it doesn't exist */
@@ -140,12 +125,12 @@ void o_slot_end(GSCHEM_TOPLEVEL *w_current, OBJECT *object, const char *string)
 
     /* manually attach attribute */
     o_attrib_attach (toplevel, new_obj, object, FALSE);
+
+    /* Call add-objects-hook */
+    g_run_hook_object (w_current, "%add-objects-hook", new_obj);
   }
 
-  o_invalidate (w_current, object);
   s_slot_update_object (toplevel, object);
-
-  o_invalidate (w_current,object);
 
   toplevel->page_current->CHANGED = 1;
   g_free (value);

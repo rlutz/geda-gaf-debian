@@ -11,15 +11,15 @@ dist_docsreadme_DATA = \
 	README.vhdl README.sysc README.eagle
 
 dist_man_MANS = gnetlist.1
-
+noinst_MANS = mk_verilog_syms.1
 
 # Rules for converting man->html
-html_man_files = gnetlist.html
+html_man_files = $(dist_man_MANS:%.1=%.html)
 SUFFIXES = .1 .html
 
-if ENABLE_GROFF_HTML
 docsmandir=$(docdir)/man
 docsman_DATA=$(html_man_files)
+if ENABLE_GROFF_HTML
 .1.html:
 	rm -rf $@.tmp && \
 	LC_NUMERIC=C $(GROFF) -man -T html  $< >$@.tmp && \
@@ -30,8 +30,22 @@ else
 	@! :
 endif
 
+doxygen: gnetlist.dox
+	@echo 'Creating doxygen documentation for gnetlist...'
+if ENABLE_DOXYGEN
+	$(DOXYGEN) gnetlist.dox
+else
+	@echo 'configure was not run with the --enable-doxygen switch.'
+	@echo 'The documentation cannot be built from the sources.'
+endif
 
 MOSTLYCLEANFILES = *.log *~
 CLEANFILES = *.log *~
 DISTCLEANFILES = *.log core FILE *~
 MAINTAINERCLEANFILES = *.log *~ Makefile.in $(html_man_files)
+
+distclean-local:
+	-rm -rf html latex
+
+maintainer-clean-local:
+	-rm -rf html latex

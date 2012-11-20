@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/*! \file m_geometry.c
+/*! \file m_line.c
  *
  *  \brief Low-level mathmatical functions for lines
  */

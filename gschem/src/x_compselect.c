@@ -443,12 +443,16 @@ tree_row_activated (GtkTreeView       *tree_view,
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
+  Compselect *compselect = (Compselect*)user_data;
 
   model = gtk_tree_view_get_model (tree_view);
   gtk_tree_model_get_iter (model, &iter, path);
 
-  if (!gtk_tree_model_iter_has_child (model, &iter))
+  if (!gtk_tree_model_iter_has_child (model, &iter)) {
+    gtk_dialog_response (GTK_DIALOG (compselect),
+                         COMPSELECT_RESPONSE_HIDE);
     return;
+  }
 
   if (gtk_tree_view_row_expanded (tree_view, path))
     gtk_tree_view_collapse_row (tree_view, path);
@@ -629,7 +633,15 @@ compselect_filter_timeout (gpointer data)
   model = gtk_tree_view_get_model (compselect->libtreeview);
 
   if (model != NULL) {
+    const gchar *text = gtk_entry_get_text (compselect->entry_filter);
     gtk_tree_model_filter_refilter ((GtkTreeModelFilter*)model);
+    if (strcmp (text, "") != 0) {
+      /* filter text not-empty */
+      gtk_tree_view_expand_all (compselect->libtreeview);
+    } else {
+      /* filter text is empty, collapse expanded tree */
+      gtk_tree_view_collapse_all (compselect->libtreeview);
+    }
   }
 
   /* return FALSE to remove the source */
@@ -685,7 +697,7 @@ compselect_callback_filter_entry_changed (GtkEditable *editable,
  *  It resets the filter entry, indirectly causing re-evaluation
  *  of the filter on the list of symbols to update the display.
  *
- *  \param [in] editable  The filter text entry.
+ *  \param [in] button    The clear button
  *  \param [in] user_data The component selection dialog.
  */
 static void
@@ -750,7 +762,7 @@ create_inuse_tree_model (Compselect *compselect)
                         -1);
   }
 
-  g_list_free (symlist);
+  g_list_free (symhead);
 
   return (GtkTreeModel*)store;
 }
@@ -810,11 +822,13 @@ compselect_callback_refresh_library (GtkButton *button, gpointer user_data)
 {
   Compselect *compselect = COMPSELECT (user_data);
   GtkTreeModel *model;
+  GtkTreeSelection *selection;
 
   /* Rescan the libraries for symbols */
   s_clib_refresh ();
 
   /* Refresh the "Library" view */
+  g_object_unref (gtk_tree_view_get_model (compselect->libtreeview));
   model = (GtkTreeModel *)
     g_object_new (GTK_TYPE_TREE_MODEL_FILTER,
                   "child-model", create_lib_tree_model (compselect),
@@ -826,11 +840,27 @@ compselect_callback_refresh_library (GtkButton *button, gpointer user_data)
                                           compselect,
                                           NULL);
 
+  /* Block handling selection updated for duration of model changes */
+  selection = gtk_tree_view_get_selection (compselect->libtreeview);
+  g_signal_handlers_block_by_func (selection,
+                                   compselect_callback_tree_selection_changed,
+                                   compselect);
+
+  /* Update the view model with signals blocked */
   gtk_tree_view_set_model (compselect->libtreeview, model);
 
   /* Refresh the "In Use" view */
+  g_object_unref (gtk_tree_view_get_model (compselect->inusetreeview));
   model = create_inuse_tree_model (compselect);
+
+  /* Here we can update the model without blocking signals
+   * as this is the second (final) tree view we are updating */
   gtk_tree_view_set_model (compselect->inusetreeview, model);
+
+  /* Unblock & fire handler for libtreeview selection */
+  g_signal_handlers_unblock_by_func (selection,
+                                     compselect_callback_tree_selection_changed,
+                                     compselect);
 }
 
 /*! \brief Creates the treeview for the "In Use" view. */

@@ -41,6 +41,7 @@
  */
 
 #include <config.h>
+#include <missing.h>
 
 #include <stdio.h>
 #ifdef HAVE_STRING_H
@@ -69,6 +70,8 @@ void o_attrib_add(TOPLEVEL *toplevel, OBJECT *object, OBJECT *item)
   /* Add link from item to attrib listing */
   item->attached_to = object;
   object->attribs = g_list_append (object->attribs, item);
+
+  o_attrib_emit_attribs_changed (toplevel, object);
 }
 
 
@@ -131,10 +134,6 @@ void o_attrib_attach (TOPLEVEL *toplevel, OBJECT *attrib, OBJECT *object,
 
   if (set_color)
     o_set_color (toplevel, attrib, ATTRIBUTE_COLOR);
-
-  /* can't do this here since just selecting something */
-  /* will cause this to be set */
-  /* toplevel->page_current->CHANGED=1;*/
 }
 
 
@@ -169,16 +168,21 @@ void o_attrib_detach_all(TOPLEVEL *toplevel, OBJECT *object)
   OBJECT *a_current;
   GList *a_iter;
 
+  o_attrib_freeze_hooks (toplevel, object);
+
   for (a_iter = object->attribs; a_iter != NULL;
        a_iter = g_list_next (a_iter)) {
     a_current = a_iter->data;
 
     a_current->attached_to = NULL;
     o_set_color (toplevel, a_current, DETACHED_ATTRIBUTE_COLOR);
+    o_attrib_emit_attribs_changed (toplevel, object);
   }
 
   g_list_free (object->attribs);
   object->attribs = NULL;
+
+  o_attrib_thaw_hooks (toplevel, object);
 }
 
 /*! \brief Print all attributes to a Postscript document.
@@ -217,11 +221,16 @@ void o_attrib_print(GList *attributes)
  */
 void o_attrib_remove(TOPLEVEL *toplevel, GList **list, OBJECT *remove)
 {
+  OBJECT *attached_to;
+
   g_return_if_fail (remove != NULL);
 
+  attached_to = remove->attached_to;
   remove->attached_to = NULL;
 
   *list = g_list_remove (*list, remove);
+
+  o_attrib_emit_attribs_changed (toplevel, attached_to);
 }
 
 /*! \brief Read attributes from a buffer.
@@ -229,26 +238,22 @@ void o_attrib_remove(TOPLEVEL *toplevel, GList **list, OBJECT *remove)
  *  Read attributes from a TextBuffer.
  *
  *  \param [in]  toplevel               The TOPLEVEL object.
- *  \param [out] list                   Storage for attributes.
  *  \param [in]  object_to_get_attribs  Object which gets these attribs.
  *  \param [in]  tb                     The text buffer to read from.
  *  \param [in]  release_ver            libgeda release version number.
  *  \param [in]  fileformat_ver         file format version number.
- *  \return GList of attributes read.
+ *  \return GList of attributes read, or NULL on error.
  */
 GList *o_read_attribs (TOPLEVEL *toplevel,
-                       GList *list,
                        OBJECT *object_to_get_attribs,
                        TextBuffer *tb,
-                       unsigned int release_ver, unsigned int fileformat_ver)
+                       unsigned int release_ver, unsigned int fileformat_ver, GError ** err)
 {
-  GList *object_list;
+  GList *object_list = NULL;
   OBJECT *new_obj;
-  char *line = NULL;
+  const char *line = NULL;
   char objtype;
   int ATTACH=FALSE;
-
-  object_list = g_list_reverse (list);
 
   while (1) {
 
@@ -259,79 +264,92 @@ GList *o_read_attribs (TOPLEVEL *toplevel,
     switch (objtype) {
 
       case(OBJ_LINE):
-        new_obj = o_line_read (toplevel, line, release_ver, fileformat_ver);
+        if ((new_obj = o_line_read (toplevel, line, release_ver, fileformat_ver, err)) == NULL)
+          goto error;
         object_list = g_list_prepend (object_list, new_obj);
         break;
 
 
       case(OBJ_NET):
-        new_obj = o_net_read (toplevel, line, release_ver, fileformat_ver);
+        if ((new_obj = o_net_read (toplevel, line, release_ver, fileformat_ver, err)) == NULL)
+          goto error;
         object_list = g_list_prepend (object_list, new_obj);
         break;
 
       case(OBJ_BUS):
-        new_obj = o_bus_read (toplevel, line, release_ver, fileformat_ver);
+        if ((new_obj = o_bus_read (toplevel, line, release_ver, fileformat_ver, err)) == NULL)
+          goto error;
         object_list = g_list_prepend (object_list, new_obj);
         break;
 
       case(OBJ_BOX):
-        new_obj = o_box_read (toplevel, line, release_ver, fileformat_ver);
+        if ((new_obj = o_box_read (toplevel, line, release_ver, fileformat_ver, err)) == NULL)
+          goto error;
         object_list = g_list_prepend (object_list, new_obj);
         break;
 
       case(OBJ_CIRCLE):
-        new_obj = o_circle_read (toplevel, line, release_ver, fileformat_ver);
+        if ((new_obj = o_circle_read (toplevel, line, release_ver, fileformat_ver, err)) == NULL)
+          goto error;
         object_list = g_list_prepend (object_list, new_obj);
         break;
 
       case(OBJ_COMPLEX):
       case(OBJ_PLACEHOLDER):
-        new_obj = o_complex_read (toplevel, line, release_ver, fileformat_ver);
+        if ((new_obj = o_complex_read (toplevel, line, release_ver, fileformat_ver, err)) == NULL)
+          goto error;
         object_list = g_list_prepend (object_list, new_obj);
         break;
 
       case(OBJ_PATH):
-        line = g_strdup (line);
-        new_obj = o_path_read (toplevel, line, tb, release_ver, fileformat_ver);
-        g_free (line);
+        new_obj = o_path_read (toplevel, line, tb, release_ver, fileformat_ver, err);
+        if (new_obj == NULL)
+          goto error;
         object_list = g_list_prepend (object_list, new_obj);
         break;
 
       case(OBJ_PIN):
-        new_obj = o_pin_read (toplevel, line, release_ver, fileformat_ver);
+        if ((new_obj = o_pin_read (toplevel, line, release_ver, fileformat_ver, err)) == NULL)
+          goto error;
         object_list = g_list_prepend (object_list, new_obj);
         break;
 
       case(OBJ_ARC):
-        new_obj = o_arc_read (toplevel, line, release_ver, fileformat_ver);
+        if ((new_obj = o_arc_read (toplevel, line, release_ver, fileformat_ver, err)) == NULL)
+          goto error;
         object_list = g_list_prepend (object_list, new_obj);
         break;
 
       case(OBJ_TEXT):
-        line = g_strdup (line);
-        new_obj = o_text_read (toplevel, line, tb, release_ver, fileformat_ver);
-        g_free (line);
+        new_obj = o_text_read (toplevel, line, tb, release_ver, fileformat_ver, err);
+        if (new_obj == NULL)
+          goto error;
         object_list = g_list_prepend (object_list, new_obj);
         ATTACH=TRUE;
 
         break;
 
-      case(ENDATTACH_ATTR): 
-        object_list = g_list_reverse (object_list);
-        return(object_list);
+      case(ENDATTACH_ATTR):
+        return object_list;
         break;
-
     }
 
     if (ATTACH) {
       o_attrib_attach (toplevel, new_obj, object_to_get_attribs, FALSE);
       ATTACH=FALSE;
     } else {
-      fprintf(stderr, "Tried to attach a non-text item as an attribute\n");
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Tried to attach a non-text item as an attribute"));
+      goto error;
     }
   }
-  object_list = g_list_reverse (object_list);
-  return(object_list);
+
+  /* The attribute list wasn't terminated, so it's a parse error! */
+  g_set_error (err, EDA_ERROR, EDA_ERROR_PARSE,
+               _("Unexpected end-of-file in attribute list"));
+
+error:
+  s_delete_object_glist(toplevel, object_list);
+  return NULL;
 }
 
 
@@ -455,7 +473,7 @@ GList *o_attrib_find_floating_attribs (const GList *list)
  *
  *  \param [in] list     GList of attributes to search.
  *  \param [in] name     Character string with attribute name to search for.
- *  \param [in] counter  Which occurance to return.
+ *  \param [in] count    Which occurance to return.
  *  \return The n'th attribute object in the given list with the given name.
  */
 OBJECT *o_attrib_find_attrib_by_name (const GList *list, char *name, int count)
@@ -674,11 +692,73 @@ GList * o_attrib_return_attribs (OBJECT *object)
  *  This function returns TRUE if the given attribute OBJECT is a
  *  toplevel un-attached attribute inside a complex's prim_objs.
  *
- *  \param [in] object       OBJECT who's status to query.
+ *  \param [in] attrib       OBJECT who's status to query.
  *  \return TRUE if the given attribute is inside a symbol
  */
 int o_attrib_is_inherited (OBJECT *attrib)
 {
   return (attrib->attached_to == NULL &&
           attrib->parent != NULL);
+}
+
+
+typedef struct {
+  AttribsChangedFunc func;
+  void *data;
+} AttribsChangedHook;
+
+
+void o_attrib_append_attribs_changed_hook (TOPLEVEL *toplevel,
+                                           AttribsChangedFunc func,
+                                           void *data)
+{
+  AttribsChangedHook *new_hook;
+
+  new_hook = g_new0 (AttribsChangedHook, 1);
+  new_hook->func = func;
+  new_hook->data = data;
+
+  toplevel->attribs_changed_hooks =
+    g_list_append (toplevel->attribs_changed_hooks, new_hook);
+}
+
+
+static void call_attribs_changed_hook (gpointer data, gpointer user_data)
+{
+  AttribsChangedHook *hook = data;
+  OBJECT *object = user_data;
+
+  hook->func (hook->data, object);
+}
+
+
+void o_attrib_emit_attribs_changed (TOPLEVEL *toplevel, OBJECT *object)
+{
+  if (object->attrib_notify_freeze_count > 0) {
+    object->attrib_notify_pending = 1;
+    return;
+  }
+
+//  printf ("The attributes of object %p have changed\n", object);
+
+  object->attrib_notify_pending = 0;
+
+  g_list_foreach (toplevel->attribs_changed_hooks,
+                  call_attribs_changed_hook, object);
+}
+
+void o_attrib_freeze_hooks (TOPLEVEL *toplevel, OBJECT *object)
+{
+  object->attrib_notify_freeze_count ++;
+}
+
+void o_attrib_thaw_hooks (TOPLEVEL *toplevel, OBJECT *object)
+{
+  g_return_if_fail (object->attrib_notify_freeze_count > 0);
+
+  object->attrib_notify_freeze_count --;
+
+  if (object->attrib_notify_freeze_count == 0 &&
+      object->attrib_notify_pending)
+    o_attrib_emit_attribs_changed (toplevel, object);
 }

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ void o_lock(GSCHEM_TOPLEVEL *w_current)
     if (object) {
       /* check to see if locked_color is already being used */
       if (object->locked_color == -1) {
-        object->sel_func = NULL;
+        object->selectable = FALSE;
         object->locked_color = object->color;
         object->color = LOCK_COLOR;
         w_current->toplevel->page_current->CHANGED=1;
@@ -153,9 +153,9 @@ void o_unlock(GSCHEM_TOPLEVEL *w_current)
   while(s_current != NULL) {
     object = (OBJECT *) s_current->data;
     if (object) {
-      /* only unlock if sel_func is not set to something */
-      if (object->sel_func == NULL) {
-        object->sel_func = select_func;
+      /* only unlock if the object is locked */
+      if (object->selectable == FALSE) {
+        object->selectable = TRUE;
         object->color = object->locked_color;
         object->locked_color = -1;
         w_current->toplevel->page_current->CHANGED = 1;
@@ -191,8 +191,6 @@ void o_rotate_world_update(GSCHEM_TOPLEVEL *w_current,
   TOPLEVEL *toplevel = w_current->toplevel;
   OBJECT *o_current;
   GList *o_iter;
-  GList *prev_conn_objects=NULL;
-  GList *connected_objects=NULL;
 
   /* this is okay if you just hit rotate and have nothing selected */
   if (list == NULL) {
@@ -201,18 +199,15 @@ void o_rotate_world_update(GSCHEM_TOPLEVEL *w_current,
     return;
   }
 
-  if (!toplevel->DONT_REDRAW) {
-    o_invalidate_glist (w_current, list);
-  }
+  o_invalidate_glist (w_current, list);
 
   /* Find connected objects, removing each object in turn from the
    * connection list. We only _really_ want those objects connected
-   * to the selection, not those within in it. The extra redraws
-   * don't _really_ hurt though. */
+   * to the selection, not those within in it.
+   */
   for (o_iter = list; o_iter != NULL; o_iter = g_list_next (o_iter)) {
     o_current = o_iter->data;
 
-    prev_conn_objects = s_conn_return_others (prev_conn_objects, o_current);
     s_conn_remove_object (toplevel, o_current);
   }
 
@@ -220,72 +215,24 @@ void o_rotate_world_update(GSCHEM_TOPLEVEL *w_current,
 
   /* Find connected objects, adding each object in turn back to the
    * connection list. We only _really_ want those objects connected
-   * to the selection, not those within in it. The extra redraws dont
-   * _really_ hurt though. */
+   * to the selection, not those within in it.
+   */
   for (o_iter = list; o_iter != NULL; o_iter = g_list_next (o_iter)) {
     o_current = o_iter->data;
 
     s_conn_update_object (toplevel, o_current);
-    connected_objects = s_conn_return_others (connected_objects, o_current);
   }
 
-  if (!toplevel->DONT_REDRAW) {
-    o_invalidate_glist (w_current, list);
-    o_invalidate_glist (w_current, prev_conn_objects);
-    o_invalidate_glist (w_current, connected_objects);
-  }
+  o_invalidate_glist (w_current, list);
 
-  g_list_free (prev_conn_objects);
-  prev_conn_objects = NULL;
-  g_list_free (connected_objects);
-  connected_objects = NULL;
-
-  /* All objects were rotated. Run the rotate hooks */
-  o_rotate_call_hooks (w_current, list);
+  /* Run rotate-objects-hook */
+  g_run_hook_object_list (w_current, "%rotate-objects-hook", list);
 
   /* Don't save the undo state if we are inside an action */
   /* This is useful when rotating the selection while moving, for example */
   toplevel->page_current->CHANGED = 1;
   if (!w_current->inside_action) {
     o_undo_savestate(w_current, UNDO_ALL);
-  }
-}
-
-
-void o_rotate_call_hooks (GSCHEM_TOPLEVEL *w_current, GList *list)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  OBJECT *o_current;
-  GList *iter;
-
-  /* Do not run any hooks for simple objects here, like text, since they
-     were rotated in the previous pass, and the selection list can contain
-     an object and all its attributes (text) */
-  for (iter = list; iter != NULL; iter = g_list_next (iter)) {
-    o_current = iter->data;
-
-    switch (o_current->type) {
-      case OBJ_PIN:
-        /* Run the rotate pin hook */
-        if (scm_hook_empty_p (rotate_pin_hook) == SCM_BOOL_F) {
-          scm_run_hook (rotate_pin_hook,
-                        scm_cons (g_make_object_smob (toplevel, o_current),
-                                  SCM_EOL));
-        }
-        break;
-
-      case OBJ_COMPLEX:
-        /* Run the rotate hook */
-        if (scm_hook_empty_p (rotate_component_object_hook) == SCM_BOOL_F) {
-          scm_run_hook (rotate_component_object_hook,
-                        scm_cons (g_make_object_smob (toplevel, o_current),
-                                  SCM_EOL));
-        }
-        break;
-
-      default:
-        break;
-    }
   }
 }
 
@@ -299,8 +246,6 @@ void o_mirror_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery,
   TOPLEVEL *toplevel = w_current->toplevel;
   OBJECT *o_current;
   GList *o_iter;
-  GList *prev_conn_objects=NULL;
-  GList *connected_objects=NULL;
 
   if (list == NULL) {
     w_current->inside_action = 0;
@@ -312,12 +257,11 @@ void o_mirror_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery,
 
   /* Find connected objects, removing each object in turn from the
    * connection list. We only _really_ want those objects connected
-   * to the selection, not those within in it. The extra redraws
-   * don't _really_ hurt though. */
+   * to the selection, not those within in it.
+   */
   for (o_iter = list; o_iter != NULL; o_iter = g_list_next (o_iter)) {
     o_current = o_iter->data;
 
-    prev_conn_objects = s_conn_return_others (prev_conn_objects, o_current);
     s_conn_remove_object (toplevel, o_current);
   }
 
@@ -325,58 +269,18 @@ void o_mirror_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery,
 
   /* Find connected objects, adding each object in turn back to the
    * connection list. We only _really_ want those objects connected
-   * to the selection, not those within in it. The extra redraws dont
-   * _really_ hurt though. */
+   * to the selection, not those within in it.
+   */
   for (o_iter = list; o_iter != NULL; o_iter = g_list_next (o_iter)) {
     o_current = o_iter->data;
 
     s_conn_update_object (toplevel, o_current);
-    connected_objects = s_conn_return_others (connected_objects, o_current);
   }
 
   o_invalidate_glist (w_current, list);
-  o_invalidate_glist (w_current, prev_conn_objects);
-  o_invalidate_glist (w_current, connected_objects);
 
-  g_list_free (prev_conn_objects);
-  prev_conn_objects = NULL;
-  g_list_free (connected_objects);
-  connected_objects = NULL;
-
-  /* All objects were mirrored. Do a 2nd pass to run the mirror hooks */
-  /* Do not run any hooks for simple objects here, like text, since they
-     were mirrored in the previous pass, and the selection list can contain
-     an object and all its attributes (text) */
-  o_iter = list;
-  while (o_iter != NULL) {
-    o_current = (OBJECT *) o_iter->data;
-
-    switch(o_current->type) {
-      case(OBJ_PIN):
-        /* Run the mirror pin hook */
-        if (scm_hook_empty_p(mirror_pin_hook) == SCM_BOOL_F &&
-            o_current != NULL) {
-          scm_run_hook(mirror_pin_hook,
-                       scm_cons(g_make_object_smob(toplevel, o_current),
-                                SCM_EOL));
-        }
-        break;
-
-      case (OBJ_COMPLEX):
-        /* Run the mirror pin hook */
-        if (scm_hook_empty_p(mirror_component_object_hook) == SCM_BOOL_F &&
-            o_current != NULL) {
-          scm_run_hook(mirror_component_object_hook,
-                       scm_cons(g_make_object_smob(toplevel, o_current),
-                                SCM_EOL));
-        }
-        break;
-    default:
-        break;
-    }
-
-    o_iter = g_list_next(o_iter);
-  }
+  /* Run mirror-objects-hook */
+  g_run_hook_object_list (w_current, "%mirror-objects-hook", list);
 
   toplevel->page_current->CHANGED=1;
   o_undo_savestate(w_current, UNDO_ALL);
@@ -397,23 +301,10 @@ void o_edit_show_hidden_lowlevel (GSCHEM_TOPLEVEL *w_current,
   iter = o_list;
   while (iter != NULL) {
     o_current = (OBJECT *)iter->data;
-    if (o_current->type == OBJ_TEXT && o_current->visibility == INVISIBLE) {
+    if (o_current->type == OBJ_TEXT && !o_is_visible (toplevel, o_current)) {
 
       /* don't toggle the visibility flag */
-
-      if (toplevel->show_hidden_text) {
-        /* draw the text object if it hidden  */
-        o_text_recreate(toplevel, o_current);
-        o_recalc_single_object(toplevel, o_current);
-        o_invalidate (w_current, o_current);
-      } else {
-        /* object is hidden and we are now NOT drawing it, so */
-        /* get rid of the extra primitive data */
-        o_text_recreate(toplevel, o_current);
-        o_recalc_single_object(toplevel, o_current);
-        /* unfortunately, you cannot erase the old visible text here */
-        /* because o_text_draw will just return */
-      }
+      o_text_recreate (toplevel, o_current);
     }
 
     if (o_current->type == OBJ_COMPLEX || o_current->type == OBJ_PLACEHOLDER) {
@@ -451,38 +342,6 @@ void o_edit_show_hidden (GSCHEM_TOPLEVEL *w_current, const GList *o_list)
   }
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-void o_edit_make_visible (GSCHEM_TOPLEVEL *w_current, const GList *o_list)
-{
-  /* this function actually changes the visibility flag */
-  TOPLEVEL *toplevel = w_current->toplevel;
-  OBJECT *o_current;
-  const GList *iter;
-
-  iter = o_list;
-  while (iter != NULL) {
-    o_current = (OBJECT *)iter->data;
-
-    if (o_current->type == OBJ_TEXT) {
-      if (o_current->visibility == INVISIBLE) {
-        o_current->visibility = VISIBLE;
-        o_text_recreate(toplevel, o_current);
-
-        o_invalidate (w_current, o_current);
-
-        toplevel->page_current->CHANGED = 1;
-      }
-    }
-    iter = g_list_next (iter);
-  }
-  o_undo_savestate(w_current, UNDO_ALL);
-
-}
-
 #define FIND_WINDOW_HALF_SIZE (5000)
 
 OBJECT *last_o = NULL;
@@ -492,7 +351,7 @@ int skiplast;
  *  \brief
  *  \par Function Description
  *
- *  \fixme Only descends into the first source schematic
+ *  \todo Only descends into the first source schematic
  *
  */
 int o_edit_find_text (GSCHEM_TOPLEVEL *w_current, const GList *o_list,
@@ -506,7 +365,6 @@ int o_edit_find_text (GSCHEM_TOPLEVEL *w_current, const GList *o_list,
   int page_control = 0;
   int pcount = 0;
   int rv;
-  int x1, y1, x2, y2;
   int text_screen_height;
   const GList *iter;
 
@@ -535,33 +393,39 @@ int o_edit_find_text (GSCHEM_TOPLEVEL *w_current, const GList *o_list,
           pcount = 0;
           current_filename = u_basic_breakup_string(attrib, ',', pcount);
           if (current_filename != NULL) {
-            page_control =
+            PAGE *child_page =
               s_hierarchy_down_schematic_single(toplevel,
                                                 current_filename,
                                                 parent,
                                                 page_control,
                                                 HIERARCHY_NORMAL_LOAD);
-            /* o_invalidate_all (w_current); */
 
-            rv = o_edit_find_text (w_current,
-                                   s_page_objects (toplevel->page_current),
-                                   stext, descend, skiplast);
-            if (!rv) {
-              return 0;
+            if (child_page != NULL) {
+              page_control = child_page->page_control;
+              rv = o_edit_find_text (w_current,
+                                     s_page_objects (child_page),
+                                     stext, descend, skiplast);
+              if (!rv) {
+                s_page_goto( toplevel, child_page );
+                return 0;
+              }
             }
-            s_page_goto( toplevel, parent );
           }
         }
       }
     }
 
-    if (o_current->type == OBJ_TEXT) {
+    if (o_current->type == OBJ_TEXT &&
+        (o_is_visible (toplevel, o_current) || toplevel->show_hidden_text)) {
+
       const gchar *str = o_text_get_string (toplevel, o_current);
      /* replaced strcmp with strstr to simplify the search */
       if (strstr (str,stext)) {
         if (!skiplast) {
+          int x1, y1, x2, y2;
+
           a_zoom(w_current, ZOOM_FULL, DONTCARE, A_PAN_DONT_REDRAW);
-          world_get_single_object_bounds (toplevel, o_current, &x1, &y1, &x2, &y2);
+          g_assert( world_get_single_object_bounds (toplevel, o_current, &x1, &y1, &x2, &y2) );
           text_screen_height = SCREENabs (w_current, y2 - y1);
           /* this code will zoom/pan till the text screen height is about */
           /* 50 pixels high, perhaps a future enhancement will be to make */
@@ -617,8 +481,8 @@ void o_edit_hide_specific_text (GSCHEM_TOPLEVEL *w_current,
     if (o_current->type == OBJ_TEXT) {
       const gchar *str = o_text_get_string (w_current->toplevel, o_current);
       if (!strncmp (stext, str, strlen (stext))) {
-        if (o_current->visibility == VISIBLE) {
-          o_current->visibility = INVISIBLE;
+        if (o_is_visible (toplevel, o_current)) {
+          o_set_visibility (toplevel, o_current, INVISIBLE);
           o_text_recreate(toplevel, o_current);
 
           toplevel->page_current->CHANGED = 1;
@@ -651,11 +515,10 @@ void o_edit_show_specific_text (GSCHEM_TOPLEVEL *w_current,
     if (o_current->type == OBJ_TEXT) {
       const gchar *str = o_text_get_string (w_current->toplevel, o_current);
       if (!strncmp (stext, str, strlen (stext))) {
-        if (o_current->visibility == INVISIBLE) {
-          o_current->visibility = VISIBLE;
+        if (!o_is_visible (toplevel, o_current)) {
+          o_set_visibility (toplevel, o_current, VISIBLE);
           o_text_recreate(toplevel, o_current);
 
-          o_invalidate (w_current, o_current);
           toplevel->page_current->CHANGED = 1;
         }
       }
@@ -665,139 +528,116 @@ void o_edit_show_specific_text (GSCHEM_TOPLEVEL *w_current,
   o_undo_savestate(w_current, UNDO_ALL);
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
+
+/*! \brief Update a component.
  *
+ * \par Function Description
+ * Updates \a o_current to the latest version of the symbol available
+ * in the symbol library, while preserving any attributes set in the
+ * current schematic. On success, returns the new OBJECT which
+ * replaces \a o_current on the page; \a o_current is deleted. On
+ * failure, returns NULL, and \a o_current is left unchanged.
+ *
+ * \param [in]     w_current The GSCHEM_TOPLEVEL object.
+ * \param [in,out] o_current The OBJECT to be updated.
+ *
+ * \return the new OBJECT that replaces \a o_current.
  */
-void o_update_component(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
+OBJECT *
+o_update_component (GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
 {
   TOPLEVEL *toplevel = w_current->toplevel;
-  OBJECT *new_complex;
-  OBJECT *a_current;
-  GList *temp_list;
-  GList *a_iter;
-  GList *po_iter;
-  gboolean is_embedded;
+  OBJECT *o_new;
+  PAGE *page;
+  GList *new_attribs;
+  GList *old_attribs;
+  GList *iter;
   const CLibSymbol *clib;
 
-  g_return_if_fail (o_current != NULL);
+  g_return_val_if_fail (o_current != NULL, NULL);
+  g_return_val_if_fail (o_current->type == OBJ_COMPLEX, NULL);
+  g_return_val_if_fail (o_current->complex_basename != NULL, NULL);
 
-  is_embedded = o_complex_is_embedded (o_current);
+  page = o_get_page (toplevel, o_current);
 
-  g_assert (o_current->complex_basename != NULL);
-
-  /* This shuold be replaced with API to invalidate only the specific
-   * symbol name we want to update */
-  s_clib_flush_symbol_cache ();
+  /* Force symbol data to be reloaded from source */
   clib = s_clib_get_symbol_by_name (o_current->complex_basename);
+  s_clib_symbol_invalidate_data (clib);
 
   if (clib == NULL) {
     s_log_message (_("Could not find symbol [%s] in library. Update failed.\n"),
                    o_current->complex_basename);
-    return;
+    return NULL;
   }
 
-  /* ensure we repaint where the complex object was */
-  o_invalidate (w_current, o_current);
-  /* delete its connections */
-  s_conn_remove_object (toplevel, o_current);
-  /* and unselect it */
-  o_selection_remove (toplevel,
-                      toplevel->page_current->selection_list, o_current);
+  /* Unselect the old object. */
+  o_selection_remove (toplevel, page->selection_list, o_current);
 
-  new_complex = o_complex_new (toplevel, OBJ_COMPLEX, DEFAULT_COLOR,
-                               o_current->complex->x,
-                               o_current->complex->y,
-                               o_current->complex->angle,
-                               o_current->complex->mirror,
-                               clib, o_current->complex_basename,
-                               1);
-
-  temp_list = o_complex_promote_attribs (toplevel, new_complex);
-  temp_list = g_list_append (temp_list, new_complex);
-
-  /* updating the old complex with data from the new one */
-  /* first process the prim_objs: */
-  /*   - delete the prim_objs of the old component */
-  s_delete_object_glist (toplevel, o_current->complex->prim_objs);
-  /*   - put the prim_objs of the new component in the old one */
-  o_current->complex->prim_objs = new_complex->complex->prim_objs;
-
-  /* set the parent field now */
-  for (po_iter = o_current->complex->prim_objs;
-       po_iter != NULL;
-       po_iter = g_list_next (po_iter)) {
-    OBJECT *tmp = po_iter->data;
-    tmp->parent = o_current;
+  /* Create new object and set embedded */
+  o_new = o_complex_new (toplevel, OBJ_COMPLEX, DEFAULT_COLOR,
+                         o_current->complex->x,
+                         o_current->complex->y,
+                         o_current->complex->angle,
+                         o_current->complex->mirror,
+                         clib, o_current->complex_basename,
+                         1);
+  if (o_complex_is_embedded (o_current)) {
+    o_embed (toplevel, o_new);
   }
 
-  /*   - reset the new complex prim_objs */
-  new_complex->complex->prim_objs = NULL;
+  new_attribs = o_complex_promote_attribs (toplevel, o_new);
 
-  /* then process the attributes: */
-  /*   - check each attrib of the new complex */
-  a_iter = new_complex->attribs;
-  while (a_iter != NULL) {
-    OBJECT *o_attrib;
+  /* Cull any attributes from new COMPLEX that are already attached to
+   * old COMPLEX. Note that the new_attribs list is kept consistent by
+   * setting GList data pointers to NULL if their OBJECTs are
+   * culled. At the end, the new_attribs list is updated by removing
+   * all list items with NULL data. This is slightly magic, but
+   * works. */
+  for (iter = new_attribs; iter != NULL; iter = g_list_next (iter)) {
+    OBJECT *attr_new = iter->data;
     gchar *name;
-    char *attrfound;
+    gchar *value;
 
-    a_current = a_iter->data;
-    g_assert (a_current->type == OBJ_TEXT);
+    g_assert (attr_new->type == OBJ_TEXT);
 
-    o_attrib_get_name_value (a_current, &name, NULL);
+    o_attrib_get_name_value (attr_new, &name, NULL);
 
-    /* We are only interested in the attributes which were promoted during
-     * load of the new complex. Any which aren't already promoted in the
-     * schematic are migrated.
-     */
-    attrfound = o_attrib_search_attached_attribs_by_name (o_current, name, 0);
-
-    /* free this now since it is no longer being used */
-    g_free(name);
-
-    if (attrfound == NULL) {
-      /* attribute with same name not found in old component: */
-      /* add new attribute to old component */
-
-      /* make a copy of the attribute object */
-      o_attrib = o_object_copy (toplevel, a_current, NORMAL_FLAG);
-      s_page_append (toplevel, toplevel->page_current, o_attrib);
-      /* add the attribute to old */
-      o_attrib_add (toplevel, o_current, o_attrib);
-      /* redraw the attribute object */
-      o_invalidate (w_current, o_attrib);
-      /* note: this object is unselected (not added to selection). */
-    }
-    else
-    {
-      g_free(attrfound);
+    value = o_attrib_search_attached_attribs_by_name (o_current, name, 0);
+    if (value != NULL) {
+      o_attrib_remove (toplevel, &o_new->attribs, attr_new);
+      s_delete_object (toplevel, attr_new);
+      iter->data = NULL;
     }
 
-    a_iter = g_list_next (a_iter);
+    g_free (name);
+    g_free (value);
   }
+  new_attribs = g_list_remove_all (new_attribs, NULL);
 
-  s_delete_object_glist (toplevel, temp_list);
+  /* Detach attributes from old OBJECT and attach to new OBJECT */
+  old_attribs = g_list_copy (o_current->attribs);
+  o_attrib_detach_all (toplevel, o_current);
+  o_attrib_attach_list (toplevel, old_attribs, o_new, 1);
+  g_list_free (old_attribs);
 
-  /* update the pinnumbers to the current slot */
-  s_slot_update_object (toplevel, o_current);
+  /* Add new attributes to page */
+  s_page_append_list (toplevel, page, new_attribs);
 
-  /* Recalculate the bounds of the object */
-  o_recalc_single_object(toplevel, o_current);
+  /* Update pinnumbers for current slot */
+  s_slot_update_object (toplevel, o_new);
 
-  /* reconnect, re-select and redraw */
-  s_conn_update_object (toplevel, o_current);
-  o_selection_add (toplevel, toplevel->page_current->selection_list, o_current);
-  o_invalidate (w_current, o_current);
+  /* Replace old OBJECT with new OBJECT */
+  s_page_replace (toplevel, page, o_current, o_new);
+  s_delete_object (toplevel, o_current);
 
-  /* Re-flag as embedded if necessary */
-  o_current->complex_embedded = is_embedded;
+  /* Select new OBJECT */
+  o_selection_add (toplevel, page->selection_list, o_new);
 
   /* mark the page as modified */
   toplevel->page_current->CHANGED = 1;
   o_undo_savestate (w_current, UNDO_ALL);
 
+  return o_new;
 }
 
 /*! \brief Do autosave on all pages that are marked.
@@ -890,7 +730,9 @@ void o_autosave_backups(GSCHEM_TOPLEVEL *w_current)
           umask(saved_umask);
         }
 
-        if (o_save_curr_page (toplevel, backup_filename)) {
+        if (o_save (toplevel,
+                    s_page_objects (toplevel->page_current),
+                    backup_filename, NULL)) {
 
           p_current->ops_since_last_backup = 0;
                 p_current->do_autosave_backup = 0;

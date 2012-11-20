@@ -15,12 +15,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02111-1301 USA.
  */
 
 
 #ifndef __GEDA_LIST_H__
 #define __GEDA_LIST_H__
+
+G_BEGIN_DECLS
 
 #define GEDA_TYPE_LIST            (geda_list_get_type())
 #define GEDA_LIST(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GEDA_TYPE_LIST, GedaList))
@@ -55,6 +58,8 @@ void geda_list_remove_all( GedaList *list );
 
 /*const GList *geda_list_get_glist( GedaList *list ); */
 #define geda_list_get_glist(list) (list->glist)
+
+G_END_DECLS
 
 #endif /* __GEDA_LIST_H__ */
 

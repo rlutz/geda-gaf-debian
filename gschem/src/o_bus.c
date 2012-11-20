@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,8 +47,7 @@ void o_bus_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
   }
 
   /* reuse line's routine */
-  if ( (toplevel->DONT_REDRAW == 1) ||
-       (!o_line_visible (w_current, o_current->line, &x1, &y1, &x2, &y2)) ) {
+  if (!o_line_visible (w_current, o_current->line, &x1, &y1, &x2, &y2)) {
     return;
   }
 
@@ -136,7 +135,7 @@ void o_bus_draw_stretch (GSCHEM_TOPLEVEL *w_current,
  *  
  *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
  *  \param [in] w_x        the x position in world coords
- *  \param [in] w_x        the y position in world coords
+ *  \param [in] w_y        the y position in world coords
  */
 void o_bus_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
 {
@@ -156,7 +155,7 @@ void o_bus_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
  *
  *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
  *  \param [in] w_x        (unused)
- *  \param [in] w_x        (unused)
+ *  \param [in] w_y        (unused)
  */
 int o_bus_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
 {
@@ -189,12 +188,13 @@ int o_bus_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
                       w_current->second_wx, w_current->second_wy, 0);
   s_page_append (toplevel, toplevel->page_current, new_obj);
 
-  o_invalidate (w_current, new_obj);
-
   /* connect the new bus to the other busses */
   prev_conn_objects = s_conn_return_others (prev_conn_objects, new_obj);
   o_invalidate_glist (w_current, prev_conn_objects);
   g_list_free (prev_conn_objects);
+
+  /* Call add-objects-hook */
+  g_run_hook_object (w_current, "%add-objects-hook", new_obj);
 
   toplevel->page_current->CHANGED=1;
   w_current->first_wx = w_current->second_wx;

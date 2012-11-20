@@ -15,10 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02111-1301 USA.
  */
 
 #include <config.h>
+#include <missing.h>
 #include <version.h>
 
 #include <stdio.h>
@@ -41,26 +43,29 @@
 #include "../include/i_vars.h"
 #include "../include/prototype.h"
 
-SCM g_rc_gsymcheck_version(SCM version)
+SCM g_rc_gsymcheck_version(SCM scm_version)
 {
-  SCM_ASSERT (scm_is_string (version), version,
+  char *version;
+  SCM ret = SCM_BOOL_T;
+
+  SCM_ASSERT (scm_is_string (scm_version), scm_version,
 	      SCM_ARG1, "gsymcheck-version");
-  
-  if (g_strcasecmp (SCM_STRING_CHARS (version), PACKAGE_DATE_VERSION) != 0) {
+
+  version = scm_to_utf8_string (scm_version);
+  if (g_strcasecmp (version, PACKAGE_DATE_VERSION) != 0) {
     fprintf(stderr,
             "You are running gEDA/gaf version [%s%s.%s],\n",
             PREPEND_VERSION_STRING, PACKAGE_DOTTED_VERSION, PACKAGE_DATE_VERSION);
     fprintf(stderr,
             "but you have a version [%s] gsymcheckrc file:\n[%s]\n",
-            SCM_STRING_CHARS (version), rc_filename);
+            version, rc_filename);
     fprintf(stderr,
             "Please be sure that you have the latest rc file.\n");
-    return SCM_BOOL_F;
-
+    ret = SCM_BOOL_F;
   }
-  
-  return SCM_BOOL_T;
 
+  free (version);
+  return ret;
 }
 
 /*************************** GUILE end done *********************************/

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,8 +90,7 @@ void o_net_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
   }
 
   /* reuse line's routine */
-  if ( (toplevel->DONT_REDRAW == 1) ||
-       (!o_line_visible (w_current, o_current->line, &x1, &y1, &x2, &y2)) ) {
+  if (!o_line_visible (w_current, o_current->line, &x1, &y1, &x2, &y2)) {
     return;
   }
 
@@ -195,7 +194,8 @@ void o_net_guess_direction(GSCHEM_TOPLEVEL *w_current,
   const int bus_rules[] = {90, 0, 40};
   const int net_rules[] = {80, 30, 0};
   
-  objectlists = s_tile_get_objectlists(toplevel, wx, wy, wx, wy);
+  objectlists = s_tile_get_objectlists(toplevel, toplevel->page_current,
+                                       wx, wy, wx, wy);
 
   for (iter1 = objectlists; iter1 != NULL; iter1 = g_list_next(iter1)) {
     for (iter2 = (GList*) iter1->data; iter2 != NULL; iter2 = g_list_next(iter2)) {
@@ -325,7 +325,8 @@ void o_net_find_magnetic(GSCHEM_TOPLEVEL *w_current,
   y1 = w_y - w_magnetic_reach;
   x2 = w_x + w_magnetic_reach;
   y2 = w_y + w_magnetic_reach;
-  objectlists = s_tile_get_objectlists(toplevel, x1, y1, x2, y2);
+  objectlists = s_tile_get_objectlists(toplevel, toplevel->page_current,
+                                       x1, y1, x2, y2);
 
   for (iter1 = objectlists; iter1 != NULL; iter1 = g_list_next(iter1)) {
     for (iter2 = (GList*) iter1->data; iter2 != NULL; iter2 = g_list_next(iter2)) {
@@ -558,8 +559,11 @@ int o_net_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
   int found_primary_connection = FALSE;
   int save_wx, save_wy;
 
-  GList *prev_conn_objects = NULL;
+  GList *prev_conn_objects;
   OBJECT *new_net = NULL;
+
+  /* Save a list of added objects to run the %add-objects-hook later */
+  GList *added_objects = NULL;
 
   g_assert( w_current->inside_action != 0 );
 
@@ -604,27 +608,18 @@ int o_net_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
                           w_current->second_wx, w_current->second_wy);
       s_page_append (toplevel, toplevel->page_current, new_net);
 
+      added_objects = g_list_prepend (added_objects, new_net);
+
       /* conn stuff */
       /* LEAK CHECK 1 */
-      prev_conn_objects = s_conn_return_others (prev_conn_objects, new_net);
-
-      if (o_net_add_busrippers (w_current, new_net, prev_conn_objects)) {
-        g_list_free (prev_conn_objects);
-        prev_conn_objects = NULL;
-        prev_conn_objects = s_conn_return_others (prev_conn_objects, new_net);
-      }
+      prev_conn_objects = s_conn_return_others (NULL, new_net);
+      o_net_add_busrippers (w_current, new_net, prev_conn_objects);
+      g_list_free (prev_conn_objects);
 
 #if DEBUG 
       printf("primary:\n"); 
       s_conn_print(new_net->conn_list);
 #endif
-
-      o_invalidate (w_current, new_net);
-
-      o_invalidate_glist (w_current, prev_conn_objects);
-
-      g_list_free (prev_conn_objects);
-      prev_conn_objects = NULL;
 
       /* Go off and search for valid connection on this newly created net */
       found_primary_connection = s_conn_net_search(new_net, 1, 
@@ -648,25 +643,22 @@ int o_net_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
                           w_current->third_wx, w_current->third_wy);
       s_page_append (toplevel, toplevel->page_current, new_net);
 
+      added_objects = g_list_prepend (added_objects, new_net);
+
       /* conn stuff */
       /* LEAK CHECK 2 */
-      prev_conn_objects = s_conn_return_others (prev_conn_objects, new_net);
-
-      if (o_net_add_busrippers (w_current, new_net, prev_conn_objects)) {
-        g_list_free (prev_conn_objects);
-        prev_conn_objects = NULL;
-        prev_conn_objects = s_conn_return_others (prev_conn_objects, new_net);
-      }
+      prev_conn_objects = s_conn_return_others (NULL, new_net);
+      o_net_add_busrippers (w_current, new_net, prev_conn_objects);
+      g_list_free (prev_conn_objects);
 #if DEBUG
       s_conn_print(new_net->conn_list);
 #endif
+  }
 
-      o_invalidate (w_current, new_net);
-
-      o_invalidate_glist (w_current, prev_conn_objects);
-
-      g_list_free (prev_conn_objects);
-      prev_conn_objects = NULL;
+  /* Call add-objects-hook */
+  if (added_objects != NULL) {
+    g_run_hook_object_list (w_current, "%add-objects-hook", added_objects);
+    g_list_free (added_objects);
   }
 
   toplevel->page_current->CHANGED = 1;
@@ -1160,8 +1152,6 @@ int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
           s_page_append_list (toplevel, toplevel->page_current,
                               o_complex_promote_attribs (toplevel, new_obj));
           s_page_append (toplevel, toplevel->page_current, new_obj);
-
-          o_invalidate (w_current, new_obj);
         } else {
           s_log_message(_("Bus ripper symbol [%s] was not found in any component library\n"),
                         toplevel->bus_ripper_symname);

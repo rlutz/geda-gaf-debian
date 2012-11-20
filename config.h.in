@@ -144,6 +144,9 @@
 /* Define if your <locale.h> file defines LC_MESSAGES. */
 #undef HAVE_LC_MESSAGES
 
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
+
 /* Define to 1 if libstroke is available */
 #undef HAVE_LIBSTROKE
 
@@ -189,6 +192,30 @@
 
 /* Define to 1 if you have the `putenv' function. */
 #undef HAVE_PUTENV
+
+/* Define to 1 if scm_display_error expects a frame as first argument. */
+#undef HAVE_SCM_DISPLAY_ERROR_FRAME
+
+/* Define to 1 if scm_display_error expects a stack as first argument. */
+#undef HAVE_SCM_DISPLAY_ERROR_STACK
+
+/* Define to 1 if you have the `scm_from_utf8_string' function. */
+#undef HAVE_SCM_FROM_UTF8_STRING
+
+/* Define to 1 if you have the `scm_from_utf8_stringn' function. */
+#undef HAVE_SCM_FROM_UTF8_STRINGN
+
+/* Define to 1 if you have the `scm_from_utf8_symbol' function. */
+#undef HAVE_SCM_FROM_UTF8_SYMBOL
+
+/* Define to 1 if you have the `scm_from_utf8_symboln' function. */
+#undef HAVE_SCM_FROM_UTF8_SYMBOLN
+
+/* Define to 1 if you have the `scm_to_utf8_string' function. */
+#undef HAVE_SCM_TO_UTF8_STRING
+
+/* Define to 1 if you have the `scm_to_utf8_stringn' function. */
+#undef HAVE_SCM_TO_UTF8_STRINGN
 
 /* Define to 1 if you have the `setenv' function. */
 #undef HAVE_SETENV
@@ -292,6 +319,21 @@
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 #undef NO_MINUS_C_MINUS_O
 
+/* Define to 1 if on Mac OS X Carbon. */
+#undef OS_CARBON
+
+/* Define to 1 if on Cygwin. */
+#undef OS_CYGWIN
+
+/* Define to 1 if on Linux. */
+#undef OS_LINUX
+
+/* Define to 1 if on Windows. */
+#undef OS_WIN32
+
+/* Define to 1 if on native Windows. */
+#undef OS_WIN32_NATIVE
+
 /* Name of package */
 #undef PACKAGE
 
@@ -318,6 +360,13 @@
 
 /* Define if the pthread_in_use() detection is hard. */
 #undef PTHREAD_IN_USE_DETECTION_HARD
+
+/* Command to launch default application for a URI. */
+#undef SHOW_URI_COMMAND
+
+/* Define to 1 if GIO should be used to launch a default application for a
+   URI. */
+#undef SHOW_URI_GIO
 
 /* Define as the maximum value of type 'size_t', if the system doesn't define
    it. */

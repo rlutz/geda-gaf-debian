@@ -33,9 +33,6 @@
 #include <dmalloc.h>
 #endif
 
-/*! Default setting for arc draw function. */
-void (*arc_draw_func)() = NULL;
-
 /*! \brief
  *  \par Function Description
  *  The function creates a new OBJECT of type arc.
@@ -110,9 +107,6 @@ OBJECT *o_arc_new(TOPLEVEL *toplevel,
   o_arc_recalc(toplevel, new_node);
 
   /* new_node->graphical = arc; eventually */
-	
-  new_node->draw_func = arc_draw_func;  
-  new_node->sel_func = select_func;
 
   return new_node;
 }
@@ -178,6 +172,8 @@ void o_arc_modify(TOPLEVEL *toplevel, OBJECT *object,
 		  int x, int y, int whichone)
 {
 
+	o_emit_pre_change_notify (toplevel, object);
+
 	switch(whichone) {
 		case ARC_CENTER:
 		/* modify the center of arc object */
@@ -207,7 +203,7 @@ void o_arc_modify(TOPLEVEL *toplevel, OBJECT *object,
 
 	/* update the screen coords and the bounding box */
 	o_arc_recalc(toplevel, object);
-	
+	o_emit_change_notify (toplevel, object);
 }
 
 /*! \brief
@@ -234,10 +230,10 @@ void o_arc_modify(TOPLEVEL *toplevel, OBJECT *object,
  *  \param [in] buf
  *  \param [in] release_ver
  *  \param [in] fileformat_ver
- *  \return
+ *  \return The ARC OBJECT that was created, or NULL on error.
  */
-OBJECT *o_arc_read (TOPLEVEL *toplevel, char buf[],
-		   unsigned int release_ver, unsigned int fileformat_ver)
+OBJECT *o_arc_read (TOPLEVEL *toplevel, const char buf[],
+           unsigned int release_ver, unsigned int fileformat_ver, GError **err)
 {
   OBJECT *new_obj;
   char type; 
@@ -255,8 +251,11 @@ OBJECT *o_arc_read (TOPLEVEL *toplevel, char buf[],
    *  restrictive - the oldest - file format are set to common values
    */
   if(release_ver <= VERSION_20000704) {
-    sscanf(buf, "%c %d %d %d %d %d %d", &type,
-           &x1, &y1, &radius, &start_angle, &end_angle, &color);
+    if (sscanf(buf, "%c %d %d %d %d %d %d", &type,
+	       &x1, &y1, &radius, &start_angle, &end_angle, &color) != 7) {
+      g_set_error (err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse arc object"));
+      return NULL;
+    }
 
     arc_width = 0;
     arc_end   = END_NONE;
@@ -264,16 +263,19 @@ OBJECT *o_arc_read (TOPLEVEL *toplevel, char buf[],
     arc_space = -1;
     arc_length= -1;
   } else {
-    sscanf(buf, "%c %d %d %d %d %d %d %d %d %d %d %d", &type,
-           &x1, &y1, &radius, &start_angle, &end_angle, &color,
-           &arc_width, &arc_end, &arc_type, &arc_length, &arc_space);
-
+    if (sscanf(buf, "%c %d %d %d %d %d %d %d %d %d %d %d", &type,
+	       &x1, &y1, &radius, &start_angle, &end_angle, &color,
+	       &arc_width, &arc_end, &arc_type, &arc_length, &arc_space) != 12) {
+      g_set_error (err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse arc object"));
+      return NULL;
+    }
   }
 
   /* Error check */
   if (radius <= 0) {
     s_log_message (_("Found a zero radius arc [ %c %d, %d, %d, %d, %d, %d ]\n"),
                    type, x1, y1, radius, start_angle, end_angle, color);
+    radius = 0;
   }
 	
   if (color < 0 || color > MAX_COLORS) {
@@ -302,10 +304,11 @@ OBJECT *o_arc_read (TOPLEVEL *toplevel, char buf[],
  *  A pointer to the new allocated and formated string is returned.
  *  The string must be freed at some point.
  *
+ *  \param [in] toplevel
  *  \param [in] object
  *  \return the string representation of the arc object
  */
-char *o_arc_save(OBJECT *object)
+char *o_arc_save(TOPLEVEL *toplevel, OBJECT *object)
 {
   int x, y, radius, start_angle, end_angle;
   int arc_width, arc_length, arc_space;
@@ -863,7 +866,7 @@ void o_arc_print_dashed(TOPLEVEL *toplevel, FILE *fp,
 			int arc_width, int length, int space,
 			int origin_x, int origin_y)
 {
-  int da, db, a1, a2, d;
+  int da, db, a1, d;
 
   f_print_set_color(toplevel, fp, color);
   
@@ -920,10 +923,8 @@ void o_arc_print_dashed(TOPLEVEL *toplevel, FILE *fp,
 
   if ((d + da) < (angle1 + angle2)) {
     a1 = d;
-    a2 = da;
   } else {
     a1 = d;
-    a2 = (angle1 + angle2) - d;
   }
 
   fprintf(fp,"[%d %d] ",
@@ -970,7 +971,7 @@ void o_arc_print_center(TOPLEVEL *toplevel, FILE *fp,
 			int arc_width, int length, int space,
 			int origin_x, int origin_y)
 {
-  int da, db, a1, a2, d;
+  int da, db, a1, d;
 
   f_print_set_color(toplevel, fp, color);
 
@@ -1034,12 +1035,10 @@ void o_arc_print_center(TOPLEVEL *toplevel, FILE *fp,
   
   if ((d + da) < (angle1 + angle2)) {
     a1 = d;
-    a2 = da;
     
     d = d + da;
   } else {
     a1 = d;
-    a2 = (angle1 + angle2) - d;
     
     d = d + da;
   }
@@ -1100,7 +1099,7 @@ void o_arc_print_phantom(TOPLEVEL *toplevel, FILE *fp,
 			 int arc_width, int length, int space,
 			 int origin_x, int origin_y)
 {
-  int da, db, a1, a2, d;
+  int da, db, a1, d;
 
   f_print_set_color(toplevel, fp, color);
 
@@ -1178,11 +1177,9 @@ void o_arc_print_phantom(TOPLEVEL *toplevel, FILE *fp,
 
   if ((d + da) < (angle1 + angle2)) {
     a1 = d;
-    a2 = da;
     d = d + da;
   } else {
     a1 = d;
-    a2 = (angle1 + angle2) - d;
     d = d + da;
   }
   

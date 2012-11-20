@@ -1,5 +1,5 @@
-<!-- Creator     : groff version 1.20.1 -->
-<!-- CreationDate: Fri Jan 14 23:25:25 2011 -->
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Sun Nov 18 17:17:28 2012 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -24,11 +24,11 @@
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
 <a href="#OPTIONS">OPTIONS</a><br>
-<a href="#EXAMPLES">EXAMPLES</a><br>
+<a href="#SCHEMATIC AND SYMBOL FILES">SCHEMATIC AND SYMBOL FILES</a><br>
 <a href="#ENVIRONMENT">ENVIRONMENT</a><br>
-<a href="#AUTHOR">AUTHOR</a><br>
-<a href="#SEE ALSO">SEE ALSO</a><br>
+<a href="#AUTHORS">AUTHORS</a><br>
 <a href="#COPYRIGHT">COPYRIGHT</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
 
 <hr>
 
@@ -47,110 +47,95 @@ gEDA/gaf Schematic Capture</p>
 
 
 <p style="margin-left:11%; margin-top: 1em"><b>gschem</b>
-[&minus;q] [&minus;v] [&minus;t] [&minus;r rcfilename]
-[&minus;s scriptfilename] [&minus;o outputfilename]
-[&minus;p] [&minus;h] [schematic1 ... schematicN]</p>
+[<i>OPTION</i> ...] [<i>--</i>] [<i>FILE</i> ...]</p>
 
 <h2>DESCRIPTION
 <a name="DESCRIPTION"></a>
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em"><i>gschem</i>
-is the schematic capture program which is part gEDA (GPL
-Electronic Design Automation) toolset. This program is used
-to draw electronic schematics. Schematics consist of
-standard symbols (which are either part of a standard
-library or created by the user) which represent the various
-gates and components. These components are then
-interconnected by nets (wires). Schematics may be printed to
-a PostScript file for printing or further conversion to
-other output formats. Output to various image formats is
-also supported.</p>
+<p style="margin-left:11%; margin-top: 1em"><b>gschem</b>
+is a schematic capture application, and is part of the gEDA
+(GPL Electronic Design Automation) toolset. It is used to
+draw electronic schematics, which describe the logical
+structure of an circuit. Schematics are made up of symbols,
+which represent the various components in the circuit, and
+are obtained either from a standard library or created by
+the user. The connections between components represented by
+nets (wires). Schematics may be printed to a PostScript file
+for printing or further conversion to other output formats.
+Output to various image formats is also supported.</p>
 
-<p style="margin-left:11%; margin-top: 1em"><i>gschem</i>
-is also the symbol creation editor. All the standard methods
-of creating schematics are used in the creation of symbols.
-There are a few special rules when creating symbols, so
-please refer to the (non-existant as of now) symbol creation
-document.</p>
-
-<p style="margin-left:11%; margin-top: 1em">Please read the
-official documentation (very minimal at this point) on how
-to use <i>gschem</i>, since this man page just describes the
-command line arguments and a few examples on how to run
-<i>gschem</i>.</p>
+<p style="margin-left:11%; margin-top: 1em"><b>gschem</b>
+can also be used for editing symbols for use in
+schematics.</p>
 
 <h2>OPTIONS
 <a name="OPTIONS"></a>
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em"><i>gschem</i>
-accepts the following options:</p>
+<p style="margin-left:11%; margin-top: 1em"><b>-q</b>,
+<b>--quiet</b></p>
+
+<p style="margin-left:23%;">Quiet mode. Turn off all
+warnings/notes/messages.</p>
+
+<p style="margin-left:11%;"><b>-v</b>, <b>--verbose</b></p>
+
+<p style="margin-left:23%;">Verbose mode. Output all
+diagnostic information.</p>
+
+<p style="margin-left:11%;"><b>-r</b>,
+<b>--config-file</b>=<i>FILE</i></p>
+
+<p style="margin-left:23%;">Specify an additional
+configuration file. Normally <b>gschem</b> searches for the
+system configuration file, then
+&lsquo;$HOME/.gEDA/gschemrc&rsquo;, and finally for a
+&lsquo;gschemrc&rsquo; file in the current working
+directory. This option allows the user to specify an
+additional rc file which is read after all the other rc
+files have been are read.</p>
+
+<p style="margin-left:11%;"><b>-L</b> <i>DIRECTORY</i></p>
+
+<p style="margin-left:23%;">Prepend <i>DIRECTORY</i> to the
+list of directories to be searched for Scheme files.</p>
 
 <table width="100%" border="0" rules="none" frame="void"
        cellspacing="0" cellpadding="0">
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="3%">
+<td width="11%">
 
 
-<p><b>-q</b></p></td>
-<td width="9%"></td>
+<p><b>-s</b> <i>FILE</i></p></td>
+<td width="1%"></td>
 <td width="77%">
 
 
-<p>Quiet mode on. This mode turns off all
-warnings/notes/messages. (optional)</p></td></tr>
+<p>Specify a Scheme script to be executed at startup.</p></td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
-<td width="3%">
+<td width="11%">
 
 
-<p><b>-v</b></p></td>
-<td width="9%"></td>
+<p><b>-c</b> <i>EXPR</i></p></td>
+<td width="1%"></td>
 <td width="77%">
 
 
-<p>Verbose mode on. This mode gives as much feedback to the
-user as possible. (optional)</p></td></tr>
-<tr valign="top" align="left">
-<td width="11%"></td>
-<td width="3%">
-
-
-<p><b>-t</b></p></td>
-<td width="9%"></td>
-<td width="77%">
-
-
-<p>Print out more information when using mouse strokes.
-With this command line flag and the middle button configured
-for mouse strokes, gschem will output the stroke sequence
-numbers as the user executes strokes. These numbers can be
-used to define new strokes in the system-gschemrc file.</p></td></tr>
+<p>Specify a Scheme expression to be evaluated at
+startup.</p> </td></tr>
 </table>
 
-<p style="margin-left:11%;"><b>-r filename</b></p>
-
-<p style="margin-left:23%;">Specify a rc filename. Normally
-<i>gschem</i> searches for the system-gschemrc, then
-~/.gEDA/gschemrc, and finally for a gschemrc in the current
-directory. This options allows the user to specify an
-additional rc file which is read after all the other rc
-files are read. (optional)</p>
-
-<p style="margin-left:11%;"><b>-s filename</b></p>
-
-<p style="margin-left:23%;">Specify a guile script to be
-executed at startup. (optional)</p>
-
-<p style="margin-left:11%;"><b>-o filename</b></p>
+<p style="margin-left:11%;"><b>-o</b>,
+<b>--output</b>=<i>FILE</i></p>
 
 <p style="margin-left:23%;">Specify a filename for
-postscript output. This command line argument is useful when
-running <i>gschem</i> from a shell script and with a guile
+PostScript output. This command line argument is useful when
+running <b>gschem</b> from a shell script and with a Scheme
 script. The filename can be changed through the print dialog
 box.</p>
 
@@ -166,81 +151,92 @@ box.</p>
 <td width="77%">
 
 
-<p>Automatically place the window, especially useful if
-running gschem from the command line and generating
+<p>Automatically place the window. This may be useful if
+running <b>gschem</b> from the command line and generating
 output.</p> </td></tr>
+</table>
+
+<p style="margin-left:11%;"><b>-h</b>, <b>--help</b></p>
+
+<p style="margin-left:23%;">Print a help message.</p>
+
+<p style="margin-left:11%;"><b>-V</b>, <b>--version</b></p>
+
+<p style="margin-left:23%;">Print <b>gschem</b> version
+information.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
 <tr valign="top" align="left">
 <td width="11%"></td>
 <td width="3%">
 
 
-<p><b>-h</b></p></td>
+<p><b>--</b></p></td>
 <td width="9%"></td>
 <td width="77%">
 
 
-<p>Print out short command line help.</p></td></tr>
+<p>Treat all remaining arguments as schematic or symbol
+filenames. Use this if you have a schematic or symbol
+filename which begins with &lsquo;-&rsquo;.</p></td></tr>
 </table>
 
-<p style="margin-left:11%;"><b>schematic1 [...
-schematicN]</b></p>
-
-<p style="margin-left:23%;">Schematic file to be loaded.
-Specifing a schematic file is optional. If multiple
-schematic files are specified they are read in sequentially
-and put on seperate pages. It is important that the
-schematic(s) follow all the options (ie last).</p>
-
-<h2>EXAMPLES
-<a name="EXAMPLES"></a>
+<h2>SCHEMATIC AND SYMBOL FILES
+<a name="SCHEMATIC AND SYMBOL FILES"></a>
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em">These examples
-assume that you have a schematic called stack_1.sch in the
-current directory</p>
+<p style="margin-left:11%; margin-top: 1em">Optionally,
+schematic or symbol <i>FILE</i>s may be specified on the
+command line. Any schematic or symbols specified are loaded
+at startup as separate documents in the schematic
+editor.</p>
 
-<p style="margin-left:11%; margin-top: 1em">To run
-<i>gschem</i> and then interact with the program:</p>
-
-<p style="margin-left:11%; margin-top: 1em">gschem</p>
-
-<p style="margin-left:11%; margin-top: 1em">To run
-<i>gschem</i> in interactive mode but load a sample
-schematic:</p>
-
-<p style="margin-left:11%; margin-top: 1em">gschem
-adders_1.sch</p>
-
-<p style="margin-left:11%; margin-top: 1em">To run
-<i>gschem</i> and load up all schematics in the current
-subdirectory:</p>
-
-<p style="margin-left:11%; margin-top: 1em">gschem
-*.sch</p>
+<p style="margin-left:11%; margin-top: 1em">If no
+<i>FILE</i>s are specified, a blank schematic is created for
+editing.</p>
 
 <h2>ENVIRONMENT
 <a name="ENVIRONMENT"></a>
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em"><i>gschem</i>
-respects the following environment variable: <b><br>
-GEDADATA</b></p>
 
-<p style="margin-left:23%;">specifies where the various
-required scheme and rc files are located (the default is
-${prefix}/share/gEDA). This environment variables does not
-need to be set by the end user unless they are moving the
-executables to a new install ${prefix}.</p>
+<p style="margin-left:11%; margin-top: 1em"><b>GEDADATA</b></p>
 
-<h2>AUTHOR
-<a name="AUTHOR"></a>
+<p style="margin-left:23%;">specifies the search directory
+for Scheme and rc files. The default is
+&lsquo;${prefix}/share/gEDA&rsquo;.</p>
+
+<p style="margin-left:11%;"><b>GEDADATARC</b></p>
+
+<p style="margin-left:23%;">specifies the search directory
+for rc files. The default is &lsquo;$GEDADATA&rsquo;.</p>
+
+<h2>AUTHORS
+<a name="AUTHORS"></a>
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em">Ales Hvezda and
-many others</p>
+<p style="margin-left:11%; margin-top: 1em">See the
+&lsquo;AUTHORS&rsquo; file included with this program.</p>
+
+<h2>COPYRIGHT
+<a name="COPYRIGHT"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Copyright
+&copy; 1999-2011 gEDA Contributors. License GPLv2+: GNU GPL
+<br>
+version 2 or later. Please see the &lsquo;COPYING&rsquo;
+file included with this <br>
+program for full details.</p>
+
+<p style="margin-left:11%; margin-top: 1em">This is free
+software: you are free to change and redistribute it. <br>
+There is NO WARRANTY, to the extent permitted by law.</p>
 
 <h2>SEE ALSO
 <a name="SEE ALSO"></a>
@@ -251,18 +247,10 @@ many others</p>
 <p style="margin-left:11%; margin-top: 1em"><b>gnetlist</b>(1),
 <b>gsymcheck</b>(1)</p>
 
-<h2>COPYRIGHT
-<a name="COPYRIGHT"></a>
-</h2>
-
-
-<p style="margin-left:11%; margin-top: 1em">Copyright
-&copy; 1999-2008 Ales Hvezda</p>
-
-<p style="margin-left:11%; margin-top: 1em">This document
-can be freely redistributed according to the terms of the
-<br>
-GNU General Public License version 2.0</p>
+<p style="margin-left:11%; margin-top: 1em">The full
+documentation for <b>gschem</b> is available from within the
+program by selecting the &lsquo;gEDA Documentation&rsquo;
+option from the program&rsquo;s &lsquo;Help&rsquo; menu.</p>
 <hr>
 </body>
 </html>

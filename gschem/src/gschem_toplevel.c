@@ -51,6 +51,7 @@ GSCHEM_TOPLEVEL *gschem_toplevel_new ()
   w_current->toolbar_bus    = NULL;
 
   w_current->keyaccel_string = NULL;
+  w_current->keyaccel_string_source_id = FALSE;
 
   /* ------------ */
   /* Dialog boxes */
@@ -71,7 +72,6 @@ GSCHEM_TOPLEVEL *gschem_toplevel_new ()
   w_current->tshowwindow  = NULL;
   w_current->thidewindow  = NULL;
   w_current->tfindwindow  = NULL;
-  w_current->abwindow     = NULL;
   w_current->hkwindow     = NULL;
   w_current->clwindow     = NULL;
   w_current->edit_color   = 0;
@@ -118,6 +118,11 @@ GSCHEM_TOPLEVEL *gschem_toplevel_new ()
   w_current->net_direction = 0;
   w_current->which_grip = -1;
   w_current->which_object = NULL;
+
+  /* ------------------ */
+  /* Rubberbanding nets */
+  /* ------------------ */
+  w_current->stretch_list = NULL;
 
   /* --------------------- */
   /* Gschem internal state */
@@ -188,14 +193,28 @@ GSCHEM_TOPLEVEL *gschem_toplevel_new ()
   w_current->dots_grid_mode = DOTS_GRID_VARIABLE_MODE;
   w_current->mesh_grid_display_threshold = 3;
   w_current->add_attribute_offset = 50;
-  w_current->drag_can_move = TRUE;
   w_current->mousepan_gain = 5;
   w_current->keyboardpan_gain = 10;
   w_current->select_slack_pixels = 4;
   w_current->zoom_gain = 20;
   w_current->scrollpan_steps = 8;
+  w_current->snap = SNAP_GRID;
+  w_current->snap_size = 100;
 
   w_current->print_command = NULL;
 
+  w_current->smob = SCM_UNDEFINED;
+
   return w_current;
+}
+
+void gschem_toplevel_alloc_libgeda_toplevel (GSCHEM_TOPLEVEL *w_current)
+{
+    w_current->toplevel = s_toplevel_new ();
+    o_attrib_append_attribs_changed_hook (w_current->toplevel,
+                                          (AttribsChangedFunc) o_invalidate,
+                                          w_current);
+    s_conn_append_conns_changed_hook (w_current->toplevel,
+                                      (ConnsChangedFunc) o_invalidate,
+                                      w_current);
 }

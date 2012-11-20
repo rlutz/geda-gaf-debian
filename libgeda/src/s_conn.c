@@ -121,6 +121,8 @@ int s_conn_remove_other (TOPLEVEL *toplevel, OBJECT *other_object,
     GList *c_current = NULL;
     CONN *conn = NULL;
 
+    o_emit_pre_change_notify (toplevel, other_object);
+
     c_current = other_object->conn_list;
     while (c_current != NULL) {
 	conn = (CONN *) c_current->data;
@@ -148,12 +150,15 @@ int s_conn_remove_other (TOPLEVEL *toplevel, OBJECT *other_object,
               other_object->bus_ripper_direction = 0;
             }
 #endif
+        s_conn_emit_conns_changed (toplevel, other_object);
             
 	    return (TRUE);
 	}
 
 	c_current = g_list_next(c_current);
     }
+
+    o_emit_change_notify (toplevel, other_object);
 
     return (FALSE);
 }
@@ -199,11 +204,14 @@ void s_conn_remove_object (TOPLEVEL *toplevel, OBJECT *to_remove)
            c_iter = g_list_next (c_iter)) {
         conn = c_iter->data;
 
+
+        s_conn_freeze_hooks (toplevel, conn->other_object);
         /* keep calling this till it returns false (all refs removed) */
         /* there is NO body to this while loop */
         while (s_conn_remove_other (toplevel, conn->other_object, to_remove));
 
         c_iter->data = NULL;
+        s_conn_thaw_hooks (toplevel, conn->other_object);
         g_free (conn);
       }
 
@@ -216,6 +224,8 @@ void s_conn_remove_object (TOPLEVEL *toplevel, OBJECT *to_remove)
       s_conn_remove_glist (toplevel, to_remove->complex->prim_objs);
       break;
   }
+
+  s_conn_emit_conns_changed (toplevel, to_remove);
 }
 
 /*! \brief Checks if a point is a midpoint of an OBJECT
@@ -323,7 +333,8 @@ static int check_direct_compat (OBJECT *object1, OBJECT *object2)
 }
 
 
-static void add_connection (OBJECT *object, OBJECT *other_object,
+static void add_connection (TOPLEVEL *toplevel,
+                            OBJECT *object, OBJECT *other_object,
                             int type, int x, int y,
                             int whichone, int other_whichone)
 {
@@ -333,6 +344,8 @@ static void add_connection (OBJECT *object, OBJECT *other_object,
   /* Do uniqness check */
   if (s_conn_uniq (object->conn_list, new_conn)) {
     object->conn_list = g_list_append (object->conn_list, new_conn);
+    s_conn_emit_conns_changed (toplevel, object);
+    s_conn_emit_conns_changed (toplevel, other_object);
   } else {
     g_free (new_conn);
   }
@@ -356,6 +369,8 @@ static void s_conn_update_line_object (TOPLEVEL *toplevel, OBJECT *object)
   OBJECT *found;
   int j, k;
 
+  s_conn_freeze_hooks (toplevel, object);
+
   /* loop over all tiles which object appears in */
   for (tl_current = object->tiles;
        tl_current != NULL;
@@ -369,6 +384,8 @@ static void s_conn_update_line_object (TOPLEVEL *toplevel, OBJECT *object)
 
       if (object == other_object)
         continue;
+
+      s_conn_freeze_hooks (toplevel, other_object);
 
       /* Here is where you check the end points */
       /* Check both end points of the other object */
@@ -391,13 +408,17 @@ static void s_conn_update_line_object (TOPLEVEL *toplevel, OBJECT *object)
               object->line->y[j] == other_object->line->y[k] &&
               check_direct_compat (object, other_object)) {
 
-            add_connection (object, other_object, CONN_ENDPOINT,
+            o_emit_pre_change_notify (toplevel, other_object);
+
+            add_connection (toplevel, object, other_object, CONN_ENDPOINT,
                             other_object->line->x[k],
                             other_object->line->y[k], j, k);
 
-            add_connection (other_object, object, CONN_ENDPOINT,
+            add_connection (toplevel, other_object, object, CONN_ENDPOINT,
                             object->line->x[j],
                             object->line->y[j], k, j);
+
+            o_emit_change_notify (toplevel, other_object);
           }
         }
       }
@@ -420,13 +441,14 @@ static void s_conn_update_line_object (TOPLEVEL *toplevel, OBJECT *object)
             ((object->type == OBJ_NET && other_object->type == OBJ_BUS) ||
               check_direct_compat (object, other_object))) {
 
-          add_connection (object, other_object, CONN_MIDPOINT,
+          add_connection (toplevel, object, other_object, CONN_MIDPOINT,
                           object->line->x[k],
                           object->line->y[k], k, -1);
 
-          add_connection (other_object, object, CONN_MIDPOINT,
+          add_connection (toplevel, other_object, object, CONN_MIDPOINT,
                           object->line->x[k],
                           object->line->y[k], -1, k);
+
         }
       }
 
@@ -449,22 +471,25 @@ static void s_conn_update_line_object (TOPLEVEL *toplevel, OBJECT *object)
              ((object->type == OBJ_BUS && other_object->type == OBJ_NET) ||
                check_direct_compat (object, other_object))) {
 
-          add_connection (object, other_object, CONN_MIDPOINT,
+          add_connection (toplevel, object, other_object, CONN_MIDPOINT,
                           other_object->line->x[k],
                           other_object->line->y[k], -1, k);
 
-          add_connection (other_object, object, CONN_MIDPOINT,
+          add_connection (toplevel, other_object, object, CONN_MIDPOINT,
                           other_object->line->x[k],
                           other_object->line->y[k], k, -1);
         }
       }
 
+      s_conn_thaw_hooks (toplevel, other_object);
     }
   }
 
 #if DEBUG
   s_conn_print(object->conn_list);
 #endif
+
+  s_conn_thaw_hooks (toplevel, object);
 }
 
 /*! \brief add an OBJECT to the connection system
@@ -628,4 +653,94 @@ GList *s_conn_return_others(GList *input_list, OBJECT *object)
   }
 
   return return_list;
+}
+
+
+typedef struct {
+  ConnsChangedFunc func;
+  void *data;
+} ConnsChangedHook;
+
+
+void s_conn_append_conns_changed_hook (TOPLEVEL *toplevel,
+                                       ConnsChangedFunc func,
+                                       void *data)
+{
+  ConnsChangedHook *new_hook;
+
+  new_hook = g_new0 (ConnsChangedHook, 1);
+  new_hook->func = func;
+  new_hook->data = data;
+
+  toplevel->conns_changed_hooks =
+    g_list_append (toplevel->conns_changed_hooks, new_hook);
+}
+
+
+static void call_conns_changed_hook (gpointer data, gpointer user_data)
+{
+  ConnsChangedHook *hook = data;
+  OBJECT *object = user_data;
+
+  hook->func (hook->data, object);
+}
+
+
+void s_conn_emit_conns_changed (TOPLEVEL *toplevel, OBJECT *object)
+{
+  if (object->conn_notify_freeze_count > 0) {
+    object->conn_notify_pending = 1;
+    return;
+  }
+
+  object->conn_notify_pending = 0;
+
+  g_list_foreach (toplevel->conns_changed_hooks,
+                  call_conns_changed_hook, object);
+}
+
+void s_conn_freeze_hooks (TOPLEVEL *toplevel, OBJECT *object)
+{
+  object->conn_notify_freeze_count += 1;
+}
+
+void s_conn_thaw_hooks (TOPLEVEL *toplevel, OBJECT *object)
+{
+  g_return_if_fail (object->conn_notify_freeze_count > 0);
+
+  object->conn_notify_freeze_count -= 1;
+
+  if (object->conn_notify_freeze_count == 0 &&
+      object->conn_notify_pending)
+    s_conn_emit_conns_changed (toplevel, object);
+}
+
+static void refresh_connectivity_cache (TOPLEVEL *toplevel, OBJECT *object)
+{
+    if (object->type == OBJ_NET) {
+        /* FIXME: suboptimal to refresh cache every time */
+        /* better approach would invalidate cache without refresh */
+        /* refresh would be done on redraw of pin cues */
+        o_net_refresh_conn_cache (toplevel, object);
+    }
+}
+
+static void s_conn_init_toplevel (TOPLEVEL *toplevel)
+{
+    /* Connect the hooks for tracking net connectivity here */
+    s_conn_append_conns_changed_hook (toplevel,
+                                      (ConnsChangedFunc)
+                                          refresh_connectivity_cache,
+                                      toplevel);
+
+    o_attrib_append_attribs_changed_hook (toplevel,
+                                          (AttribsChangedFunc)
+                                              refresh_connectivity_cache,
+                                          toplevel);
+}
+
+void s_conn_init (void)
+{
+    s_toplevel_append_new_hook ((NewToplevelFunc) s_conn_init_toplevel,
+                                NULL);
 }

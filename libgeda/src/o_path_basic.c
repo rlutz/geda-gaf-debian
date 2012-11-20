@@ -29,9 +29,6 @@
 #include <dmalloc.h>
 #endif
 
-/*! Default setting for path draw function. */
-void (*path_draw_func)() = NULL;
-
 
 typedef void (*DRAW_FUNC) (TOPLEVEL *toplevel, FILE *fp, PATH *path,
                            int line_width, int length, int space,
@@ -90,9 +87,6 @@ OBJECT *o_path_new (TOPLEVEL *toplevel,
                       END_NONE, TYPE_SOLID, 0, -1, -1);
   o_set_fill_options (toplevel, new_node,
                       FILLING_HOLLOW, -1, -1, -1, -1, -1);
-
-  new_node->draw_func = path_draw_func;
-  new_node->sel_func = select_func;
 
   /* compute bounding box */
   o_path_recalc (toplevel, new_node);
@@ -156,11 +150,11 @@ OBJECT *o_path_copy (TOPLEVEL *toplevel, OBJECT *o_current)
  *  \param [in]  tb              Text buffer containing the path string.
  *  \param [in]  release_ver     libgeda release version number.
  *  \param [in]  fileformat_ver  libgeda file format version number.
- *  \return A pointer to the new path object.
+ *  \return A pointer to the new path object, or NULL on error;
  */
 OBJECT *o_path_read (TOPLEVEL *toplevel,
                      const char *first_line, TextBuffer *tb,
-                     unsigned int release_ver, unsigned int fileformat_ver)
+                     unsigned int release_ver, unsigned int fileformat_ver, GError **err)
 {
   OBJECT *new_obj;
   char type;
@@ -180,10 +174,13 @@ OBJECT *o_path_read (TOPLEVEL *toplevel,
    * The meaning of each item is described in the file format documentation.
    */
   /* Allocate enough space */
-  sscanf (first_line, "%c %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-          &type, &color, &line_width, &line_end, &line_type,
-          &line_length, &line_space, &fill_type, &fill_width, &angle1,
-          &pitch1, &angle2, &pitch2, &num_lines);
+  if (sscanf (first_line, "%c %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+	      &type, &color, &line_width, &line_end, &line_type,
+	      &line_length, &line_space, &fill_type, &fill_width, &angle1,
+	      &pitch1, &angle2, &pitch2, &num_lines) != 14) {
+    g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse path object"));
+    return NULL;
+  }
 
   /*
    * Checks if the required color is valid.
@@ -202,13 +199,16 @@ OBJECT *o_path_read (TOPLEVEL *toplevel,
 
   pathstr = g_string_new ("");
   for (i = 0; i < num_lines; i++) {
-    gchar *line;
+    const gchar *line;
 
     line = s_textbuffer_next_line (tb);
 
-    if (line != NULL) {
-      pathstr = g_string_append (pathstr, line);
+    if (line == NULL) {
+      g_set_error (err, EDA_ERROR, EDA_ERROR_PARSE, _("Unexpected end-of-file when reading path"));
+      return NULL;
     }
+
+    pathstr = g_string_append (pathstr, line);
   }
 
   /* retrieve the character string from the GString */
@@ -235,6 +235,7 @@ OBJECT *o_path_read (TOPLEVEL *toplevel,
  *  The function formats a string in the buffer <B>*buff</B> to describe
  *  the path object <B>*object</B>.
  *
+ *  \param [in] toplevel  a TOPLEVEL structure
  *  \param [in] object  path OBJECT to create string from.
  *  \return A pointer to the path OBJECT character string.
  *
@@ -242,7 +243,7 @@ OBJECT *o_path_read (TOPLEVEL *toplevel,
  *  Caller must g_free returned character string.
  *
  */
-char *o_path_save (OBJECT *object)
+char *o_path_save (TOPLEVEL *toplevel, OBJECT *object)
 {
   int line_width, line_space, line_length;
   char *buf;
@@ -303,6 +304,8 @@ void o_path_modify (TOPLEVEL *toplevel, OBJECT *object,
   int grip_no = 0;
   PATH_SECTION *section;
 
+  o_emit_pre_change_notify (toplevel, object);
+
   for (i = 0; i <  object->path->num_sections; i++) {
     section = &object->path->sections[i];
 
@@ -334,6 +337,7 @@ void o_path_modify (TOPLEVEL *toplevel, OBJECT *object,
 
   /* Update bounding box */
   o_path_recalc (toplevel, object);
+  o_emit_change_notify (toplevel, object);
 }
 
 
@@ -477,19 +481,21 @@ void o_path_mirror_world (TOPLEVEL *toplevel, int world_centerx,
  */
 void o_path_recalc (TOPLEVEL *toplevel, OBJECT *o_current)
 {
-  int left, right, top, bottom;
+  int left = 0, right = 0, top = 0, bottom = 0;
 
-  if (o_current->path == NULL) {
-    return;
-  }
+  g_return_if_fail (o_current->path != NULL);
 
   /* Update the bounding box */
-  world_get_path_bounds (toplevel, o_current, &left, &top, &right, &bottom);
-  o_current->w_left   = left;
-  o_current->w_top    = top;
-  o_current->w_right  = right;
-  o_current->w_bottom = bottom;
-  o_current->w_bounds_valid = TRUE;
+  if (o_current->path->num_sections > 0) {
+    world_get_path_bounds (toplevel, o_current, &left, &top, &right, &bottom);
+    o_current->w_left   = left;
+    o_current->w_top    = top;
+    o_current->w_right  = right;
+    o_current->w_bottom = bottom;
+    o_current->w_bounds_valid = TRUE;
+  } else {
+    o_current->w_bounds_valid = FALSE;
+  }
 }
 
 
@@ -901,13 +907,10 @@ static void o_path_print_mesh (TOPLEVEL *toplevel, FILE *fp, PATH *path,
 void o_path_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
                   int origin_x, int origin_y)
 {
-  int color;
   int line_width, length, space;
   int fill_width, angle1, pitch1, angle2, pitch2;
   DRAW_FUNC outl_func = NULL;
   FILL_FUNC fill_func = NULL;
-
-  color  = o_current->color;
 
   /*! \note
    *  Depending on the type of the line for this particular path, the

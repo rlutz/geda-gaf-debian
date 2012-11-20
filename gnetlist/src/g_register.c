@@ -81,23 +81,20 @@ static struct gsubr_t gnetlist_funcs[] = {
   { "gnetlist:get-nets",            2, 0, 0, g_get_nets },
   { "gnetlist:get-pins-nets",       1, 0, 0, g_get_pins_nets },
 
-  { "gnetlist:get-package-attribute",  2, 0, 0, g_get_package_attribute },
+  { "gnetlist:get-all-package-attributes", 2, 0, 0, g_get_all_package_attributes },
   { "gnetlist:get-toplevel-attribute", 1, 0, 0, g_get_toplevel_attribute },
   /* { "gnetlist:set-netlist-mode", 1, 0, 0, g_set_netlist_mode }, no longer needed */
   { "gnetlist:get-renamed-nets",    1, 0, 0, g_get_renamed_nets },
   { "gnetlist:get-attribute-by-pinseq",    3, 0, 0, g_get_attribute_by_pinseq },
   { "gnetlist:get-attribute-by-pinnumber", 3, 0, 0, g_get_attribute_by_pinnumber },
   { "gnetlist:vams-get-package-attributes", 1, 0, 0, vams_get_package_attributes },
-  { "gnetlist:get-slots",           1, 0, 0, g_get_slots },
-  { "gnetlist:get-unique-slots",    1, 0, 0, g_get_unique_slots },
 
   { "gnetlist:graphical-objs-in-net-with-attrib-get-attrib",    
     3, 0, 0, g_graphical_objs_in_net_with_attrib_get_attrib },
 
   /* SDB -- 9.1.2003 */
-  { "gnetlist:get-calling-flags",   0, 0, 0, g_get_calling_flags },
-  /* SDB -- 8.22.2004 */
-  { "gnetlist:get-command-line",    0, 0, 0, g_get_command_line },
+  { "gnetlist:get-backend-arguments", 0, 0, 0, g_get_backend_arguments },
+  { "gnetlist:get-input-files",     0, 0, 0, g_get_input_files },
   { NULL,                           0, 0, 0, NULL } };
 
 

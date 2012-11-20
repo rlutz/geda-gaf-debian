@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <config.h>
+#include <missing.h>
 #include <version.h>
 
 #include <stdio.h>
@@ -57,35 +58,55 @@ void g_rc_parse_gtkrc()
   g_free (filename);
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
+/*! \brief Verify the version of the RC file under evaluation.
  *  \par Function Description
  *
+ *  Implements the Scheme function "gschem-version". Tests the version
+ *  string in the argument against the version of the application
+ *  itself.
+ *
+ *  \param [in] scm_version Scheme object containing RC file version string
+ *
+ *  \returns #t if the version of the RC file matches the application,
+ *           else #f.
  */
-SCM g_rc_gschem_version(SCM version)
+SCM g_rc_gschem_version(SCM scm_version)
 {
   SCM ret;
+  char *version;
+  SCM rc_filename;
+  char *sourcefile;
   
-  SCM_ASSERT (scm_is_string (version), version,
+  SCM_ASSERT (scm_is_string (scm_version), scm_version,
               SCM_ARG1, "gschem-version");
 
-  if (g_strcasecmp (SCM_STRING_CHARS (version), PACKAGE_DATE_VERSION) != 0) {
+  scm_dynwind_begin (0);
+  version = scm_to_utf8_string (scm_version);
+  scm_dynwind_free (version);
+
+  if (g_utf8_collate (g_utf8_casefold (version,-1),
+		      g_utf8_casefold (PACKAGE_DATE_VERSION,-1)) != 0) {
+    sourcefile = NULL;
+    rc_filename = g_rc_rc_filename ();
+    sourcefile = scm_to_utf8_string (rc_filename);
+    scm_dynwind_free (sourcefile);
     fprintf(stderr,
             "You are running gEDA/gaf version [%s%s.%s],\n",
             PREPEND_VERSION_STRING, PACKAGE_DOTTED_VERSION,
             PACKAGE_DATE_VERSION);
     fprintf(stderr,
             "but you have a version [%s] gschemrc file:\n[%s]\n",
-            SCM_STRING_CHARS (version), rc_filename);
+            version, sourcefile);
     fprintf(stderr,
             "Please be sure that you have the latest rc file.\n");
     ret = SCM_BOOL_F;
   } else {
     ret = SCM_BOOL_T;
   }
-
+  scm_dynwind_end();
   return ret;
 }
+
 
 /*! \todo Finish function documentation!!!
  *  \brief
@@ -365,6 +386,17 @@ SCM g_rc_embed_components(SCM mode)
 		   2);
 }
 
+static void
+free_string_glist(void *data)
+{
+  GList *iter, *glst = *((GList **) data);
+
+  for (iter = glst; iter != NULL; iter = g_list_next (iter)) {
+    g_free (iter->data);
+  }
+  g_list_free (glst);
+}
+
 /*! \brief read the configuration string list for the component dialog
  *  \par Function Description
  *  This function reads the string list from the component-dialog-attributes
@@ -385,14 +417,23 @@ SCM g_rc_component_dialog_attributes(SCM stringlist)
   g_list_foreach(default_component_select_attrlist, (GFunc)g_free, NULL);
   g_list_free(default_component_select_attrlist);
 
+  scm_dynwind_begin(0);
+  scm_dynwind_unwind_handler(free_string_glist, (void *) &list, 0);
+
   /* convert the scm list into a GList */
   for (i=0; i < length; i++) {
-    SCM_ASSERT(scm_is_string(scm_list_ref(stringlist, scm_from_int(i))), 
-	       scm_list_ref(stringlist, scm_from_int(i)), SCM_ARG1, 
-	       "list element is not a string");
-    attr = g_strdup(SCM_STRING_CHARS(scm_list_ref(stringlist, scm_from_int(i))));
+    char *str;
+    SCM elem = scm_list_ref(stringlist, scm_from_int(i));
+
+    SCM_ASSERT(scm_is_string(elem), elem, SCM_ARG1, "list element is not a string");
+
+    str = scm_to_utf8_string(elem);
+    attr = g_strdup(str);
+    free(str);
     list = g_list_prepend(list, attr);
   }
+
+  scm_dynwind_end();
 
   default_component_select_attrlist = g_list_reverse(list);
 
@@ -420,27 +461,6 @@ SCM g_rc_text_size(SCM size)
   }
 
   default_text_size = val;
-
-  return SCM_BOOL_T;
-}
-
-/*! \brief Catch deprecated option to set the output font scaling factor
- *
- *  \par This setting used to change the scale of the output PS font
- *  characters. Since gEDA 1.6.0, this is fixed to match the on-screen
- *  font size.
- *
- *  \return SCM_BOOL_T always.
- */
-
-SCM g_rc_postscript_font_scale(SCM scale)
-{
-  g_warning (_("\n"
-               "The config option postscript-font-scale is "
-               "deprecated and will be removed in gEDA 1.8.0.\n"
-               "Printed text is fixed to match on-screen sizes. "
-               "Please remove this option from your config files.\n"
-               "\n"));
 
   return SCM_BOOL_T;
 }
@@ -519,7 +539,7 @@ SCM g_rc_attribute_name(SCM scm_path)
   SCM_ASSERT (scm_is_string (scm_path), scm_path,
               SCM_ARG1, "attribute-name");
 
-  path = SCM_STRING_CHARS (scm_path);
+  path = scm_to_utf8_string (scm_path);
 
   /* not unique? */
   if (!s_attrib_uniq(path)) {
@@ -528,7 +548,8 @@ SCM g_rc_attribute_name(SCM scm_path)
     s_attrib_add_entry (path);
     ret = SCM_BOOL_T;
   }
-  
+
+  free(path);
   return ret;
 }
 
@@ -563,8 +584,8 @@ SCM g_rc_paper_size(SCM width, SCM height)
               SCM_ARG2, FUNC_NAME);
   
   /* yes this is legit, we are casting the resulting double to an int */
-  default_paper_width  = (int) (SCM_NUM2DOUBLE (0, width)  * MILS_PER_INCH);
-  default_paper_height = (int) (SCM_NUM2DOUBLE (0, height) * MILS_PER_INCH);
+  default_paper_width  = (int) (scm_to_double (width)  * MILS_PER_INCH);
+  default_paper_height = (int) (scm_to_double (height) * MILS_PER_INCH);
 
   return SCM_BOOL_T;
 }
@@ -590,9 +611,9 @@ SCM g_rc_paper_sizes(SCM scm_papername, SCM scm_width, SCM scm_height)
   SCM_ASSERT (SCM_NIMP (scm_height) && SCM_REALP (scm_height), scm_height,
               SCM_ARG3, FUNC_NAME);
 
-  papername = SCM_STRING_CHARS (scm_papername);
-  width  = (int) (SCM_NUM2DOUBLE (0, scm_width)  * MILS_PER_INCH);
-  height = (int) (SCM_NUM2DOUBLE (0, scm_height) * MILS_PER_INCH);
+  width  = (int) (scm_to_double (scm_width)  * MILS_PER_INCH);
+  height = (int) (scm_to_double (scm_height) * MILS_PER_INCH);
+  papername = scm_to_utf8_string (scm_papername);
 
   if (!s_papersizes_uniq(papername)) {
     ret = SCM_BOOL_F;
@@ -601,6 +622,7 @@ SCM g_rc_paper_sizes(SCM scm_papername, SCM scm_width, SCM scm_height)
     ret = SCM_BOOL_T;
   }
 
+  free(papername);
   return ret;
 }
 #undef FUNC_NAME
@@ -1064,14 +1086,18 @@ SCM g_rc_sort_component_library(SCM mode)
  *  \par Function Description
  *
  */
-SCM g_rc_add_menu(SCM menu_name, SCM menu_items)
+SCM g_rc_add_menu(SCM scm_menu_name, SCM scm_menu_items)
 {
-  SCM_ASSERT (scm_is_string (menu_name), menu_name,
+  char *menu_name;
+
+  SCM_ASSERT (scm_is_string (scm_menu_name), scm_menu_name,
               SCM_ARG1, "add-menu");
-  SCM_ASSERT (SCM_NIMP (menu_items) && SCM_CONSP (menu_items), menu_items,
+  SCM_ASSERT (SCM_NIMP (scm_menu_items) && SCM_CONSP (scm_menu_items), scm_menu_items,
               SCM_ARG2, "add-menu");
 
-  s_menu_add_entry(SCM_STRING_CHARS (menu_name), menu_items);  
+  menu_name = scm_to_utf8_string (scm_menu_name);
+  s_menu_add_entry(menu_name, scm_menu_items);
+  free (menu_name);
 
   return SCM_BOOL_T;
 }
@@ -1397,23 +1423,6 @@ SCM g_rc_auto_save_interval(SCM seconds)
  *  \par Function Description
  *
  */
-SCM g_rc_drag_can_move(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {TRUE,  "enabled" },
-    {FALSE, "disabled"  }
-  };
-
-  RETURN_G_RC_MODE("drag-can-move",
-		   default_drag_can_move,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
 SCM g_rc_mousepan_gain(SCM gain)
 {
   int val;
@@ -1469,10 +1478,11 @@ SCM g_rc_print_command(SCM scm_command)
   SCM_ASSERT (scm_is_string (scm_command), scm_command,
               SCM_ARG1, FUNC_NAME);
   
-  command = SCM_STRING_CHARS (scm_command);
+  command = scm_to_utf8_string (scm_command);
 
   g_free (default_print_command);
   default_print_command = g_strdup (command);
+  free (command);
 
   return SCM_BOOL_T;
 }

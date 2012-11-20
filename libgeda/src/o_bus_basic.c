@@ -32,9 +32,6 @@
 #include <dmalloc.h>
 #endif
 
-/*! Default setting for bus draw function. */
-void (*bus_draw_func)() = NULL;
-
 /*! \brief get the position of the first bus point
  *  \par Function Description
  *  This function gets the position of the first point of a bus object.
@@ -105,14 +102,6 @@ OBJECT *o_bus_new(TOPLEVEL *toplevel,
 
   o_bus_recalc (toplevel, new_node);
 
-  new_node->draw_func = bus_draw_func;  
-  new_node->sel_func = select_func;  
-
-  if (!toplevel->ADDING_SEL) {
-    s_tile_add_object (toplevel, new_node);
-    s_conn_update_object (toplevel, new_node);
-  }
-
   return new_node;
 }
 
@@ -151,14 +140,13 @@ void o_bus_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
  *  allocated and appended to the \a object_list.
  *  
  *  \param [in] toplevel     The TOPLEVEL object
- *  \param [in] object_list  list of OBJECTS to append a new bus
  *  \param [in] buf          a text buffer (usually a line of a schematic file)
  *  \param [in] release_ver  The release number gEDA
  *  \param [in] fileformat_ver a integer value of the file format
- *  \return The object list
+ *  \return The object list, or NULL on error.
  */
-OBJECT *o_bus_read (TOPLEVEL *toplevel, char buf[],
-                    unsigned int release_ver, unsigned int fileformat_ver)
+OBJECT *o_bus_read (TOPLEVEL *toplevel, const char buf[],
+                    unsigned int release_ver, unsigned int fileformat_ver, GError **err)
 {
   OBJECT *new_obj;
   char type; 
@@ -168,11 +156,17 @@ OBJECT *o_bus_read (TOPLEVEL *toplevel, char buf[],
   int ripper_dir;
 
   if (release_ver <= VERSION_20020825) {
-    sscanf (buf, "%c %d %d %d %d %d\n", &type, &x1, &y1, &x2, &y2, &color);
+    if (sscanf (buf, "%c %d %d %d %d %d\n", &type, &x1, &y1, &x2, &y2, &color) != 6) {
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse bus object"));
+      return NULL;
+    }
     ripper_dir = 0;
   } else {
-    sscanf (buf, "%c %d %d %d %d %d %d\n", &type, &x1, &y1, &x2, &y2, &color,
-            &ripper_dir);
+    if (sscanf (buf, "%c %d %d %d %d %d %d\n", &type, &x1, &y1, &x2, &y2, &color,
+		&ripper_dir) != 7) {
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse bus object"));
+      return NULL;
+    }
   }
 
   if (x1 == x2 && y1 == y2) {
@@ -206,10 +200,11 @@ OBJECT *o_bus_read (TOPLEVEL *toplevel, char buf[],
  *  This function takes a bus \a object and return a string
  *  according to the file format definition.
  *
+ *  \param [in] toplevel  a TOPLEVEL structure
  *  \param [in] object  a bus OBJECT
  *  \return the string representation of the bus OBJECT
  */
-char *o_bus_save(OBJECT *object)
+char *o_bus_save(TOPLEVEL *toplevel, OBJECT *object)
 {
   int x1, x2, y1, y2;
   char *buf;
@@ -235,9 +230,6 @@ char *o_bus_save(OBJECT *object)
  */
 void o_bus_translate_world(TOPLEVEL *toplevel, int dx, int dy, OBJECT *object)
 {
-  if (object == NULL) printf("btw NO!\n");
-
-
   /* Update world coords */
   object->line->x[0] = object->line->x[0] + dx;
   object->line->y[0] = object->line->y[0] + dy;
@@ -288,8 +280,7 @@ OBJECT *o_bus_copy(TOPLEVEL *toplevel, OBJECT *o_current)
 void o_bus_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
 		 int origin_x, int origin_y)
 {
-  int offset, offset2;
-  int cross, bus_width;
+  int bus_width;
   int x1, y1;
   int x2, y2;
 
@@ -297,11 +288,6 @@ void o_bus_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
     printf("got null in o_bus_print\n");
     return;
   }
-
-  offset = 7*6;
-  offset2 = 7;  
-
-  cross = offset;
 
   f_print_set_color(toplevel, fp, o_current->color);
 

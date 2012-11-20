@@ -4,6 +4,7 @@ libgedaincludedir = $(includedir)/libgeda
 libgedainclude_HEADERS = \
 	libgeda/colors.h \
 	libgeda/defines.h \
+	libgeda/edaerrors.h \
 	libgeda/funcs.h \
 	libgeda/geda_list.h \
 	libgeda/globals.h \
@@ -11,14 +12,17 @@ libgedainclude_HEADERS = \
 	libgeda/o_types.h \
 	libgeda/papersizes.h \
 	libgeda/prototype.h \
+	libgeda/libgedaguile.h \
 	libgeda/struct.h
+
 
 noinst_HEADERS = \
 	gettext_priv.h \
 	i_vars_priv.h \
 	libgeda_priv.h \
 	prototype_priv.h \
-	struct_priv.h
+	struct_priv.h \
+	libgedaguile_priv.h
 
 MOSTLYCLEANFILES = *.log core FILE *~
 CLEANFILES = *.log core FILE *~

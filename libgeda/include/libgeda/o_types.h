@@ -14,16 +14,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02111-1301 USA.
  */
 
 #ifndef _O_TYPES_H_INCL
 #define _O_TYPES_H_INCL
 
 /* Object types */
-/* Object types are also available in scheme */
-/* If there is any addition, add them also in g_register.c 
-   (function g_register_libgeda_vars) */
 #define OBJ_LINE        'L'
 #define OBJ_PATH        'H'
 #define OBJ_BOX         'B'
