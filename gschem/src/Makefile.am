@@ -1,13 +1,25 @@
 bin_PROGRAMS = gschem
 
+BUILT_SOURCES = \
+	g_attrib.x \
+	g_hook.x \
+	g_keys.x \
+	g_util.x \
+	g_window.x \
+	g_select.x
+
 gschem_SOURCES = \
 	a_pan.c \
 	a_zoom.c \
+	g_attrib.c \
 	g_funcs.c \
 	g_hook.c \
 	g_keys.c \
 	g_rc.c \
 	g_register.c \
+	g_select.c \
+	g_util.c \
+	g_window.c \
 	globals.c \
 	gschem.c \
 	gschem_accel_label.c \
@@ -46,6 +58,7 @@ gschem_SOURCES = \
 	o_text.c \
 	o_undo.c \
 	parsecmd.c \
+	s_stretch.c \
 	x_attribedit.c \
 	x_autonumber.c \
 	x_basic.c \
@@ -59,10 +72,12 @@ gschem_SOURCES = \
 	x_image.c \
 	x_log.c \
 	x_menus.c \
+	x_misc.c \
 	x_multiattrib.c \
 	x_pagesel.c \
 	x_preview.c \
 	x_print.c \
+	x_rc.c \
 	x_script.c \
 	x_stroke.c \
 	x_window.c
@@ -76,12 +91,19 @@ gschem_LDFLAGS = $(LIBSTROKE_LDFLAGS) $(GLIB_LIBS) $(GTK_LIBS) \
 	$(GTHREAD_LIBS) $(GUILE_LIBS) $(MINGW_GUI_LDFLAGS)
 gschem_LDADD = $(top_builddir)/libgeda/src/libgeda.la @LIBINTL@
 
+
+# This is used to generate boilerplate for defining Scheme functions
+# in C.
+SUFFIXES = .x
+snarf_cpp_opts = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(gschem_CPPFLAGS) $(AM_CFLAGS) $(gschem_CFLAGS)
+.c.x:
+	CPP="$(CPP)" $(GUILE_SNARF) -o $@ $< $(snarf_cpp_opts)
+
 localedir = @datadir@/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 
-EXTRA_DIST = rcstrings.c
-
 MOSTLYCLEANFILES = *.log core FILE *~
-CLEANFILES = *.log core FILE *~
+CLEANFILES = *.log core FILE *~ $(BUILT_SOURCES)
 DISTCLEANFILES = *.log core FILE *~
 MAINTAINERCLEANFILES = *.log core FILE *~ Makefile.in

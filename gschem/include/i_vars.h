@@ -1,7 +1,6 @@
 
 extern int default_text_size;
 extern int default_text_caps;
-extern float default_postscript_font_scale;
 extern gchar *default_print_command;
 extern int default_override_net_color;
 extern int default_override_bus_color;
@@ -77,7 +76,6 @@ extern int default_dots_grid_fixed_threshold;
 extern int default_mesh_grid_display_threshold;
 extern int default_add_attribute_offset;
 extern int default_auto_save_interval;
-extern int default_drag_can_move;
 extern int default_mousepan_gain;
 extern int default_keyboardpan_gain;
 extern int default_select_slack_pixels;

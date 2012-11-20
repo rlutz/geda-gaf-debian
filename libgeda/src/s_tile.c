@@ -130,10 +130,9 @@ static void s_tile_add_line_object (TOPLEVEL *toplevel, OBJECT *object)
   g_return_if_fail (object != NULL);
   g_return_if_fail (object->line != NULL);
 
-  if (toplevel->ADDING_SEL) {
-#if DEBUG    
-    printf("s_tile_add_object, adding sel TRUE\n");
-#endif
+  p_current = o_get_page (toplevel, object);
+
+  if (p_current == NULL) {
     return;
   }
   
@@ -146,7 +145,6 @@ static void s_tile_add_line_object (TOPLEVEL *toplevel, OBJECT *object)
   y2 = (int) (object->line->y[1] / y_size);
 
   bottom = x2 - x1;
-  p_current = toplevel->page_current;
 
   if (bottom != 0.0) {
     m = (double) (y2 - y1) / bottom;
@@ -309,12 +307,22 @@ static void s_tile_add_line_object (TOPLEVEL *toplevel, OBJECT *object)
  */
 void s_tile_add_object (TOPLEVEL *toplevel, OBJECT *object)
 {
+  GList *iter;
+
   switch (object->type) {
     case OBJ_NET:
     case OBJ_PIN:
     case OBJ_BUS:
       s_tile_add_line_object (toplevel, object);
       break;
+
+  case OBJ_COMPLEX:
+  case OBJ_PLACEHOLDER:
+    for (iter = object->complex->prim_objs;
+         iter != NULL;
+         iter = g_list_next (iter)) {
+      s_tile_add_object (toplevel, iter->data);
+    }
   }
 }
 
@@ -326,7 +334,17 @@ void s_tile_add_object (TOPLEVEL *toplevel, OBJECT *object)
  */
 void s_tile_remove_object(OBJECT *object)
 {
+  GList *iter;
   GList *tl_current;
+
+  /* Correctly deal with compound objects */
+  if (object->type == OBJ_COMPLEX || object->type == OBJ_PLACEHOLDER) {
+    for (iter = object->complex->prim_objs;
+         iter != NULL;
+         iter = g_list_next (iter)) {
+      s_tile_remove_object (iter->data);
+    }
+  }
 
   for (tl_current = object->tiles;
        tl_current != NULL;
@@ -362,16 +380,14 @@ void s_tile_update_object(TOPLEVEL * toplevel, OBJECT * object)
  *  by the given rectangle (x1,y1), (x2,y2).
  *  \note The caller has to g_list_free() the returned list.
  */
-GList* s_tile_get_objectlists(TOPLEVEL *toplevel, int world_x1, int world_y1,
-			      int world_x2, int world_y2)
+GList* s_tile_get_objectlists(TOPLEVEL *toplevel, PAGE *p_current,
+                              int world_x1, int world_y1,
+                              int world_x2, int world_y2)
 {
   TILE *t_current;
-  PAGE *p_current;
   int x1, x2, y1, y2, x, y;
   double x_size, y_size;
   GList *objectlists = NULL;
-
-  p_current = toplevel->page_current;
 
   x_size = (double) toplevel->init_right / (double) MAX_TILES_X;
   y_size = (double) toplevel->init_bottom / (double) MAX_TILES_Y;
@@ -413,7 +429,7 @@ GList* s_tile_get_objectlists(TOPLEVEL *toplevel, int world_x1, int world_y1,
  *  Debugging function to print all object names that are inside
  *  the tiles.
  */
-void s_tile_print(TOPLEVEL * toplevel)
+void s_tile_print(TOPLEVEL * toplevel, PAGE *page)
 {
   TILE *t_current;
   GList *temp;
@@ -424,7 +440,7 @@ void s_tile_print(TOPLEVEL * toplevel)
     for (i = 0; i < MAX_TILES_X; i++) {
       printf("\nTile %d %d\n", i, j);
 
-      t_current = &toplevel->page_current->world_tiles[i][j];
+      t_current = &page->world_tiles[i][j];
 
       temp = t_current->objects;
       while (temp) {

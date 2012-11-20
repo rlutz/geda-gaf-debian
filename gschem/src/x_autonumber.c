@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -577,11 +577,6 @@ void autonumber_remove_number(AUTONUMBER_TEXT * autotext, OBJECT *o_current)
   o_text_set_string (autotext->w_current->toplevel, o_current, str);
   g_free (str);
 
-  /* redraw the text */
-  o_invalidate (autotext->w_current, o_current);
-  o_text_recreate(autotext->w_current->toplevel, o_current);
-  o_invalidate (autotext->w_current, o_current);
-
   /* remove the slot attribute if slotting is active */
   if (autotext->slotting) {
     /* get the slot attribute */
@@ -592,9 +587,6 @@ void autonumber_remove_number(AUTONUMBER_TEXT * autotext, OBJECT *o_current)
       /* Only attempt to remove non-inherited slot attributes */
       if (o_slot != NULL && !o_attrib_is_inherited (o_slot)) {
         /* delete the slot attribute */
-        o_selection_remove (autotext->w_current->toplevel,
-                            autotext->w_current->toplevel->
-                              page_current->selection_list, o_slot);
         o_delete (autotext->w_current, o_slot);
       }
     }
@@ -623,10 +615,6 @@ void autonumber_apply_new_text(AUTONUMBER_TEXT * autotext, OBJECT *o_current,
   o_text_set_string (autotext->w_current->toplevel, o_current, str);
   g_free (str);
 
-  /* redraw the text */
-  o_invalidate (autotext->w_current, o_current);
-  o_text_recreate(autotext->w_current->toplevel, o_current);
-  o_invalidate (autotext->w_current, o_current);
   autotext->w_current->toplevel->page_current->CHANGED = 1;
 }
 
@@ -664,7 +652,9 @@ void autonumber_text_autonumber(AUTONUMBER_TEXT *autotext)
   scope_text = g_list_first(autotext->scope_text)->data;
 
   /* Step1: get all pages of the hierarchy */
-  pages = s_hierarchy_traversepages(w_current->toplevel, HIERARCHY_NODUPS);
+  pages = s_hierarchy_traversepages (w_current->toplevel,
+                                     w_current->toplevel->page_current,
+                                     HIERARCHY_NODUPS);
 
   /*  g_list_foreach(pages, (GFunc) s_hierarchy_print_page, NULL); */
 
@@ -1408,14 +1398,13 @@ void autonumber_text_dialog(GSCHEM_TOPLEVEL *w_current)
     gtk_dialog_set_default_response (GTK_DIALOG (autotext->dialog), 
                                      GTK_RESPONSE_ACCEPT);
 
-    gtk_signal_connect(GTK_OBJECT(autotext->dialog), "response",
-		       GTK_SIGNAL_FUNC(autonumber_text_response),
-		       autotext);
+    g_signal_connect (G_OBJECT (autotext->dialog), "response",
+                      G_CALLBACK (autonumber_text_response),
+                      autotext);
 
-    gtk_signal_connect(GTK_OBJECT(opt_removenum),
-		       "clicked",
-		       GTK_SIGNAL_FUNC(autonumber_removenum_toggled),
-		       autotext);
+    g_signal_connect (G_OBJECT (opt_removenum), "clicked",
+                      G_CALLBACK (autonumber_removenum_toggled),
+                      autotext);
 
     autonumber_set_state(autotext);
 

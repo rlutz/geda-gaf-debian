@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,14 +43,9 @@
  */
 void o_arc_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
-
   if (o_current->arc == NULL) {
     return;
   }
-
-  if (toplevel->DONT_REDRAW == 1)
-    return;
 
   gschem_cairo_arc (w_current, o_current->line_width,
                                o_current->arc->x,
@@ -211,12 +206,12 @@ void o_arc_end4(GSCHEM_TOPLEVEL *w_current, int radius,
                        radius, start_angle, end_angle);
   s_page_append (toplevel, toplevel->page_current, new_obj);
 
-  /* draw the new object */
-  o_invalidate (w_current, new_obj);
-
   w_current->first_wx  = -1;
   w_current->first_wy  = -1;
   w_current->distance = 0;
+
+  /* Call add-objects-hook */
+  g_run_hook_object (w_current, "%add-objects-hook", new_obj);
 
   toplevel->page_current->CHANGED = 1;
   
@@ -297,9 +292,9 @@ void o_arc_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y, int whichone)
       if (w_current->second_wy == 0)
         w_current->second_wy = 360;
       break;
-	
-    default:
-      return;
+      
+      // No default required - one of above two branches
+      // *must* be taken - Coverity ID 201571
     }
 
   }

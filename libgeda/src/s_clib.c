@@ -111,6 +111,7 @@
  */
 
 #include <config.h>
+#include <missing.h>
 
 #include <stdio.h>
 #include <glib.h>
@@ -379,11 +380,11 @@ static gint compare_source_name (gconstpointer a, gconstpointer b)
   const CLibSource *src1 = a;
   const CLibSource *src2 = b;
 
-  g_assert (src1 != NULL);
-  g_assert (src2 != NULL);
+  g_return_val_if_fail ((src1 != NULL), 0);
+  g_return_val_if_fail ((src2 != NULL), 0);
 
-  g_assert (src1->name != NULL);
-  g_assert (src2->name != NULL);
+  g_return_val_if_fail ((src1->name != NULL), 0);
+  g_return_val_if_fail ((src2->name != NULL), 0);
 
   return strcasecmp(src1->name, src2->name);
 }
@@ -404,11 +405,11 @@ static gint compare_symbol_name (gconstpointer a, gconstpointer b)
   const CLibSymbol *sym1 = a;
   const CLibSymbol *sym2 = b;
 
-  g_assert (sym1 != NULL);
-  g_assert (sym2 != NULL);
+  g_return_val_if_fail ((sym1 != NULL), 0);
+  g_return_val_if_fail ((sym2 != NULL), 0);
 
-  g_assert (sym1->name != NULL);
-  g_assert (sym2->name != NULL);
+  g_return_val_if_fail ((sym1->name != NULL), 0);
+  g_return_val_if_fail ((sym2->name != NULL), 0);
 
   return strcasecmp(sym1->name, sym2->name);
 }
@@ -746,7 +747,7 @@ static void refresh_scm (CLibSource *source)
 
       /* Need to make sure that the correct free() function is called
        * on strings allocated by Guile. */
-      tmp = scm_to_locale_string (symname);
+      tmp = scm_to_utf8_string (symname);
       symbol->name = g_strdup(tmp);
       free (tmp);
 
@@ -1136,7 +1137,7 @@ static gchar *get_data_scm (const CLibSymbol *symbol)
   g_return_val_if_fail ((symbol->source->type == CLIB_SCM), NULL);
 
   symdata = scm_call_1 (symbol->source->get_fn, 
-			scm_from_locale_string (symbol->name));
+			scm_from_utf8_string (symbol->name));
 
   if (!scm_is_string (symdata)) {
     s_log_message (_("Failed to load symbol data [%s] from source [%s]\n"),
@@ -1146,7 +1147,7 @@ static gchar *get_data_scm (const CLibSymbol *symbol)
 
   /* Need to make sure that the correct free() function is called
    * on strings allocated by Guile. */
-  tmp = scm_to_locale_string (symdata);
+  tmp = scm_to_utf8_string (symdata);
   result = g_strdup(tmp);
   free (tmp);
 
@@ -1224,7 +1225,6 @@ gchar *s_clib_symbol_get_data (const CLibSymbol *symbol)
 
   return data;
 }
-
 
 /*! \brief Find all symbols matching a pattern.  
  *
@@ -1351,6 +1351,18 @@ void s_clib_flush_search_cache ()
 void s_clib_flush_symbol_cache ()
 {
   g_hash_table_remove_all (clib_symbol_cache);  /* Introduced in glib 2.12 */
+}
+
+/*! \brief Invalidate all cached data about a symbol.
+ * \par Function Description
+ * Removes all cached symbol data for \a symbol.
+ *
+ * \param symbol Symbol to flush cached data for.
+ */
+void
+s_clib_symbol_invalidate_data (const CLibSymbol *symbol)
+{
+  g_hash_table_remove (clib_symbol_cache, (gpointer) symbol);
 }
 
 /*! \brief Get symbol structure for a given symbol name.

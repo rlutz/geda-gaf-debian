@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,7 +81,6 @@ static struct gsubr_t gschem_funcs[] = {
   { "attribute-name",            1, 0, 0, g_rc_attribute_name },
   { "paper-size",                2, 0, 0, g_rc_paper_size },
   { "paper-sizes",               3, 0, 0, g_rc_paper_sizes },
-  { "postscript-font-scale",     1, 0, 0, g_rc_postscript_font_scale },
 
   { "output-type",               1, 0, 0, g_rc_output_type },
   { "output-orientation",        1, 0, 0, g_rc_output_orientation },
@@ -105,8 +104,6 @@ static struct gsubr_t gschem_funcs[] = {
   { "undo-control",              1, 0, 0, g_rc_undo_control },
   { "undo-type",                 1, 0, 0, g_rc_undo_type },
   { "undo-panzoom",              1, 0, 0, g_rc_undo_panzoom },
-
-  { "drag-can-move",             1, 0, 0, g_rc_drag_can_move },
 
   { "draw-grips",                1, 0, 0, g_rc_draw_grips },
   { "netconn-rubberband",        1, 0, 0, g_rc_netconn_rubberband },
@@ -148,7 +145,6 @@ static struct gsubr_t gschem_funcs[] = {
   { "gschem-msg",                1, 0, 0, g_funcs_msg },
   { "gschem-confirm",            1, 0, 0, g_funcs_confirm },
   { "gschem-filesel",            2, 0, 1, g_funcs_filesel },
-  { "gschem-browse-wiki",        0, 1, 0, g_funcs_browse_wiki },
 
   /* keymapping callbacks */
   { "file-new-window",           0, 0, 0, g_keys_file_new_window },
@@ -165,6 +161,8 @@ static struct gsubr_t gschem_funcs[] = {
   { "edit-undo",                 0, 0, 0, g_keys_edit_undo },
   { "edit-redo",                 0, 0, 0, g_keys_edit_redo },
   { "edit-select",               0, 0, 0, g_keys_edit_select },
+  { "edit-select-all",           0, 0, 0, g_keys_edit_select_all },
+  { "edit-deselect",             0, 0, 0, g_keys_edit_deselect },
   { "edit-copy",                 0, 0, 0, g_keys_edit_copy },
   { "edit-copy-hotkey",          0, 0, 0, g_keys_edit_copy_hotkey },
   { "edit-mcopy",                0, 0, 0, g_keys_edit_mcopy },
@@ -190,7 +188,6 @@ static struct gsubr_t gschem_funcs[] = {
   { "edit-unembed",              0, 0, 0, g_keys_edit_unembed },
   { "edit-update",               0, 0, 0, g_keys_edit_update },
   { "edit-show-hidden",          0, 0, 0, g_keys_edit_show_hidden },
-  { "edit-make-text-visible",    0, 0, 0, g_keys_edit_make_visible },
   { "edit-find-text",            0, 0, 0, g_keys_edit_find },
   { "edit-show-text",            0, 0, 0, g_keys_edit_show_text },
   { "edit-hide-text",            0, 0, 0, g_keys_edit_hide_text },
@@ -237,9 +234,9 @@ static struct gsubr_t gschem_funcs[] = {
   { "view-pan-right",		 0, 0, 0, g_keys_view_pan_right },
   { "view-pan-up",		 0, 0, 0, g_keys_view_pan_up },
   { "view-pan-down",		 0, 0, 0, g_keys_view_pan_down },
-  { "view-update-cues",          0, 0, 0, g_keys_view_update_cues },
   { "view-dark-colors",          0, 0, 0, g_keys_view_dark_colors },
   { "view-light-colors",         0, 0, 0, g_keys_view_light_colors },
+  { "view-bw-colors",            0, 0, 0, g_keys_view_bw_colors },
   { "page-manager",              0, 0, 0, g_keys_page_manager },
   { "page-next",                 0, 0, 0, g_keys_page_next },
   { "page-prev",                 0, 0, 0, g_keys_page_prev },
@@ -271,7 +268,6 @@ static struct gsubr_t gschem_funcs[] = {
   { "hierarchy-down-schematic",  0, 0, 0, g_keys_hierarchy_down_schematic },
   { "hierarchy-down-symbol",     0, 0, 0, g_keys_hierarchy_down_symbol },
   { "hierarchy-up",              0, 0, 0, g_keys_hierarchy_up },
-  { "hierarchy-documentation",   0, 0, 0, g_keys_hierarchy_documentation },
   { "attributes-attach",         0, 0, 0, g_keys_attributes_attach },
   { "attributes-detach",         0, 0, 0, g_keys_attributes_detach },
   { "attributes-show-name",      0, 0, 0, g_keys_attributes_show_name },
@@ -291,16 +287,11 @@ static struct gsubr_t gschem_funcs[] = {
   { "options-show-coord-window", 0, 0, 0, g_keys_options_show_coord_window },
   { "help-about",                0, 0, 0, g_keys_help_about },
   { "help-hotkeys",              0, 0, 0, g_keys_help_hotkeys },
-  { "help-component",            0, 0, 0, g_keys_hierarchy_documentation },
   { "misc-misc",                 0, 0, 0, g_keys_misc },
   { "misc-misc2",                0, 0, 0, g_keys_misc2 },
   { "misc-misc3",                0, 0, 0, g_keys_misc3 },
   { "cancel",                    0, 0, 0, g_keys_cancel },
 
-  /*help functions for generating netlists*/
-  { "get-selected-filename",     0, 0, 0, g_get_selected_filename },
-  { "get-selected-component-attributes", 0, 0, 0, g_get_selected_component_attributes },
-  
   { NULL,                        0, 0, 0, NULL } };
 
 /*! \brief Define a hook.
@@ -335,33 +326,5 @@ void g_register_funcs (void)
   }
 
   /* Hook stuff */
-  scm_c_define_gsubr ("add-attribute-to-object", 5, 0, 0, g_add_attrib);
-  scm_c_define_gsubr ("get-object-attributes", 1, 0, 0, g_get_object_attributes);
-  scm_c_define_gsubr ("get-object-bounds", 3, 0, 0, g_get_object_bounds);
-  scm_c_define_gsubr ("get-object-pins", 1, 0, 0, g_get_object_pins);
-  scm_c_define_gsubr ("get-pin-ends", 1, 0, 0, g_get_pin_ends);
-  scm_c_define_gsubr ("set-attribute-text-properties!", 7, 0, 0, g_set_attrib_text_properties);
-  scm_c_define_gsubr ("set-attribute-value!", 2, 0, 0, g_set_attrib_value_x);
-  scm_c_define_gsubr ("add-component-at-xy", 7, 0, 0, g_add_component);
-  scm_c_define_gsubr ("get-objects-in-page", 1, 0, 0, g_get_objects_in_page);
-  scm_c_define_gsubr ("get-current-page", 0, 0, 0, g_get_current_page);
-
-  add_component_hook  = create_hook ("add-component-hook", 1);
-  add_component_object_hook  = create_hook ("add-component-object-hook", 1);
-  rotate_component_object_hook  = create_hook ("rotate-component-object-hook", 1);
-  mirror_component_object_hook  = create_hook ("mirror-component-object-hook", 1);
-  copy_component_hook = create_hook ("copy-component-hook", 1);
-  move_component_hook = create_hook ("move-component-hook", 1);
-  deselect_component_hook = create_hook ("deselect-component-hook", 1);
-  deselect_net_hook = create_hook ("deselect-net-hook", 1);
-  deselect_all_hook = create_hook ("deselect-all-hook", 1);
-  select_component_hook = create_hook ("select-component-hook", 1);
-  select_net_hook = create_hook ("select-net-hook", 1);
-
-  add_pin_hook = create_hook ("add-pin-hook", 1);
-  mirror_pin_hook = create_hook ("mirror-pin-hook", 1);
-  rotate_pin_hook = create_hook ("rotate-pin-hook", 1);
-  add_attribute_hook = create_hook ("add-attribute-hook", 1);
-  new_page_hook = create_hook ("new-page-hook", 1);
   complex_place_list_changed_hook = create_hook ("complex-place-list-changed-hook", 1);
 }

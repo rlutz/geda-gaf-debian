@@ -18,14 +18,16 @@ all:
 
 images: $(png_images) $(pdf_images)
 
-clean:
+clean-local:
 	rm -rf $(png_images) $(pdf_images)
 
-%.png: %.svg
+.svg.png:
 	inkscape -e $@ $<  ||  convert $< $@
 
-%.pdf: %.svg
+.svg.pdf:
 	inkscape -A $@ $<  ||  convert $< $@
+
+SUFFIXES = .svg .pdf .png
 
 MOSTLYCLEANFILES = *~ $(png_images) $(pdf_images)
 CLEANFILES = *~ $(png_images) $(pdf_images)

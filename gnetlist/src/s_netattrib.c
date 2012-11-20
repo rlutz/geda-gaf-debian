@@ -113,10 +113,7 @@ s_netattrib_create_pins(TOPLEVEL * pr_current, OBJECT * o_current,
 
 	    if (old_cpin) {
 
-		if (!old_cpin->nets) {
-		    fprintf(stderr,
-			    "Ack! internal error! (s_netattrib_create_pins)\n");
-		}
+		g_assert (old_cpin->nets != NULL);
 
 		if (old_cpin->nets->net_name) {
 		    fprintf(stderr,
@@ -305,7 +302,7 @@ char *s_netattrib_return_netname(TOPLEVEL * pr_current, OBJECT * o_current,
 #endif
 
     /* skip over POWER tag */
-    current_pin = strtok(pinnumber, " ");
+    (void) strtok(pinnumber, " ");
 
     current_pin = strtok(NULL, " ");
     if (current_pin == NULL) {

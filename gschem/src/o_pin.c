@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,21 +44,18 @@ void o_pin_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
   }
 
   /* reuse line's routine */
-  if ( (toplevel->DONT_REDRAW == 1) ||
-       (!o_line_visible (w_current, o_current->line, &x1, &y1, &x2, &y2)) ) {
+  if (!o_line_visible (w_current, o_current->line, &x1, &y1, &x2, &y2)) {
     return;
   }
 
-  if (toplevel->DONT_REDRAW == 0) {
-    if (toplevel->pin_style == THICK)
-      size = o_current->line_width;
+  if (toplevel->pin_style == THICK)
+    size = o_current->line_width;
 
-    gschem_cairo_line (w_current, END_NONE, size, x1, y1, x2, y2);
+  gschem_cairo_line (w_current, END_NONE, size, x1, y1, x2, y2);
 
-    gschem_cairo_set_source_color (w_current,
-                                   o_drawing_color (w_current, o_current));
-    gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, size, -1, -1);
-  }
+  gschem_cairo_set_source_color (w_current,
+                                 o_drawing_color (w_current, o_current));
+  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, size, -1, -1);
 
   /* draw the cue directly */
   o_cue_draw_lowlevel(w_current, o_current, o_current->whichend);
@@ -120,8 +117,6 @@ void o_pin_end(GSCHEM_TOPLEVEL *w_current, int x, int y)
   TOPLEVEL *toplevel = w_current->toplevel;
   OBJECT *new_obj;
   int color;
-  GList *prev_conn_objects = NULL;
-  OBJECT *o_current, *o_current_pin;
 
   g_assert( w_current->inside_action != 0 );
 
@@ -147,20 +142,8 @@ void o_pin_end(GSCHEM_TOPLEVEL *w_current, int x, int y)
                       PIN_TYPE_NET, 0);
   s_page_append (toplevel, toplevel->page_current, new_obj);
 
-  o_current = o_current_pin = new_obj;
-
-  if (scm_hook_empty_p(add_pin_hook) == SCM_BOOL_F &&
-      o_current != NULL) {
-    scm_run_hook(add_pin_hook,
-		 scm_cons(g_make_object_smob(toplevel, o_current),
-			  SCM_EOL));
-  }
-
-  /* look for connected objects */
-  prev_conn_objects = s_conn_return_others(prev_conn_objects, o_current_pin);
-  o_invalidate_glist (w_current, prev_conn_objects);
-  g_list_free (prev_conn_objects);
-  o_invalidate (w_current, o_current_pin);
+  /* Call add-objects-hook */
+  g_run_hook_object (w_current, "%add-objects-hook", new_obj);
 
   toplevel->page_current->CHANGED=1;
   o_undo_savestate(w_current, UNDO_ALL);

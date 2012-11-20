@@ -41,9 +41,6 @@
 #include <dmalloc.h>
 #endif
 
-/*! Default setting for complex draw function. */
-void (*complex_draw_func)() = NULL;
-
 
 /*! \brief Return the bounds of the given object.
  *  \par Given an object, calculate the bounds coordinates.
@@ -126,7 +123,10 @@ int world_get_object_glist_bounds(TOPLEVEL *toplevel, const GList *head,
   /* Find the first object with bounds, and set the bounds variables, then expand as necessary */
   while ( s_current != NULL ) {
     o_current = (OBJECT *) s_current->data;
-    g_assert (o_current != NULL);
+
+    /* Sanity check */
+    g_return_val_if_fail ((o_current != NULL), found);
+
     if ( world_get_single_object_bounds( toplevel, o_current, &rleft, &rtop, &rright, &rbottom) ) {
       if ( found ) {
         *left = min( *left, rleft );
@@ -263,19 +263,16 @@ int o_complex_is_embedded(OBJECT *o_current)
  *  Returns a GList of OBJECTs which are eligible for promotion from
  *  within the passed complex OBJECT.
  *
- *  If detach is TRUE, the function removes these attribute objects from
- *  the prim_objs of the complex. It detached, the returned OBJECTs are
- *  isolated from each other, having their next and prev pointers set to NULL.
- *
- *  If detach is FALSE, the OBJECTs are left in place. Their next and prev
- *  pointers form part of the complex's prim_objs linked list.
+ *  If detach is TRUE, the function removes these attribute objects
+ *  from the prim_objs of the complex.  If detach is FALSE, the
+ *  OBJECTs are left in place.
  *
  *  \param [in]  toplevel The toplevel environment.
  *  \param [in]  object   The complex object being modified.
  *  \param [in]  detach   Should the attributes be detached?
  *  \returns              A linked list of OBJECTs to promote.
  */
-static GList *o_complex_get_promotable (TOPLEVEL *toplevel, OBJECT *object, int detach)
+GList *o_complex_get_promotable (TOPLEVEL *toplevel, OBJECT *object, int detach)
 {
   GList *promoted = NULL;
   GList *attribs;
@@ -333,8 +330,7 @@ GList *o_complex_promote_attribs (TOPLEVEL *toplevel, OBJECT *object)
   if (toplevel->keep_invisible) {
     for (iter = promotable; iter != NULL; iter = g_list_next (iter)) {
       OBJECT *o_kept = (OBJECT *) iter->data;
-      OBJECT *o_copy = o_object_copy (toplevel, o_kept,
-                                      toplevel->ADDING_SEL);
+      OBJECT *o_copy = o_object_copy (toplevel, o_kept);
       o_set_visibility (toplevel, o_kept, INVISIBLE);
       o_copy->parent = NULL;
       promoted = g_list_prepend (promoted, o_copy);
@@ -399,72 +395,12 @@ static void o_complex_remove_promotable_attribs (TOPLEVEL *toplevel, OBJECT *obj
   g_list_free (promotable);
 }
 
-
-/* Done */
-/*! \brief
- *  \par Function Description
- *
- */
-OBJECT *o_complex_new(TOPLEVEL *toplevel,
-		      char type,
-		      int color, int x, int y, int angle,
-		      int mirror, const CLibSymbol *clib,
-		      const gchar *basename,
-		      int selectable)
+static void create_placeholder(TOPLEVEL * toplevel, OBJECT * new_node, int x, int y)
 {
-  OBJECT *new_node=NULL;
-  OBJECT *new_prim_obj;
-  GList *prim_objs;
-  GList *iter;
-  int save_adding_sel = 0;
-  int loaded_normally = FALSE;
-
-  gchar *buffer = NULL;
-
-  new_node = s_basic_new_object(type, "complex");
-
-  if (clib != NULL) {
-    new_node->complex_basename = g_strdup (s_clib_symbol_get_name (clib));
-  } else {
-    new_node->complex_basename = g_strdup (basename);
-  }
-
-
-  new_node->complex_embedded = FALSE;
-  new_node->color = color;
-
-  new_node->complex = (COMPLEX *) g_malloc(sizeof(COMPLEX));
-  new_node->complex->angle = angle;
-  new_node->complex->mirror = mirror;
-  new_node->complex->x = x;
-  new_node->complex->y = y;
-
-  new_node->draw_func = complex_draw_func;
-
-  if (selectable) {
-    new_node->sel_func = select_func;
-  } else {
-    new_node->sel_func = NULL;
-  }
-
-  prim_objs = NULL;
-
-  /* get the symbol data */
-  if (clib != NULL) {
-    buffer = s_clib_symbol_get_data (clib);
-  }
-
-  save_adding_sel = toplevel->ADDING_SEL;
-  toplevel->ADDING_SEL = 1;	/* name is hack, don't want to */
-
-  if (clib == NULL || buffer == NULL) {
-
+    OBJECT *new_prim_obj;
     char *not_found_text = NULL;
     int left, right, top, bottom;
     int x_offset, y_offset;
-
-    /* filename was NOT found */
-    loaded_normally = FALSE;
 
     /* Put placeholder into object list.  Changed by SDB on
      * 1.19.2005 to fix problem that symbols were silently
@@ -475,23 +411,23 @@ OBJECT *o_complex_new(TOPLEVEL *toplevel,
     new_prim_obj = o_line_new(toplevel, OBJ_LINE,
                            DETACHED_ATTRIBUTE_COLOR,
                            x - 50, y, x + 50, y);
-    prim_objs = g_list_append (prim_objs, new_prim_obj);
+    new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
     new_prim_obj = o_line_new(toplevel, OBJ_LINE,
                            DETACHED_ATTRIBUTE_COLOR,
                            x, y + 50, x, y - 50); 
-    prim_objs = g_list_append (prim_objs, new_prim_obj);
+    new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
 
     /* Add some useful text */
     not_found_text = 
       g_strdup_printf (_("Component not found:\n %s"),
-		       new_node->complex_basename);
+           new_node->complex_basename);
     new_prim_obj = o_text_new(toplevel,
                            OBJ_TEXT, DETACHED_ATTRIBUTE_COLOR, 
                            x + NOT_FOUND_TEXT_X, 
                            y + NOT_FOUND_TEXT_Y, LOWER_LEFT, 0, 
                            not_found_text, 8,
                            VISIBLE, SHOW_NAME_VALUE);
-    prim_objs = g_list_append (prim_objs, new_prim_obj);
+    new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
     g_free(not_found_text);
 
     /* figure out where to put the hazard triangle */
@@ -508,7 +444,7 @@ OBJECT *o_complex_new(TOPLEVEL *toplevel,
                            y + NOT_FOUND_TEXT_Y + y_offset); 
     o_set_line_options(toplevel, new_prim_obj, END_ROUND, TYPE_SOLID,
                        50, -1, -1);
-    prim_objs = g_list_append (prim_objs, new_prim_obj);
+    new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
     new_prim_obj = o_line_new(toplevel, OBJ_LINE,
                            DETACHED_ATTRIBUTE_COLOR,
                            x + NOT_FOUND_TEXT_X + x_offset, 
@@ -517,7 +453,7 @@ OBJECT *o_complex_new(TOPLEVEL *toplevel,
                            y + NOT_FOUND_TEXT_Y + y_offset + 500); 
     o_set_line_options(toplevel, new_prim_obj, END_ROUND, TYPE_SOLID,
                        50, -1, -1);
-    prim_objs = g_list_append (prim_objs, new_prim_obj);
+    new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
     new_prim_obj = o_line_new(toplevel, OBJ_LINE,
                            DETACHED_ATTRIBUTE_COLOR,
                            x + NOT_FOUND_TEXT_X + x_offset + 300, 
@@ -526,54 +462,90 @@ OBJECT *o_complex_new(TOPLEVEL *toplevel,
                            y + NOT_FOUND_TEXT_Y + y_offset); 
     o_set_line_options(toplevel, new_prim_obj, END_ROUND, TYPE_SOLID,
                        50, -1, -1);
-    prim_objs = g_list_append (prim_objs, new_prim_obj);
+    new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
     new_prim_obj = o_text_new(toplevel,
                            OBJ_TEXT, DETACHED_ATTRIBUTE_COLOR, 
                            x + NOT_FOUND_TEXT_X + x_offset + 270, 
                            y + NOT_FOUND_TEXT_Y + y_offset + 90, 
                            LOWER_LEFT, 0, "!", 18,
                            VISIBLE, SHOW_NAME_VALUE);
-    prim_objs = g_list_append (prim_objs, new_prim_obj);
+    new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
+    new_node->complex->prim_objs = g_list_reverse(new_node->complex->prim_objs);
+}
 
+/* Done */
+/*! \brief
+ *  \par Function Description
+ *
+ */
+OBJECT *o_complex_new(TOPLEVEL *toplevel,
+		      char type,
+		      int color, int x, int y, int angle,
+		      int mirror, const CLibSymbol *clib,
+		      const gchar *basename,
+		      int selectable)
+{
+  OBJECT *new_node=NULL;
+  GList *iter;
+  gchar *buffer = NULL;
+
+  new_node = s_basic_new_object(type, "complex");
+
+  if (clib != NULL) {
+    new_node->complex_basename = g_strdup (s_clib_symbol_get_name (clib));
   } else {
+    new_node->complex_basename = g_strdup (basename);
+  }
 
-    /* filename was found */
-    loaded_normally = TRUE;
+
+  new_node->complex_embedded = FALSE;
+  new_node->color = color;
+  new_node->selectable = selectable;
+
+  new_node->complex = (COMPLEX *) g_malloc(sizeof(COMPLEX));
+  new_node->complex->prim_objs = NULL;
+  new_node->complex->angle = angle;
+  new_node->complex->mirror = mirror;
+  new_node->complex->x = x;
+  new_node->complex->y = y;
+
+  /* get the symbol data */
+  if (clib != NULL) {
+    buffer = s_clib_symbol_get_data (clib);
+  }
+
+  if (clib == NULL || buffer == NULL)
+    create_placeholder(toplevel, new_node, x, y);
+  else {
+    GError * err = NULL;
 
     /* add connections till translated */
-    prim_objs = o_read_buffer (toplevel, prim_objs, buffer, -1, new_node->complex_basename);
+    new_node->complex->prim_objs = o_read_buffer (toplevel, NULL, buffer, -1, new_node->complex_basename, &err);
+    if (err) {
+      g_error_free(err);
+      /* If reading fails, replace with placeholder object */
+      create_placeholder(toplevel, new_node, x, y);
+    }
+    else {
+      if (mirror) {
+        o_glist_mirror_world (toplevel, 0, 0, new_node->complex->prim_objs);
+      }
+      
+      o_glist_rotate_world (toplevel, 0, 0, angle, new_node->complex->prim_objs);
+      o_glist_translate_world (toplevel, x, y, new_node->complex->prim_objs);
+    }
 
     g_free (buffer);
 
   }
-  toplevel->ADDING_SEL = save_adding_sel;
-
-  /* do not mirror/rotate/translate/connect the primitive objects if the
-   * component was not loaded via o_read 
-   */
-  if (loaded_normally == TRUE) {
-    if (mirror) {
-      o_glist_mirror_world (toplevel, 0, 0, prim_objs);
-    }
-
-    o_glist_rotate_world (toplevel, 0, 0, angle, prim_objs);
-    o_glist_translate_world (toplevel, x, y, prim_objs);
-  }
-
-  new_node->complex->prim_objs = prim_objs;
 
   /* set the parent field now */
-  for (iter = prim_objs; iter != NULL; iter = g_list_next (iter)) {
+  for (iter = new_node->complex->prim_objs; iter != NULL; iter = g_list_next (iter)) {
     OBJECT *tmp = iter->data;
     tmp->parent = new_node;
   }
 
   o_complex_recalc(toplevel, new_node);
-
-  if (!toplevel->ADDING_SEL) {
-    s_tile_add_object (toplevel, new_node);
-    s_conn_update_object (toplevel, new_node);
-  }
 
   return new_node;
 }
@@ -613,15 +585,7 @@ OBJECT *o_complex_new_embedded(TOPLEVEL *toplevel,
   new_node->complex_embedded = TRUE;
 
   new_node->color = color;
-
-  new_node->draw_func = complex_draw_func;  
-
-  /* (for a title block) an object that isn't selectable */
-  if (selectable) { 
-    new_node->sel_func = select_func;
-  } else {
-    new_node->sel_func = NULL;
-  }
+  new_node->selectable = selectable;
 
   new_node->complex->prim_objs = NULL;
 
@@ -648,6 +612,9 @@ void o_complex_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
   if ((!o_current) || (o_current->type != OBJ_COMPLEX && o_current->type != OBJ_PLACEHOLDER))
     return;
 
+  if (o_current->complex->prim_objs == NULL)
+    return;
+
   world_get_complex_bounds(toplevel, o_current, &left, &top, &right, &bottom);
   o_current->w_left = left;
   o_current->w_top = top;
@@ -663,30 +630,30 @@ void o_complex_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
  *  allocated and appended to the \a object_list.
  *  
  *  \param [in] toplevel     The TOPLEVEL object
- *  \param [in] object_list  list of OBJECTS to append a new net
  *  \param [in] buf          a text buffer (usually a line of a schematic file)
  *  \param [in] release_ver  The release number gEDA
  *  \param [in] fileformat_ver a integer value of the file format
- *  \return The object list
- *
- *  \todo Don't use fixed-length string for symbol basename
+ *  \return The object list, or NULL on error.
  */
 OBJECT *o_complex_read (TOPLEVEL *toplevel,
-                        char buf[], unsigned int release_ver,
-                        unsigned int fileformat_ver)
+                        const char buf[], unsigned int release_ver,
+                        unsigned int fileformat_ver, GError **err)
 {
   OBJECT *new_obj;
   char type; 
   int x1, y1;
   int angle;
 
-  char basename[256]; /* FIXME This is a hack */
-	
+  char *basename = g_malloc (1 + strlen (buf));
+
   int selectable;
   int mirror;
 
-  sscanf(buf, "%c %d %d %d %d %d %s\n",
-         &type, &x1, &y1, &selectable, &angle, &mirror, basename);
+  if (sscanf(buf, "%c %d %d %d %d %d %s\n",
+	     &type, &x1, &y1, &selectable, &angle, &mirror, basename) != 7) {
+    g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse complex object"));
+    return NULL;
+  }
 
   switch(angle) {
 
@@ -698,7 +665,8 @@ OBJECT *o_complex_read (TOPLEVEL *toplevel,
 
     default:
       s_log_message(_("Found a component with an invalid rotation [ %c %d %d %d %d %d %s ]\n"), type, x1, y1, selectable, angle, mirror, basename);
-      break;
+      s_log_message (_("Setting angle to 0\n"));
+      angle = 0;
   }
 
   switch(mirror) {
@@ -710,7 +678,8 @@ OBJECT *o_complex_read (TOPLEVEL *toplevel,
 		
     default:
       s_log_message(_("Found a component with an invalid mirror flag [ %c %d %d %d %d %d %s ]\n"), type, x1, y1, selectable, angle, mirror, basename);
-      break;
+      s_log_message (_("Setting mirror to 0\n"));
+      mirror = 0;
   }
   if (strncmp(basename, "EMBEDDED", 8) == 0) {
     
@@ -728,8 +697,11 @@ OBJECT *o_complex_read (TOPLEVEL *toplevel,
                                 angle, mirror, clib,
                                 basename, selectable);
     /* Delete or hide attributes eligible for promotion inside the complex */
-     o_complex_remove_promotable_attribs (toplevel, new_obj);
+    if (new_obj)
+      o_complex_remove_promotable_attribs (toplevel, new_obj);
   }
+
+  g_free (basename);
 
   return new_obj;
 }
@@ -739,10 +711,11 @@ OBJECT *o_complex_read (TOPLEVEL *toplevel,
  *  This function takes a complex \a object and return a string
  *  according to the file format definition.
  *
+ *  \param [in] toplevel  a TOPLEVEL structure
  *  \param [in] object  a complex OBJECT
  *  \return the string representation of the complex OBJECT
  */
-char *o_complex_save(OBJECT *object)
+char *o_complex_save(TOPLEVEL *toplevel, OBJECT *object)
 {
   int selectable;
   char *buf = NULL;
@@ -750,10 +723,7 @@ char *o_complex_save(OBJECT *object)
 
   g_return_val_if_fail (object != NULL, NULL);
 
-  if (object->sel_func != NULL) 
-  selectable = 1;
-  else 
-  selectable = 0;
+  selectable = (object->selectable) ? 1 : 0;
 
   if ((object->type == OBJ_COMPLEX) || (object->type == OBJ_PLACEHOLDER)) {
     basename = g_strdup_printf ("%s%s",
@@ -812,10 +782,9 @@ OBJECT *o_complex_copy(TOPLEVEL *toplevel, OBJECT *o_current)
 
   o_new = s_basic_new_object(o_current->type, "complex");
   o_new->color = o_current->color;
+  o_new->selectable = o_current->selectable;
   o_new->complex_basename = g_strdup(o_current->complex_basename);
   o_new->complex_embedded = o_current->complex_embedded;
-  o_new->sel_func = o_current->sel_func;
-  o_new->draw_func = o_current->draw_func;
 
   o_new->complex = g_malloc0(sizeof(COMPLEX));
   o_new->complex->x = o_current->complex->x;
@@ -826,7 +795,7 @@ OBJECT *o_complex_copy(TOPLEVEL *toplevel, OBJECT *o_current)
   /* Copy contents and set the parent pointers on the copied objects. */
   o_new->complex->prim_objs =
     o_glist_copy_all (toplevel, o_current->complex->prim_objs,
-                      NULL, toplevel->ADDING_SEL);
+                      NULL);
 
   for (iter = o_new->complex->prim_objs;
        iter != NULL;

@@ -19,6 +19,7 @@
  */
 
 #include <config.h>
+#include <missing.h>
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -52,7 +53,6 @@ static struct gsubr_t libgeda_funcs[] = {
   { "component-library",        1, 1, 0, g_rc_component_library },
   { "component-library-command", 3, 0, 0, g_rc_component_library_command },
   { "component-library-funcs",  3, 0, 0, g_rc_component_library_funcs },
-  { "component-library-search", 1, 0, 0, g_rc_component_library_search },
   { "source-library",           1, 0, 0, g_rc_source_library },
   { "source-library-search",    1, 0, 0, g_rc_source_library_search },
   
@@ -70,7 +70,9 @@ static struct gsubr_t libgeda_funcs[] = {
   { "promote-invisible",         1, 0, 0, g_rc_promote_invisible },
   { "keep-invisible",            1, 0, 0, g_rc_keep_invisible },
   { "always-promote-attributes",1, 0, 0, g_rc_always_promote_attributes },
+  { "make-backup-files",        1, 0, 0, g_rc_make_backup_files },
   { "print-color-map", 0, 1, 0, g_rc_print_color_map },
+  { "rc-filename",              0, 0, 0, g_rc_rc_filename },
   { NULL,                       0, 0, 0, NULL } };
 
 /*! \brief Register all libgeda functions with scheme.
@@ -89,30 +91,17 @@ void g_register_libgeda_funcs (void)
   
 }
 
-
-/*! \brief Register some libgeda variables with scheme.
- *  \par Function Description
- *  Define some variables to be visible to Scheme.
+/*! \brief Register some libgeda directories with Scheme.
+ * \par Function Description
+ * Ensures that the default gEDA Scheme directory is added to the
+ * Guile load path.
  */
-void g_register_libgeda_vars (void)
+void
+g_register_libgeda_dirs (void)
 {
-  scm_c_define("geda-rc-path", 
-	       scm_from_locale_string (s_path_sys_config ()));
-  scm_c_define("geda-data-path",
-	       scm_from_locale_string (s_path_sys_data ()));
-  scm_c_define("path-sep", 
-	       scm_from_locale_string(G_DIR_SEPARATOR_S));
+  char *scheme_dir;
 
-  scm_c_define("OBJ_LINE", SCM_MAKE_CHAR((unsigned char) OBJ_LINE));
-  scm_c_define("OBJ_BOX", SCM_MAKE_CHAR((unsigned char) OBJ_BOX));
-  scm_c_define("OBJ_PICTURE", SCM_MAKE_CHAR((unsigned char) OBJ_PICTURE));
-  scm_c_define("OBJ_CIRCLE", SCM_MAKE_CHAR((unsigned char) OBJ_CIRCLE));
-  scm_c_define("OBJ_NET", SCM_MAKE_CHAR((unsigned char) OBJ_NET));
-  scm_c_define("OBJ_BUS", SCM_MAKE_CHAR((unsigned char) OBJ_BUS));
-  scm_c_define("OBJ_COMPLEX", SCM_MAKE_CHAR((unsigned char) OBJ_COMPLEX));
-  scm_c_define("OBJ_TEXT", SCM_MAKE_CHAR((unsigned char) OBJ_TEXT));
-  scm_c_define("OBJ_PIN", SCM_MAKE_CHAR((unsigned char) OBJ_PIN));
-  scm_c_define("OBJ_ARC", SCM_MAKE_CHAR((unsigned char) OBJ_ARC));
-  scm_c_define("OBJ_PLACEHOLDER", SCM_MAKE_CHAR((unsigned char) OBJ_PLACEHOLDER));
-  scm_c_define("OBJ_PATH", SCM_MAKE_CHAR((unsigned char) OBJ_PATH));
+  scheme_dir = g_build_filename (s_path_sys_data (), "scheme", NULL);
+  g_rc_scheme_directory (scm_from_utf8_string (scheme_dir));
+  g_free (scheme_dir);
 }

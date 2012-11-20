@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #endif
 
 #include "gschem.h"
+#include <missing.h>
 
 #ifdef HAVE_LIBDMALLOC
 #include <dmalloc.h>
@@ -41,9 +42,7 @@ void o_complex_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
   g_return_if_fail (o_current != NULL); 
   g_return_if_fail (o_current->complex != NULL);
 
-  if (!w_current->toplevel->DONT_REDRAW) {
-    o_redraw(w_current, o_current->complex->prim_objs, TRUE);
-  }
+  o_redraw(w_current, o_current->complex->prim_objs, TRUE);
 }
 
 
@@ -73,7 +72,7 @@ void o_complex_prepare_place(GSCHEM_TOPLEVEL *w_current, const CLibSymbol *sym)
   OBJECT *o_current;
   char *buffer;
   const gchar *sym_name = s_clib_symbol_get_name (sym);
-  int redraw_state;
+  GError *err = NULL;
 
   /* remove the old place list if it exists */
   s_delete_object_glist(toplevel, toplevel->page_current->place_list);
@@ -89,14 +88,24 @@ void o_complex_prepare_place(GSCHEM_TOPLEVEL *w_current, const CLibSymbol *sym)
 
     temp_list = NULL;
 
-    toplevel->ADDING_SEL=1;
     buffer = s_clib_symbol_get_data (sym);
     temp_list = o_read_buffer (toplevel,
                                temp_list,
                                buffer, -1,
-                               sym_name);
+                               sym_name,
+                               &err);
     g_free (buffer);
-    toplevel->ADDING_SEL=0;
+
+    if (err) {
+      /* If an error occurs here, we can assume that the preview also has failed to load,
+         and the error message is displayed there. We therefore ignore this error, but
+         end the component insertion.
+         */
+
+      g_error_free(err);
+      i_set_state (w_current, SELECT);
+      return;
+    }
 
     /* Take the added objects */
     toplevel->page_current->place_list =
@@ -105,32 +114,36 @@ void o_complex_prepare_place(GSCHEM_TOPLEVEL *w_current, const CLibSymbol *sym)
   } else { /* if (w_current->include_complex) {..} else { */
     OBJECT *new_object;
 
-    toplevel->ADDING_SEL = 1; /* reuse this flag, rename later hack */
     new_object = o_complex_new (toplevel, OBJ_COMPLEX, DEFAULT_COLOR,
                                 0, 0, 0, 0, sym, sym_name, 1);
 
-    toplevel->page_current->place_list =
-      g_list_concat (toplevel->page_current->place_list,
-        o_complex_promote_attribs (toplevel, new_object));
-    toplevel->page_current->place_list =
-      g_list_append (toplevel->page_current->place_list, new_object);
+    if (new_object->type == OBJ_PLACEHOLDER) {
+      /* If created object is a placeholder, the loading failed and we end the insert action */
 
-    toplevel->ADDING_SEL = 0;
+      s_delete_object(toplevel, new_object);
+      i_set_state (w_current, SELECT);
+      return;
+    }
+    else {
 
-    /* Flag the symbol as embedded if necessary */
-    o_current = (g_list_last (toplevel->page_current->place_list))->data;
-    if (w_current->embed_complex) {
-      o_current->complex_embedded = TRUE;
+      toplevel->page_current->place_list =
+          g_list_concat (toplevel->page_current->place_list,
+                         o_complex_promote_attribs (toplevel, new_object));
+      toplevel->page_current->place_list =
+          g_list_append (toplevel->page_current->place_list, new_object);
+
+      /* Flag the symbol as embedded if necessary */
+      o_current = (g_list_last (toplevel->page_current->place_list))->data;
+      if (w_current->embed_complex) {
+        o_current->complex_embedded = TRUE;
+      }
     }
   }
 
   /* Run the complex place list changed hook without redrawing */
   /* since the place list is going to be redrawn afterwards */
-  redraw_state = toplevel->DONT_REDRAW;
-  toplevel->DONT_REDRAW = 1;
   o_complex_place_changed_run_hook (w_current);
-  toplevel->DONT_REDRAW = redraw_state;
-
+ 
   w_current->inside_action = 1;
   i_set_state (w_current, ENDCOMP);
 }
@@ -149,59 +162,21 @@ void o_complex_place_changed_run_hook(GSCHEM_TOPLEVEL *w_current) {
   GList *ptr = NULL;
 
   /* Run the complex place list changed hook */
-  if (scm_hook_empty_p(complex_place_list_changed_hook) == SCM_BOOL_F &&
+  if (scm_is_false (scm_hook_empty_p (complex_place_list_changed_hook)) &&
       toplevel->page_current->place_list != NULL) {
     ptr = toplevel->page_current->place_list;
+
+    scm_dynwind_begin (0);
+    g_dynwind_window (w_current);
     while (ptr) {
-      scm_run_hook(complex_place_list_changed_hook, 
-		   scm_cons (g_make_object_smob
-			     (toplevel,
-			      (OBJECT *) ptr->data), SCM_EOL));
+      SCM expr = scm_list_3 (scm_from_utf8_symbol ("run-hook"),
+                             complex_place_list_changed_hook,
+                             edascm_from_object ((OBJECT *) ptr->data));
+      g_scm_eval_protected (expr, scm_interaction_environment ());
       ptr = g_list_next(ptr);
     }
-
+    scm_dynwind_end ();
   }
-}
-
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-void o_complex_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y, int continue_placing)
-{
-  GList *new_objects;
-  GList *iter;
-  OBJECT *o_current;
-
-  o_place_end (w_current, w_x, w_y, continue_placing, &new_objects);
-
-  if (w_current->include_complex) {
-    g_list_free (new_objects);
-    return;
-  }
-
-  /* Run the add component hook for the new component */
-  for (iter = new_objects;
-       iter != NULL;
-       iter = g_list_next (iter)) {
-    o_current = iter->data;
-
-    if (scm_hook_empty_p(add_component_hook) == SCM_BOOL_F) {
-      scm_run_hook(add_component_hook,
-                   scm_cons(g_make_attrib_smob_list(w_current, o_current),
-                            SCM_EOL));
-    }
-
-    if (scm_hook_empty_p(add_component_object_hook) == SCM_BOOL_F) {
-      scm_run_hook(add_component_object_hook,
-                   scm_cons(g_make_object_smob(w_current->toplevel,
-                                               o_current), SCM_EOL));
-    }
-  }
-
-  g_list_free (new_objects);
 }
 
 
@@ -238,13 +213,12 @@ void o_complex_translate_all(GSCHEM_TOPLEVEL *w_current, int offset)
    * the correct sense) were in use . */
   y = snap_grid (w_current, w_rtop);
 
-  iter = s_page_objects (toplevel->page_current);
-  while (iter != NULL) {
+  for (iter = s_page_objects (toplevel->page_current);
+       iter != NULL; iter = g_list_next (iter)) {
     o_current = iter->data;
     s_conn_remove_object (toplevel, o_current);
-    iter = g_list_next (iter);
   }
-        
+
   if (offset == 0) {
     s_log_message(_("Translating schematic [%d %d]\n"), -x, -y);
     o_glist_translate_world (toplevel, -x, -y,
@@ -256,15 +230,10 @@ void o_complex_translate_all(GSCHEM_TOPLEVEL *w_current, int offset)
                              s_page_objects (toplevel->page_current));
   }
 
-  iter = s_page_objects (toplevel->page_current);
-  while (iter != NULL) {
+  for (iter = s_page_objects (toplevel->page_current);
+       iter != NULL;  iter = g_list_next (iter)) {
     o_current = iter->data;
-    if (o_current->type != OBJ_COMPLEX && o_current->type != OBJ_PLACEHOLDER) {
-      s_conn_update_object (toplevel, o_current);
-    } else {
-      s_conn_update_object (toplevel, o_current);
-    }
-    iter = g_list_next (iter);
+    s_conn_update_object (toplevel, o_current);
   }
 
   /* this is an experimental mod, to be able to translate to all

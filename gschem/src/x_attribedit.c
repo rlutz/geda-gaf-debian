@@ -211,7 +211,7 @@ void attrib_edit_dialog_ok(GtkWidget * w, GSCHEM_TOPLEVEL *w_current)
               }
             }
             if (!replaced) {
-              new = o_attrib_add_attrib(w_current, newtext, vis, show, object);
+              (void) o_attrib_add_attrib(w_current, newtext, vis, show, object);
             }
           }
         }
@@ -239,7 +239,6 @@ void attrib_edit_dialog_ok(GtkWidget * w, GSCHEM_TOPLEVEL *w_current)
 	new->text->x = wx;
 	new->text->y = wy;
 	o_text_recreate(toplevel, new);
-	o_invalidate (w_current, new);
 	toplevel->page_current->CHANGED = 1;
 	o_undo_savestate(w_current, UNDO_ALL);
       }
@@ -342,8 +341,9 @@ void attrib_edit_dialog (GSCHEM_TOPLEVEL *w_current, OBJECT *attr_obj, int flag)
 					  GTK_RESPONSE_REJECT,
 					  -1);
 					 
-  gtk_signal_connect(GTK_OBJECT(aewindow), "response",
-		     GTK_SIGNAL_FUNC(attribute_edit_dialog_response), w_current);
+  g_signal_connect (G_OBJECT (aewindow), "response",
+                    G_CALLBACK (attribute_edit_dialog_response),
+                    w_current);
 
   gtk_window_set_position (GTK_WINDOW (aewindow), GTK_WIN_POS_MOUSE);
 
@@ -490,7 +490,7 @@ void attrib_edit_dialog (GSCHEM_TOPLEVEL *w_current, OBJECT *attr_obj, int flag)
   if (attr_obj) {
     o_attrib_get_name_value (attr_obj, &name, &val);
     attrib = attr_obj;
-    if (attrib->visibility == VISIBLE) {
+    if (o_is_visible (toplevel, attrib)) {
       gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(visbutton), TRUE);
     } else {
       gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(visbutton), FALSE);

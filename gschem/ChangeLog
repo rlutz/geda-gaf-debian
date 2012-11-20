@@ -1,17 +1,2201 @@
-commit a30f00bbee18ad5140616ad6459365cb48b03ee7
+commit bbb663612afa98c274279edbe167f86dd7b3f6d8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 18 16:03:31 2012 +0000
+
+    Final .po file update before release.
+
+commit 87f1e0e76965a514277c949dbf2191993962cb88
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 18 15:26:09 2012 +0000
+
+    Update version numbers to 1.8.0-20121118.
+
+commit 7f6d142d6a17d77d3185f8bbc690d13f2e128c18
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Mon Jan 30 23:32:34 2012 +0100
+
+    gschem: fix segfault when multiple windows are closed
+    
+    Reported-by Vladimir Zhbanov <vzhbanov@gmail.com>, introduced in
+    commit 8342bddce4487edf4a7214d5d6ab83cb73a066d4.
+    
+    Add new function gschem_toplevel_alloc_libgeda_toplevel which allocates
+    the TOPLEVEL and appends new hooks that force pin cues redraw when net
+    connectivity changes.
+    
+    Previously each new TOPLEVEL had invalidation hooks attached which had
+    the GSCHEM_TOPLEVEL hardcoded, pointing at the very first window created
+    when gschem was launched.
+    
+    Closes-bug: lp-1070243
+
+commit f0b0b0d7e26cae671692a23edc0251a59c3a7e6b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 17 22:39:42 2012 +0000
+
+    gschem: Add "fully-connected" net to "drawing primitives" example.
+    
+    Useful for testing how net ends appear, now that the
+    "connection-tracking" function has been added that affects when
+    warning markers are printed at the ends of nets.
+
+commit 1598b5884ba8790efe713907c5707240c97a934e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 17 21:35:31 2012 +0000
+
+    gschem: Draw arrows on 'connected' dangling net ends.
+    
+    Recently, gschem was changed to not draw anything at a net endpoint
+    when it thinks the net is connected.  This has the drawback that in
+    some cases the eye can be fooled into thinking that two nets are
+    connected together when they are not, with the concomitant risk of
+    badly breaking a design.
+    
+    This patch alters gschem to draw an arrow in 'junction colour' on
+    dangling net segment ends when it thinks the net is properly
+    connected.  This is not an ideal solution, but should go most of the
+    way towards solving the "invisible errors wrecking my expensive
+    boards" problem.
+    
+    A follow-up patch should probably do the same for printed output.
+    
+    Affects-bug: lp-1014160
+
+commit 546d2bb9333209059a00810ddf386242651cdb95
+Author: Sergey Alyoshin <alyoshin.s@gmail.com>
+Date:   Fri Nov 16 22:13:06 2012 +0000
+
+    gschem: unreference existing view models on library refresh
+    
+    Closes-bug: lp-1075142
+
+commit e6cdf09ad9330c2066363809f7839f698ca2476b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 15 23:22:20 2012 +0000
+
+    Hand-merge Dutch translations from master branch.
+    
+    Merge Dutch translation improvements made by Bert Timmerman in from
+    the unstable branch (commits 4b17c888, f9bd70f6, and a164660f).
+
+commit 24ef353613c1a0114920a90c89167127cbcdf925
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Nov 14 21:45:45 2012 +0000
+
+    gschem: update translations with new URLs in usage message
+    
+    Commit 10e8788d updated the address for filing bugs and the gEDA/gaf
+    webpage. Update the translation strings to match.
+    
+    Affects-bug: lp-926456
+
+commit 96a2822b1e5b5ee9d789dea2cd7b0efa04c70b01
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Thu Nov 8 19:07:28 2012 +0000
+
+    gschem: replace deprecated calls to g_strcasecmp ()
+    
+    g_strcasecmp() is deprecated, so replace it with a combination of calls
+    to g_utf8_collate() and g_utf8_casefold() in various bits of dialog code.
+
+commit eeba9560d8c015a6ce3bba2ad9d489e42a4bd8b0
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Oct 31 22:59:41 2012 +0000
+
+    gschem: remove unused pointer values in multiattrib code
+    
+    In function multiattrib_action_promote_attribute(), the pointer
+    "o_new" returned by "o_attrib_add_attrib()" is never used.  In
+    function attrib_edit_dialog_ok(), Pointer "new" returned by
+    "o_attrib_add_attrib()" is never used. In
+    gschem_action_connect_proxy(), "label" is unused. Replace all with
+    cast to (void).
+    
+    Coverity-ID: 201684
+    Coverity-ID: 201683
+    Coverity-ID: 201682
+
+commit e7b0a2338de5f31d2bab6d3348fec69ae9c9c2fa
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Oct 29 15:14:10 2012 +0000
+
+    gschem: replace deprecated call to g_strcasecmp () in gschem-version Guile function.
+    
+    g_rc_gschem_version() was using g_strcasecmp () which has been deprecated since
+    glib 2.2. Replace it with UTF8 implementations as recommended in the glib
+    documentation.
+
+commit d189176e41b642ddd227cf35dc0535574560084a
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Oct 29 18:14:46 2012 +0000
+
+    gschem: suppress compiler warning in line type dialog code
+    
+    gcc is complaining that "end" may not be set. Pre-set it to a sensible
+    default at declaration.
+
+commit 0e8dada182d9045677e92d44f9254f1f07b375b3
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Mar 16 21:54:45 2012 +0000
+
+    gschem: fix unsafe use of strncpy
+    
+    Make sure string is zero-terminated after using strncpy.
+    
+    Coverity-ID: 201559
+    Coverity-ID: 201560
+    Coverity-ID: 201561
+    Coverity-ID: 201562
+
+commit ac4757af8ef6db9509e137f49ae1b106ea4698a4
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Mar 16 21:35:44 2012 +0000
+
+    gschem: Remove dead code
+    
+    Default statement in switch in o_arc.c will never be executed due to the
+    earlier "if" statement.
+    
+    Coverity-ID: 201571
+
+commit 10e8788d2bc4d227dc62bd46013ab29ca5b4219c
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Mar 19 22:28:51 2012 +0000
+
+    gschem: update usage with bug-filing address
+    
+    Change the bug filing address from email to the launchpad site. Also
+    update the website address for the gEDA project and update the copyright
+    date range for the file to include 2012.
+    
+    Closes-bug: lp-926456
+
+commit f0923997c5ea727f6b73afad23ee2f974ac6b6b0
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Mar 18 11:36:59 2012 +0000
+
+    Update FSF mailing address.
+    
+    Change all references to the FSF mailing address to the new Franklin
+    Street location.
+    
+    Closes-bug: lp-934934
+
+commit a6dff5449e17ebe2bd3a6a4ee4ca0fabef9d04bb
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 14 17:15:13 2012 +0000
+
+    gschem: Import translations from Launchpad
+    
+    N.b. Did not import AF, AR, or ZH_CN translations, as
+    Launchpad translations were less fully-translated than translations
+    already in tree.
+
+commit 74f1fcc061a4f08ed4bcce3dba7c6e1f3006c41d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 12:51:41 2012 +0000
+
+    gschem: Fix unchecked return value.
+    
+    Coverity-ID: 201567
+
+commit 6a5247b6d5706c95f8f9af3b9f056b035603ee2f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 12:07:10 2012 +0000
+
+    gschem: Fix dereference after NULL check.
+    
+    In o_undo_savestate(), we assume that u_current must be non-NULL.
+    Make this explicit by adding an assertion.
+    
+    Coverity-ID: 201602
+
+commit e5465cc12e620be1c4cf6d2b41f672d6c13f97cc
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Feb 9 11:27:51 2012 +0000
+
+    gschem: Fix buffer overruns in buffer handling code.
+    
+    Off-by-one errors.
+    
+    Coverity-ID: 201623
+    Coverity-ID: 201624
+    Coverity-ID: 201625
+
+commit ea3a3214312203f886c10faa5a28ade7c5e9d4f6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 31 10:50:10 2012 +0000
+
+    gschem: Don't import srfi-69 in keymap.scm.
+    
+    We don't currently use SRFI 69 functions in the keymap system anyway.
+    
+    Closes-bug: lp-923874
+
+commit 82e62f3dcb2a55f69a892b9922edeb4fde80244a
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Wed Jan 18 23:54:10 2012 +0100
+
+    gschem: cleanup o_cue_draw_lowlevel
+    (cherry picked from commit bbcb153180b2c45fe74012059b428b06ad61eaae)
+
+commit 18658e26cb65aa99b7dba4954a973000e057929f
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Wed Jan 18 23:53:41 2012 +0100
+
+    gschem: fix drawing of junction cues
+    
+    Closes bug "disappearing dots in gschem" reported by
+    Gabriel Paubert <paubert@iram.es>.  Issue was introduced in
+    commit 6cae96e.
+    
+    Additionally, now junction cues are also drawn when 3 or more pins are
+    connected (same behavior as for net segments).
+    (cherry picked from commit 0df45c9f859537bf9683b7fa8fb3d4b35828672e)
+
+commit 7943b8a2c696265b334dbfa4dce1101e95754024
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Jan 15 19:24:45 2012 +0400
+
+    Updated Russian translation
+
+commit 59eafeb48043ec092e7b33017698a4ed10b0f5f6
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Jan 17 02:53:52 2012 +0400
+
+    libgeda,gschem: add three missing files to POTFILES.in
+    
+    Reported by Sergey Alyoshin
+
+commit b0a8dc828c4a94f90ca90b966f141924d45d3c64
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Jan 15 18:51:08 2012 +0000
+
+    gschem: Use correct textdomain in Scheme code.
+    
+    Reported-by: Sergey Alyoshin
+    Closes-bug: lp-916803
+
+commit cc53dd4e0671c27fde2738d12be7d44a416e753d
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Jan 15 19:02:28 2012 +0400
+
+    gschem l10n: add missing file to POTFILES.in
+    
+    x_rc.c is missing in POTFILES.in (reported by Sergey Alyoshin)
+    and contains typo (missing space) in one of strings.
+
+commit 037b21c18cb674ac50970e8474138b6809d3fcb6
+Author: Nathan Schulte <nmschulte@gmail.com>
+Date:   Fri Jan 13 19:32:21 2012 -0600
+
+    gschem: Fix formatting and code style
+    
+    Affects-bug: lp-916234
+
+commit e0140ecc98a57fc480a152717b53ac6fe5463611
+Author: Nathan Schulte <nmschulte@gmail.com>
+Date:   Fri Jan 13 19:23:04 2012 -0600
+
+    gschem: Fix bug with selection and hidden attributes
+    
+    Fixes a regression caused by 9b73a4c7f6f5e9dade0ddaca5aadc9ecb326bb5c.
+    When selecting an object via box selection it's invisible attributes
+    are now automatically selected as well.
+    
+    Closes-bug: lp-916234
+
+commit 13664d6acc70b939668493bb43e60eeaa9c202ea
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 12 00:14:35 2012 +0000
+
+    gschem: Remove some unused variables and labels.
+
+commit f86efb8f2d426810c6405f4a9696280e1cf63215
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Jan 11 21:52:17 2012 +0000
+
+    gschem: fix potential memory leak in g_funcs_filesel()
+    
+    Guard against non-local guile exit using a dynamic context.
+
+commit cfaf93e4a1fd5592ed40caf7ed643a7011f8d727
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Jan 11 21:37:27 2012 +0000
+
+    gschem: Fix potential memory leak in g_rc_paper_sizes()
+    
+    Move the conversion of the "papername" string from a Scheme object to
+    be the last Scheme call in the function, so that no potential
+    non-local exits in guile could cause the string not to be freed.
+
+commit 321c005a6170b34fc9f3e9f6ab1e4ab931120f81
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Jan 11 07:37:47 2012 +0000
+
+    gschem: display gschemrc filename properly on version failure
+    
+    Add a new Scheme function "rc-filename" to libgeda to extract the
+    filename of the Scheme file under evaluation, and use this in the
+    "gschem-version" Scheme function in gschem to show which file is
+    wrong.
+    
+    Closes-bug: lp-910663
+
+commit 684211777ffcf0414887f814207da97dc37dd5fa
+Merge: 72be40e cbdd5af
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 11 20:06:11 2012 +0000
+
+    Merge branch 'entropy_reduction' of git://github.com/gareth8118/geda-gaf into for-stable-1.8
+
+commit cbdd5af9825c99a38164fdd76f49be6a5e887821
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Jan 4 22:35:21 2012 +0000
+
+    gschem: add function documentation for g_rc_gschem_version()
+
+commit 72be40e1081e56050a81e73e74c5a4e0c645fe3d
+Author: Nathan Schulte <nmschulte@gmail.com>
+Date:   Sat Jan 7 15:16:44 2012 -0600
+
+    gschem: Fix a bug with invert selection
+    
+    When invert selecting "nothing", all currently selected objects are
+    deselected.  This is annoying when you "miss" trying to invert select a
+    small group of objects.  This is now fixed such that "missing" and
+    selecting "nothing" does not deselect everything.
+    
+    Closes-bug: lp-912489
+
+commit 97bea3a73c9c8d25d54454ea28a942b9c9c38c57
+Author: Nathan Schulte <nmschulte@gmail.com>
+Date:   Tue Jan 10 12:28:51 2012 -0600
+
+    gschem: Fix bug with invert selection and attributes
+    
+    This fixes a bug that causes attributes to be left unselected when
+    selected in the same select box as their parent object.
+    
+    Closes-bug: lp-912475
+
+commit 3671d4acdab78025b658cdba81f53c2ecec0208d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 10 09:20:26 2012 +0000
+
+    Update translations.
+
+commit 31440e054a54001bf462f7da9d31bfc0f0063d3f
+Merge: c6db159 0884425
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 9 20:13:41 2012 +0000
+
+    Merge branch 'bug-700448-load-error'.
+    
+    Eivind Kvedalen has provided some changes to libgeda and tools that
+    provide better error detection when loading schematic and symbol
+    files, and I have made a few improvements and bugfixes based on his
+    branch.
+    
+    Closes-bug: lp-700448
+    
+    Conflicts:
+    	libgeda/src/a_basic.c
+
+commit 08844256caf27c2ac0be8614388f6e30c034437d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 9 19:48:55 2012 +0000
+
+    gschem: Improve clipboard paste error dialog.
+
+commit fbb6ccced155992563052f4c23ac40dec43998f4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 9 19:40:01 2012 +0000
+
+    gschem: Make file load error dialog more useful.
+
+commit 08573f2f4f53afa3735081ea129cd1d86f14a6a2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 6 23:48:30 2012 +0000
+
+    gschem: Correctly checked-cast arguments when creating dialog.
+
+commit 8342bddce4487edf4a7214d5d6ab83cb73a066d4
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Wed May 18 22:27:51 2011 +0200
+
+    gschem: refresh pin-cues on connectivity change
+    
+    Closes-bug: lp-707064
+
+commit 6cae96ed0629a87bd71cecce4cc966e58b8bd0af
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Fri Mar 11 00:13:23 2011 +0100
+
+    gschem: skip drawing endpoint cues on fully connected nets
+    
+    Affects-bug: lp-707064
+
+commit b5f994f7c439cb0fbc863eec4843594165986683
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Jan 22 17:55:42 2011 +0100
+
+    gschem: replace pin end markings with boxes
+    
+    Affects-bug: lp-706552
+
+commit 58af3327f4fbca32597f7081cc84453fdf4c8dee
+Author: Nathan Schulte <nmschulte@gmail.com>
+Date:   Thu Jan 5 12:49:50 2012 -0600
+
+    gschem: Fix bug with inverted (control key) selection.
+    
+    Fixes a regression caused by commit 7f88749446b6.  The previous commit
+    made it so that making a selection with the control key pressed no
+    longer inverts the selection state of the objects selected, but
+    instead starts a new selection.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Closes-bug: lp-721445
+
+commit 7fa7d9ec42e089fcba9f2876c45330c406b19891
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Tue Jan 3 00:25:39 2012 +0100
+
+    Use an "Ok" button instead of "Close" button for dialog box if
+    parsing data from clipboard fails.
+
+commit 8c4438ef6071fede03c687c317a1f9d1489dd5f4
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Wed Sep 7 20:33:02 2011 +0200
+
+    Improved error reporting/behaviour when a symbol cannot be loaded.
+
+commit 4cebffe4ffc464cc16ac08191083deb0cbc76bbc
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Wed Sep 7 20:32:09 2011 +0200
+
+    Use GtkMeessageDialog instead of the generic dialog.
+
+commit d1305adf92982b3a159707c940bafb8c293223fe
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Tue Jun 28 21:43:13 2011 +0200
+
+    Partial fix for bug #700448.
+    
+    NULL is returned from o_*_read and o_read_buffer functions if parsing of the input buffer fails.
+    An error object is returned in these cases, describing in detail what error occured.
+    
+    gnetlist is updated to exit with status code 2 if the input file can't be read.
+    
+    gschem is updated to report errors when using o_read_buffer.
+    
+    TODO:
+    * Prone to segfaults on bad input files (separate patch)
+
+commit 5033a7a8765b35c405cd5cc44269b67d17dc2b19
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 2 19:20:17 2012 +0000
+
+    gschem: Correctly construct expressions for running hooks.
+    
+    In commit 71cc3eb5583b, the way hooks were run was changed from
+    directly calling libguile's scm_run_hook().  Instead, an expression
+    was constructed as a Scheme list structure, to be evaluated.
+    
+    Unfortunately, the way that the expression was constructed was wrong,
+    and led to the Guile evaluator attempting (and failing) to evaluate
+    gEDA OBJECT smobs.
+
+commit c5d37e544e04f42db420f9f6f3e4d042311947b7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 2 18:52:27 2012 +0000
+
+    gschem: Don't dirty page by adding default titleblock.
+    
+    The hook that adds the default titleblock to a newly-created, empty
+    schematic page shouldn't mark the page as having been changed.  gschem
+    will now no longer prompt to save when you run gschem and immediately
+    quit.
+
+commit d68a5277f1a4f1ad67a3cd9448b11d1a3dda6d01
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 2 18:27:58 2012 +0000
+
+    gschem: Unbreak most of the dialog boxes.
+    
+    In commit 78c8ee905dad, OBJECT smobs were altered to store a TOPLEVEL
+    pointer for use when freeing them during garbage collection.  The
+    TOPLEVEL pointer is obtained using edascm_current_toplevel().
+    Unfortunately, since edascm_current_toplevel() raises a Scheme error
+    when the TOPLEVEL fluid is not set, this means that
+    edascm_from_object() can crash gEDA applications if it is not called
+    from inside a Scheme catch context *and* the TOPLEVEL fluid isn't set
+    in the current dynamic context.
+    
+    This exposed a bug in commit 71cc3eb5583b, where OBJECT smobs were
+    created *before* setting the TOPLEVEL fluid.  As a result, gschem
+    crashed pretty reliably when hooks were triggered via dialog boxes
+    rather than via keystrokes or menu item (e.g. when adding attributes
+    with the "Add Attribute" dialog box).  This patch fixes the issue.
+
+commit 528ae278c95dd38dee2c4747effb18d723cbc271
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Jan 1 18:46:02 2012 +0000
+
+    gschem: add zero termination to invalid keycode list.
+    
+    A loop in g_key_is_valid() scans a list of keycodes to see if the current
+    one matches. Add a zero to the end of the list so that the search terminates
+    correctly.
+
+commit e2eda476fb8f3a16aeba8eab0cc8b7fa12e37d6b
 Author: Ales Hvezda <ahvezda@seul.org>
-Date:   Fri Jan 14 23:21:56 2011 -0500
+Date:   Sat Dec 31 16:00:23 2011 -0500
+
+    Updated man page date and version in prep for a new release (1.7.2)
+
+commit 46bfb5cf26f33947a2efc7522dabd1107ce0afe4
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sat Dec 31 15:56:11 2011 -0500
+
+    Updated all po files in prep for a new release (1.7.2)
+
+commit 0bf198375db72ec4ec2ba2b288993fd054e059fb
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 31 11:59:01 2011 +0000
+
+    gschem: Add some guidance comments for translators.
+    
+    Make it clear that "ChangeLog" is a filename and shouldn't be
+    translated.  Also untranslate it in the Dutch translation.
+
+commit eb13877a8e1f5d270d70dbb68739f506a7fd8873
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 31 12:00:37 2011 +0000
+
+    gschem: Remove postscript-font-scale option.
+    
+    Since 1.6.0, this has emitted a warning that it will be removed in
+    1.8.0.  So remove it.
+
+commit 0f2b06d2aa2693de9baf79a7bb6ac0bc5110bbcf
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Dec 31 11:48:58 2011 +0100
+
+    gschem: updated the Dutch translation.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 6b1c656f8833b6f3b893d5c204c72eb789a2221d
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Dec 27 16:57:46 2011 +0400
+
+    gattrib/po, gschem/po: Updated Russian translation
+
+commit ec9259f77f9af88f0bf3dbaa1c09a92b87b2c36b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 28 11:01:55 2011 +0000
+
+    gschem: Correct dynamic extent for complex place list changed hook.
+    
+    Note that the changes in commit 71cc3eb5583b did not affect this hook,
+    since it works through a different mechanism to the rest of the hooks.
+    
+    Closes-bug: 909193
+
+commit 71cc3eb5583b88e886d2a7bbd652db415af52259
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 28 10:53:08 2011 +0000
+
+    gschem: Always set gschem state fluid & catch errors for hooks.
+    
+    This should squash any remaining bugs of the same class as bug 908997
+    or bug 908444. At some point in the future, we should do something
+    helpful if an error occurs when running a hook, rather than just
+    dumping it into the log and carrying on blithely.
+
+commit a8cd39f99d2c354b76edc064bda1b6936c6ff736
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Dec 27 11:18:01 2011 +0000
+
+    gschem: Set GSCHEM_TOPLEVEL fluid when calling deselect-object-hook.
+    
+    Closes-bug: lp-908997
+
+commit 5e557fdfcb55b64dea1492df898785694f9ed155
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 24 20:07:01 2011 +0000
+
+    scheme-api: Correct bug in set-attribute-value!
+    
+    Closes-bug: lp-908444
+
+commit df9c96cc352c7723e5ba64cad7835c3972433556
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 24 01:00:56 2011 +0000
+
+    Update translation files.
+
+commit dd18397d667622407f0cf2856c5f407b0c3dca80
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 23 21:14:30 2011 +0000
+
+    gschem: Remove special case for Escape.
+    
+    In commit ef8cf3e9cd75, the <Escape> key was special-cased to do
+    nothing in g_keys_execute().  This meant that pressing <Escape> no
+    longer fired the 'cancel' action to reset to Select Mode.
+    
+    A better approach is to just treat <Escape> like any other key.
+
+commit 6fac0c0f99b51a845f8ab7be2c358f703a54d61f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 21 15:14:03 2011 +0000
+
+    scheme-api: Add 'snap-point' function to (gschem window) module.
+    
+    The snap-point function returns the closest on-grid position to a
+    given point. Suggested by Luigi Palese.
+    
+    Affects-bug: lp-905294
+
+commit f958bbe344b9834291446858e884ee742927596f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 21 15:44:22 2011 +0000
+
+    scheme-api: Correct some comments.
+
+commit 8134a47e969c9025b7469d40d5ae1e56a8bab9a5
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 14 12:12:53 2011 +0000
+
+    gschem: Error in gschemdoc PDF internet search.
+    
+    gschemdoc was trying to call internet-pdf-search to Google for
+    documentation, but the correct function was internet-doc-search.
+
+commit fea67660e14d7e927e5ec2c6df5d18c2ea23f82c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 14 11:41:51 2011 +0000
+
+    gschem: Update state properly on changing pages using page manager.
+    
+    Closes-bug: lp-705524
+
+commit 9c9744fa1a4dec33ecd3022412d80267a93a8370
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Dec 13 23:38:49 2011 +0400
+
+    gschem: Fixed incorrectly formed list for stroke Z
+    
+    Closes-bug: 904101
+
+commit 42182f0ae6b16171329f00f32ff1857d38c1c33e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 23:45:53 2011 +0000
+
+    gschem: Workaround for zero-height text view bug.
+    
+    This is a temporary workaround for a bug on systems using overlay
+    scrollbars for GTK+ widgets, where the value editing GtkTextView in
+    the multi-attribute editing dialog was appearing with zero height.
+    
+    Obviously, setting the height request to a constant size isn't ideal.
+    It would be better to set the height request based on the font size,
+    so that a certain number of lines are displayed.
+    
+    This should be revisited at a later date.
+    
+    Affects-bug: lp-876299
+
+commit ed520a7824eef460c3924e064330ccef3696592e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 14:52:22 2011 +0000
+
+    gschem: Remove empty FIXME file.
+
+commit 0e506ebd5d5cc87a7f373b83b24f2ad3c90fd18b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 14:13:22 2011 +0000
+
+    Remove per-tool INSTALL files.
+    
+    Only one top-level INSTALL file is needed, and that is provided by
+    automake.
+
+commit a957588adee2ec54f0cc3c23f9650dff6ed03d09
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 13:50:01 2011 +0000
+
+    gschem: Correct error in (gschem core gettext)
+    
+    Corrects an error introduced in commit 8d4c574efc3a, where the wrong
+    Scheme module name was defined.
+
+commit 8d4c574efc3a081324ef92d16e6feb6720c86c33
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 10:31:12 2011 +0000
+
+    scheme-api: Translate strings.
+    
+    Makes the messages emitted by Scheme API functions
+    internationalizable.  This required an update to the gnetlist
+    testsuite to set the library path for built-but-not-installed Scheme
+    modules.
+    
+    Closes-bug: lp-901013
+
+commit 182110f690c51eb53ea1799fd022e87322d742e3
+Author: Dima Kogan <dima@secretsauce.net>
+Date:   Thu Sep 8 01:40:46 2011 -0700
+
+    gschem: Move variables closer to where they are used, for clarity
+    
+    Signed-off-by: Dima Kogan <dima@secretsauce.net>
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Affects-bug: lp-845380
+
+commit 039e012397f2638d1577dd7c80fb862a5503dbfd
+Author: Dima Kogan <dima@secretsauce.net>
+Date:   Thu Sep 8 01:40:17 2011 -0700
+
+    gschem: Fix searching for hidden text.
+    
+    searching (and finding) hidden text no longer produces random results
+    by looking at uninitialized data.
+    
+    Signed-off-by: Dima Kogan <dima@secretsauce.net>
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Affects-bug: lp-845380
+
+commit bd7a0be7431df1a2a03027edb96cfde558256cb1
+Author: Dima Kogan <dima@secretsauce.net>
+Date:   Thu Sep 8 01:05:02 2011 -0700
+
+    gschem: Update optional debug printing to work with the latest code
+    
+    Signed-off-by: Dima Kogan <dima@secretsauce.net>
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Affects-bug: lp-845380
+
+commit ebfe6ae6a76b6a44a0bbe2d184bf99bfee7d97bf
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 11 00:11:59 2011 +0000
+
+    Add s_clib_symbol_invalidate_data().
+    
+    This allows a symbol's data to be reloaded from disk without
+    invalidating the full symbol data cache.
+    
+    Closes-bug: lp-698504
+
+commit 0f978cc519016ac1cbb56c772107e1f23c98c831
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 4 17:25:51 2011 +0000
+
+    Remove exit_if_null().
+    
+    Replace with g_return_if_fail(), g_return_val_if_fail(), etc.  We
+    shouldn't exit() from a shared library anyway.
+    
+    Also, this patch makes gschem *not* crash in a bunch of places where
+    it doesn't really make sense to just give up.
+    
+    Affects-bug: lp-698851
+
+commit bccf15c104d64b33d33bb7167703469d75884a7e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 9 23:52:19 2011 +0000
+
+    General fixes for pictures, picture rendering and picture operations.
+    
+    Streamlined the API for picture objects to make it harder to leave a
+    picture object in an inconsistent state.  This is a prerequisite patch
+    to providing a Scheme API for working with picture objects.
+    
+    This patch also makes primitive transformations of pictures actually
+    work, and fixes rendering of pictures in gschem, because the changes
+    weren't really feasible to separate.
+
+commit 121bd353ac7c4e9de0f94c4b7378945cf33222c6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 10 02:06:02 2011 +0000
+
+    gschem: Fix a crash when cancelling out of an action.
+    
+    In some cases, the new keybinding code could cause a crash when
+    cancelling out of an action with the right mouse button.  This was
+    because there was an call to scm_c_eval_string() which could sometimes
+    be called in a context where Guile exceptions weren't caught, and
+    which hadn't been updated to reflect the changes to the keybinding
+    system.
+
+commit 32ca3b25355ca4bef14ed3a2d15277367c32fead
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 9 16:46:20 2011 +0000
+
+    scheme-api: Stop show-uri from leaking a GError on failure.
+
+commit 6a2b3ff8557ebd8c321cdbe6e23abe1ef1df1580
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 8 18:59:02 2011 +0000
+
+    gschem: Tidy up status bar keystroke display.
+    
+    Tidies up the behaviour of the status bar when it displays user
+    keystrokes.
+    
+    - If the keystroke is a prefix (i.e. it resolves to a keymap), the
+      display will persist indefinitely.
+    
+    - Otherwise, the keystroke will be displayed for 400 ms or until
+      another keystroke is typed, whichever is sooner.
+    
+    This also fixes a problem where keybindings that resolve to pure
+    Scheme functions were not clearing the displayed key sequence.
+
+commit 1c00bf53cb8b49eb29e84a63e5c49253fc479f21
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 8 17:23:10 2011 +0000
+
+    gschem: Rewrite gschemdoc in Scheme.
+    
+    This completely removes the "gschemdoc" helper tool, and reimplements
+    almost all its functionality in Scheme, using the "show-uri" function
+    added in commit b4452ce0b1d4.  This permits gschem's documentation and
+    component documentation to be found and shown in an appropriate viewer
+    on all platforms, including Windows.  I have verified that this works
+    correctly on Linux, Cygwin and Windows XP.
+    
+    There is a drawback, however, in that "locate" is no longer used to
+    search for candidate files -- only the gEDA documentation directory
+    and the working directory are checked.  In future, this functionality
+    should probably be restored using desktop search.  There may also be
+    problems displaying documentation if gEDA data or documentation were
+    installed to non-standard directories, due to the slightly inelegant
+    methods used to detect the gEDA documentation directory relocatably.
+    
+    The component documentation search behaviour can be altered by
+    redefining the 'hierarchy-documentation' function in a gschemrc file.
+
+commit 30fa50eb42e33e4c8ff616eef7c4ba10eb65d228
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 8 18:04:31 2011 +0000
+
+    scheme-api: Add show-uri and show-file functions to (gschem util).
+
+commit c0d2ef0cd57cd566c457979b67a017503591d7aa
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 8 17:23:10 2011 +0000
+
+    gschem: Add x_show_uri().
+    
+    This function launches a URI in the appropriate application for
+    handling it, as determined by the platform's filetype association
+    settings.
+    
+    GTK+ 2.16.0 and later provide a the gtk_show_uri() function, which
+    attempts to use GIO to launch the default application for a URI.
+    Unfortunately, it doesn't work properly on Windows with HTTP and FTP
+    URLs, does evil things with FUSE when passed some URIs, and insists on
+    GNOME applications even when you're not running GNOME.  Unfortunately,
+    it is also currently considered the Right Way of doing things, and has
+    the advantage of providing detailed error messages when things go
+    wrong.
+    
+    With this patch, x_show_url() defaults to using gtk_show_url() on
+    Linux, but not on other host platforms.  The --enable-gio and
+    --disable-gio arguments to configure can be used to override this
+    behaviour.
+    
+    If GIO is not enabled, the default behaviour differs depending on the
+    platform:
+    
+    - On native Windows, the ShellExecute() API call is used by default.
+    
+    - On other platforms, a helper command is used.  If the URI_VIEWER
+      variable was not set during configure, the command used is:
+    
+      * `cygstart' on Cygwin
+      * `open' on Mac OS X
+      * `xdg-open' otherwise.
+    
+    Using a helper command can be forced on Windows by setting URI_VIEWER.
+    
+    For example, to disable GIO and select an alternative URI launcher
+    command:
+    
+      ./configure URI_VIEWER=my-open --disable-gio
+
+commit c41a838b680ed158ddd8e2acb880de21caf0a352
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 8 17:23:09 2011 +0000
+
+    scheme-api: Fix duplicate function name close_page_x.
+    
+    This was causing build failures on Cygwin.
+
+commit 0f3a44ec39dfb562ccfd9d3d458ba5e9062d2259
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 5 17:37:30 2011 +0000
+
+    gschem: Use g_assert() instead of exit().
+
+commit decfce058604a9d8a595b7917234d8a0b0e715c2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 4 18:51:46 2011 +0000
+
+    gschem: Fix some "set but not used" warnings.
+
+commit ef8cf3e9cd75779d17927c5a4ce51104d42a0ada
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 30 09:34:40 2011 +0000
+
+    gschem: Use new keymaps.
+    
+    Modify gschem to use the new keymaps throughout.  This is a fairly
+    intrusive change, requiring changes to the keybinding syntax for
+    configuration files.  The new syntax one is *much* simpler and easier
+    to understand for people who are not familiar to Scheme, and lends
+    itself well to modifications in user and local gschemrc files.
+    
+    Major improvements include:
+    
+    * gschem now behaves properly when the user accidentally hits Caps
+      Lock.  This has been a source of great annoyance to me in the past,
+      when gschem would stop responding to keystrokes for no obvious
+      reason, only for me to realise that Caps Lock was on.  Now
+      keybindings ignore Caps Lock entirely.
+    
+    * Menus now show the same symbols as should appear on a user's
+      keyboard, instead of raw X keynames.  This is much more accessible
+      and user-friendly than having to remember which bracket
+      "bracketright" refers to.
+    
+    * The heavy lifting of parsing key specification strings, and of
+      converting keystrokes to a correctly-internationalised
+      representation for display, is now carried out by GTK+.  This also
+      cheaply provides support for extended modifiers such as Super
+      ("Windows" key on most keyboards).
+    
+    * Changing the keybinding to show documentation to "Ctrl+D"
+      is now as simple as adding:
+    
+        (global-set-key "<Ctrl>D" 'hierarchy-documentation)
+    
+      to my "~/.gEDA/gschemrc", rather than some more complex Scheme code
+      to patch it correctly into the tree constructed by
+      "system-gschemrc".
+
+commit 70be3926b8f0604faadbe59651a1a7384fddb873
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 30 14:48:28 2011 +0000
+
+    gschem: Load `gschem.scm' earlier in boot process.
+    
+    `gschem.scm' provides several core services to gschem, particularly
+    w.r.t. key- and stroke-bindings.  Since rc files may wish to override
+    or make use of these functions, gschem.scm needs to be loaded *before*
+    the rc files are.
+
+commit 54bb85c55e147a0222a41f415e3200194d3e70ac
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 30 18:43:57 2011 +0000
+
+    gschem: Recursive keymaps.
+    
+    Adds the bind-keys! and lookup-keys functions, which are
+    used to work with key sequences and sub-keymaps.
+
+commit d29eb4d67b08065be7e7961725d9b40a234ef1f7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 30 18:44:06 2011 +0000
+
+    gschem: Basic keymaps.
+    
+    Adds a basic keymap type.  A keymap maps key combinations to "bindable
+    objects", which at the moment are expected (but not required) to be
+    thunks or other keymaps.
+
+commit 675c01fe262c1bbc912a43a74c3c96ca78dc88e2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 30 19:24:06 2011 +0000
+
+    gschem: Key sequences.
+    
+    Adds some Scheme API functions for working with key sequences.  A key
+    sequence is a vector of key combinations.
+
+commit 5a3917a2fe89a1b3e43d0fe9f7ee6a466f65e57c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 29 16:33:28 2011 +0000
+
+    gschem: Key combinations as first-class objects.
+    
+    Adds a new Scheme type to gschem that represents a key combination
+    (e.g. Ctrl+Shift+A).  The interface for working with them simply wraps
+    the GTK+ accelerator handling API, which means it's easy to convert
+    the key combination smobs either into a precise representation for
+    storing or into a properly-translated "pretty" representation for
+    display.
+
+commit b34be3c923c680efac20e3fafc68f9f820eb7255
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 30 14:31:06 2011 +0000
+
+    scheme-api: Fix parse-attrib usage in deprecated set-attribute-value!
+
+commit 1bf087eac8287e5d835be9961e82bb6a523a2c75
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Sep 2 01:48:38 2011 +0100
+
+    Revert "gschem: Make the user click the first point when adding nets or buses"
+    
+    This reverts commit 2197952617d42ccbe2355747ef48668c63ece30b.
+    
+    It turns out this behaviour was unpopular, and until I (or someone) has
+    time to make the behaviour configurable, it is better to revert this.
+    
+    Perhaps we may be able to come up with another way of allowing magnetic
+    net mode for the start-point of a net, whilst retaining the immediate
+    action of the shortcut key.
+    
+    (Revert tweaked a little to avoid re-adding whitespace errors)
+
+commit d1b632e03de0610209e24d8c72ccb37beb3c4aa3
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Sep 2 01:44:22 2011 +0100
+
+    Revert the last four commits - pushed by accident
+    
+    Those last four commits weren't ready for prime-time yet.
+    
+    This reverts:
+    
+        commit bdb529ee1c070c0119cafbd143e067d2aea99457
+        commit 7b4bd14b22cb890cfc156ef83678fef44e41afad
+        commit a909848f6efd539c10348f23f1b01ae35882a956
+        commit 50365b0d5da45201a834574441cdc02f0181db2a
+    
+    Thanks to Peter Brett for spotting my mistake.
+
+commit bdb529ee1c070c0119cafbd143e067d2aea99457
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Aug 26 05:58:59 2011 +0100
+
+    gschem: Play with move net-rubberbanding heuristics a little
+
+commit 7b4bd14b22cb890cfc156ef83678fef44e41afad
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Aug 26 05:58:59 2011 +0100
+
+    gschem: Add more abstract API for rubberbanding nets
+
+commit a909848f6efd539c10348f23f1b01ae35882a956
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Aug 26 05:58:59 2011 +0100
+
+    TEMPORARY: Debug redraws by removing updates to status-bar
+    
+    Changing the status bar text triggers a full-page redraw, don't do it!
+
+commit 50365b0d5da45201a834574441cdc02f0181db2a
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Aug 26 05:58:58 2011 +0100
+
+    gschem: Fix rendering artifacts when object creation is cancelled
+    
+    Object creation cancelled due to dragging out an invalid sized object
+    (zero radius circle, box or picture with zero width or height), left
+    an impression of the rubber-band lines on the screen.
+    
+    Cancelling object creation with the escape key does not cause this
+    effect, as it triggers a state change which includes a complete redraw
+    of the schematic page.
+    
+    TODO: Actually write the code!
+
+commit 6633fa2583170a30032d57962d64a6e56a3fe324
+Author: Kai-Martin Knaak <kmk@familieknaak.de>
+Date:   Mon Jun 20 00:00:00 2011 +0200
+
+    Revert "gschem: enhance grid contrast in lightbg color map"
+    
+    This reverts commit 142077b9769041195dd58d9f6cd59487bcb8afca.
+    
+    Needs discussion before we commit this, as the existing colours
+    were chosen with some careful consideration and testing.
+    
+    In particular, the off-white background was designed to avoid
+    eye-strain. From recollcetion, it was intended that the grid be
+    subtle, and not distract from the schematic.
+
+commit 142077b9769041195dd58d9f6cd59487bcb8afca
+Author: Kai-Martin Knaak <kmk@familieknaak.de>
+Date:   Mon Jun 20 00:00:00 2011 +0200
+
+    gschem: enhance grid contrast in lightbg color map
+    
+    Closes-bug: lp-799926
+
+commit c9d4f6638bbc7ba84534c2460037f19915114a95
+Author: Karl Hammar <karl@aspodata.se>
+Date:   Tue Jul 26 16:08:01 2011 +0200
+
+    Correct SCM_ASSERT() usage with incorrect SCM_ARGx.
+    
+    From guile documentation:
+    
+     -- Macro: void SCM_ASSERT (int TEST, SCM OBJ, unsigned int POSITION,
+              const char *SUBR)
+    ...
+     -- Macro: int SCM_ARG1
+    ...
+     -- Macro: int SCM_ARG7
+         One of the above values can be used for POSITION to indicate the
+         number of the argument of SUBR which is being checked.
+    ...
+    
+    Some SCM_ASSERT() calls have the wrong SCM_ARGx for its TEST and OBJ.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 7686d165f994a3064032de749b7b44cec6794c55
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sun Jul 3 00:54:53 2011 +0200
+
+    auto-uref: align with new scheme-api
+
+commit 9ab022fb196c38e00711148e590193ac423233aa
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sun Jul 3 00:36:25 2011 +0200
+
+    auto-uref: allow for empty refdes prefix
+    
+    Fix the case when regex in get-prefix does not match.
+    
+    Closes-bug: lp-804898
+
+commit f68f9a31c57e2aa343db14d6d7c98997a4c533ad
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jun 29 07:12:30 2011 +0100
+
+    gschem: Make sure window fluid is set for double-click events.
+    
+    This patch prevents a Scheme crash when double-clicking on objects to
+    bring up the edit window.
+    
+    Reported-by: Eivind Kvedalen
+
+commit d01e46055593990e918d94e4b30609df989561b4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jun 28 06:25:03 2011 +0100
+
+    build-sys: guile-snarf should use host CPP.
+    
+    Fix cross-compilation by making sure that guile-snarf uses the same C
+    preprocessor that will be later used for compilation.
+    
+    Reported-by: DJ Delorie <dj@delorie.com>
+
+commit ec7825e81a6ac142972bc4f0c28fb2276c3df60c
+Merge: 2fa4f57 c4ca820
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 20:35:29 2011 +0100
+
+    Merge changes from main unstable branch
+
+commit 4f6d3a0fd5810d8fabd93a1629495f5c916ae4d3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 20:04:21 2011 +0100
+
+    scheme-api: gschem API documentation (hooks).
+
+commit 6b299b8b9f423976f746cf3694a49b9124950237
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 19:49:10 2011 +0100
+
+    scheme-api: Make gschem's overridden close-page! never ask.
+    
+    The original version of the overridden version of close-page! loaded
+    by gschem into the (geda core page) asked the user to confirm closing
+    of dirtied pages.  It turns out that this was a really bad idea,
+    because it made the close-page! function impossible to document
+    clearly.  This patch makes the behaviour of gschem's close-page! match
+    the core library version, i.e. close immediately without question.
+
+commit c4ca82095d88e29ade47c8c9f69734cfeaea5c1a
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Jun 4 22:26:12 2011 +0200
+
+    auto-uref: smarter calculation of first refes on page
+    
+    Introduces the "page-offset" concept, where it is assumed
+    refdeses on each page should start at multiple of page-offset.
+    So for page-offset = 100 and minimum refdes used on page = 224
+    the hook will assign next refdes equal to 201.
+    
+    To enable this feature use (auto-uref-set-page-offset <number>).
+    Default value of page-offset is 0 which disables the feature.
+    
+    Currently minimum refdes is calculated separately for each prefix.
+
+commit f479409ac22750160df85e012012b81785afc37b
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Jun 4 00:45:38 2011 +0200
+
+    auto-uref: rewrite to support reusing refdeses
+    
+    auto-uref now scans all objects in the current page in order to find the
+    first unused refdes which can be assigned to the object.
+    Duplicate refdeses are handled correctly.
+
+commit 9c540461df266e548684ab2f0bd3294605cf749e
+Merge: f7cc583 12260ba
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Jun 19 18:16:48 2011 +0100
+
+    Merge changes from main unstable branch
+
+commit 12260baebf9f828e9297fc794e911224b8dcd163
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jun 19 10:36:02 2011 -0400
+
+    Updated all man page dates/versions
+
+commit 7eb55e097bf26bef7a4c57753837ee69c5c3471e
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jun 19 10:33:58 2011 -0400
+
+    Updated all po files in prep for a release
+
+commit ad289e2ea5d5402fd7061965a3939d33323e4292
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 18 13:06:57 2011 +0100
+
+    gschem: Add pointer-position function.
+
+commit 0aaabc599c8146801364d5b8bc9e984ea764cc5b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 18 10:42:42 2011 +0100
+
+    gschem: Reimplement get-object-bounds in Scheme.
+
+commit 0f7d19313b0a8e2ecd7d4a5ea24ee6e0ab243d60
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 17 21:43:22 2011 +0100
+
+    gschem: Remove unused g_make_attrib_smob_list().
+
+commit 6b3c4f7f52f684e10c08ef478e341b954032c94b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 17 20:27:49 2011 +0100
+
+    gschem: Reimplement set-attribute-text-properties! in Scheme.
+
+commit 4af6da495fd9233bfcf002d9addf9c36fe5d9751
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 17 20:43:23 2011 +0100
+
+    gschem: Make "About" dialog version match --version.
+
+commit 0b9ce5de9589b09ec35cdf321f5ac8540f81daa1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 17 19:24:28 2011 +0100
+
+    gschem: Reimplement get-selected-component-attributes in Scheme.
+
+commit c761f0ed17f915369143bcf180eafbf52076e1ae
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 16 21:45:27 2011 +0100
+
+    gschem: Reimplement add-component-at-xy in Scheme.
+
+commit 1cd1b3ecf56c183c6b7fd6cd968574f4a3f9c8eb
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 17 19:18:09 2011 +0100
+
+    gschem: Reimplement add-attribute-to-object in Scheme.
+
+commit 4feb90789ff1394465d2d6b8a5556da2c1462a14
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 17 19:12:10 2011 +0100
+
+    gschem: Improve documentation comments in Scheme code.
+
+commit c5ec85006694d354462680339dbd67499ad1f0a2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 17 18:43:17 2011 +0100
+
+    gschem: Reimplement get-selected-filename in Scheme.
+
+commit 4e191297be1c7a47566a072f1d6e44905fe4647a
+Merge: 0a5ccba a6cce78
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 16 21:47:18 2011 +0100
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	gschem/src/g_hook.c
+
+commit a6cce7844d1a1553ec5d39a49ad9426d9ed86417
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:25 2011 +0100
+
+    gschem: get_main_menu: remove use of deprecated SCM_{SYMBOL,STRING}_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 4d62c8dfcb4f062485f033a01e2ff88dbfab1feb
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:24 2011 +0100
+
+    gschem: g_rc_print_command: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 994c9f2625c01b34759bed81392f5deb6c5e47f5
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:24 2011 +0100
+
+    gschem: g_rc_add_menu: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 24fb619b41e5548c2433969680ba11f9fa00b4ca
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:24 2011 +0100
+
+    gschem: g_rc_paper_sizes: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 8aed0ad4e3771067cf98b654ea1b927f3c581291
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:24 2011 +0100
+
+    gschem: g_rc_attribute_name: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit c67055e0619ec803ca76cbe24de2b4289a7fd455
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:24 2011 +0100
+
+    gschem: g_rc_component_dialog_attributes: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 30e2f85555b1b6728bbc7c7435ccc426fff69aee
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:24 2011 +0100
+
+    gschem: g_rc_gschem_version: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit e0d12f118f80bb403cbaa1f22e1d5f4766a501d4
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:24 2011 +0100
+
+    gschem: g_keys_dump_keymap: remove use of deprecated SCM_{STRING,SYMBOL}_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 70ea4a4f4c649762ae0990a2708bf18d22b558c7
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:24 2011 +0100
+
+    gschem: g_add_component: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit bd53f9e5993d66e0c315ee7fa555f721864db02a
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:24 2011 +0100
+
+    gschem: g_get_object_bounds: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 0de35b4cb726e712961b153cf26fcf5c0ebebc78
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:24 2011 +0100
+
+    gschem: g_set_attrib_text_properties: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 156c4ac93245aa9075f5134221a06a185d140f3c
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Thu Jun 16 21:42:23 2011 +0100
+
+    gschem: g_add_attrib: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 8c66dc1b9545ed60d25fe7fa2a7f9aa95c2b4a92
+Merge: 25952c3 5f4308e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jun 15 18:12:44 2011 +0100
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	gschem/src/g_funcs.c
+
+commit 5f4308e8a6421175751aac21763d694973b6a016
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Wed Jun 15 10:20:49 2011 +0200
+
+    gschem: g_funcs_browse_wiki: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit d908e616b814fa2b2836c953684fdb6e6cfa5361
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Wed Jun 15 10:06:51 2011 +0200
+
+    gschem: g_funcs_filesel: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 113ab5ee6cf557b17bf47c521147230e462e92af
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Wed Jun 15 09:40:08 2011 +0200
+
+    gschem: g_funcs_confirm: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 2404ee24d3679ee55b7c0d28c54a456a13363fab
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Wed Jun 15 09:38:11 2011 +0200
+
+    gschem: g_funcs_msg: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 6eaf4f05e794741194c16151854f54df5cd73092
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Wed Jun 15 09:26:00 2011 +0200
+
+    gschem: g_funcs_log: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit b7edaba5db2059cae36b9b83c67507ffb6e601b2
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Wed Jun 15 09:20:46 2011 +0200
+
+    gschem: g_funcs_image: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit c005781278c095fffa6e31a68698204ae6e41f2c
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Wed Jun 15 09:16:56 2011 +0200
+
+    gschem: g_funcs_postscript: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit faffc3449660df53cd7f42a51687ed09f77fc9b6
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Wed Jun 15 08:53:17 2011 +0200
+
+    gschem: g_funcs_print: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 25952c382fc199fb91502279267c45f880a55cdd
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jun 14 00:20:50 2011 +0100
+
+    scheme-api: Correct import of (gschem core attrib) module.
+
+commit 5cf897c1c107dc3d0b2e4ef82d1f15cbdeb76041
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jun 14 00:10:36 2011 +0100
+
+    scheme-api: Use missing.h to pull in SCM<->C string funcs.
+
+commit 1a96308dcf365d4cad0de8373beb108c14dfeae2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 16:24:02 2011 +0100
+
+    scheme-api: Add add-attrib! function.
+    
+    Add convenience Scheme API function in gschem to shadow the
+    o_attrib_add_attrib() C function.  Although most of the behaviour of
+    this function could be provided in pure Scheme, it would be somewhat
+    annoying to have two lots of code which do the same thing.  Also, the
+    slotting mess is still in C only.
+
+commit 623341482a94b2f92e662dd8e9ff8f6a218f42cc
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 21:43:57 2011 +0100
+
+    Use UTF-8 instead of locale Scheme string functions.
+    
+    See commit 09c6613f93b6.
+
+commit 91865253d6e4422b06648fe5b0334a5013a7d08a
+Merge: 4bccef2 09c6613
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 21:42:48 2011 +0100
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	libgeda/src/g_register.c
+    	libgeda/src/g_smob.c
+
+commit 09c6613f93b65d3f9193e7dbc65bd696cf8a6b06
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 20:35:37 2011 +0100
+
+    libgeda: Use UTF-8 instead of locale Scheme string functions.
+    
+    Note that there are several places where locale string functions are
+    still used, because the input depends on the current locale
+    (e.g. strings obtained from command-line options or from the
+    filesystem).
+    
+    There are still a lot of places where we're still treating
+    locale-dependent strings as UTF-8 strings (and probably vice-versa).
+    Enough bugs for everybody to share!
+
+commit 4bccef20f38b43da0d9916f63601dec35fd5b33c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 11 12:57:45 2011 +0100
+
+    gschem: Better hook behaviour for "Select All".
+    
+    Run select-objects-hook for all objects selected by the "Select All"
+    operation at once, not one at a time.
+
+commit 0d5ec53d5ce3baa3004bd1dbfea2f33c4d4abece
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 12 13:24:08 2010 +0000
+
+    gschem: Enable new-page-hook.
+    
+    This varies slightly from the original behaviour, in that it is only
+    called when a *new* page is created (e.g. through File->New), and not
+    on page load.
+
+commit d8abb509c60de0fbd4c288ff7fa9c32c2448f1cf
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:29 2010 +0000
+
+    gschem: Enable select-objects-hook and deselect-objects-hook.
+    
+    Not a brilliant implementation -- calls hooks one object at a time
+    even when a large number of objects are selected/deselected.  But it
+    works.
+
+commit b4a75a6ebc480d866d2b268059de04cfcecff40f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:29 2010 +0000
+
+    gschem: Enable attach-attribs-hook and detach-attribs-hook.
+
+commit 228f6b55dc0d95e2a9695fc9cbb019099811524f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:29 2010 +0000
+
+    gschem: Enable move-objects-hook and paste-objects-hook.
+
+commit 91e869f566c82cf2bcd9c501bad2060a257c2192
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:29 2010 +0000
+
+    gschem: Enable mirror-objects-hook and rotate-objects-hook.
+
+commit d0467a2c5c6fde4155bfc57f0345bbb162e1b4c7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:29 2010 +0000
+
+    gschem: Enable remove-objects-hook.
+
+commit 05954f101e9ae90193150e030fb66c1b3d32e44b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:28 2010 +0000
+
+    gschem: Enable add-objects-hook.
+
+commit 62f51dcfeb8a08288bc1854fd1d49e667b03f490
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:28 2010 +0000
+
+    gschem: Start implementing simplified hook system.
+    
+    Rather than the current hook system, which uses misleading hook names
+    and is only useful for a limited range of use cases, use a smaller
+    number of more general hooks.
+
+commit 1121d83a5450ad9040cabb7ef9a8cfb6c2a395f3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 10 13:46:15 2011 +0100
+
+    scheme-api: Only use (ice-9 syncase) if define-syntax missing.
+    
+    In Guile 2.0, syntax-case is built in by default and importing the
+    (ice-9 syncase) module isn't required.
+
+commit e9f2f0b1285b877a12f0338635af0eade60c7c68
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 9 17:37:16 2011 +0100
+
+    scheme-api: Fix (gschem deprecated) module.
+    
+    The set-attribute-value! function contained a let with invalid syntax.
+    Guile 2.0 rightly gets upset by this.
+
+commit 1543eda1dbb823fd3052a3b831eae5b8316ed690
+Merge: 19963e9 014b30b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 9 15:06:46 2011 +0100
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	gschem/scheme/gschem.scm
+    	libgeda/include/prototype_priv.h
+    	libgeda/src/g_smob.c
+    	libgeda/src/o_basic.c
+
+commit bd939b78afa64e27bd9366133ecf636b145c2fe7
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Jun 4 23:04:56 2011 +0200
+
+    gschem: enlarge macro entry box
+
+commit 84949b85df8e8ac1475ae8555bcffe060624d254
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 12:43:28 2011 +0100
+
+    Silently skip duplicate config files.
+    
+    Affects-bug: lp-710587
+
+commit 83777ec203d9dfcf6a257a0c92e2fe2a3deeb552
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 12:30:36 2011 +0100
+
+    Silently skip missing config files.
+    
+    Closes-bug: lp-710587
+
+commit 2fd51c888dfeb536481b7cbfefe2484f4ddede33
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 09:45:34 2011 +0100
+
+    gschem: Use scm_is_pair(x) instead of scm_pair_p(x) == SCM_BOOL_T.
+
+commit e89ef317e6603e41f2fde56ec02cf98775e51b27
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 09:36:01 2011 +0100
+
+    Use scm_is_false instead of comparing with SCM_BOOL_F.
+
+commit ec5a4822f2f30ff48f521ed62ad0b3fda1021faf
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 09:12:07 2011 +0100
+
+    Remove uses of deprecated SCM_STRINGP and SCM_SYMBOLP.
+
+commit edac96258eb6ff8888f05479de942f3e239da87c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 09:10:03 2011 +0100
+
+    gschem: Add missing regex module to autoplace plugin.
+
+commit 4809fe081c03bd3a9468db4aa6ad7823c4717b0d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 4 09:07:08 2011 +0100
+
+    gschem: Rename File->Close to File->Close Window.
+    
+    There has been some confusion over whether File->Close closes the
+    current page or current window.
+    
+    Affects-bug: lp-792459
+
+commit b410e0b5965e4d0fd95b032676e3f3b658ee2792
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Jun 4 01:34:58 2011 +0200
+
+    gschem: add property "editing-canceled" in CellTextView
+    
+    Since GTK 2.20 the GtkCellEditable interface requires boolean property
+    "editing-canceled". This patch silences warnings from GTK.
+
+commit 8db0bdda749c1b30a1b2295db9e80d4dd98f67a9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 21:19:49 2011 +0100
+
+    gschem: Stricter R5RS definitions.
+    
+    Guile 2.0 requires definitions to occur only at the top level of a
+    <program> and at the beginning of a <body>.
+
+commit fb917f8b61f58b3cde5f1730b94c28c5992edea1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 15:58:31 2011 +0100
+
+    Remove uses of deprecated scm_makfrom0str.
+
+commit eb2eeee3626c6f127ba2790f708b03d06bb04122
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 3 15:29:46 2011 +0100
+
+    Remove uses of deprecated scm_num2double.
+
+commit 9e3496eb1b753ae9e42dfddd2343892a6618455d
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Wed May 25 22:59:10 2011 +0200
+
+    auto-uref: initialise data structures at page load
+    
+    New toplevel procedure is defined in auto-uref.scm to be used with
+    the new-page-hook:
+    
+        (add-hook! new-page-hook auto-uref-init-page)
+    
+    When called, internal refdes map is initialised from attributes of
+    existing elements on the page.
+    
+    Closes-bug: lp-787637
+
+commit a827a0424b456e9f4b7b05a24a245cd871b6ce15
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Wed May 25 01:54:10 2011 +0200
+
+    auto-uref: keep track of refdeses per page
+    
+    Affects-bug: lp-787637
+
+commit cbd30169122f7882c4d70db7e6c03604a917c8d2
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue May 24 23:40:56 2011 +0200
+
+    auto-uref: omit inherited refdes attribute
+    
+    Affects-bug: lp-787637
+
+commit 2dfb5547bdf486ca4375af9e73cbe318768cb59f
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Fri May 20 23:47:09 2011 +0200
+
+    gschem: recent file list checks file extensions
+    
+    In the recently used files both symbol and schematic files are shown.
+    Change the filtering method, so recently used files are chosen not only
+    by MIME type, but also by the file extension as well.
+    
+    Rationale: if gEDA is installed in a location other than default (say in
+    users home dir), the MIME type databases will not be updated and list
+    of recently used files will always be empty.
+
+commit 2197952617d42ccbe2355747ef48668c63ece30b
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed May 11 18:06:20 2011 +0100
+
+    gschem: Make the user click the first point when adding nets or buses
+    
+    This allows "magnetic net" mode to be used for the start-point of a net
+    as well as its end-point, whilst still being able to initiate net drawing
+    with the "n" key.
+    
+    I have updated buses as well in an effort not to have them diverge yet
+    further in their behaviour.
+
+commit c24bbf855cd3d5f5840ce33d6ad06195008dc141
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Feb 11 23:38:57 2011 +0100
+
+    gschem: disable menu items operating on text objects if no text is selected
+    
+    And ignore non-text objects while iterating the list of selected objects.
+    
+    This patch fixes the following warning:
+    
+     ** (gschem:31478): CRITICAL **: o_attrib_toggle_show_name_value: assertion
+       `object != NULL && object->type == OBJ_TEXT' failed
+    
+    which can be trivially reproduced by (for example) selecting a net and then
+    choosing the "Attributes/Show Value" menu item.
+    
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+    Reviewed-by: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+
+commit 7f88749446b61493e881ad6aeb0a82f909a8c0d7
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Mar 21 22:51:23 2011 +0000
+
+    gschem: Don't require select to drag objects
+    
+    This comes from watching users interacting with gschem and their
+    clear expectations that objects can be dragged around the canvas
+    without an explicit selection step first.
+    
+    When a mouse drag starts on non-selected object, starting dragging
+    that object rather than forming a box selection.
+
+commit 0fffd6b16214cd05cba9de9e4d65d4e1ea2cf16a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Mar 21 19:53:29 2011 +0000
+
+    Remove draw funcs from libgeda.
+    
+    Removes all of the statically-registered draw functions from libgeda,
+    as well as the draw_func field from the OBJECT structure. Makes
+    o_redraw_single() dispatch to type-specific drawing functions
+    directly.
+    
+    Refreshed by Peter Clifton <pcjc2@cam.ac.uk>
+
+commit 7cc025db90267d5cb5b038e2cc39cb15544e0367
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Mar 21 19:21:49 2011 +0000
+
+    Remove OBJECT->sel_func in favour of an OBJECT->selectable flag
+    
+    Only gschem called OBJECT->sel_func anyway, so lets avoid passing vfunc
+    pointers everywhere as a flag. This has the added benefit of removing
+    some dummy functions from gattrib and gschlas which were only present
+    so the status of locked objects could be preserved across load/save.
+
+commit 1eb06387f70cef7e46f37d6be70ea4429a29c894
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Mar 21 19:07:27 2011 +0000
+
+    gschem: Make dragging selected objects obey the same hit test as selecting
+    
+    This makes dragging a group of selected objects more consistent with the
+    action required to select the objects in the first place, most notably
+    when dealing objects whos bounding boxes don't fit tightly to the
+    selectable geometry - e.g. lines and curves.
+    
+    In order to start a drag, the user must hit within some distance of some
+    selected geometry. This makes it easier to change selection to another
+    object with overlapping bounding box if the user did not intend to initiate
+    a drag.
+
+commit 497241f260a728e485cf68dfbf3eea8ce9433a29
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Mar 21 18:35:17 2011 +0000
+
+    gschem: Remove (drag-can-move ...) option from system-gschemrc.
+    
+    Make this non-configurable to reduce the number of options I would bet
+    money on no-one using. On a more practical note, I am trying to reduce
+    the number of combinations we need to test when altering mouse bindings.
+
+commit 3f0e6e8bc8771a83ed8df36a0818258f51813580
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Mar 12 16:17:10 2011 +0100
+
+    gschem: show error dialog when save fails
+    
+    Closes-bug: lp-698566
+
+commit d506039d41aea6ecd9e15e62e7b79de8cca284bd
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Mar 12 16:07:34 2011 +0100
+
+    libgeda: add GError argument to f_save and o_save
+    
+    o_save and f_save now can report errors during file write using GLib
+    GError mechanism, similar to f_open.
+    
+    Affects-bug: lp-698566
+
+commit 5da67a77456e288a0e54c2243779261b191c8cf2
+Author: Kai-Martin Knaak <kmk@lilalaser.de>
+Date:   Sun Jan 30 12:34:46 2011 +0100
+
+    gschem: Do not suggest in system-gschemrc, that snap-size is not grid size.
+    
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+    Closes-bug: lp-706758
+
+commit 66de7e71a2e8a4b2b1f4f9ccc33021c0cff08028
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Jan 29 03:43:39 2011 +0000
+
+    gschem: Remove unnecessary include from gschem_pango.h
+
+commit ddb932b52888c181d1eea9934776fb303e463c56
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Jan 29 03:35:29 2011 +0000
+
+    gschem: Use GtkAdjustment type, not deprecated GtkObject
+
+commit 877ff2236bd6e2d397143d92ff80ace193524f36
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Jan 29 03:08:33 2011 +0000
+
+    gschem: Use cairo drawing for text bounding box / mark / "I" marker
+
+commit 0e49b41b82323f4632410314b680a9d9d6450540
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Jan 29 03:03:23 2011 +0000
+
+    gschem: Make object fill functions static inside their o_*.c file
+    
+    Move the o_*_draw() functions down after the fill functions, so we
+    don't even have to prototype them in the C file.
+
+commit 465db62f713eb8f1f6c73842a166160a24ba18fd
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Jan 29 03:02:50 2011 +0000
+
+    gschem: Remove unused GdkGC and GdkDrawable arguments from fill routines
+    
+    Also swap the (GSCHEM_TOPLEVEL *) argument to be the first, to better
+    match other API.
+
+commit 6f30672e88af11776aa1a1fed74d00fab7c492f7
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Jan 28 01:12:27 2011 +0000
+
+    gschem: Remove some commented out code from o_grips.c
+
+commit 854581f8b60756ee6bd79b41095084215395469d
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Wed Jan 19 17:37:46 2011 +0100
+
+    gschem: plug GList leak in create_inuse_tree_model
+
+commit 2e5decb6ff1601935cc1f005a312ca04b6d13dfb
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Wed Jan 19 23:12:49 2011 +0100
+
+    gschem: fix refresh in component seleciton dialog
+    
+    Block signal handler for GtkTreeSelection "updated" signal while the
+    refreshed GtkTreeModel is installed in the GtkTreeView widget.
+    
+    This is necessary as x_compselect_callback_response cannot reliably
+    determine whether it has been triggered by update of "library" or "in
+    use" tree views.
+    
+    Closes-bug: lp-704829
+
+commit 77b5bd3b9b49d907492aa3b20e3362f3fc4f6209
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 18 23:04:42 2011 +0000
+
+    gschem: Don't use "Select All" icon for "Deselect" action.
+    
+    The wrong icon was set in commit cfed6e31d278.
+
+commit f4c86354333a8dfc0d5bca04532a9fb0efe7513f
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 18 18:33:15 2011 +0100
+
+    gschem: add keymapping for edit-deselect action
+    
+    Deselect is now triggered by Ctrl+Shift+A shortcut.
+    
+    Closes-bug: lp-699852
+
+commit 0c46b10b3965054be0d2ad00a6659164b830a91b
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 18 23:16:49 2011 +0100
+
+    gschem: normalize key mappings defined in rc files
+    
+    Add Scheme routines to normalize defind key mappings at gschem startup.
+    List of accel modifiers is sorted alphabetically to match ordering
+    implemented in g_keys_execute.
+    This allows the user can specify accelerators in any order.
+    
+    Affects-bug: lp-699852
+
+commit cf7da69276fe7626677cc843fbb7a916ed36e0e4
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 18 18:21:58 2011 +0100
+
+    gschem: support multiple key modifiers in c-code
+    
+    Modify g_keys_execute() to support multiple keypress modifiers.
+    Modifiers are ordered alphabetically: Alt Control Shift.
+    
+    Affects-bug: lp-699852
+
+commit 9379c19a7563a02c271c8640fdb814ef0add5981
+Merge: f9156f1 23383c5
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 18 22:36:59 2011 +0000
+
+    Merge changes from main unstable branch
+    
+    Conflicts:
+    	gnetlist/src/gnetlist.c
+    	gschem/src/g_hook.c
+    	gschem/src/gschem.c
+    	libgeda/include/libgeda/prototype.h
+    	libgeda/src/g_basic.c
+    	libgeda/src/g_smob.c
+
+commit dc66dc0af3426f92381e9b35573f5365371e527a
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jan 16 01:59:23 2011 -0500
+
+    Another set of changes to all the po files
+    
+    These changes were made when 'make distcheck' was run to create the
+    1.7.0 tarball.
+
+commit cb0eaabe02c154e6fe95ac49dd638fd6057e9883
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jan 16 00:16:42 2011 -0500
+
+    Updated copyright data in gschem's about box
+
+commit 799d67452921ed1447e8b030ee268fe8c34c5785
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jan 16 00:15:29 2011 -0500
 
     Updated version strings in all man pages
 
-commit 48f3d8aedb5db6f5dfb6232565e65e03d45b5efb
+commit 2e2e2bf53458d6fea7e4c8dd7736818470fde248
 Author: Ales Hvezda <ahvezda@seul.org>
-Date:   Fri Jan 14 23:18:41 2011 -0500
+Date:   Sun Jan 16 00:12:48 2011 -0500
 
     Manually ran make update-po in order to prep for the make distcheck
+
+commit 1c531ec953bb3a7fe895eafc65c3d4f85c2603c6
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Jan 15 13:45:08 2011 +0000
+
+    gschem: Delete "Edit"->"Make Inv Text Vis" menu item
     
-    This step is always done right before make distcheck is run to create
-    a release tarball.
+    This menu item trips up more people than it helps. Remove
+    it and associated code. (By popular request on geda-user.)
+
+commit 2a6c81e6b88e23b9f391c80b2c8a042cf5a87a1a
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 11 23:59:22 2011 +0100
+
+    gschem: write object visibility field with setter
+    
+    Replace direct write to visibility field with calls to o_set_visibility.
+    
+    Affects-bug: lp-701431
+    
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+
+commit 0fad1e0c5aafa043387a8a5114795cdd352af3a6
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 11 23:55:09 2011 +0100
+
+    gschem: read object visibility field with getter
+    
+    Replace direct attribute access with calls to o_is_visible.
+    
+    Affects-bug: lp-701431
+    
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+
+commit 502ab80495c45e092eca6052edd6cf8e7ff55429
+Merge: 27f7a52 e1c3ba4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 13 19:59:35 2011 +0000
+
+    Merge branch 'stable-1.6'
+    
+    Conflicts:
+    	NEWS
+    	libgeda/include/prototype_priv.h
+    	libgeda/src/gdk-pixbuf-hacks.c
+    	libgeda/src/o_basic.c
+    	libgeda/src/o_complex_basic.c
+    	utils/src/gsch2pcb.c
+
+commit bbab4c1f8c9fc13ed6276cde8371b77cc9c08342
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:45 2011 +0000
+
+    gschem: Warning dialogs when rc file load fails.
+    
+    When loading configuration files at gschem startup, display
+    informative dialog boxes if an error occurs.
+    
+    This still does not apply to configuration files loaded "on-the-fly"
+    when loading new pages from disk.
+    
+    Affects-bug: lp-698578
+
+commit 7ca2b049dbcfb9f0eb8d3dd3fcf21cbd66c0ec95
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    Print message and exit if rc file load fails.
+    
+    Modifies g_rc_parse() to print useful messages to standard error and
+    exit with non-zero status if an error other than ENOENT occurs while
+    attempting to parse any configuration file.
+    
+    N.b. only copes with rc files loaded at startup; rc files loaded later
+    (e.g. a gafrc auto-loaded while loading a schematic using gschem
+    "File->Open") can't cause the application to die.
+    
+    Since this means that under some circumstances gschem and gattrib can
+    appear to do nothing silently (e.g. when launched from via a .desktop
+    file) subsequent patches need to make gschem and gattrib generate
+    appropriate warning and/or error message dialogs.
+    
+    Affects-bug: lp-698578
+
+commit f82c6d0e497d7d18905d65b8499f33f3e7e3e073
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    Upgrade g_read_file() to support GError.
+    
+    Allow g_read_file() to return error information in a GError if an
+    error occurs while loading the requested rc file or Scheme script.
+
+commit d50f80399fc8de5bcc24723b87f9132324569fb9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    Invert g_read_file() return values.
+    
+    Make g_read_file() return TRUE on success and FALSE on failure.  It
+    turns out that not only had the return value on success been incorrect
+    for some time, there was only one use of g_read_file() that cared
+    about the return value anyway.
+
+commit 3fa62435953d75e9a927e36fb5edab7bdc17535e
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Tue Jan 4 01:49:51 2011 +0100
+
+    gschem: replace gtk_signal_connect with g_signal_connect
+    
+    gtk_signal_connect is deprecated and should not be used in new code.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Closes-bug: lp-698742
+
+commit 355fd9bae3392c120d85f81feff04cae5a0ed42e
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Jan 8 02:46:28 2011 +0100
+
+    gschem: fix secondary label in close confirmation dialog
+    
+    Secondary label used a pointer string that was previously freed.  This
+    bug was introduced in commit d8803215ea59.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Closes-bug: lp-700189
 
 commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
 Author: Peter TB Brett <peter@peter-b.co.uk>
@@ -25,6 +2209,109 @@ Date:   Fri Jan 7 22:00:09 2011 +0000
     
     Only files remaining with old address are wiki files (although the
     wiki has now been updated) and PostScript files.
+
+commit 86c305d9a2c62f062cbd9b63810a0173e4855310
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 14:53:51 2011 +0000
+
+    Install HTML versions of manpages even without groff.
+    
+    If groff isn't available, try to install HTML manpages anyway.  This
+    allows users to install manpages even if they don't have groff as long
+    as they aren't compiling from git and don't edit the manpages.
+    
+    Closes-bug: lp-698586
+
+commit cfed6e31d2781f3e0981d62c1b965f0565a03420
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 13:02:16 2011 +0000
+
+    gschem: Add "Deselect" to "Edit" menu.
+    
+    Add an action to deselect all objects on the page to the gschem "Edit"
+    menu. Ideally, it would be bound to <Control Shift A>, but gschem
+    keybindings can only have a single modifier key.  For now, don't bind
+    the action to a key.
+    
+    Related-bugs: lp-699794
+
+commit d8803215ea591b9349999c17c5a85aee7da473af
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 09:45:11 2011 +0000
+
+    Remove warnings when building with "--disable-nls".
+    
+    Closes-bug: lp-698450
+
+commit d1569f38123674ffa71b0160cd0fb56806673c84
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 23:28:49 2011 +0000
+
+    gschem: Fix some compilation warnings.
+    
+    Removes a bunch of unused variables that were causing compilation
+    warnings.
+
+commit 5dcaa34495465cfc413b9d2cf3bbd217c1b8c6a3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 00:40:20 2011 +0000
+
+    gschem: Add `-c EXPR' to evaluate Scheme EXPR on load.
+    
+    Adds a `-c' option to gschem, which allows a Scheme expression to be
+    evaluated on gschem load.  Multiple `-s' and `-c' options can be
+    specified, and they are applied in order.
+
+commit 0881305f47b16bb530983604a55abe4fe4fbd1b3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 00:24:40 2011 +0000
+
+    gschem: Allow multiple `-s' scripts to be specified.
+
+commit c3193a03970dfe1b19a595a6d7f86be445c3bb70
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 13:50:20 2011 +0000
+
+    gschem: Add `-L' option for adding to Guile load path.
+
+commit d56ec6d94b1ecd8e08a8ee9beb56b3b8dd9eb01f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 17:10:15 2011 +0000
+
+    gschem: Provide long-form options and update man page.
+    
+    Make gschem support long-form alternatives for several command-line
+    options.  Additionally, make some further improvements to the gschem man page.
+
+commit 0f9554ec1bcb37dba92a09f1b69680ca8cd3366f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 13:52:56 2011 +0000
+
+    gschem: Remove `-t' option from usage message.
+    
+    The `-t' option was removed in commit 65b79e360357, but was not
+    removed from the usage message at the that time.
+
+commit 7a3e9f294d12732cd6fb043412c1bf92eaf5b268
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 5 11:52:35 2011 +0000
+
+    Make `scheme-directory' rc function prepend to Guile load path.
+    
+    Guile already provides infrastructure for loading Scheme files from a
+    library, so this patch makes gEDA use it properly.  With this (fully
+    backward-compatible) patch it's now possible to load Scheme files,
+    including gnetlist backends, from more than one directory.
+    
+    Note: This commit makes the gnetlist test suite pass again.
+
+commit 2a9e92fa59aafcd18286ebf0816fb54bafaac386
+Author: Patrick Bernaud <patrickb@chez.com>
+Date:   Tue Jan 4 19:08:19 2011 +0100
+
+    gschem: Do not attempt to set GtkWindow's type after construction.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
 
 commit 9ae03d499783cbbc42dfd5180d0abfa88b8ed8f0
 Author: Wojciech Kazubski <wk0@o2.pl>
@@ -49,6 +2336,455 @@ Date:   Tue Jan 4 15:37:47 2011 +0000
     corruption and genereral chaos. This was reproducable by moving
     some objects (em), then switching pages with a key-binding.
 
+commit 0d658babe176af44e2a58fe09ca18b718aea2412
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 4 15:11:09 2011 +0000
+
+    gschem: Add "Select All" bound to Ctrl-A. [3143355]
+
+commit 371bd6130c77ae0d671ade3a82410f9a3a6105c3
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Mon Jan 3 00:40:03 2011 +0100
+
+    gschem: expand component tree after filtering
+    
+    This patch changes the behavior of the component selection dialog.
+    After filtering by name is applied the tree view of matching components
+    is automatically expanded so that all leafs are immediately selectable.
+    The tree view is collapsed when the filter is cleared.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 1e93f7bea2cbe0fa8887337c261093b55c31dd6d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 3 23:07:25 2011 +0000
+
+    Revert "Remove some CVS keywords."
+    
+    This reverts commit f5ada1de1372bd3772b4f4bd33afa59803c1dade, which
+    was pushed to the repository in error.
+
+commit f5ada1de1372bd3772b4f4bd33afa59803c1dade
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Dec 21 12:37:10 2010 +0000
+
+    Remove some CVS keywords.
+
+commit a49c4cf66556570af7ba8dd2af1a6186015ea367
+Author: Felix Ruoff <Felix@posaunenmission.de>
+Date:   Sun Jan 2 22:22:37 2011 +0100
+
+    gschem: Replace recent file list with GtkRecentManager.
+    
+    This patch replaces the implemented recent-file - list by the recent-manager provided by GTK since version 2.10.
+    Only schematic-files (*.sch) and symbol-files (*.sym) will be shown (case insensitive).
+    Known differences to previous version:
+    * No 'free recent list' option
+    * Shows just filename (not full path) as menu-label
+    * Full file-path avaiable as tooltip
+    * Shows filetype-icons
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 3b0905a748953a6b1cb72b747f096ccc7b936884
+Author: Felix Ruoff <Felix@posaunenmission.de>
+Date:   Sat Oct 9 18:35:33 2010 +0200
+
+    gschem: Fix warning on moving over menu-item without action
+    
+    Fix a warning at the info-dialog if the mouse moves over a menu-item
+    which has no action defined, e.g. the top item of a submenu.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit ec2648696c5574205ff36caab1b81b0dba6a1901
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 22 21:57:34 2010 +0000
+
+    gschem: Update man page.
+    
+    Numerous changes:
+    
+    - Simplify synopsis section.
+    - Improve English grammar.
+    - Generally abbreviate.
+    - Update copyright information.
+    - Add instructions for accessing full manual from inside gschem.
+    - Describe GEDADATARC environment variable.
+
+commit 65b79e3603571b159b8f1283fb64e4ba257c69f5
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 22 22:08:19 2010 +0000
+
+    gschem: Remove non-functional -t option.
+    
+    The -t option hasn't done anything for quite some time now (since
+    commit d96ad3c39121, in fact).  Since no-one's complained that it's
+    broken, remove it completely.
+
+commit f3d2f1a8b2820ab053219c9453d9f32c3172ce2c
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sat Dec 18 23:12:10 2010 +0000
+
+    Don't set construct-only 'type' property on log dialog. [3140276]
+    
+    Running gschem gives a warning:
+    
+    (gschem:62319): GLib-GObject-WARNING **: g_object_set_valist: construct
+    property "type" for object `Log' can't be set after construction
+    
+    This patch removes the attempt to set the CONSTRUCT-ONLY GtkWindow property
+    "type" from the g_object_set call in the Log instance initializer and moves
+    it into the g_object_new call when the Log instance is created.
+    
+    Signed-off-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 0f95f7181b3824c278e034b40fe9c5156da7c527
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sat Dec 18 23:11:47 2010 +0000
+
+    Added doxygen comments to Log class functions [3140275]
+    
+    Added some doxygen comments to the class functions for the Log class
+    throughout x_log.c
+    
+    Signed-off-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit f66597934bf8c88519396956637792533ba3a151
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 12 08:14:06 2010 +0000
+
+    Don't use page_current in hierarchy traversal.
+    
+    With this patch, the only remaining functions in libgeda which care
+    about the "current page" are:
+    
+    - o_get_page_compat() [deprecated]
+    - s_page_goto()
+    - s_page_delete()
+    - s_page_delete_list()
+    - s_toplevel_new()
+
+commit 3d7719ca26bd4a77bce4f3ce3100c72d93d5e933
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 11 11:36:11 2010 +0000
+
+    Add PAGE argument to o_net_consolidate().
+
+commit 0b94d2379a5bd5d14690f941690e0df761df13c9
+Merge: 63cd6d7 a33839a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 12 09:48:07 2010 +0000
+
+    Merge some changes from Peter Brett.
+    
+    Merge a series of more generally useful changes from Peter Brett's
+    `guile-scheme-api' branch, most of which remove uses of
+    TOPLEVEL.page_current from libgeda.
+
+commit 0db9dce07c52cb5f905c0c68d78b9d7656371c98
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 17 11:59:02 2010 +0000
+
+    Revert po file changes in previous commit.
+    
+    This reverts most of the incorrectly-commited po file updates in
+    commit 5cc5a1743e97.
+
+commit f9156f1642e0a24661f06cc335178a14d5fa7b1c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:28 2010 +0000
+
+    scheme-api: Remove some legacy Scheme functions.
+    
+    Remove some trivially-replaced Scheme functions from gschem to the
+    (gschem deprecated) module.
+
+commit 5cc5a1743e97218325285975bfb68e090d382143
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 17 11:33:25 2010 +0000
+
+    gschem: Make 7-byte SHA-1 prefix using %.7s format specifier.
+    
+    This is slightly more elegant than using g_strndup().
+    
+    Suggested-by: Patrick Bernaud <patrickb@chez.com>
+
+commit f74b3ba70dc5b7c16613b6e751935fb9e7bdb37a
+Merge: b70513b 6dff7f3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 17 09:17:28 2010 +0000
+
+    Merge changes from main unstable branch
+
+commit 6dff7f35a0ab76a2d07b8f6e68d48e638498426f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 17 08:47:51 2010 +0000
+
+    gschem: Use g_strndup() instead of strndup().
+    
+    strndup() is not in the OS X libc.
+    
+    Reported-by: Matthew Wampler-Doty <matt@w-d.org>
+
+commit 3940ee1a2704d07f7e6f9f2c71eb65346a709f46
+Merge: 8c4d33a ee7e4a8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 16 22:23:15 2010 +0000
+
+    Merge changes from main unstable branch
+
+commit ee7e4a8e823dd362bc0dc998cc584ab6ea84bdcd
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 13 17:42:14 2010 +0000
+
+    Remove DONT_REDRAW flag.
+    
+    Because we now use the GTK/Cairo renderer for gschem, we use the GTK
+    model for redrawing. In this model, objects are queued for redrawing
+    by invalidating them, and at some point later all invalidated regions
+    of the viewable area are drawn together.
+    
+    Due to this mechanism, the TOPLEVEL.DONT_REDRAW flag is redundant, as
+    it as always set and then restored without visiting the GTK main loop,
+    and thus no drawing would occur in that context anyway.
+    
+    This patch removes the now-useless TOPLEVEL.DONT_REDRAW flag entirely.
+
+commit 700d8c7bb6ed397185f4aee5e857979af07d2d96
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 13 13:12:03 2010 +0000
+
+    libgeda: Allow registration of multiple change notify functions.
+    
+    A mechanism for getting notifications when OBJECTs are changed was
+    added in commit 8b1faf85362b, but this only allowed one set of change
+    handlers to be added to a TOPLEVEL.  This patch allows the multiple
+    sets of handlers to be registered, and also fleshes out the API
+    documentation.
+
+commit 49fb65103d192a462edb5f0db8ace851c675b749
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 12 23:30:15 2010 +0000
+
+    gschem: Add -V (version info) command-line option.
+
+commit a3433b6a4c088b8926f8768e20eff18d0dafea4b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:28 2010 +0000
+
+    Remove most legacy libgeda Scheme types & functions.
+    
+    Removes most of the legacy Scheme types, functions and definitions
+    from libgeda, replacing them with compatible equivalents based on the
+    new Scheme API.  The remaining Scheme functions are those for working
+    with the component and source libraries, the various rc functions, and
+    the eval-* functions, all of which need to be revisited at a later
+    date.
+    
+    Also removes set-attribute-value! from gschem and reimplements in
+    Scheme, since it was sole user of g_set_attrib_value_internal() and it
+    was easier to replace than rewrite.
+
+commit fc8bcac43b6f3dd611f6030ffe36465d67be379d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:28 2010 +0000
+
+    scheme-api: Port legacy Scheme procedures in C to new smob system.
+    
+    Make all users of legacy Scheme smobs in libgeda use new Scheme smob
+    system.  This is a preliminary patch so that unit tests can be written
+    to verify that functions ported to new API work the same way as the
+    originals.
+
+commit 7f85f28e67c59dbccb0f2a321794b0ddbb3e578f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:27 2010 +0000
+
+    Add e-mail address to copyright headers.
+
+commit 6359f03b8615d707b122d84c6e73ae6bf99c097b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 11 19:33:27 2010 +0000
+
+    scheme_api: Give modifying functions _x suffixes in C.
+    
+    When Scheme functions modify their arguments or have side-effects,
+    they use a `!' at the end of the function name.  In C, this is
+    commonly represented with a _x suffix.  This patch adopts that
+    convention.
+
+commit bf643e97eef4919fb11aace7dd597d0b092170cb
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 9 14:31:59 2010 +0000
+
+    scheme-api: Test if an object is selected.
+    
+    An obvious omission from commit 85753049b2b9.
+
+commit 85753049b2b9455d815ede96dca161cb0de2f22b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 9 10:01:45 2010 +0000
+
+    scheme-api: Access to gschem selection.
+    
+    Makes it possible to retrieve and modify the current selection in
+    gschem from Scheme code.
+
+commit d1d4dbf5841368874215b7ef102090ce4dfc0780
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 8 16:54:35 2010 +0000
+
+    scheme-api: Correct some comments.
+
+commit 3c2636864cc838286d31799d800f13c4f38f6d07
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 8 23:48:39 2010 +0000
+
+    gschem: Don't select placed objects.
+    
+    Stop o_place_end() from modifying the selection.  This makes the
+    behaviour when placing text and components consistent with the
+    behaviour when placing other objects.
+
+commit 7dacbe7ca2c9d7a209a5f5cc474c58a4cb9a6c24
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 8 13:51:31 2010 +0000
+
+    gschem: Make Scheme command entry text box full width of window.
+    
+    Makes it easier to see what you're doing when playing with Scheme
+    functions in gschem.
+
+commit 7aff6e91ae4520072f4b0272a8fed56e27b82c0a
+Merge: e92b66a 03a529b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 21:02:16 2010 +0000
+
+    Merge changes from main unstable branch
+
+commit 03a529b993bc5f7b432a8c11e74a69dee12043ed
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 12:23:18 2010 +0000
+
+    gschem: Extract translatable strings directly from system-gschemrc.
+    
+    Reduces the number of matching lists of menu accelerator strings from
+    three to two...
+
+commit 64fc02d71b235f5b1b5a5640f15d9cf3270672a6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 10:40:24 2010 +0000
+
+    desktop-i18n: Don't have misleading ".h" suffixes in .po files.
+
+commit 803ea8cd6ee3203559d99fbaa178a869c2046d38
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 13:54:15 2010 +0000
+
+    Update po files, fixing Language and Language-Team strings.
+    
+    Updates all po files using update-po, making sure all po files have
+    their Language string set, and set all Language-Team strings to
+    geda-dev@seul.org.
+
+commit 5ee02960cb8cc90c6c6fd946c53cdf94b0b46b0e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 12:11:03 2010 +0000
+
+    Make new C files translatable.
+    
+    Also marks an new error message in gschem as translatable.
+
+commit bb9e4bcd4d3e5b9b598105f7f6f1aecae880783b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 6 09:22:02 2010 +0000
+
+    Delete guile-snarf output files during distclean.
+
+commit 19fbd43464e59cbbed0fb98371b1daf5b3edc363
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 15:11:47 2010 +0000
+
+    gschem: Include <libgedaguile.h> by default.
+
+commit c759a14672a1ee047c8d27f2d9c39339c88da18e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 08:00:19 2010 +0000
+
+    scheme-api: Closing pages.
+    
+    Since it's possible to create new pages from the Scheme API, it's also
+    useful to be able to close them.  This patch adds the close-page!
+    function to the (geda page) module.
+    
+    It's necessary for gschem to provide a slightly different
+    implementation of close-page! which allows for the GUI to be updated
+    and for the user to be prompted to save changes.  To do this, gschem
+    uses Guile module reflection to change the binding of the close-page!
+    function during startup.
+
+commit dbfcf03ba08226b6c752f57006a3e2cde7ffcde8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 5 07:45:22 2010 +0000
+
+    gschem: Remove some Guile 1.4/1.6 compatibility code.
+
+commit 275740ab72ae6fd9ab2ddcc024181d1c3330064d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 4 19:53:13 2010 +0000
+
+    scheme-api: Retrieve and change the current gschem page.
+
+commit 2cd6cf4922ef828ed8bbb2d409d0e40b04f7d8ff
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:25 2010 +0000
+
+    gschem: Remove global_window_current.
+    
+    Instead, use the GSCHEM_TOPLEVEL fluid (accessed via
+    g_current_toplevel()). Although this does indeed remove one magic
+    global variable in favour of another, the fluid has the advantage of
+    coping correctly with non-local exits, and is more clearly only for
+    the benefit of procedures that are called via Scheme.
+
+commit c51711b32a5673b6ee3f18d5160c9c4e16d15b5e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:25 2010 +0000
+
+    gschem: Add a fluid for current GSCHEM_TOPLEVEL.
+    
+    Adds a smob that represents a gschem window structure, and a Guile
+    fluid that tracks the active window and that can be accessed from
+    Scheme code.  The functions which update the fluid also ensure that
+    the libgeda TOPLEVEL fluid is updated in lockstep.  This ensures that
+    Scheme code that is not gschem-aware will run correctly in gschem, and
+    will allow the global_window_current variable to be removed.
+
+commit e883ed4bf0681db9e67da5e176d2caa6d8876f4c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:24 2010 +0000
+
+    libgeda: Remove o_save_curr_page().
+
+commit 3abdca2a4ee088184e976822c444069d67e20a20
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:25 2010 +0000
+
+    libgeda: Add PAGE argument to file load/save functions.
+
+commit 4a3a3d9e4cc72fa94165306c5b8d411d47812d45
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:24 2010 +0000
+
+    libgeda: Add PAGE argument to print functions.
+
+commit c26ed9d5b126f7e2b67285e465438aa9b5ee4ffd
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:23 2010 +0000
+
+    libgeda: Make g_read_file() take a TOPLEVEL argument.
+
 commit 4491d031d5f02a43ec72443a3be6668c9cdc58b6
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Mon Nov 1 20:59:11 2010 +0000
@@ -61,6 +2797,490 @@ Date:   Mon Nov 1 20:59:11 2010 +0000
     
     Cherry-picked from: e5f32954a1fb23534309d6fa06d887859afbc664
     and subsequent fix: 66e54fd03f75f70d9fcf101d6ed3cad1bb354b13
+
+commit bb8ca8df886f6a800e96910424d6b3ba55f2f14f
+Author: Wojciech Kazubski <wk0@o2.pl>
+Date:   Mon Nov 1 18:24:56 2010 +0000
+
+    gschem: Don't crop the png output [3100660] [3100680]
+    
+    Gschem sometimes crops the image exported to bitmap file (png,
+    bmp... but not eps). This appears in certain range of picture
+    proportions, landscape but close to square.
+    
+    This patch alters the algorithm that adjusts the image proportions to
+    remove this problem.
+
+commit e5f32954a1fb23534309d6fa06d887859afbc664
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat May 1 13:42:35 2010 +0100
+
+    Fix hiding the command prompt window on Win32 builds with -mwindows
+    
+    There was a mistake in gschem and gattrib's Makefile.am, where it
+    included the non-existant MINGW_GUI_CFLAGS rather than pulling in
+    MINGW_GUI_LDFLAGS where the required -mwindows was set.
+
+commit 0768fc34916818904623a914780fe583a8bcf186
+Author: Robert Drehmel <rdrehmel@users.sourceforge.net>
+Date:   Thu Apr 22 11:13:06 2010 +0100
+
+    gschem: Fix memory corruption in o_update_component()
+    
+    s_page_append_list() consumes the GList passed, which must not
+    be g_list_free'd afterwards.
+
+commit 8e19b5509a40826aeacd6b43efa35403f13763f8
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Apr 2 16:55:25 2010 +0100
+
+    gschem: Introduce B/W colour scheme
+
+commit 923116bc968ff32ed2c997afa596af59ce9752ce
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Mar 7 23:16:03 2010 +0000
+
+    libgeda: Add PAGE argument to tile functions.
+    
+    With this patch, the tile system no longer uses TOPLEVEL.page_current
+    anywhere.
+
+commit 3b76382b7624bd6f22c6e96353185d41053f5e15
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Mar 7 21:12:39 2010 +0000
+
+    gschem: Remove unused connection field from the STRETCH struct
+    
+    This field was only ever used for debug purposes, remove it.
+
+commit 9c42a66c0a985ef424f35ac93a289e82ef88b32b
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Mar 7 19:00:01 2010 +0000
+
+    Move STRETCH structure and s_stretch.c from libgeda to gschem
+    
+    This structure and related functions deal with rubberbanding nets during
+    move operations. They are only used from within gschem, although there
+    is of course setup and tear-down in libgeda. Move this all to gschem.
+    
+    This isn't a 1-1 move, since various headers and structures needed to
+    be fixed up in the process. The stretch_list now lives in the
+    GSCHEM_TOPLEVEL, not the PAGE, matching the fact that we don't allow
+    action state to persist when a GSCHEM_TOPLEVEL changes active PAGE.
+    
+    A free of the stretch list is removed from s_page_delete(), but no
+    equivalent is re-added in gschem. Action state is torn down when an
+    action is cancelled, which is done before deleting any GSCHEM_TOPLEVEL.
+
+commit d4820b644781b337812a78a1416b67025fa79c2a
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Mar 7 18:39:43 2010 +0000
+
+    gschem: Exit any current event state before switching pages
+    
+    If we don't do this, state from an operation on one page can cause
+    corruption and genereral chaos. This was reproducable by moving
+    some objects (em), then switching pages with a key-binding.
+
+commit d4908a377f6a1ebcc80d12a08d96d85e8d0473c1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Mar 7 17:40:38 2010 +0000
+
+    gschem: Correct some type casts; comment out not-yet-used variable.
+
+commit 8a290f30e3f89e7d2c7dd4459c02fa0dce366e02
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Mar 7 15:00:40 2010 +0000
+
+    gschem: Tidy up o_move_prep_rubberband()
+    
+    Delete some debug printf and generally tidy up the function. Should
+    be no functional changes.
+
+commit b5cf93429f13cf9e68cc9cf86a05d72eae239f6f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 12 18:14:18 2009 +0000
+
+    gschem: Pass the current GSCHEM_TOPLEVEL to menu signal handlers.
+    
+    This has the beneficial side-effect of fixing a memory leak.
+
+commit 84c708ec13ab8cbd2f66eea3239ce8106232ffab
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Mar 3 11:01:19 2010 +0000
+
+    gschem: Rewrite o_update_component() to replace, not modify, OBJECTs.
+    
+    Instead of deleting the contents of a compound OBJECT and adding new
+    contents loaded from file, make o_update_component() create a new
+    OBJECT, move attributes across, and then replace the original OBJECT
+    with the new OBJECT.
+    
+    This works much more nicely with the use of an event-based
+    connection-update scheme in libgeda.
+    
+    Fixes a crash bug reported by Peter Clifton <pcjc2@cam.ac.uk>, where
+    component prim_objs were not being correctly removed and re-added to
+    the page's tile system.
+
+commit cc0ced2f6d765e5be43de4cd8d0e7caacee9478d
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:24 2010 +0000
+
+    gschem: Remove o_invalidate_glist() call from i_callback_edit_(un)embed
+    
+    This invalidate calls are not required, as any relevant changes will
+    cause change notifications from within libgeda to trigger redraws of
+    specific areas of the page.
+    
+    NB: Changing the embedded status of an object doesn't actually cause a
+    change notification at present, since it should not affect the how the
+    objects are rendered.
+
+commit 5e8f2be04fd2a1371dcfc2dd595ca319749fe7e2
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Mar 3 00:57:23 2010 +0000
+
+    gschem: Remove o_invalidate_all() call from i_callback_edit_update
+    
+    This invalidate call is not required, as any changes will cause
+    change notifications from within libgeda to trigger specific areas
+    of the page to be redrawn.
+
+commit b59058138ce5057b3520f70754a610a99fb440a7
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Feb 24 16:33:08 2010 +0000
+
+    Use change notification to redraw objects when connectivity changes
+    
+    Emit change notifications in the connectivity tracking functions
+    s_conn_remove_other() and s_conn_update_line_object(). This frees
+    gschem from the somewhat complex task of tracking which objects were
+    connected to a given object before and after a particular set of
+    operations.
+    
+    This change leads to a significant simplification of many operations,
+    and removes quantities of code from:
+    
+      o_pin_end()
+      o_net_end()
+      o_move_end()
+      o_move_end_rubberband()
+      o_move_end_lowlevel()
+      o_mirror_world_update()
+      o_rotate_world_update()
+      o_grips_end_bus()
+      o_grips_end_pin()
+      o_grips_end_net()
+      o_delete()
+
+commit cf6ea830c56a04ebb47e958dc1f8895dcc8f60e7
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:23 2010 +0000
+
+    Use change notification to redraw when a pin's type is modified
+    
+    Emit change notifications in o_pin_set_type(), and remove
+    o_invalidate() calls where this function is used in gschem.
+
+commit 5e43eb790eee741c861862d27435fac0cca55df2
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Mar 3 00:34:35 2010 +0000
+
+    Add change notification when objects are modified via o_*_modify()
+    
+    Emit change notification in the o_*_modify() functions, and remove
+    some o_invalidate() calls where o_arc_modify() is also used in
+    gschem's arc editing dialog.
+    
+    The o_*_modify() routines are also used in o_grips.c, where there
+    is no explicit o_invalidate() call after them. o_grips_end() calls
+    o_invalidate(), which is strictly un-necessary, but I've left it for
+    clarity, as it comes after resetting the OBJECT's dont_redraw flag.
+
+commit 51461b59d30487e9c1c2dbf3beb6883bd66314e1
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:23 2010 +0000
+
+    Use change notification to redraw when an object's fill properties change
+    
+    Emit change notifications in o_set_fill_options(), and remove
+    o_invalidate() calls where this function is used in gschem.
+
+commit ca60bcbdab636a6ee28a004d5ce802a57933e6bb
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:22 2010 +0000
+
+    Use change notification to redraw when an object's line properties change
+    
+    Emit change notification in o_set_line_options(), and remove
+    o_invalidate() calls where this function is used in gschem.
+
+commit 51c180d137513668925fe2f5834f8ec5cb1d4563
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:22 2010 +0000
+
+    Use change notifications to redraw objects with selection changes
+    
+    Emit change notifications when an OBJECT's selected flag is changed,
+    and removes o_invalidate() calls where the selection is manipulated
+    in gschem.
+
+commit 47ebe0bb0145d95946d05fa1fd8d9bab7bd08175
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:22 2010 +0000
+
+    Use change notifications for redraw when text is recreated
+    
+    Emit change notifications in the o_text_recreate() function, and
+    remove o_invalidate() calls from gschem where o_text_recreate(),
+    or other functions calling it are made.
+
+commit 5c14a649bd633950624dfda4128bd83ed77ef4bc
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:21 2010 +0000
+
+    Use change notifications for objects added / removed from the page
+    
+    Adds emission of the change and pre-change notify events for adding
+    and removing objects from the page respectively.
+    
+    Remove explicit invalidation calls after performing these actions
+    in gschem.
+
+commit ccf8b757df96f9eafb676a8ab0960c76f9692238
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 28 18:37:21 2010 +0000
+
+    gschem: Hookup change notify functions to invalidate on-screen objects
+    
+    When change pre-change and change notifications are emitted on objects,
+    we need to invalidate their on-screen representation.
+    
+    The pre-change notification is used to invalidate the area where an
+    object is currently drawn, which is expected (usually) to be followed
+    by a change notification - so the new object bounds are invalidated
+    to be repainted.
+    
+    Certain operations might skip one of these events. For cases where the
+    bounding box of an object is known to remain constant, the "pre-change"
+    notification could potentially be omitted. Adding an object to the page
+    will (obviously) only be able to generate a "change" notification, and
+    removing an object will only generate a "pre-change" notification.
+
+commit 6e5fa46cc04db09e0fa0fee54985fa98413c339e
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Feb 24 16:32:51 2010 +0000
+
+    gschem: Make sure we invalidate the rubberbanded object before cancelling
+    
+    This showed up as a rendering artefact left behind after grip-resizing
+    objects to an invalid size, then letting go of the grip. The grip
+    operation is cancelled, and the original object re-drawn - but it is
+    possible that the rubber-banded view of the object just before
+    cancelling the action covers an area of the screen not touched by the
+    original object.
+
+commit 4a2baceb1bf4546f8888045f80fb989794d9130f
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 20 14:27:07 2010 +0000
+
+    gschem: Remove some redundant alias variables in o_pin_end()
+    
+    Whilst I'm here, remove a NULL test.. o_pin_new() doesn't return NULL.
+
+commit 4474d121a1c2c81f8c79b95a426e3e7245eb032d
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 20 01:59:11 2010 +0000
+
+    gschem: Make o_grips_{start,end}_*() functions private to o_grips.c
+
+commit 960875cc1d57986f2d626b1843330b3bcc2efafa
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 20 02:05:47 2010 +0000
+
+    gschem: Tidy up some coding style in text_edit_dialog
+    
+    Don't initialise variables to NULL un-necessarily. Also, tidy up
+    some bits of the function which could usefully be grouped together.
+
+commit 92302408ad3d0ba01f1e969b39d04dba3c91cf24
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 20 02:04:38 2010 +0000
+
+    gschem: Fix object type for align_menu in text_edit_dialog
+    
+    The type is GtkListStore *, not GtkWidget *. I've renamed the variable
+    from align_menu to align_menu_model to reflect its contents more clearly.
+    
+    As a cleanup, don't bother casting align_menu_model to G_OBJECT when
+    calling g_object_unref(). g_object_unref() takes a gpointer argument so
+    it isn't necessary.
+
+commit 833a0a181cbc012a7c68f02371524a51aa362a43
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 20 00:12:44 2010 +0000
+
+    gschem: Move o_invalidate calls out of o_grips_{start,end}_*()
+    
+    Put the o_invalidate() calls in o_grips_start() and o_grips_end()
+    instead, which dispatch to the more specific functions.
+
+commit c3e6a002e3361f4341e7e09557cf12c4dbfd0c8b
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 20 00:20:05 2010 +0000
+
+    gschem: Cancel box grip operation if height is collapsed to zero
+    
+    The cancel worked for the case where width was collapsed to zero, but
+    not height. Seems to be due to 1) To a copy-paste error meaning the
+    box height was always read as zero, and 2) A logic error in that either
+    a zero width, OR zero height box should abort the grip opeation.
+
+commit 351bdfd3b45c8283c5dd9b9e903edf648fa5df00
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 19 23:08:43 2010 +0000
+
+    Move o_text_recreate() call inside o_text_set_string()
+    
+    All callers of o_text_set_string() call o_text_recreate() to update
+    the text object. o_text_set_string() should call it directly.
+    
+    Despite being a hold over from the old "prim_objs" based text rendering
+    system, this function still does useful work preparing the string to be
+    displayed on screen.
+
+commit 54ef9936ca0f046ea37d4aa3b2d9b5ca524bbbc8
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 19 23:16:14 2010 +0000
+
+    gschem: Don't second-guess whether to call o_invalidate on text objects
+    
+    The o_invalidate() call is a NOP if the text is invisible (or hidden
+    text is not shown), so there is no need to check before calling.
+
+commit 7a2311b5e144601594c5b99b2ceb8a8e8567ac5e
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 19 23:28:04 2010 +0000
+
+    gschem: Rename o_attrib_remove_selected_invisible()
+    
+    This function had a todo note "get a better name". Lets go with
+    o_attrib_deselect_invisible().
+    
+    Whilst I'm here, complete the doxygen comments for this function.
+
+commit 6045569126c44bd5f09f77d74e472e75e36c908d
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 19 23:25:21 2010 +0000
+
+    gschem: Tidy the o_attrib_remove_selected_invisible() function
+    
+    This function does nothing when toplevel->show_hidden_text is
+    true. Returning immediately when this is the case, rather
+    than looping over the entire selection not doing anything.
+
+commit 5cad2cd9a184e1af8273dba6d8ddc3c02a2b72d6
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 19 22:52:58 2010 +0000
+
+    gschem: Tidy up o_grips_end_{net,pin,bus}() a little
+    
+    Somewhat of a pointless change, but I ended up moving these functions
+    about a bit in another patch - so I figured a NOP patch to do most of
+    the tidying would be better than mixing this with functional changes.
+
+commit 8e3d9a6a219ee166260bdc1e1d2980878b524450
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 19 22:50:35 2010 +0000
+
+    gschem: Remove the view_update_cues function
+    
+    This function doesn't do anything different to view->redraw.
+
+commit e5aecb64ebaa24e9511a7f814aeffc2a334d563f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Feb 17 18:24:13 2010 +0000
+
+    Kill ADDING_SEL flag with FIRE!
+    
+    The TOPLEVEL.ADDING_SEL flag has long preyed upon intrepid programmers
+    venturing into the labyrinthine and treacherous depths of the gEDA
+    source code, introducing strange and hard-to-trace logic errors and
+    segmentation faults to hinder them on their various quests to fix bugs
+    and add features.
+    
+    But no more! The beast lies slain! No more will developers need to
+    perform the dance of "flag save and restore" to placate the ravening
+    beast! No more will they mutter strange incantations for hours as they
+    seek to determine whether the flag should be set or unset!
+    
+    
+    
+    In serious terms: the flag was only used for controlling whether or
+    not objects should be added to the tile system.  By ensuring that
+    objects are only added to or removed from the tile system when added
+    to or removed from the tile's corresponding page, it's then possible
+    to replace the flag check by checking whether the OBJECT is currently
+    part of a PAGE.
+
+commit ace44e31ae453dc7f1fe7c55e514c3435d70932f
+Author: Richard Barlow <richard@richardbarlow.co.uk>
+Date:   Mon Feb 15 15:15:49 2010 +0000
+
+    gschem: Improve the text edit dialog's alignment menu
+    
+    This patch alters the way the alignment for text is set in the text edit
+    dialogue. I've always felt that the linear list of options doesn't work
+    very well and slows down my work flow quite a bit.
+    
+    The GtkOptionsMenu, which is now deprecated, has been replaced with a
+    GtkComboBox. The alignment options are laid out in a table allowing the
+    correct option to be selected much quicker.
+
+commit e85bf2f103667368768939dfc2c40484be8abf8f
+Merge: 0e5defe 93b0370
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Feb 15 20:30:22 2010 +0000
+
+    Merge translations from the stable-1.6 branch
+    
+    NB: Translations were merged manually
+
+commit 0e5defe4871370a93c6ccb8bbf4a10e5df098884
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 21:26:37 2010 -0500
+
+    Updated man page dates
+    
+    (cherry picked from commit 11921dc18209ed4ea12288114634bb94a5b9b8a9)
+    (from stable-1.6)
+
+commit c31d9a1a90db32dd1e1d41f9d3d5ef5888424ba1
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 17:09:45 2010 -0500
+
+    Updated copyright text/header in most source files.
+    
+    Updated all copyright text dates that should be updated for the new year.
+    Fixed a bunch of GNU text typos (these should have been either
+    GPL or gEDA).  Removed some $Id$ tags which are no longer used/needed.
+    Fixed a few file header that were just plain incorrect.
+    
+    (cherry picked from commit bd34cfde2450790b357e574281f9562adce64303)
+    (from stable-1.6 branch)
+
+commit 5df2c5c6f400facb3f81963d6fb0332832cc9e6b
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Feb 15 19:26:10 2010 +0000
+
+    Make update-po
+
+commit f186753e6e229e2dd3e8e317ec5f71884b5c04d0
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@sabily.org>
+Date:   Mon Feb 15 15:04:35 2010 +0000
+
+    gschem: Fix a couple of typos in the gschem manpage
 
 commit 11921dc18209ed4ea12288114634bb94a5b9b8a9
 Author: Ales Hvezda <ahvezda@seul.org>
@@ -100,6 +3320,12 @@ Date:   Sat Feb 13 14:15:40 2010 +0000
     These changes relate to menu-accelerators, so I was able to take
     an educated guess at the correct strings.
 
+commit e20d11966e03c54fc9279bc4bdb3d64a9fc81389
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 13 13:13:02 2010 +0000
+
+    gschem/po: Apply updated Dutch translations from Bert Timmerman
+
 commit c8af8579d460fdbf9591133c7e30556ce77ba329
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Sat Feb 13 12:57:57 2010 +0000
@@ -124,6 +3350,15 @@ Date:   Fri Feb 12 18:23:01 2010 +0000
     accelerators.
     (cherry picked from commit 11dd19eedb4fedf06858ec7af1f13371b69441f9)
 
+commit 11dd19eedb4fedf06858ec7af1f13371b69441f9
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Fri Feb 12 18:17:56 2010 +0000
+
+    gschem: Fix hard-coded menu names to match new accelerators
+    
+    Fixes breakage caused by changing the root menu names to include
+    accelerators.
+
 commit 4e91bc5e52699639cf78a9112b0422d2763a6346
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Fri Feb 12 18:00:44 2010 +0000
@@ -139,15 +3374,37 @@ Date:   Fri Feb 12 11:25:40 2010 +0000
     I did most of the previous translation in Launchpad but now I'm using
     git so it's more handy for me to submit a patch.
 
+commit 885f9686ce0997015f3baf69d7c545b889a33b78
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Fri Feb 12 10:57:07 2010 +0100
+
+    gschem: updated german translation
+    
+    copied from 7ebe889c777237eed359da7687202fa1f23be537
+
 commit 7ebe889c777237eed359da7687202fa1f23be537
 Author: Werner Hoch <werner.ho@gmx.de>
 Date:   Fri Feb 12 10:41:22 2010 +0100
 
     gschem: updated german translation
 
+commit 8ec97e5432679849f1dcac3bdabeac32d67c6b29
+Author: Carlos Nieves Onega <cnieves@iespana.es>
+Date:   Thu Feb 11 19:01:01 2010 +0100
+
+    Fixed some menu accelerators for spanish translation.
+    
+    There were some duplicated, or assigned to letter with accents.
+
 commit d8b5d756ae661bb15dc4e24f470e36d833442513
 Author: Carlos Nieves Onega <cnieves@iespana.es>
 Date:   Thu Feb 11 18:56:39 2010 +0100
+
+    Updated spanish translation.
+
+commit c5454e79e1a79e2a172c43544bf528c8f0b0cb28
+Author: Carlos Nieves Onega <cnieves@iespana.es>
+Date:   Thu Feb 11 17:54:24 2010 +0100
 
     Updated spanish translation.
 
@@ -251,11 +3508,103 @@ Date:   Thu Feb 11 01:33:28 2010 +0000
     Reported-by: John Doty <jpd@noqsi.com>
     (cherry picked from commit b635dd1c3b9297d3f6e1487f4e2a03cc9effcf05)
 
+commit e94dd5222f2267218572e81cfae9fbbdc2f70021
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Thu Feb 11 00:21:54 2010 +0000
+
+    gschem: Provide accelerator mnemonics for root menus
+
+commit a800451bef4df21797df3707b672571e5441e594
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Feb 10 19:52:44 2010 +0000
+
+    gschem: Allow mnemonics for root menus, such as _File, _Edit etc..
+
+commit 9c71110a49be8a677f7ea3eabaebf6479873c7af
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Feb 10 21:05:38 2010 +0000
+
+    gschem: Fix update of pinnumbers after auto-renumberering slots
+    
+    Call o_slot_end() rather than o_text_set_string(), in order to
+    ensure the object's pinnumbers are updated correctly.
+    
+    NB: This patch requires the changes making o_slot_end() to take an
+    OBJECT * arguement, as the objects being updated aren't necessarily
+    selected.
+
+commit 040db4675fcbd7739ad8c0dfbc82bbcf2eaff815
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Feb 10 21:36:37 2010 +0000
+
+    gschem: Pass o_slot_end() an OBJECT *object parameter
+    
+    The OBJECT * parameter points to the object who's slot is being
+    updated - not the slot attribute itself.
+    
+    Previously o_slot_end() used the first object in the selection.
+    This call is used for other cases where slotting needs to be
+    updated - not all will necessarily have the object selected.
+
+commit d03c03949e17313a222645fc38c376b802f5fb4c
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Feb 10 22:18:45 2010 +0000
+
+    gschem: Remove the exit(-1) error path from o_slot_end()
+    
+    This is not a friendly way to treat the user.. g_return_if_fail() instead.
+
+commit 2998c43e60e95a28df9ce7db2cd64dfaf46712b9
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Feb 10 19:53:09 2010 +0000
+
+    gschem: Remove unused "len" parameter from o_slot_end()
+
+commit b635dd1c3b9297d3f6e1487f4e2a03cc9effcf05
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Feb 10 19:59:08 2010 +0000
+
+    gschem: Fix slot editing routines to not edit inherited attributes (#2949232)
+    
+    Fixes a bug where symbols without a promoted slot= attribute had their
+    non-promited slot= attribute modified. Also, a similar bug was lurking
+    in the auto-number code, which could break the auto-number slots feature
+    or cause crashes when the remove numbers feature was used on slotted
+    components without a promoted slot= attribute.
+    
+    Tidied up some variable names to make all the fixed functions consistent.
+    
+    A neater fix might have been changing the interface to s_slot_search_slot()
+    back, such that it only reports non-inherited attributes. This would
+    ideally involve renaming the function in libgeda, to (say, for example)
+    s_slot_search_attached_slot(). Since this change is intended for back-
+    port to stable-1.6 as well, I don't want to break libgeda ABI. It seems
+    unwise to change the function's behaviour without a break in API, hence
+    the solution in this patch.. to have callers to s_slot_search_slot() check
+    !o_attrib_is_inherited() on the returned attribute before editing it.
+    
+    Reported-by: John Doty <jpd@noqsi.com>
+
 commit 6261b5ea22dfcff6aac6060f98dd7606b7cb4ed2
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Mon Feb 8 16:31:00 2010 +0000
 
     Merge translations with those exported from launchpad
+
+commit 375c146d8700ea02a31edb10dfebcde4b85d7aa1
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sun Feb 7 12:07:16 2010 +0000
+
+    gschem/po: Merge updated Dutch translations.
+    
+    Translations merged by Peter Clifton <pcjc2@cam.ac.uk>
+
+commit 124a73f493b15948ad8c5babe4593c63f4278235
+Merge: 0b87692 9d6d0a0
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Feb 7 01:34:00 2010 +0000
+
+    Merge updated translations from stable-1.6 branch
 
 commit 9d6d0a0cc0cf0675a6f5f313272dcd224675ebf8
 Author: Peter Clifton <pcjc2@cam.ac.uk>
@@ -291,6 +3640,64 @@ Date:   Sat Feb 6 23:10:52 2010 +0000
     due to adding "_" to the menu text to make _Accelerators.
     (cherry picked from commit 0b87692907ad83635fab42a59fa4e86f464905c5)
 
+commit 0b87692907ad83635fab42a59fa4e86f464905c5
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 6 23:09:51 2010 +0000
+
+    gschem: Fix rcstrings.c to relect text in menus
+    
+    This makes our menus translatable again. Looks like most cases were
+    due to adding "_" to the menu text to make _Accelerators.
+
+commit 99c5e8ce7cb7d2f06d3da3c3b841b0d40c583583
+Merge: 89ad783 d3b0112
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 6 21:36:08 2010 +0000
+
+    Manually merge translations from the stable-1.6 branch
+    
+    For newly translated languages, this was fairly simple, using msgmerge
+    to update the stable-1.6 "$LANG.po" files with the current git HEAD
+    translation template ".pot" files.
+    
+    For existing languages, I used msgcat to combine the two, allowing it
+    to choose the "newer" translation - ie.. the one on the stable-1.6
+    branch if there were any conflicts.
+    
+    To assist, I used the following short script:
+    
+    \#!/bin/sh
+    
+    LINGUAS=`cat LINGUAS`
+    TEMPLATE="geda-gschem.pot"
+    NEW_DIR="stable-1.6"
+    OLD_DIR="HEAD"
+    
+    for TR_LANG in $LINGUAS
+    do
+      echo "Attempting to merge for language ${TR_LANG}"
+      if [ -e ${OLD_DIR}/${TR_LANG}.po ]; then
+        echo -n "Old translation exists.. merging"
+        msgcat --use-first ${NEW_DIR}/${TR_LANG}.po ${OLD_DIR}/${TR_LANG}.po -o merge_tmp.po
+        msgmerge merge_tmp.po ${TEMPLATE} -o ${TR_LANG}.po
+      else
+        echo -n "Translation is new, updating"
+        msgmerge ${NEW_DIR}/${TR_LANG}.po ${TEMPLATE} -o ${TR_LANG}.po
+      fi
+    done
+    
+    (Modified appropriately for each */po/ directory.)
+    
+    The current translations were placed in po/HEAD/ and the (newer)
+    stable-1.6 translations were placed in po/stable-1.6/
+    
+    The script requires the LINGUAS file to be updated to include all
+    new languages before it is run.
+    
+    The resulting changes have been reviewed to ensure nothing
+    massively broken happened during the merge, and committed as a merge
+    to show the origin of the translations.
+
 commit 431772cec853ba3344ca68865dc29441c73d6b14
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Sun Jan 31 13:09:30 2010 +0000
@@ -313,6 +3720,20 @@ Date:   Sun Jan 31 12:38:06 2010 +0000
     
     Looks like something accidentally mangled this header.
     (cherry picked from commit 89ad783e3f1298ee1ea0a12d148a192c74e4d78f)
+
+commit 89ad783e3f1298ee1ea0a12d148a192c74e4d78f
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 12:36:15 2010 +0000
+
+    gschem/po: Fix plural form header for es.po
+    
+    Looks like something accidentally mangled this header.
+
+commit 7b97171ff386bb96e16dbd879aed45b8da908efe
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 11:09:45 2010 +0000
+
+    Update en_GB translation
 
 commit fd66d4de4dd32b4d080a9cbd4f53f2a598269b63
 Author: Peter Clifton <pcjc2@cam.ac.uk>
@@ -339,6 +3760,33 @@ Date:   Sun Jan 31 10:58:55 2010 +0000
     potentially translatable strings at a later date.
     (cherry picked from commit 3c64f506a6b3babc4db67a5841d5b95a2189b34c)
 
+commit bf82ca8680254c7752fed304fb67716fcc0f6023
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 10:45:01 2010 +0000
+
+    Run make update-po in the */po/ directories
+
+commit 3c64f506a6b3babc4db67a5841d5b95a2189b34c
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 10:42:19 2010 +0000
+
+    gschem: Remove _() translatable markers from some internal strings
+    
+    Save work for the translators, as we don't really need or want to
+    translate the descriptive strings for GObject properties.
+    
+    Introduce a P_() helper as in GTK code. This means we can find the
+    potentially translatable strings at a later date.
+
+commit 041d55bf82f356ef01d2c17305a973192323644c
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 10:51:05 2010 +0000
+
+    gschem/po: Fix keywords passed to xgettext, it is N_, not _N
+    
+    This was broken accidentally in
+    commit 7cf778da5905cf4189eeb043c1b98cb0efa2b305
+
 commit c603cb9f75068837eb8f5a309f590fb3d8e5156e
 Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@users.sourceforge.net>
 Date:   Fri Nov 20 16:23:15 2009 +0000
@@ -347,6 +3795,21 @@ Date:   Fri Nov 20 16:23:15 2009 +0000
     
     Fixes undefined use of `l' macro, and incorrect uses of `-' character.
     (cherry picked from commit 93dd5a941f34d1dd58cf9a57a07dec1e01ce3afe)
+
+commit ce53e956128a330f7c13e1953cad937b27027323
+Author: Peter Brett <ptbb2@cam.ac.uk>
+Date:   Sun Jan 31 10:01:02 2010 +0000
+
+    Move snap state tracking out of libgeda.
+    
+    Since snapping is only relevant to gschem, store snap state in the
+    GSCHEM_TOPLEVEL structure.
+
+commit 3f30ab76bbf247e8151fd4bbfd43bb7703e0fb80
+Author: Peter Brett <ptbb2@cam.ac.uk>
+Date:   Sun Jan 31 10:01:00 2010 +0000
+
+    gschem: Fix some warnings about non-literal format strings.
 
 commit 7575c114b590077a3399d28a499005625f7ae212
 Author: Peter Clifton <pcjc2@cam.ac.uk>
@@ -375,6 +3838,65 @@ Date:   Sun Jan 31 02:00:34 2010 +0000
     those cases, o_rotate_world_update() would not update the undo list,
     I have not included the conditional undo update in o_place_rotate().
     (cherry picked from commit 16090ce2eedc014d82e96fd340ec27f9ea6b186d)
+
+commit 16090ce2eedc014d82e96fd340ec27f9ea6b186d
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 02:00:34 2010 +0000
+
+    gschem: Don't update page connectivity from o_place_rotate()  Bug #2904715
+    
+    This fixes bug #2904715, where gschem would crash if an object being
+    multi-copied contained nets, and the place-buffer was rotated (by 90
+    degrees) four times during the place operation.
+    
+    Items in the place list should never have their connectivity updated
+    on the page. (They don't belong to the page, so have no business
+    being referenced from the page, or objects on it).
+    
+    Rather than calling o_rotate_world_update() (which updates connectivity)
+    call o_glist_rotate_world() and then the scheme rotate hooks explictly.
+    
+    Rotate hook handling was split from o_rotate_world_update() into a new
+    function, o_rotate_call_hooks(). When doing this split, I took the
+    chance to remove a few pointless tests of o_current != NULL in there.
+    We know o_current isn't going to be NULL, and we already dereferenced
+    it (unchecked) a few lines above.
+    
+    As o_place_rotate() is always called from within an action - and in
+    those cases, o_rotate_world_update() would not update the undo list,
+    I have not included the conditional undo update in o_place_rotate().
+
+commit 2eae6d63738a0a27578e2868d788d59313d75583
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 01:03:00 2010 +0000
+
+    gschem: Don't duplicate registration of new zero-length rubber-band nets
+    
+    o_net_new() adds the net into the tile system and updates conectivity
+    (assuming toplevel->ADDING_SEL is false).
+
+commit f1a5270236c98274f3d02a1513823fd9a8ff707f
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 00:35:42 2010 +0000
+
+    libgeda: Tidy up some calls in o_complex_translate_all()
+    
+    Convert a couple of short while loops over a GList into a for() structure.
+    Remove a completely redundant if statement. The if () {...} and else {...}
+    branches had the same code in them!
+
+commit 7cf778da5905cf4189eeb043c1b98cb0efa2b305
+Author: Peter Brett <ptbb2@cam.ac.uk>
+Date:   Sat Jan 30 15:54:28 2010 +0000
+
+    Add --from-code=UTF-8 to XGETTEXT_OPTIONS.
+    
+    Some of the translatable strings in the source code contain UTF-8
+    encoded characters.  Without setting the --from-code argument
+    appropriately, xgettext chokes on these strings, which can result in
+    an infinitely-recursing build.
+    
+    Reported-by: Peter <link@penguindevelopment.org>
 
 commit 037651cdde1684c640d1339f699e1e45838e35e1
 Author: Peter Clifton <pcjc2@cam.ac.uk>
@@ -414,6 +3936,96 @@ Date:   Tue Jan 19 23:11:36 2010 +0000
     
     Tested-by: Cesar Strauss <cestrauss@gmail.com>
     (cherry picked from commit 5d130060e694cfd3b3be177f1fae4a576728ff25)
+
+commit 620ee00b6211b04c75e9cadffe5547ce4ed1ca8b
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Tue Jan 19 23:17:06 2010 +0000
+
+    gschem: Set font description explictly, rather than by parsing a string
+    
+    This makes the font description string robust against numeric locale
+    settings, which could cause problems if "," gets used as the decimal
+    separator in the requested font size.
+    
+    This issue caused text rendering to be broken in gschem on Win32 for
+    locales where "," was used as the decimal specifier. The underlying
+    bug (failing to override the LC_NUMERIC settings) is now fixed,
+    although it is just as well to be as robust as possible here.
+    
+    Thanks to Cesar and Bert for testing this fix.
+    
+    Tested-by: Cesar Strauss <cestrauss@gmail.com>
+    Tested-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 5d130060e694cfd3b3be177f1fae4a576728ff25
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Tue Jan 19 23:11:36 2010 +0000
+
+    Set the LC_NUMERIC locale to "C" rather than "POSIX"
+    
+    This value is supported on Win32 platforms, whereas "POSIX" doesn't
+    appear to have any effect.
+    
+    This is required in order to get correct postscript output in locales
+    where "," is used as the decimal point separator. It also affects the
+    font strings passed to Pango, causing broken text rendering in gschem.
+    
+    Thanks to Cesar for testing this change indeed fixes the issue.
+    
+    Tested-by: Cesar Strauss <cestrauss@gmail.com>
+
+commit 7ffb3884c477ea4c54dc7e80fbc9120407ec6fcf
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Thu Dec 31 12:52:19 2009 +0000
+
+    gschem: Re-trace about logo to have transparency in anti-aliasing
+    
+    The previous version was partially flattened, so the anti-aliasing
+    only worked on a light coloured background. Re-trace the gate, red
+    net end cues and re-export.
+    
+    Is otherwise identical to the website logo.
+
+commit 7f8f8beb4d2ab3e2508c125da15ac817c5ab0f68
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Wed Dec 30 21:41:53 2009 -0500
+
+    Changed the new gschem about logo to be the same as the gEDA website logo
+
+commit 1af6cf8dcc23174a6e57e8cdf2f3b84996a5b23e
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Wed Dec 30 20:29:04 2009 +0000
+
+    gschem: New about dialog, including gEDA logo graphics
+
+commit f1e5729f9638731595c2af4ecf5c492d8de4076d
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 22:17:43 2009 +0000
+
+    gschem: Clean up doxygen warnings [2899355]
+    
+    Quite a few of the doxygen comments for gschem have
+    fallen into bitrot, particularly around parameter names and lists.
+    This patch updates doxygen comments to fix almost all warnings generated
+    in the gschem doxygen run. Also corrected apostrophe error on main page.
+
+commit 93dd5a941f34d1dd58cf9a57a07dec1e01ce3afe
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@users.sourceforge.net>
+Date:   Fri Nov 20 16:23:15 2009 +0000
+
+    Fix for some manpage issues. [2901183]
+    
+    Fixes undefined use of `l' macro, and incorrect uses of `-' character.
+
+commit 4885969f50e7942ce4180ff5e59907876ccf39aa
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@users.sourceforge.net>
+Date:   Fri Nov 20 16:09:19 2009 +0000
+
+    Don't use Encoding field in .desktop files [2901187]
+    
+    The .desktop files contain the deprecated Encoding field. The Encoding
+    key is now deprecated by the FreeDesktop standard and all strings are
+    required to be encoded in UTF-8.
 
 commit 9fb9761c0ae5b34670683de30f4251e24d55e652
 Author: Peter Clifton <pcjc2@cam.ac.uk>
@@ -461,6 +4073,85 @@ Date:   Fri Nov 20 06:58:53 2009 +0000
 commit 4a952841e7aca364018a9ebd81a0c1793c371273
 Author: Werner Hoch <werner.ho@gmx.de>
 Date:   Fri Nov 20 06:58:52 2009 +0000
+
+    gschem, gattrib desktop file: add trailing semicolon
+    
+    the openSUSE buildservice claims that it's necessary to add a
+    trailing semicolon to the Categories list entries.
+
+commit 858982a2a05ff3e128de3621f1d301ecd989f35c
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Changed message on failure to generate doxygen docs
+    
+    If --enable-doxygen was not a configure flag, change the error message
+    on an attempt to build doxygen documentation to suggest the configure
+    flag was the cause of the failure rather than the lack of a doxygen
+    install itself.
+
+commit ea34de8e761f40b697fc4800375ab8c5ef642c60
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Don't drop a file called "doxygen"
+    
+    Remove the file redirection that causes a file called "doxygen"
+    to be created in the */docs/ directories if --enable-doxygen
+    is *not* one of the configure flags.
+
+commit ef86dc34509308a29c2acca9eca73d7953b49346
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Nov 16 20:42:26 2009 +0000
+
+    Don't immediately redraw rubberband objects after placing
+    
+    This allows the user to see the placed (and selected) object
+    without it being overwriten by any object still attached to the
+    mouse cursor. (This made it appear that the object had not been
+    placed).
+    
+    The rubberband objects attached to the cursor are re-drawn as soon
+    as the mouse moves.
+
+commit 90ab35e96c4c2a9c37c5913ab4b574a131133b31
+Author: Sergey Alyoshin <aslv@users.sourceforge.net>
+Date:   Thu Nov 12 19:01:00 2009 +0000
+
+    gschem: Updated Russian translation.
+
+commit 69f7faf706f7eba312d012fdaa2d4c81df97051c
+Author: Roland Lutz <gaf@grinsen-ohne-katze.de>
+Date:   Thu Nov 12 18:48:55 2009 +0000
+
+    Allow double-click to select component in Compselect dialog [#2661223]
+
+commit a7c7e96e17937ea0780261101a4c45383df71134
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Sun Oct 18 23:03:23 2009 +0100
+
+    gschem: Fix rendering with zoomed out dashed lines. Bug #2876373
+    
+    Rather than using SCREENabs, use the screen_width function to
+    determine the on-screen size of dash elements. This clamps the
+    width at a rendereable size, so cairo does not get tripped into
+    an error state (and stop drawing other objects on the schematic).
+
+commit dac4cc228ac75df18311b8d7cf7b920772fa2038
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Sat Oct 17 11:05:27 2009 +0200
+
+    updated german translation for gschem
+
+commit 9cf811f0bd4269fa21ed3fb42ede93945f95e935
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Oct 17 10:14:14 2009 +0200
+
+    Updated the Dutch translations for gschem
+
+commit 4e558bed59a13d9e3197f68bdd54fcc3ab28c79d
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Tue Oct 6 20:12:02 2009 +0200
 
     gschem, gattrib desktop file: add trailing semicolon
     

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@ void o_attrib_add_selected(GSCHEM_TOPLEVEL *w_current, SELECTION *selection,
 {
   OBJECT *a_current;
   GList *a_iter;
+  GList *selected_objects = NULL;
 
   g_assert( selection != NULL );
 
@@ -64,36 +65,82 @@ void o_attrib_add_selected(GSCHEM_TOPLEVEL *w_current, SELECTION *selection,
     /* make sure object isn't selected already */
     if (!a_current->selected) {
       o_selection_add (w_current->toplevel, selection, a_current);
-      o_invalidate (w_current, a_current);
+      selected_objects = g_list_prepend (selected_objects, a_current);
     }
+  }
+
+  if (selected_objects != NULL) {
+    /* Run select-objects-hook */
+    g_run_hook_object_list (w_current, "%select-objects-hook",
+                            selected_objects);
+    g_list_free (selected_objects);
   }
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
+/*! \brief Remove invisible attributes of an object from the selection list.
  *  \par Function Description
- *  Remove all invisible attributes from the selection list.
  *
- *  \todo get a better name
+ *  Remove all invisible attributes attached to the given object
+ *  from the selection list. If hidden text is being shown, this
+ *  function returns immediately.
+ *
+ *  \param [in]     w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in,out] selection  The SELECTION list to remove from.
+ *  \param [in]     object     The OBJECT whose invisible attributes to remove.
  */
-void o_attrib_remove_selected_invisible (GSCHEM_TOPLEVEL *w_current,
-                                         SELECTION *selection,
-                                         OBJECT *selected)
+void o_attrib_deselect_invisible (GSCHEM_TOPLEVEL *w_current,
+                                  SELECTION *selection,
+                                  OBJECT *selected)
 {
   OBJECT *a_current;
   GList *a_iter;
 
   g_assert( selection != NULL );
 
+  if (w_current->toplevel->show_hidden_text) {
+    return;
+  }
+
   for (a_iter = selected->attribs; a_iter != NULL;
        a_iter = g_list_next (a_iter)) {
     a_current = a_iter->data;
 
-    if (!w_current->toplevel->show_hidden_text &&
-        a_current->visibility == INVISIBLE &&
-        a_current->selected) {
+    if (a_current->selected && !o_is_visible(w_current->toplevel, a_current)) {
       o_selection_remove (w_current->toplevel, selection, a_current);
-      o_invalidate (w_current, a_current);
+    }
+  }
+}
+
+/*! \brief Add invisible attributes of an object to the selection list.
+ *  \par Function Description
+ *
+ *  Add all invisible attributes attached to the given object
+ *  to the selection list. If hidden text is being shown, this
+ *  function returns immediately.
+ *
+ *  \param [in]     w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in,out] selection  The SELECTION list to add to.
+ *  \param [in]     object     The OBJECT whose invisible attributes to add.
+ */
+void o_attrib_select_invisible (GSCHEM_TOPLEVEL *w_current,
+                                  SELECTION *selection,
+                                  OBJECT *selected)
+{
+  OBJECT *a_current;
+  GList *a_iter;
+
+  g_assert( selection != NULL );
+
+  if (w_current->toplevel->show_hidden_text) {
+    return;
+  }
+
+  for (a_iter = selected->attribs; a_iter != NULL;
+       a_iter = g_list_next (a_iter)) {
+    a_current = a_iter->data;
+
+    if (!a_current->selected && !o_is_visible(w_current->toplevel, a_current)) {
+      o_selection_add (w_current->toplevel, selection, a_current);
     }
   }
 }
@@ -113,13 +160,13 @@ void o_attrib_toggle_visibility(GSCHEM_TOPLEVEL *w_current, OBJECT *object)
 
   g_return_if_fail (object != NULL && object->type == OBJ_TEXT);
 
-  if (object->visibility == VISIBLE) {
+  if (o_is_visible (toplevel, object)) {
     /* only erase if we are not showing hidden text */
     if (!toplevel->show_hidden_text) {
       o_invalidate (w_current, object);
     }
 
-    object->visibility = INVISIBLE;
+    o_set_visibility (toplevel, object, INVISIBLE);
 
     if (toplevel->show_hidden_text) {
       /* draw text so that little I is drawn */
@@ -133,10 +180,8 @@ void o_attrib_toggle_visibility(GSCHEM_TOPLEVEL *w_current, OBJECT *object)
       o_invalidate (w_current, object);
     }
 
-    object->visibility = VISIBLE;
+    o_set_visibility (toplevel, object, VISIBLE);
     o_text_recreate(toplevel, object);
-
-    o_invalidate (w_current, object);
   }
 
   toplevel->page_current->CHANGED = 1;
@@ -162,7 +207,6 @@ void o_attrib_toggle_show_name_value(GSCHEM_TOPLEVEL *w_current,
   o_invalidate (w_current, object);
   object->show_name_value = show_name_value;
   o_text_recreate(toplevel, object);
-  o_invalidate (w_current, object);
 
   toplevel->page_current->CHANGED = 1;
 }
@@ -229,13 +273,10 @@ OBJECT *o_attrib_add_attrib(GSCHEM_TOPLEVEL *w_current,
         break;
 
       case(OBJ_TEXT):
-
         world_x = o_current->text->x;
         world_y = o_current->text->y;
-			
         color = DETACHED_ATTRIBUTE_COLOR;
-
-	o_current = NULL;
+        o_current = NULL;
         break;
     }
   } else {
@@ -253,9 +294,9 @@ OBJECT *o_attrib_add_attrib(GSCHEM_TOPLEVEL *w_current,
 
   /* first create text item */
   new_obj = o_text_new(toplevel, OBJ_TEXT, color, world_x, world_y,
-             LOWER_LEFT, 0, /* zero is angle */
-             text_string,  w_current->text_size,  /* current text size */
-             visibility, show_name_value);
+                       LOWER_LEFT, 0, text_string, /* zero is angle */
+                       w_current->text_size, /* current text size */
+                       visibility, show_name_value);
   s_page_append (toplevel, toplevel->page_current, new_obj);
 
   /* now attach the attribute to the object (if o_current is not NULL) */
@@ -266,21 +307,15 @@ OBJECT *o_attrib_add_attrib(GSCHEM_TOPLEVEL *w_current,
 
   o_selection_add (toplevel, toplevel->page_current->selection_list, new_obj);
 
-  o_invalidate (w_current, new_obj);
-
   /* handle slot= attribute, it's a special case */
   if (o_current != NULL &&
       g_ascii_strncasecmp (text_string, "slot=", 5) == 0) {
     o_slot_end (w_current, o_current, text_string);
   }
 
-  /* Run the add attribute hook */
-  if (scm_hook_empty_p(add_attribute_hook) == SCM_BOOL_F &&
-      o_current != NULL) {
-    scm_run_hook (add_attribute_hook,
-                  scm_cons (g_make_object_smob (toplevel, o_current),
-                            SCM_EOL));
-  }
+  /* Call add-objects-hook. */
+  g_run_hook_object (w_current, "%add-objects-hook", new_obj);
+  g_run_hook_object (w_current, "%select-objects-hook", new_obj);
 
   toplevel->page_current->CHANGED = 1;
 

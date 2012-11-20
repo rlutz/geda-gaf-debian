@@ -20,6 +20,7 @@
 /*! \todo STILL NEED to clean up line lengths in aa and tr */
 #include <config.h>
 #include <version.h>
+#include <missing.h>
 
 #include <stdio.h>
 #ifdef HAVE_STDLIB_H
@@ -191,9 +192,9 @@ void text_input_dialog (GSCHEM_TOPLEVEL *w_current)
     gtk_window_position(GTK_WINDOW (w_current->tiwindow),
                         GTK_WIN_POS_NONE);
 
-    gtk_signal_connect(GTK_OBJECT (w_current->tiwindow), "response",
-                       GTK_SIGNAL_FUNC(text_input_dialog_response),
-                       w_current);
+    g_signal_connect (G_OBJECT (w_current->tiwindow), "response",
+                      G_CALLBACK (text_input_dialog_response),
+                      w_current);
 
     gtk_dialog_set_default_response(GTK_DIALOG(w_current->tiwindow),
                                     GTK_RESPONSE_ACCEPT);
@@ -265,11 +266,17 @@ void text_input_dialog (GSCHEM_TOPLEVEL *w_current)
  *  \todo Remove that function. Only the OK-Button should set any
  *  properties in the GSCHEM_TOPLEVEL struct.
  */
-gint change_alignment(GtkWidget *w, GSCHEM_TOPLEVEL *w_current)
+gint change_alignment(GtkComboBox *w, GSCHEM_TOPLEVEL *w_current)
 {
-  char *alignment;
-  alignment = gtk_object_get_data(GTK_OBJECT(w),"alignment");
-  w_current->text_alignment = atoi(alignment);
+  GtkTreeIter iter;
+  GtkTreeModel *model;
+  gint value;
+  if( gtk_combo_box_get_active_iter(w, &iter))
+  {
+    model = gtk_combo_box_get_model(w);
+    gtk_tree_model_get(model, &iter, 1, &value, -1);
+    w_current->text_alignment = value;
+  }
 
   /*w_current->page_current->CHANGED=1; I don't think this belongs */
   /* o_undo_savestate(w_current, UNDO_ALL); I don't think this belongs */
@@ -277,121 +284,50 @@ gint change_alignment(GtkWidget *w, GSCHEM_TOPLEVEL *w_current)
   return 0;
 }
 
-/*! \brief Create the alignment menu for the text property dialog
+/*! \brief Create the alignment combo box list store for the text
+*   property dialog
  *  \par Function Description
- *  This function creates a GtkMenu with nine different alignment
+ *  This function creates a GtkListStore with nine different alignment
  *  entries.
  */
-static GtkWidget *create_menu_alignment (GSCHEM_TOPLEVEL *w_current)
+static GtkListStore *create_menu_alignment (GSCHEM_TOPLEVEL *w_current)
 {
-  GtkWidget *menu;
-  GtkWidget *menuitem;
-  GSList *group;
-  char *buf;
+  GtkListStore *store;
+  GtkTreeIter   iter;
 
-  menu = gtk_menu_new ();
-  group = NULL;
+  store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_INT);
 
-  buf = g_strdup_printf( _("Lower Left"));
-  menuitem = gtk_radio_menu_item_new_with_label (group, buf);
-  g_free(buf);
-  group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_object_set_data (GTK_OBJECT(menuitem), "alignment", "0");
-  gtk_signal_connect(GTK_OBJECT (menuitem), "activate",
-                     (GtkSignalFunc) change_alignment,
-                     w_current);
-  gtk_widget_show (menuitem);
+  gtk_list_store_append(store, &iter);
+  gtk_list_store_set(store, &iter, 0, _("Upper Left"), -1);
+  gtk_list_store_set(store, &iter, 1, 2, -1);
+  gtk_list_store_append(store, &iter);
+  gtk_list_store_set(store, &iter, 0, _("Upper Middle"), -1);
+  gtk_list_store_set(store, &iter, 1, 5, -1);
+  gtk_list_store_append( store, &iter);
+  gtk_list_store_set(store, &iter, 0, _("Upper Right"), -1);
+  gtk_list_store_set(store, &iter, 1, 8, -1);
 
-  buf = g_strdup_printf( _("Middle Left"));
-  menuitem = gtk_radio_menu_item_new_with_label (group, buf);
-  g_free(buf);
-  group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_object_set_data (GTK_OBJECT(menuitem), "alignment", "1");
-  gtk_signal_connect(GTK_OBJECT (menuitem), "activate",
-                     (GtkSignalFunc) change_alignment,
-                     w_current);
-  gtk_widget_show (menuitem);
+  gtk_list_store_append(store, &iter);
+  gtk_list_store_set(store, &iter, 0, _("Middle Left"), -1);
+  gtk_list_store_set(store, &iter, 1, 1, -1);
+  gtk_list_store_append(store, &iter);
+  gtk_list_store_set(store, &iter, 0, _("Middle Middle"), -1);
+  gtk_list_store_set(store, &iter, 1, 4, -1);
+  gtk_list_store_append(store, &iter);
+  gtk_list_store_set(store, &iter, 0, _("Middle Right"), -1);
+  gtk_list_store_set(store, &iter, 1, 7, -1);
 
-  buf = g_strdup_printf( _("Upper Left"));
-  menuitem = gtk_radio_menu_item_new_with_label (group, buf);
-  g_free(buf);
-  group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_object_set_data (GTK_OBJECT(menuitem), "alignment", "2");
-  gtk_signal_connect(GTK_OBJECT (menuitem), "activate",
-                     (GtkSignalFunc) change_alignment,
-                     w_current);
-  gtk_widget_show (menuitem);
+  gtk_list_store_append(store, &iter);
+  gtk_list_store_set(store, &iter, 0, _("Lower Left"), -1);
+  gtk_list_store_set(store, &iter, 1, 0, -1);
+  gtk_list_store_append(store, &iter);
+  gtk_list_store_set(store, &iter, 0, _("Lower Middle"), -1);
+  gtk_list_store_set(store, &iter, 1, 3, -1);
+  gtk_list_store_append(store, &iter);
+  gtk_list_store_set(store, &iter, 0, _("Lower Right"), -1);
+  gtk_list_store_set(store, &iter, 1, 6, -1);
 
-  buf = g_strdup_printf( _("Lower Middle"));
-  menuitem = gtk_radio_menu_item_new_with_label (group, buf);
-  g_free(buf);
-  group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_object_set_data (GTK_OBJECT(menuitem), "alignment", "3");
-  gtk_signal_connect(GTK_OBJECT (menuitem), "activate",
-                     (GtkSignalFunc) change_alignment,
-                     w_current);
-  gtk_widget_show (menuitem);
-
-  buf = g_strdup_printf( _("Middle Middle"));
-  menuitem = gtk_radio_menu_item_new_with_label (group, buf);
-  g_free(buf);
-  group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_object_set_data (GTK_OBJECT(menuitem), "alignment", "4");
-  gtk_signal_connect(GTK_OBJECT (menuitem), "activate",
-                     (GtkSignalFunc) change_alignment,
-                     w_current);
-  gtk_widget_show (menuitem);
-
-  buf = g_strdup_printf( _("Upper Middle"));
-  menuitem = gtk_radio_menu_item_new_with_label (group, buf);
-  g_free(buf);
-  group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_object_set_data (GTK_OBJECT(menuitem), "alignment", "5");
-  gtk_signal_connect(GTK_OBJECT (menuitem), "activate",
-                     (GtkSignalFunc) change_alignment,
-                     w_current);
-  gtk_widget_show (menuitem);
-
-  buf = g_strdup_printf( _("Lower Right"));
-  menuitem = gtk_radio_menu_item_new_with_label (group, buf);
-  g_free(buf);
-  group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_object_set_data (GTK_OBJECT(menuitem), "alignment", "6");
-  gtk_signal_connect(GTK_OBJECT (menuitem), "activate",
-                     (GtkSignalFunc) change_alignment,
-                     w_current);
-  gtk_widget_show (menuitem);
-
-  buf = g_strdup_printf( _("Middle Right"));
-  menuitem = gtk_radio_menu_item_new_with_label (group, buf);
-  g_free(buf);
-  group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_object_set_data (GTK_OBJECT(menuitem), "alignment", "7");
-  gtk_signal_connect(GTK_OBJECT (menuitem), "activate",
-                     (GtkSignalFunc) change_alignment,
-                     w_current);
-  gtk_widget_show (menuitem);
-
-  buf = g_strdup_printf( _("Upper Right"));
-  menuitem = gtk_radio_menu_item_new_with_label (group, buf);
-  g_free(buf);
-  group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (menuitem));
-  gtk_menu_append (GTK_MENU (menu), menuitem);
-  gtk_object_set_data (GTK_OBJECT(menuitem), "alignment", "8");
-  gtk_signal_connect(GTK_OBJECT (menuitem), "activate",
-                     (GtkSignalFunc) change_alignment,
-                     w_current);
-  gtk_widget_show (menuitem);
-
-  return menu;
+  return store;
 }
 
 /* we reuse the color menu so we need to declare it */
@@ -479,19 +415,24 @@ void text_edit_dialog_response(GtkWidget * widget, gint response, GSCHEM_TOPLEVE
 void text_edit_dialog (GSCHEM_TOPLEVEL *w_current, const char *string, int text_size,
                        int text_alignment)
 {
-  GtkWidget *label = NULL;
+  GtkWidget *label;
   GtkWidget *table;
   GtkWidget *vbox;
-  GtkWidget *optionmenu = NULL;
-  GtkWidget *align_menu = NULL;
-  GtkWidget *viewport1 = NULL;
-  GtkWidget *textentry = NULL;
-  GtkWidget *sizeentry = NULL;
+  GtkWidget *optionmenu;
+  GtkWidget *combobox;
+  GtkListStore *align_menu_model;
+  GtkCellRenderer *cell;
+  GtkWidget *viewport1;
+  GtkWidget *textentry;
+  GtkWidget *sizeentry;
   GtkWidget *alignment;
-  GtkWidget *scrolled_window = NULL;
+  GtkWidget *scrolled_window;
   GtkTextBuffer *textbuffer;
   char *text_size_string;
-  int num_selected=0;
+  int num_selected;
+  /* Lookup table for quickly translating between alignment values and the
+     combo box list indices, index is alignment value, value is list index */
+  static int alignment_lookup[] = {6, 3, 0, 7, 4, 1, 8, 5, 2};
 
   if (!w_current->tewindow) {
     w_current->tewindow = gschem_dialog_new_with_buttons(_("Edit Text Properties"),
@@ -513,8 +454,9 @@ void text_edit_dialog (GSCHEM_TOPLEVEL *w_current, const char *string, int text_
     gtk_dialog_set_default_response(GTK_DIALOG(w_current->tewindow),
                                     GTK_RESPONSE_ACCEPT);
 
-    gtk_signal_connect(GTK_OBJECT(w_current->tewindow), "response",
-                       GTK_SIGNAL_FUNC(text_edit_dialog_response), w_current);
+    g_signal_connect (G_OBJECT (w_current->tewindow), "response",
+                      G_CALLBACK (text_edit_dialog_response),
+                      w_current);
 
     gtk_window_position(GTK_WINDOW (w_current->tewindow),
                         GTK_WIN_POS_MOUSE);
@@ -549,8 +491,12 @@ void text_edit_dialog (GSCHEM_TOPLEVEL *w_current, const char *string, int text_
       gtk_container_add( GTK_CONTAINER(alignment), viewport1);
 
       textentry = gtk_text_view_new();
-      gtk_text_view_set_editable(GTK_TEXT_VIEW(textentry), TRUE);
-      select_all_text_in_textview(GTK_TEXT_VIEW(textentry));
+      gtk_text_view_set_editable (GTK_TEXT_VIEW (textentry), TRUE);
+      if (string != NULL) {
+        textbuffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (textentry));
+        gtk_text_buffer_set_text (GTK_TEXT_BUFFER (textbuffer), string, -1);
+        select_all_text_in_textview (GTK_TEXT_VIEW (textentry));
+      }
 
       /*! \bug FIXME: Set tab's width in the textview widget. */
       /* See first the code in text_input_dialog and get it working before adding it here. */
@@ -595,16 +541,20 @@ void text_edit_dialog (GSCHEM_TOPLEVEL *w_current, const char *string, int text_
     gtk_misc_set_alignment(GTK_MISC(label),0,0);
     gtk_table_attach(GTK_TABLE(table), label, 0,1,2,3, GTK_FILL,0,0,0);
 
-    optionmenu = gtk_option_menu_new ();
-    align_menu = create_menu_alignment (w_current);
-    gtk_option_menu_set_menu(GTK_OPTION_MENU(optionmenu),
-                             align_menu);
-    gtk_option_menu_set_history(GTK_OPTION_MENU (optionmenu),
-                                text_alignment);
+    align_menu_model = create_menu_alignment(w_current);
+    combobox = gtk_combo_box_new_with_model(GTK_TREE_MODEL(align_menu_model));
+    gtk_combo_box_set_wrap_width(GTK_COMBO_BOX(combobox), 3);
+    cell = gtk_cell_renderer_text_new();
+    gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(combobox), cell, TRUE);
+    gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(combobox), cell,
+                                   "text", 0, NULL);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combobox),
+                             alignment_lookup[text_alignment]);
     w_current->text_alignment = text_alignment;
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_menu_get_active(GTK_MENU(align_menu))),
-                                   TRUE);
-    gtk_table_attach_defaults(GTK_TABLE(table), optionmenu, 1,2,2,3);
+    g_object_unref (align_menu_model);
+    gtk_table_attach_defaults(GTK_TABLE(table), combobox, 1,2,2,3);
+    g_signal_connect(G_OBJECT(combobox), "changed",
+                      G_CALLBACK(change_alignment), w_current);
 
     GLADE_HOOKUP_OBJECT(w_current->tewindow, sizeentry,"sizeentry");
     gtk_widget_show_all(w_current->tewindow);
@@ -612,15 +562,6 @@ void text_edit_dialog (GSCHEM_TOPLEVEL *w_current, const char *string, int text_
 
   else { /* dialog already there */
     gtk_window_present(GTK_WINDOW(w_current->tewindow));
-  }
-
-  if (string != NULL) {
-    if (num_selected == 1) { /* only if one thing is selected */
-      textentry = g_object_get_data (G_OBJECT (w_current->tewindow), "textentry");
-      textbuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textentry));
-      gtk_text_buffer_set_text(GTK_TEXT_BUFFER(textbuffer), string, -1);
-      select_all_text_in_textview(GTK_TEXT_VIEW(textentry));
-    }
   }
 
   text_size_string = g_strdup_printf("%d", text_size);
@@ -865,12 +806,15 @@ static void line_type_dialog_ok(GtkWidget *w, gpointer data)
     type = -1;
   
   /* convert the options to integers (-1 means unchanged) */
-  width =  g_strcasecmp (width_str,
-                         _("*unchanged*")) ? atoi (width_str)  : -1;
-  length = g_strcasecmp (length_str,
-                         _("*unchanged*")) ? atoi (length_str) : -1;
-  space  = g_strcasecmp (space_str,
-                         _("*unchanged*")) ? atoi (space_str)  : -1;
+  width =  g_utf8_collate (g_utf8_casefold (width_str, -1),
+                           g_utf8_casefold (_("*unchanged*"), -1))
+    ? atoi (width_str)  : -1;
+  length = g_utf8_collate (g_utf8_casefold (length_str, -1),
+                           g_utf8_casefold (_("*unchanged*"), -1))
+    ? atoi (length_str) : -1;
+  space  = g_utf8_collate (g_utf8_casefold (space_str, -1),
+                           g_utf8_casefold (_("*unchanged*"), -1))
+    ? atoi (space_str)  : -1;
 
   for (iter = selection; iter != NULL; iter = g_list_next(iter)) {
     object = (OBJECT *) iter->data;
@@ -904,10 +848,8 @@ static void line_type_dialog_ok(GtkWidget *w, gpointer data)
       g_assert_not_reached();
     }
 
-    o_invalidate (w_current, object);
     o_set_line_options (toplevel, object,
                         oend, otype, owidth, olength, ospace);
-    o_invalidate (w_current, object);
   }
 
   toplevel->page_current->CHANGED = 1;
@@ -959,7 +901,7 @@ void line_type_dialog (GSCHEM_TOPLEVEL *w_current)
   GtkWidget *label;
   struct line_type_data *line_type_data;
   GList *selection;
-  OBJECT_END end;
+  OBJECT_END end=END_NONE;
   OBJECT_TYPE type=TYPE_SOLID;
   gint width=1, length=-1, space=-1;
 
@@ -996,9 +938,9 @@ void line_type_dialog (GSCHEM_TOPLEVEL *w_current)
 
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
 
-  gtk_signal_connect(GTK_OBJECT(dialog), "response",
-                     GTK_SIGNAL_FUNC(line_type_dialog_response),
-                     line_type_data);
+  g_signal_connect (G_OBJECT (dialog), "response",
+                    G_CALLBACK (line_type_dialog_response),
+                    line_type_data);
 
   gtk_container_border_width(GTK_CONTAINER(dialog),
                              DIALOG_BORDER_SPACING);
@@ -1043,9 +985,9 @@ void line_type_dialog (GSCHEM_TOPLEVEL *w_current)
   gtk_table_attach_defaults(GTK_TABLE(table), width_entry,
                             1,2,1,2);
 
-  gtk_signal_connect(GTK_OBJECT (optionmenu), "changed",
-                     (GtkSignalFunc) line_type_dialog_linetype_change,
-                     line_type_data);
+  g_signal_connect(G_OBJECT (optionmenu), "changed",
+                   G_CALLBACK (line_type_dialog_linetype_change),
+                   line_type_data);
 
   length_entry = gtk_entry_new();
   gtk_entry_set_activates_default (GTK_ENTRY(length_entry), TRUE);
@@ -1349,16 +1291,21 @@ static void fill_type_dialog_ok(GtkWidget *w, gpointer data)
     type = -1;
 
   /* convert the options to integers (-1 means unchanged) */
-  width  = g_strcasecmp (width_str,
-                         _("*unchanged*")) ? atoi (width_str)  : -1;
-  angle1 = g_strcasecmp (angle1_str,
-                         _("*unchanged*")) ? atoi (angle1_str) : -1;
-  pitch1 = g_strcasecmp (pitch1_str,
-                         _("*unchanged*")) ? atoi (pitch1_str) : -1;
-  angle2 = g_strcasecmp (angle2_str,
-                         _("*unchanged*")) ? atoi (angle2_str) : -1;
-  pitch2 = g_strcasecmp (pitch2_str,
-                         _("*unchanged*")) ? atoi (pitch2_str) : -1;
+  width  = g_utf8_collate (g_utf8_casefold (width_str, -1),
+                           g_utf8_casefold(_("*unchanged*"), -1))
+    ? atoi (width_str)  : -1;
+  angle1 = g_utf8_collate (g_utf8_casefold (angle1_str, -1),
+                           g_utf8_casefold (_("*unchanged*"), -1))
+    ? atoi (angle1_str) : -1;
+  pitch1 = g_utf8_collate (g_utf8_casefold (pitch1_str, -1),
+                           g_utf8_casefold (_("*unchanged*"), -1))
+    ? atoi (pitch1_str) : -1;
+  angle2 = g_utf8_collate (g_utf8_casefold (angle2_str, -1),
+                           g_utf8_casefold (_("*unchanged*"), -1))
+    ? atoi (angle2_str) : -1;
+  pitch2 = g_utf8_collate (g_utf8_casefold (pitch2_str, -1),
+                           g_utf8_casefold(_("*unchanged*"), -1))
+    ? atoi (pitch2_str) : -1;
 
   for (iter = selection; iter != NULL; iter = g_list_next(iter)) {
     object = (OBJECT *) iter->data;
@@ -1394,10 +1341,8 @@ static void fill_type_dialog_ok(GtkWidget *w, gpointer data)
       g_assert_not_reached();
     }
     
-    o_invalidate (w_current, object);
     o_set_fill_options (toplevel, object, otype, owidth,
                         opitch1, oangle1, opitch2, oangle2);
-    o_invalidate (w_current, object);
   }
 
   toplevel->page_current->CHANGED = 1;
@@ -1489,8 +1434,9 @@ void fill_type_dialog(GSCHEM_TOPLEVEL *w_current)
   gtk_dialog_set_default_response(GTK_DIALOG(dialog),
                                   GTK_RESPONSE_ACCEPT);
 
-  gtk_signal_connect(GTK_OBJECT(dialog), "response",
-                     GTK_SIGNAL_FUNC(fill_type_dialog_response), fill_type_data);
+  g_signal_connect (G_OBJECT (dialog), "response",
+                    G_CALLBACK (fill_type_dialog_response),
+                    fill_type_data);
 
   gtk_container_border_width(GTK_CONTAINER(dialog), DIALOG_BORDER_SPACING);
   vbox = GTK_DIALOG(dialog)->vbox;
@@ -1537,9 +1483,9 @@ void fill_type_dialog(GSCHEM_TOPLEVEL *w_current)
   gtk_table_attach_defaults(GTK_TABLE(table), optionmenu,
                             1,2,0,1);
 
-  gtk_signal_connect(GTK_OBJECT (optionmenu), "changed",
-                     (GtkSignalFunc) fill_type_dialog_filltype_change,
-                     fill_type_data);
+  g_signal_connect (G_OBJECT (optionmenu), "changed",
+                    G_CALLBACK (fill_type_dialog_filltype_change),
+                    fill_type_data);
 
   width_entry = gtk_entry_new();
   gtk_entry_set_activates_default (GTK_ENTRY(width_entry), TRUE);
@@ -1620,11 +1566,9 @@ void arc_angle_dialog_response(GtkWidget *w, gint response,
     arc_object = (OBJECT*) g_object_get_data(G_OBJECT(w_current->aawindow),"arc_object");
 
     if (arc_object != NULL) {
-      o_invalidate (w_current, arc_object);
       o_arc_modify(w_current->toplevel, arc_object, radius, 0, ARC_RADIUS);
       o_arc_modify(w_current->toplevel, arc_object, start_angle, 0, ARC_START_ANGLE);
       o_arc_modify(w_current->toplevel, arc_object, sweep_angle, 0, ARC_END_ANGLE);
-      o_invalidate (w_current, arc_object);
     } else {
       o_arc_end4(w_current, radius, start_angle, sweep_angle);
     }
@@ -1674,8 +1618,9 @@ void arc_angle_dialog (GSCHEM_TOPLEVEL *w_current, OBJECT *arc_object)
     gtk_window_position(GTK_WINDOW(w_current->aawindow),
                         GTK_WIN_POS_MOUSE);
 
-    gtk_signal_connect(GTK_OBJECT(w_current->aawindow), "response",
-                       GTK_SIGNAL_FUNC(arc_angle_dialog_response), w_current);
+    g_signal_connect (G_OBJECT (w_current->aawindow), "response",
+                      G_CALLBACK (arc_angle_dialog_response),
+                      w_current);
 
     gtk_dialog_set_default_response(GTK_DIALOG(w_current->aawindow),
                                     GTK_RESPONSE_ACCEPT);
@@ -1817,8 +1762,9 @@ void translate_dialog (GSCHEM_TOPLEVEL *w_current)
     gtk_window_position(GTK_WINDOW (w_current->trwindow),
                         GTK_WIN_POS_MOUSE);
 
-    gtk_signal_connect(GTK_OBJECT (w_current->trwindow), "response",
-                       GTK_SIGNAL_FUNC(translate_dialog_response), w_current);
+    g_signal_connect (G_OBJECT (w_current->trwindow), "response",
+                      G_CALLBACK (translate_dialog_response),
+                      w_current);
 
     gtk_dialog_set_default_response(GTK_DIALOG(w_current->trwindow),
                                     GTK_RESPONSE_ACCEPT);
@@ -1915,9 +1861,9 @@ void text_size_dialog (GSCHEM_TOPLEVEL *w_current)
     gtk_window_position(GTK_WINDOW(w_current->tswindow),
                         GTK_WIN_POS_MOUSE);
 
-    gtk_signal_connect(GTK_OBJECT(w_current->tswindow), "response",
-                       GTK_SIGNAL_FUNC(text_size_dialog_response),
-                       w_current);
+    g_signal_connect (G_OBJECT (w_current->tswindow), "response",
+                      G_CALLBACK (text_size_dialog_response),
+                      w_current);
     gtk_dialog_set_default_response(GTK_DIALOG(w_current->tswindow),
                                     GTK_RESPONSE_ACCEPT);
 
@@ -1970,7 +1916,7 @@ void snap_size_dialog_response(GtkWidget *w, gint response,
     spin_size = g_object_get_data(G_OBJECT(w_current->tswindow),"spin_size");
     size = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(spin_size));
 
-    w_current->toplevel->snap_size = size;
+    w_current->snap_size = size;
     i_update_grid_info (w_current);
     o_invalidate_all (w_current);
     w_current->toplevel->page_current->CHANGED=1;  /* maybe remove those two lines */
@@ -2021,9 +1967,9 @@ void snap_size_dialog (GSCHEM_TOPLEVEL *w_current)
     gtk_window_position(GTK_WINDOW(w_current->tswindow),
                         GTK_WIN_POS_MOUSE);
 
-    gtk_signal_connect(GTK_OBJECT(w_current->tswindow), "response",
-                       GTK_SIGNAL_FUNC(snap_size_dialog_response),
-                       w_current);
+    g_signal_connect (G_OBJECT (w_current->tswindow), "response",
+                      G_CALLBACK (snap_size_dialog_response),
+                      w_current);
     gtk_dialog_set_default_response(GTK_DIALOG(w_current->tswindow),
                                     GTK_RESPONSE_ACCEPT);
 
@@ -2052,7 +1998,7 @@ void snap_size_dialog (GSCHEM_TOPLEVEL *w_current)
 
   /* always set the current gschem value to the dialog entry */
   spin_size = g_object_get_data(G_OBJECT(w_current->tswindow),"spin_size");
-  gtk_spin_button_set_value(GTK_SPIN_BUTTON(spin_size), w_current->toplevel->snap_size);
+  gtk_spin_button_set_value(GTK_SPIN_BUTTON(spin_size), w_current->snap_size);
   gtk_editable_select_region(GTK_EDITABLE(spin_size), 0, -1);
 }
 
@@ -2131,9 +2077,9 @@ void slot_edit_dialog (GSCHEM_TOPLEVEL *w_current, const char *string)
     gtk_dialog_set_default_response (GTK_DIALOG (w_current->sewindow),
                                      GTK_RESPONSE_ACCEPT);
 
-    gtk_signal_connect(GTK_OBJECT(w_current->sewindow), "response",
-                       GTK_SIGNAL_FUNC(slot_edit_dialog_response),
-                       w_current);
+    g_signal_connect (G_OBJECT (w_current->sewindow), "response",
+                      G_CALLBACK (slot_edit_dialog_response),
+                      w_current);
 
     gtk_container_border_width(GTK_CONTAINER(w_current->sewindow),
                                DIALOG_BORDER_SPACING);
@@ -2170,82 +2116,51 @@ void slot_edit_dialog (GSCHEM_TOPLEVEL *w_current, const char *string)
 
 /***************** Start of help/about dialog box ********************/
 
-/*! \brief Response function for the about dialog
- *  \par Function Description
- *  This function destoys the about dialg.
- */
-void about_dialog_response(GtkWidget *w, gint response,
-                           GSCHEM_TOPLEVEL *w_current)
-{
-  switch (response) {
-  case GTK_RESPONSE_REJECT:
-  case GTK_RESPONSE_DELETE_EVENT:
-    /* void */
-    break;
-  default:
-    printf("about_dialog_response(): strange signal %d\n",response);
-  }
-
-  gtk_widget_destroy(w_current->abwindow);
-  w_current->abwindow = NULL;
-}
-
 /*! \brief Create the about dialog and show it
  *  \par Function Description
  *  This function creates the about dialog.
  */
 void about_dialog (GSCHEM_TOPLEVEL *w_current)
 {
-  GtkWidget *label = NULL;
-  GtkWidget *vbox;
-  char *string;
+  char *version_string;
+  char *logo_file;
+  GdkPixbuf *logo;
+  GError *error = NULL;
 
-  if (!w_current->abwindow) {
-    w_current->abwindow = gschem_dialog_new_with_buttons(_("About..."),
-                                                         GTK_WINDOW(w_current->main_window),
-                                                         GTK_DIALOG_MODAL,
-                                                         "about", w_current,
-                                                         GTK_STOCK_CLOSE,
-                                                         GTK_RESPONSE_REJECT,
-                                                         NULL);
+  version_string = g_strdup_printf (_("%s (g%.7s)"),
+                                    PACKAGE_DOTTED_VERSION,
+                                    PACKAGE_GIT_COMMIT);
 
-    gtk_window_position (GTK_WINDOW (w_current->abwindow),
-                         GTK_WIN_POS_MOUSE);
+  logo_file = g_strconcat (w_current->toplevel->bitmap_directory,
+                           G_DIR_SEPARATOR_S, "gschem-about-logo.png", NULL);
 
-    gtk_signal_connect (GTK_OBJECT (w_current->abwindow), "response",
-                        GTK_SIGNAL_FUNC(about_dialog_response),
-                        w_current);
+  logo = gdk_pixbuf_new_from_file (logo_file, &error);
+  g_free (logo_file);
 
-    gtk_container_border_width (GTK_CONTAINER(w_current->abwindow),
-                                DIALOG_BORDER_SPACING);
-    vbox = GTK_DIALOG(w_current->abwindow)->vbox;
-    gtk_box_set_spacing(GTK_BOX(vbox), DIALOG_V_SPACING);
-
-    label = gtk_label_new ( _("<b>gEDA: GPL Electronic Design Automation</b>"));
-    gtk_label_set_use_markup (GTK_LABEL(label), TRUE);
-    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
-
-    string = g_strdup_printf(_("<b>gschem version %s%s.%s</b>"),
-                             PREPEND_VERSION_STRING, PACKAGE_DOTTED_VERSION,
-                             PACKAGE_DATE_VERSION);
-    label = gtk_label_new (string);
-    gtk_label_set_use_markup (GTK_LABEL(label), TRUE);
-    g_free(string);
-    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
-
-    label = gtk_label_new ( _("Written by:\n"
-                              "Ales Hvezda\n"
-                              "ahvezda@geda.seul.org\n"
-                              "And many others (See AUTHORS file)"));
-    gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
-
-    gtk_widget_show_all(w_current->abwindow);
+  if (error != NULL) {
+    g_assert (logo == NULL);
+    s_log_message ("Could not load image at file: %s\n%s\n",
+                   logo_file, error->message);
+    g_error_free (error);
   }
 
-  else { /* dialog already created */
-    gtk_window_present(GTK_WINDOW(w_current->abwindow));
-  }
+  gtk_show_about_dialog (
+      GTK_WINDOW (w_current->main_window),
+      "version",        version_string,
+      "logo",           logo,
+      "title",          _("About gschem"),
+      "comments",       _("gEDA: GPL Electronic Design Automation"),
+      "copyright",
+      /* TRANSLATORS: "ChangeLog" is a literal filename; please don't translate it. */
+      _("Copyright © 1998-2011 Ales Hvezda"
+        " <ahvezda@geda.seul.org>\n"
+        "Copyright © 1998-2011 gEDA Contributors"
+        " (see ChangeLog for details)"),
+      "website",        "http://www.gpleda.org/",
+      NULL);
+
+  g_free (version_string);
+  g_object_unref (logo);
 }
 
 /***************** End of help/about dialog box *********************/
@@ -2307,9 +2222,9 @@ void coord_dialog (GSCHEM_TOPLEVEL *w_current, int x, int y)
     gtk_window_position (GTK_WINDOW (w_current->cowindow),
                          GTK_WIN_POS_NONE);
 
-    gtk_signal_connect (GTK_OBJECT (w_current->cowindow), "response",
-                        GTK_SIGNAL_FUNC(coord_dialog_response),
-                        w_current);
+    g_signal_connect (G_OBJECT (w_current->cowindow), "response",
+                      G_CALLBACK (coord_dialog_response),
+                      w_current);
 
     gtk_container_border_width (GTK_CONTAINER(w_current->cowindow),
                                 DIALOG_BORDER_SPACING);
@@ -2436,6 +2351,10 @@ char *index2functionstring(int index)
  *  Cell layout data function to support color swatches in the color
  *  combobox.
  *
+ *  \param layout
+ *  \param cell
+ *  \param model
+ *  \param iter
  *  \param data the current #GSCHEM_TOPLEVEL pointer.
  */
 static void
@@ -2462,6 +2381,7 @@ color_menu_swatch_layout_data (GtkCellLayout *layout,
  *  Update application state to reflect color combobox selection
  *  changes.
  *
+ *  \param widget
  *  \param data the current #GSCHEM_TOPLEVEL pointer.
  */
 static void
@@ -2637,9 +2557,9 @@ void color_edit_dialog (GSCHEM_TOPLEVEL *w_current)
     gtk_dialog_set_default_response (GTK_DIALOG (w_current->clwindow),
                                      GTK_RESPONSE_ACCEPT);
 
-    gtk_signal_connect(GTK_OBJECT(w_current->clwindow), "response",
-                       GTK_SIGNAL_FUNC(color_edit_dialog_response),
-                       w_current);
+    g_signal_connect (G_OBJECT (w_current->clwindow), "response",
+                      G_CALLBACK (color_edit_dialog_response),
+                      w_current);
 
     gtk_container_border_width(GTK_CONTAINER(w_current->clwindow),
                                DIALOG_BORDER_SPACING);
@@ -2697,11 +2617,6 @@ void x_dialog_hotkeys (GSCHEM_TOPLEVEL *w_current)
   GtkWidget *treeview;
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
-  GArray *keymap;
-  gint i;
-  struct keyseq_action_t {
-    gchar *keyseq, *action;
-  };
 
   if (!w_current->hkwindow) {
     w_current->hkwindow = gschem_dialog_new_with_buttons(_("Hotkeys"),
@@ -2715,9 +2630,9 @@ void x_dialog_hotkeys (GSCHEM_TOPLEVEL *w_current)
     gtk_window_position (GTK_WINDOW (w_current->hkwindow),
                          GTK_WIN_POS_NONE);
 
-    gtk_signal_connect (GTK_OBJECT (w_current->hkwindow), "response",
-                        GTK_SIGNAL_FUNC(x_dialog_hotkeys_response),
-                        w_current);
+    g_signal_connect (G_OBJECT (w_current->hkwindow), "response",
+                      G_CALLBACK (x_dialog_hotkeys_response),
+                      w_current);
 
     gtk_dialog_set_default_response(GTK_DIALOG(w_current->hkwindow),
                                     GTK_RESPONSE_ACCEPT);
@@ -2736,31 +2651,7 @@ void x_dialog_hotkeys (GSCHEM_TOPLEVEL *w_current)
                                     GTK_POLICY_AUTOMATIC);
 
     /* the model */
-    store = gtk_list_store_new (2,G_TYPE_STRING, G_TYPE_STRING);
-
-    /* retrieve current keymap */
-    keymap = g_keys_dump_keymap ();
-    /* add each keymap entry to the list store of the dialog */
-    for (i = 0; i < keymap->len; i++) {
-      GtkTreeIter iter;
-      struct keyseq_action_t *keymap_entry;
-
-      keymap_entry = &g_array_index (keymap, struct keyseq_action_t, i);
-      gtk_list_store_append (store, &iter);
-      gtk_list_store_set (store, &iter,
-                          0, keymap_entry->action,
-                          1, keymap_entry->keyseq,
-                          -1);
-    }
-
-    /* finally free the array for keymap */
-    for (i = 0; i < keymap->len; i++) {
-      struct keyseq_action_t *keymap_entry;
-      keymap_entry = &g_array_index (keymap, struct keyseq_action_t, i);
-      g_free (keymap_entry->keyseq);
-      g_free (keymap_entry->action);
-    }
-    g_array_free (keymap, TRUE);
+    store = g_keys_to_list_store ();
 
     /* the tree view */
     treeview = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
@@ -2835,9 +2726,6 @@ void x_dialog_raise_all(GSCHEM_TOPLEVEL *w_current)
   }
   if(w_current->tswindow) {
     gdk_window_raise(w_current->tswindow->window);
-  }
-  if(w_current->abwindow) {
-    gdk_window_raise(w_current->abwindow->window);
   }
   if(w_current->hkwindow) {
     gdk_window_raise(w_current->hkwindow->window);
@@ -3032,7 +2920,8 @@ void find_text_dialog_response(GtkWidget *w, gint response,
     string = (gchar*) gtk_entry_get_text(GTK_ENTRY(textentry));
     checkdescend = g_object_get_data(G_OBJECT(w_current->tfindwindow),"checkdescend");
 
-    strncpy(generic_textstring, string, 256);
+    strncpy(generic_textstring, string, sizeof(generic_textstring)-1);
+    generic_textstring[sizeof(generic_textstring)-1] = '\0';
 
     if (remember_page != toplevel->page_current) {
       s_page_goto(toplevel, remember_page);
@@ -3079,7 +2968,8 @@ void find_text_dialog(GSCHEM_TOPLEVEL *w_current)
     if (object->type == OBJ_TEXT) {
       strncpy (generic_textstring,
                o_text_get_string (w_current->toplevel, object),
-               256);
+               sizeof(generic_textstring)-1);
+      generic_textstring[sizeof(generic_textstring)-1] = '\0';
     }
   }
 
@@ -3103,9 +2993,9 @@ void find_text_dialog(GSCHEM_TOPLEVEL *w_current)
     gtk_window_position(GTK_WINDOW(w_current->tfindwindow),
                         GTK_WIN_POS_MOUSE);
 
-    gtk_signal_connect(GTK_OBJECT(w_current->tfindwindow), "response",
-                       GTK_SIGNAL_FUNC(find_text_dialog_response),
-                       w_current);
+    g_signal_connect (G_OBJECT (w_current->tfindwindow), "response",
+                      G_CALLBACK (find_text_dialog_response),
+                      w_current);
 
     gtk_dialog_set_default_response(GTK_DIALOG(w_current->tfindwindow),
                                      GTK_RESPONSE_ACCEPT);
@@ -3164,7 +3054,8 @@ void hide_text_dialog_response(GtkWidget *w, gint response,
     textentry = g_object_get_data(G_OBJECT(w_current->thidewindow),"textentry");
     string = (gchar*) gtk_entry_get_text(GTK_ENTRY(textentry));
 
-    strncpy(generic_textstring, string, 256);
+    strncpy(generic_textstring, string, sizeof(generic_textstring)-1);
+    generic_textstring[sizeof(generic_textstring)-1] = '\0';
     o_edit_hide_specific_text (w_current,
                                s_page_objects (w_current->toplevel->page_current),
                                string);
@@ -3209,9 +3100,9 @@ void hide_text_dialog(GSCHEM_TOPLEVEL * w_current)
     gtk_window_position(GTK_WINDOW(w_current->thidewindow),
                         GTK_WIN_POS_MOUSE);
 
-    gtk_signal_connect(GTK_OBJECT(w_current->thidewindow), "response",
-                       GTK_SIGNAL_FUNC(hide_text_dialog_response),
-                       w_current);
+    g_signal_connect (G_OBJECT (w_current->thidewindow), "response",
+                      G_CALLBACK (hide_text_dialog_response),
+                      w_current);
 
     gtk_dialog_set_default_response(GTK_DIALOG(w_current->thidewindow),
                                     GTK_RESPONSE_ACCEPT);
@@ -3264,7 +3155,8 @@ void show_text_dialog_response(GtkWidget *widget, gint response,
     textentry = g_object_get_data(G_OBJECT(w_current->tshowwindow),"textentry");
     string = (gchar*) gtk_entry_get_text(GTK_ENTRY(textentry));
 
-    strncpy(generic_textstring, string, 256);
+    strncpy(generic_textstring, string, sizeof(generic_textstring)-1);
+    generic_textstring[sizeof(generic_textstring)-1] = '\0';
     o_edit_show_specific_text (w_current,
                                s_page_objects (w_current->toplevel->page_current),
                                string);
@@ -3309,9 +3201,9 @@ void show_text_dialog(GSCHEM_TOPLEVEL * w_current)
     gtk_window_position(GTK_WINDOW(w_current->tshowwindow),
                         GTK_WIN_POS_MOUSE);
 
-    gtk_signal_connect(GTK_OBJECT(w_current->tshowwindow), "response",
-                       GTK_SIGNAL_FUNC(show_text_dialog_response),
-                       w_current);
+    g_signal_connect (G_OBJECT (w_current->tshowwindow), "response",
+                      G_CALLBACK (show_text_dialog_response),
+                      w_current);
 
     gtk_dialog_set_default_response(GTK_DIALOG(w_current->tshowwindow),
                                     GTK_RESPONSE_ACCEPT);
@@ -3586,7 +3478,7 @@ close_confirmation_dialog_init (CloseConfirmationDialog *self)
  *  This function determines the number of pages with unsaved changes
  *  from the model.
  *
- *  \param in model The tree model.
+ *  \param [in] model The tree model.
  *  \returns The number of pages with unsaved changes.
  */
 static gint
@@ -3614,8 +3506,8 @@ count_pages (GtkTreeModel *model)
  *
  *  The returned value must be freed by caller.
  *
- *  \param in model The tree model.
- *  \param in piter A pointer on a GtkTreeIter of model or NULL.
+ *  \param [in] model The tree model.
+ *  \param [in] piter A pointer on a GtkTreeIter of model or NULL.
  *  \returns The name for the page.
  */
 static gchar*
@@ -3644,12 +3536,12 @@ get_page_name (GtkTreeModel *model, GtkTreeIter *piter)
  *  This functions sets the cell of the treeview with the short name
  *  of the page obtained with <B>get_page_name()</B>.
  *
- *  \param in tree_column A GtkTreeColumn.
- *  \param in cell        The GtkCellRenderer that is being rendered by
+ *  \param [in] tree_column A GtkTreeColumn.
+ *  \param [in] cell        The GtkCellRenderer that is being rendered by
  *                        tree_column.
- *  \param in tree_model  The GtkTreeModel being rendered.
- *  \param in iter        A GtkTreeIter of the current row rendered.
- *  \param in data        .
+ *  \param [in] tree_model  The GtkTreeModel being rendered.
+ *  \param [in] iter        A GtkTreeIter of the current row rendered.
+ *  \param [in] data        .
  */
 static void
 close_confirmation_dialog_set_page_name (GtkTreeViewColumn *tree_column,
@@ -3674,9 +3566,9 @@ close_confirmation_dialog_set_page_name (GtkTreeViewColumn *tree_column,
  *  for the affected row when user toggles the check box in the
  *  treeview.
  *
- *  \param in cell_renderer The GtkCellRendererToggle.
- *  \param in path          The GtkTreePath to the concerned row in model.
- *  \param in user          The dialog as user data.
+ *  \param [in] cell_renderer The GtkCellRendererToggle.
+ *  \param [in] path          The GtkTreePath to the concerned row in model.
+ *  \param [in] user_data     The dialog as user data.
  */
 static void
 close_confirmation_dialog_callback_renderer_toggled (GtkCellRendererToggle *cell_renderer,
@@ -3690,7 +3582,9 @@ close_confirmation_dialog_callback_renderer_toggled (GtkCellRendererToggle *cell
 
   model = GTK_TREE_MODEL (dialog->store_unsaved_pages);
 
-  gtk_tree_model_get_iter_from_string (model, &iter, path);
+  if (!gtk_tree_model_get_iter_from_string (model, &iter, path)) {
+    return;
+  }
   gtk_tree_model_get (model, &iter,
                       COLUMN_SAVE, &save,
                       -1);
@@ -3707,7 +3601,7 @@ close_confirmation_dialog_callback_renderer_toggled (GtkCellRendererToggle *cell
  *
  *  The treeview displays the page names with check boxes.
  *
- *  \param in dialog The dialog.
+ *  \param [in] dialog The dialog.
  *  \returns A pointer on the GtkVBox to add to dialog.
  */
 static GtkWidget*
@@ -3798,6 +3692,7 @@ close_confirmation_dialog_constructor (GType type,
   GtkTreeIter iter;
   gboolean ret, single_page;
   gchar *tmp, *str;
+  const gchar *cstr;
 
   /* chain up to constructor of parent class */
   object =
@@ -3907,7 +3802,7 @@ close_confirmation_dialog_constructor (GType type,
   }
 
   /* secondary label */
-  str = _("If you don't save, all your changes will be permanently lost.");
+  cstr = _("If you don't save, all your changes will be permanently lost.");
   label = GTK_WIDGET (g_object_new (GTK_TYPE_LABEL,
                                     /* GtkMisc */
                                     "xalign",     0.0,
@@ -3915,7 +3810,7 @@ close_confirmation_dialog_constructor (GType type,
                                     "selectable", TRUE,
                                     /* GtkLabel */
                                     "wrap",       TRUE,
-                                    "label",      str,
+                                    "label",      cstr,
                                     NULL));
   gtk_box_pack_start (GTK_BOX (vbox), label,
                       FALSE, FALSE, 0);
@@ -4028,10 +3923,10 @@ close_confirmation_dialog_get_property (GObject    *object,
  *  action has been requested. Each selected page is appended to the
  *  GList pointed by <B>data</B>
  *
- *  \param in model The tree model.
- *  \param in path  .
- *  \param in iter  .
- *  \param in data  A pointer on a GList* to fill.
+ *  \param [in] model The tree model.
+ *  \param [in] path  .
+ *  \param [in] iter  .
+ *  \param [in] data  A pointer on a GList* to fill.
  *  \returns FALSE to continue walking the tree.
  */
 static gboolean
@@ -4062,7 +3957,7 @@ get_selected_pages (GtkTreeModel *model,
  *
  *  The returned list must be freed.
  *
- *  \param in dialog The dialog.
+ *  \param [in] dialog The dialog.
  *  \returns A GList of selected PAGE* in dialog.
  */
 GList*
@@ -4087,8 +3982,8 @@ close_confirmation_dialog_get_selected_pages (CloseConfirmationDialog *dialog)
  *  closing, or to discard the changes or to save the changes to a
  *  file.
  *
- *  \param in toplevel The toplevel environment.
- *  \param in page     The page to close.
+ *  \param [in] w_current The toplevel environment.
+ *  \param [in] page      The page to close.
  */
 void
 x_dialog_close_changed_page (GSCHEM_TOPLEVEL *w_current, PAGE *page)
@@ -4157,7 +4052,7 @@ x_dialog_close_changed_page (GSCHEM_TOPLEVEL *w_current, PAGE *page)
  *  window. Otherwise the user has somehow cancelled and the window
  *  must not be closed.
  *
- *  \param in toplevel The toplevel environment.
+ *  \param [in] w_current The toplevel environment.
  *  \returns TRUE if the window can be closed, FALSE otherwise.
  */
 gboolean
@@ -4343,11 +4238,9 @@ void x_dialog_edit_pin_type (GSCHEM_TOPLEVEL *w_current, const GList *obj_list)
         if (object->type == OBJ_PIN &&
             object->pin_type != new_type) {
           changed_anything = TRUE;
-          o_invalidate (w_current, object);
           s_conn_remove_object (w_current->toplevel, object);
           o_pin_set_type (w_current->toplevel, object, new_type);
           s_conn_update_object (w_current->toplevel, object);
-          o_invalidate (w_current, object);
         }
       }
       if (changed_anything)

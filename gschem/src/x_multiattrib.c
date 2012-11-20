@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -287,6 +287,43 @@ static void celltextview_class_init (CellTextViewClass *klass);
 static void celltextview_init       (CellTextView *self);
 static void celltextview_cell_editable_init (GtkCellEditableIface *iface);
 
+enum {
+    PROP_EDIT_CANCELED = 1
+};
+
+static void celltextview_set_property (GObject *object,
+                                       guint property_id,
+                                       const GValue *value,
+                                       GParamSpec *pspec)
+{
+  CellTextView *celltextview = (CellTextView*) object;
+
+  switch (property_id) {
+      case PROP_EDIT_CANCELED:
+        celltextview->editing_canceled = g_value_get_boolean (value);
+        break;
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+  }
+}
+
+static void celltextview_get_property (GObject *object,
+                                       guint property_id,
+                                       GValue *value,
+                                       GParamSpec *pspec)
+{
+  CellTextView *celltextview = (CellTextView*) object;
+
+  switch (property_id) {
+      case PROP_EDIT_CANCELED:
+        g_value_set_boolean (value, celltextview->editing_canceled);
+        break;
+      default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+  }
+}
+
+
 /*! \todo Finish function documentation
  *  \brief
  *  \par Function Description
@@ -377,7 +414,19 @@ GType celltextview_get_type()
  */
 static void celltextview_class_init(CellTextViewClass *klass)
 {
-/*   GObjectClass *gobject_class = G_OBJECT_CLASS (klass); */
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+
+  gobject_class->get_property = celltextview_get_property;
+  gobject_class->set_property = celltextview_set_property;
+
+  g_object_class_install_property (
+    gobject_class,
+    PROP_EDIT_CANCELED,
+    g_param_spec_boolean ("editing-canceled",
+                          "",
+                          "",
+                          FALSE,
+                          G_PARAM_READWRITE));
 }
 
 /*! \todo Finish function documentation
@@ -611,7 +660,6 @@ static void multiattrib_action_add_attribute(GSCHEM_TOPLEVEL *w_current,
 					     gint visible,
 					     gint show_name_value) 
 {
-  OBJECT *o_attrib;
   gchar *newtext;
   
   newtext = g_strdup_printf ("%s=%s", name, value);
@@ -622,8 +670,8 @@ static void multiattrib_action_add_attribute(GSCHEM_TOPLEVEL *w_current,
   }
 
   /* create a new attribute and link it */
-  o_attrib = o_attrib_add_attrib (w_current, newtext,
-                                  visible, show_name_value, object);
+  o_attrib_add_attrib (w_current, newtext,
+                       visible, show_name_value, object);
 
   w_current->toplevel->page_current->CHANGED = 1;
   o_undo_savestate (w_current, UNDO_ALL);
@@ -641,13 +689,14 @@ static void multiattrib_action_duplicate_attribute(GSCHEM_TOPLEVEL *w_current,
 						   OBJECT *object,
 						   OBJECT *o_attrib) 
 {
-  OBJECT *o_new;
-  
-  o_new = o_attrib_add_attrib (w_current,
-                               o_text_get_string (w_current->toplevel, o_attrib),
-                               o_attrib->visibility,
-                               o_attrib->show_name_value,
-                               object);
+  int visibility = o_is_visible (w_current->toplevel, o_attrib)
+      ? VISIBLE : INVISIBLE;
+
+  o_attrib_add_attrib (w_current,
+                       o_text_get_string (w_current->toplevel, o_attrib),
+                       visibility,
+                       o_attrib->show_name_value,
+                       object);
   w_current->toplevel->page_current->CHANGED = 1;
   o_undo_savestate (w_current, UNDO_ALL);
 
@@ -665,22 +714,23 @@ static void multiattrib_action_promote_attribute (GSCHEM_TOPLEVEL *w_current,
   TOPLEVEL *toplevel = w_current->toplevel;
   OBJECT *o_new;
 
-  if (o_attrib->visibility) {
+  if (o_is_visible (toplevel, o_attrib)) {
     /* If the attribute we're promoting is visible, don't clone its location */
-    o_new = o_attrib_add_attrib (w_current,
-                                 o_text_get_string (w_current->toplevel, o_attrib),
-                                 o_attrib->visibility,
-                                 o_attrib->show_name_value,
-                                 object);
+    (void) o_attrib_add_attrib (w_current,
+				o_text_get_string (w_current->toplevel, o_attrib),
+				VISIBLE,
+				o_attrib->show_name_value,
+				object);
   } else {
       /* make a copy of the attribute object */
-      o_new = o_object_copy (toplevel, o_attrib, NORMAL_FLAG);
+      o_new = o_object_copy (toplevel, o_attrib);
       s_page_append (toplevel, toplevel->page_current, o_new);
       /* add the attribute its parent */
       o_attrib_attach (toplevel, o_new, object, TRUE);
-      /* redraw the attribute object */
-      o_invalidate (w_current, o_new);
       /* note: this object is unselected (not added to selection). */
+
+      /* Call add-objects-hook */
+      g_run_hook_object (w_current, "%add-objects-hook", o_new);
   }
   w_current->toplevel->page_current->CHANGED = 1;
   o_undo_savestate (w_current, UNDO_ALL);
@@ -695,11 +745,7 @@ static void multiattrib_action_delete_attribute(GSCHEM_TOPLEVEL *w_current,
 						OBJECT *o_attrib) 
 {
   /* actually deletes the attribute */
-  o_selection_remove (w_current->toplevel,
-                      w_current->toplevel->page_current->selection_list,
-                      o_attrib);
   o_delete (w_current, o_attrib);
-  w_current->toplevel->page_current->CHANGED=1;
   o_undo_savestate (w_current, UNDO_ALL);
 
 }
@@ -782,6 +828,7 @@ static void multiattrib_column_set_data_visible(GtkTreeViewColumn *tree_column,
 						gpointer data)
 {
   OBJECT *o_attrib;
+  GschemDialog *dialog = GSCHEM_DIALOG (data);
   int inherited;
 
   gtk_tree_model_get (tree_model, iter,
@@ -792,7 +839,7 @@ static void multiattrib_column_set_data_visible(GtkTreeViewColumn *tree_column,
   inherited = o_attrib_is_inherited (o_attrib);
 
   g_object_set (cell,
-                "active", (o_attrib->visibility == VISIBLE),
+                "active", o_is_visible (dialog->w_current->toplevel, o_attrib),
                 "sensitive",   !inherited,
                 "activatable", !inherited,
                 NULL);
@@ -896,6 +943,7 @@ static void multiattrib_callback_edited_name(GtkCellRendererText *cellrendererte
   OBJECT *o_attrib;
   GSCHEM_TOPLEVEL *w_current;
   gchar *value, *newtext;
+  int visibility;
 
   model = gtk_tree_view_get_model (multiattrib->treeview);
   w_current = GSCHEM_DIALOG (multiattrib)->w_current;
@@ -931,10 +979,12 @@ static void multiattrib_callback_edited_name(GtkCellRendererText *cellrendererte
     return;
   }
 
-  
+  visibility = o_is_visible (w_current->toplevel, o_attrib)
+      ? VISIBLE : INVISIBLE;
+
   /* actually modifies the attribute */
   o_text_change (w_current, o_attrib,
-                 newtext, o_attrib->visibility, o_attrib->show_name_value);
+                 newtext, visibility, o_attrib->show_name_value);
 
   g_free (value);
   g_free (newtext);
@@ -957,6 +1007,7 @@ static void multiattrib_callback_edited_value(GtkCellRendererText *cell_renderer
   OBJECT *o_attrib;
   GSCHEM_TOPLEVEL *w_current;
   gchar *name, *newtext;
+  int visibility;
 
   model = gtk_tree_view_get_model (multiattrib->treeview);
   w_current = GSCHEM_DIALOG (multiattrib)->w_current;
@@ -979,9 +1030,12 @@ static void multiattrib_callback_edited_value(GtkCellRendererText *cell_renderer
     return;
   }
   
+  visibility = o_is_visible (w_current->toplevel, o_attrib)
+      ? VISIBLE : INVISIBLE;
+
   /* actually modifies the attribute */
   o_text_change (w_current, o_attrib,
-                 newtext, o_attrib->visibility, o_attrib->show_name_value);
+                 newtext, visibility, o_attrib->show_name_value);
   
   /* request an update of display for this row */
   update_row_display (model, &iter);
@@ -1020,12 +1074,13 @@ static void multiattrib_callback_toggled_visible(GtkCellRendererToggle *cell_ren
   g_assert (o_attrib->type == OBJ_TEXT);
   o_invalidate (w_current, o_attrib);
 
-  visibility = o_attrib->visibility == VISIBLE ? INVISIBLE : VISIBLE;
+  /* toggle visibility */
+  visibility = o_is_visible (w_current->toplevel, o_attrib)
+      ? INVISIBLE : VISIBLE;
 
   /* actually modifies the attribute */
-  o_attrib->visibility = visibility;
+  o_set_visibility (w_current->toplevel, o_attrib, visibility);
   o_text_recreate (w_current->toplevel, o_attrib);
-  o_invalidate (w_current, o_attrib);
   o_undo_savestate (w_current, UNDO_ALL);
 
   /* request an update of display for this row */
@@ -1074,7 +1129,6 @@ static void multiattrib_callback_toggled_show_name(GtkCellRendererToggle *cell_r
   /* actually modifies the attribute */
   o_attrib->show_name_value = new_snv;
   o_text_recreate (w_current->toplevel, o_attrib);
-  o_invalidate (w_current, o_attrib);
   o_undo_savestate (w_current, UNDO_ALL);
 
   /* request an update of display for this row */
@@ -1123,7 +1177,6 @@ static void multiattrib_callback_toggled_show_value(GtkCellRendererToggle *cell_
   /* actually modifies the attribute */
   o_attrib->show_name_value = new_snv;
   o_text_recreate (w_current->toplevel, o_attrib);
-  o_invalidate (w_current, o_attrib);
   o_undo_savestate (w_current, UNDO_ALL);
   
   /* request an update of display for this row */
@@ -1532,7 +1585,7 @@ static void multiattrib_popup_menu(Multiattrib *multiattrib,
   menu = gtk_menu_new();
   for (tmp = item_list; tmp->label != NULL; tmp++) {
     GtkWidget *menuitem;
-    if (g_strcasecmp (tmp->label, "-") == 0) {
+    if (g_utf8_collate (tmp->label, "-") == 0) {
       menuitem = gtk_separator_menu_item_new ();
     } else {
       menuitem = gtk_menu_item_new_with_label (_(tmp->label));
@@ -1691,7 +1744,7 @@ static void multiattrib_show_inherited_toggled (GtkToggleButton *button,
  *  GType instance initialiser for Multiattrib. Create
  *  and setup the widgets which make up the dialog.
  *
- *  \param [in]  dialog       The Multiattrib we are initialising
+ *  \param [in] multiattrib The Multiattrib we are initialising
  */
 static void multiattrib_init(Multiattrib *multiattrib)
 {
@@ -1709,7 +1762,6 @@ static void multiattrib_init(Multiattrib *multiattrib)
                 /* GtkContainer */
                 "border-width",    0,
                 /* GtkWindow */
-                "type",            GTK_WINDOW_TOPLEVEL,
                 "title",           _("Edit Attributes"),
                 "default-width",   320,
                 "default-height",  350,
@@ -1833,7 +1885,7 @@ static void multiattrib_init(Multiattrib *multiattrib)
   gtk_tree_view_column_pack_start (column, renderer, TRUE);
   gtk_tree_view_column_set_cell_data_func (column, renderer,
 					   multiattrib_column_set_data_visible,
-					   NULL, NULL);
+					   multiattrib, NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
   /*       - column 4: show name */
   renderer = GTK_CELL_RENDERER (
@@ -1949,7 +2001,10 @@ static void multiattrib_init(Multiattrib *multiattrib)
 					   "shadow-type",
 					   GTK_SHADOW_IN,
 					   NULL));
+  /*! \fixme Forcing the size request is a horrible band-aid and
+   *  should be replaced by a better heuristic. */
   textview = GTK_WIDGET (g_object_new (GTK_TYPE_TEXT_VIEW,
+                                       "height-request", 50,
 				       NULL));
   g_signal_connect (textview,
 		    "key_press_event",
@@ -2090,7 +2145,6 @@ static void multiattrib_get_property (GObject *object,
  */
 void multiattrib_update (Multiattrib *multiattrib)
 {
-  TOPLEVEL *toplevel;
   GtkListStore *liststore;
   GtkTreeIter iter;
   GList *object_attribs;
@@ -2101,7 +2155,6 @@ void multiattrib_update (Multiattrib *multiattrib)
   gboolean show_inherited;
 
   g_assert (GSCHEM_DIALOG (multiattrib)->w_current != NULL);
-  toplevel = GSCHEM_DIALOG (multiattrib)->w_current->toplevel;
 
   /* clear the list of attributes */
   liststore = (GtkListStore*)gtk_tree_view_get_model (multiattrib->treeview);

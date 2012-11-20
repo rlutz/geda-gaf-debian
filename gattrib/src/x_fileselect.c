@@ -139,7 +139,7 @@ x_fileselect_load_files (GSList *filenames)
 
     s_page_goto (pr_current, s_page_new (pr_current, string));
 
-    if(s_toplevel_read_page(string) == 0) {
+    if(s_toplevel_read_page(pr_current, string) == 0) {
        fprintf(stderr, "Couldn't load schematic [%s]\n", string);
        return FALSE;
     }
@@ -303,7 +303,7 @@ x_fileselect_save (void)
 
     /* try saving current page of toplevel to file filename */
     if (filename != NULL &&
-        f_save (pr_current, filename)) {
+        f_save (pr_current, pr_current->page_current, filename, NULL)) {
       s_log_message ("Saved As [%s]\n", filename);
 
       /* replace page filename with new one, do not free filename */

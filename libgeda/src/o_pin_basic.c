@@ -32,9 +32,6 @@
  *  \brief functions for the pin object
  */
 
-/*! Default setting for pin draw function. */
-void (*pin_draw_func)() = NULL;
-
 /*! \brief calculate and return the boundaries of a pin object
  *  \par Function Description
  *  This function calculates the object boudaries of a pin \a object.
@@ -105,15 +102,7 @@ OBJECT *o_pin_new(TOPLEVEL *toplevel,
 
   o_pin_recalc (toplevel, new_node);
 
-  new_node->draw_func = pin_draw_func;  
-  new_node->sel_func = select_func;  
-
   new_node->whichend = whichend;
-  
-  if (!toplevel->ADDING_SEL) {
-    s_tile_add_object (toplevel, new_node);
-    s_conn_update_object (toplevel, new_node);
-  }
 
   return new_node;
 }
@@ -150,14 +139,13 @@ void o_pin_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
  *  allocated and appended to the \a object_list.
  *
  *  \param [in] toplevel     The TOPLEVEL object
- *  \param [in] object_list  list of OBJECTS to append a new pin
  *  \param [in] buf          a text buffer (usually a line of a schematic file)
  *  \param [in] release_ver  The release number gEDA
  *  \param [in] fileformat_ver a integer value of the file format
- *  \return The object list
+ *  \return The object list, or NULL on error.
  */
-OBJECT *o_pin_read (TOPLEVEL *toplevel, char buf[],
-                    unsigned int release_ver, unsigned int fileformat_ver)
+OBJECT *o_pin_read (TOPLEVEL *toplevel, const char buf[],
+                    unsigned int release_ver, unsigned int fileformat_ver, GError **err)
 {
   OBJECT *new_obj;
   char type; 
@@ -168,12 +156,18 @@ OBJECT *o_pin_read (TOPLEVEL *toplevel, char buf[],
   int whichend;
 
   if (release_ver <= VERSION_20020825) {
-    sscanf (buf, "%c %d %d %d %d %d\n", &type, &x1, &y1, &x2, &y2, &color);
+    if (sscanf (buf, "%c %d %d %d %d %d\n", &type, &x1, &y1, &x2, &y2, &color) != 6) {
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse pin object"));
+      return NULL;
+    }
     pin_type = PIN_TYPE_NET;
     whichend = -1;
   } else {
-    sscanf (buf, "%c %d %d %d %d %d %d %d\n", &type, &x1, &y1, &x2, &y2,
-            &color, &pin_type, &whichend);
+    if (sscanf (buf, "%c %d %d %d %d %d %d %d\n", &type, &x1, &y1, &x2, &y2,
+		&color, &pin_type, &whichend) != 8) {
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse pin object"));
+      return NULL;
+    }
   }
 
   if (whichend == -1) {
@@ -183,10 +177,6 @@ OBJECT *o_pin_read (TOPLEVEL *toplevel, char buf[],
     s_log_message (_("Found an invalid whichend on a pin (reseting to zero): %d\n"),
                    whichend);
     whichend = 0;
-  }
-
-  if (x1 == x2 && y1 == y2) {
-    s_log_message (_("Found a zero length pin: [ %s ]\n"), buf);
   }
 
   if (color < 0 || color > MAX_COLORS) {
@@ -210,10 +200,11 @@ OBJECT *o_pin_read (TOPLEVEL *toplevel, char buf[],
  *  This function takes a pin \a object and return a string
  *  according to the file format definition.
  *
+ *  \param [in] toplevel  a TOPLEVEL structure
  *  \param [in] object  a pin OBJECT
  *  \return the string representation of the pin OBJECT
  */
-char *o_pin_save(OBJECT *object)
+char *o_pin_save(TOPLEVEL *toplevel, OBJECT *object)
 {
   int x1, x2, y1, y2;
   int pin_type, whichend;
@@ -243,9 +234,6 @@ char *o_pin_save(OBJECT *object)
  */
 void o_pin_translate_world(TOPLEVEL *toplevel, int dx, int dy, OBJECT *object)
 {
-  if (object == NULL) printf("ptw NO!\n");
-
-
   /* Update world coords */
   object->line->x[0] = object->line->x[0] + dx;
   object->line->y[0] = object->line->y[0] + dy;
@@ -567,10 +555,11 @@ void o_pin_update_whichend(TOPLEVEL *toplevel,
  *
  *  \param [in] toplevel   The TOPLEVEL object
  *  \param [in] o_current  The pin OBJECT being modified
- *  \param [in] type       The new type of this pin
+ *  \param [in] pin_type   The new type of this pin
  */
 void o_pin_set_type (TOPLEVEL *toplevel, OBJECT *o_current, int pin_type)
 {
+  o_emit_pre_change_notify (toplevel, o_current);
   switch (pin_type) {
     default:
       g_critical ("o_pin_set_type: Got invalid pin type %i\n", pin_type);
@@ -584,4 +573,5 @@ void o_pin_set_type (TOPLEVEL *toplevel, OBJECT *o_current, int pin_type)
       o_current->pin_type = PIN_TYPE_BUS;
       break;
   }
+  o_emit_change_notify (toplevel, o_current);
 }

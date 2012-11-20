@@ -29,7 +29,7 @@
 #endif
 
 #define GET_BOX_WIDTH(w)  abs((w)->second_wx - (w)->first_wx)
-#define GET_BOX_HEIGHT(w) abs((w)->second_wy - (w)->second_wy)
+#define GET_BOX_HEIGHT(w) abs((w)->second_wy - (w)->first_wy)
 
 #define GET_PICTURE_WIDTH(w)			\
   abs((w)->second_wx - (w)->first_wx) 
@@ -523,91 +523,6 @@ OBJECT *o_grips_search_line_world(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
   return NULL;
 }
 
-/*! \brief Start process of modifiying one grip.
- *  \par Function Description
- *  This function starts the process of modifying one grip of an object
- *  on the current sheet. The event occured in (<B>w_x</B>,<B>w_y</B>) in world unit.
- *  If this position is related to a grip of an object, the function
- *  prepares the modification of this grip thanks to the user input.
- *
- *  The function returns <B>FALSE</B> if an error occured or if no grip
- *  have been found under (<B>w_x</B>,<B>w_y</B>). It returns <B>TRUE</B> if a grip
- *  has been found and modification of the object has been started.
- *
- *  If a grip has been found, this function modifies the GSCHEM_TOPLEVEL
- *  variables <B>which_grip</B> and <B>which_object</B> with the identifier
- *  of the grip and the object it belongs to respectively.
- *
- *  \param [in]  w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in]  w_x        Current x coordinate of pointer in world units.
- *  \param [in]  w_y        Current y coordinate of pointer in world units.
- *  \return FALSE if an error occurred or no grip was found, TRUE otherwise.
- */
-int o_grips_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
-{
-  OBJECT *object;
-  int whichone;
-
-  if (w_current->draw_grips == FALSE) {
-    return(FALSE);
-  }
-
-  /* search if there is a grip on a selected object at (w_x,w_y) */
-  object = o_grips_search_world(w_current, w_x, w_y, &whichone);
-
-  if (object == NULL)
-    return FALSE;
-
-  w_current->which_grip = whichone;
-  w_current->which_object = object;
-
-  /* Switch off drawing for the object being modified */
-  object->dont_redraw = TRUE;
-
-  /* there is one */
-  /* depending on its type, start the modification process */
-  switch(object->type) {
-    case(OBJ_ARC):
-      /* start the modification of a grip on an arc */
-      o_grips_start_arc(w_current, object, w_x, w_y, whichone);
-      return(TRUE);
-
-    case(OBJ_BOX):
-      /* start the modification of a grip on a box */
-      o_grips_start_box(w_current, object, w_x, w_y, whichone);
-      return(TRUE);
-
-    case(OBJ_PATH):
-      /* start the modification of a grip on a path */
-      o_grips_start_path(w_current, object, w_x, w_y, whichone);
-      return(TRUE);
-
-    case(OBJ_PICTURE):
-      /* start the modification of a grip on a picture */
-      o_grips_start_picture(w_current, object, w_x, w_y, whichone);
-      return(TRUE);
-
-    case(OBJ_CIRCLE):
-      /* start the modification of a grip on a circle */
-      o_grips_start_circle(w_current, object, w_x, w_y, whichone);
-      return(TRUE);
-
-    case(OBJ_LINE):
-    case(OBJ_NET):
-    case(OBJ_PIN):
-    case(OBJ_BUS):
-      /* identical for line/net/pin/bus */
-      /* start the modification of a grip on a line */
-      o_grips_start_line(w_current, object, w_x, w_y, whichone);
-      return(TRUE);
-
-    default:
-      /* object type unknown : error condition */
-      return(FALSE);
-  }
-  return(FALSE);
-}
-
 /*! \brief Initialize grip motion process for an arc.
  *  \par Function Description
  *  This function initializes the grip motion process for an arc.
@@ -633,13 +548,10 @@ int o_grips_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
  *  \param [in]  y          (unused)
  *  \param [out] whichone   (unused)
  */
-void o_grips_start_arc(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
-                       int x, int y, int whichone)
+static void o_grips_start_arc(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                              int x, int y, int whichone)
 {
   w_current->last_drawb_mode = LAST_DRAWB_MODE_NONE;
-
-  /* erase the arc before */
-  o_invalidate (w_current, o_current);
 
   /* describe the arc with GSCHEM_TOPLEVEL variables */
   /* center */
@@ -677,13 +589,10 @@ void o_grips_start_arc(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
  *  \param [in]  y          (unused)
  *  \param [out] whichone   Which coordinate to check.
  */
-void o_grips_start_box(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
-                       int x, int y, int whichone)
+static void o_grips_start_box(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                              int x, int y, int whichone)
 {
   w_current->last_drawb_mode = LAST_DRAWB_MODE_NONE;
-
-  /* erase the box before */
-  o_invalidate (w_current, o_current);
 
   /* (second_wx, second_wy) is the selected corner */
   /* (first_wx, first_wy) is the opposite corner */
@@ -743,8 +652,8 @@ void o_grips_start_box(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
  *  \param [in]  y          (unused)
  *  \param [out] whichone   Which coordinate to check.
  */
-void o_grips_start_path(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
-                           int x, int y, int whichone)
+static void o_grips_start_path(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                               int x, int y, int whichone)
 {
   PATH_SECTION *section;
   int i;
@@ -753,9 +662,6 @@ void o_grips_start_path(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
   int gy = -1;
 
   w_current->last_drawb_mode = -1;
-
-  /* erase the path before */
-  o_invalidate (w_current, o_current);
 
   for (i = 0; i <  o_current->path->num_sections; i++) {
     section = &o_current->path->sections[i];
@@ -816,16 +722,16 @@ void o_grips_start_path(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
  *  \param [in]  y          (unused)
  *  \param [out] whichone   Which coordinate to check.
  */
-void o_grips_start_picture(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
-                           int x, int y, int whichone)
+static void o_grips_start_picture(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                                  int x, int y, int whichone)
 {
+  TOPLEVEL *toplevel = w_current->toplevel;
   w_current->last_drawb_mode = LAST_DRAWB_MODE_NONE;
 
-  /* erase the picture before */
-  o_invalidate (w_current, o_current);
-  w_current->current_pixbuf = o_current->picture->pixbuf;
-  w_current->pixbuf_filename = o_current->picture->filename;
-  w_current->pixbuf_wh_ratio = o_current->picture->ratio;
+  w_current->current_pixbuf = o_picture_get_pixbuf (toplevel, o_current);
+  w_current->pixbuf_filename =
+    g_strdup (o_picture_get_filename (toplevel, o_current));
+  w_current->pixbuf_wh_ratio = o_picture_get_ratio (toplevel, o_current);
 
   /* (second_wx,second_wy) is the selected corner */
   /* (first_wx, first_wy) is the opposite corner */
@@ -876,7 +782,7 @@ void o_grips_start_picture(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
  *  (<B>w_current->first_wx</B>,<B>w_current->first_wy</B>). They are not suppose
  *  to change during the action.
  *
- *  The radius of the circle is stored in <B>w_current->distance<B>.
+ *  The radius of the circle is stored in <B>w_current->distance</B>.
  *
  *  \param [in]  w_current  The GSCHEM_TOPLEVEL object.
  *  \param [in]  o_current  Circle OBJECT to check.
@@ -884,14 +790,11 @@ void o_grips_start_picture(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
  *  \param [in]  y          (unused)
  *  \param [out] whichone   Which coordinate to check.
  */
-void o_grips_start_circle(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
-                          int x, int y, int whichone)
+static void o_grips_start_circle(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                                 int x, int y, int whichone)
 {
 
   w_current->last_drawb_mode = LAST_DRAWB_MODE_NONE;
-
-  /* erase the circle before */
-  o_invalidate (w_current, o_current);
 
   /* store circle center and radius in GSCHEM_TOPLEVEL structure */
   w_current->first_wx = o_current->circle->center_x;
@@ -920,13 +823,10 @@ void o_grips_start_circle(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
  *  \param [in]  y          (unused)
  *  \param [out] whichone   Which coordinate to check.
  */
-void o_grips_start_line(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
-                        int x, int y, int whichone)
+static void o_grips_start_line(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                               int x, int y, int whichone)
 {
   w_current->last_drawb_mode = LAST_DRAWB_MODE_NONE;
-
-  /* erase the line before */
-  o_invalidate (w_current, o_current);
 
   /* describe the line with GSCHEM_TOPLEVEL variables */
   w_current->second_wx = o_current->line->x[whichone];
@@ -937,6 +837,92 @@ void o_grips_start_line(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
   /* draw the first temporary line */
   /* o_line_invalidate_rubber (w_current); */
   w_current->rubber_visible = 1;
+}
+
+/*! \brief Start process of modifiying one grip.
+ *  \par Function Description
+ *  This function starts the process of modifying one grip of an object
+ *  on the current sheet. The event occured in (<B>w_x</B>,<B>w_y</B>) in world unit.
+ *  If this position is related to a grip of an object, the function
+ *  prepares the modification of this grip thanks to the user input.
+ *
+ *  The function returns <B>FALSE</B> if an error occured or if no grip
+ *  have been found under (<B>w_x</B>,<B>w_y</B>). It returns <B>TRUE</B> if a grip
+ *  has been found and modification of the object has been started.
+ *
+ *  If a grip has been found, this function modifies the GSCHEM_TOPLEVEL
+ *  variables <B>which_grip</B> and <B>which_object</B> with the identifier
+ *  of the grip and the object it belongs to respectively.
+ *
+ *  \param [in]  w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in]  w_x        Current x coordinate of pointer in world units.
+ *  \param [in]  w_y        Current y coordinate of pointer in world units.
+ *  \return FALSE if an error occurred or no grip was found, TRUE otherwise.
+ */
+int o_grips_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+{
+  OBJECT *object;
+  int whichone;
+
+  if (w_current->draw_grips == FALSE) {
+    return(FALSE);
+  }
+
+  /* search if there is a grip on a selected object at (w_x,w_y) */
+  object = o_grips_search_world(w_current, w_x, w_y, &whichone);
+
+  if (object == NULL)
+    return FALSE;
+
+  w_current->which_grip = whichone;
+  w_current->which_object = object;
+
+  /* Switch off drawing for the object being modified */
+  object->dont_redraw = TRUE;
+  o_invalidate (w_current, object);
+
+  /* there is one */
+  /* depending on its type, start the modification process */
+  switch(object->type) {
+    case(OBJ_ARC):
+      /* start the modification of a grip on an arc */
+      o_grips_start_arc(w_current, object, w_x, w_y, whichone);
+      return(TRUE);
+
+    case(OBJ_BOX):
+      /* start the modification of a grip on a box */
+      o_grips_start_box(w_current, object, w_x, w_y, whichone);
+      return(TRUE);
+
+    case(OBJ_PATH):
+      /* start the modification of a grip on a path */
+      o_grips_start_path(w_current, object, w_x, w_y, whichone);
+      return(TRUE);
+
+    case(OBJ_PICTURE):
+      /* start the modification of a grip on a picture */
+      o_grips_start_picture(w_current, object, w_x, w_y, whichone);
+      return(TRUE);
+
+    case(OBJ_CIRCLE):
+      /* start the modification of a grip on a circle */
+      o_grips_start_circle(w_current, object, w_x, w_y, whichone);
+      return(TRUE);
+
+    case(OBJ_LINE):
+    case(OBJ_NET):
+    case(OBJ_PIN):
+    case(OBJ_BUS):
+      /* identical for line/net/pin/bus */
+      /* start the modification of a grip on a line */
+      o_grips_start_line(w_current, object, w_x, w_y, whichone);
+      return(TRUE);
+
+    default:
+      /* object type unknown : error condition */
+      return(FALSE);
+  }
+  return(FALSE);
 }
 
 /*! \brief Modify previously selected object according to mouse position.
@@ -997,6 +983,351 @@ void o_grips_motion(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
 }
 
 
+/*! \brief Cancel process of modifying object with grip.
+ *
+ *  \par Function Description
+ *  This function cancels the process of modifying a parameter
+ *  of an object with a grip. It's main utility is to reset the
+ *  dont_redraw flag on the object which was being modified.
+ *
+ *  \param [in,out] w_current  The GSCHEM_TOPLEVEL object.
+ */
+void o_grips_cancel(GSCHEM_TOPLEVEL *w_current)
+{
+  OBJECT *object = w_current->which_object;
+
+  /* reset global variables */
+  w_current->which_grip = -1;
+  w_current->which_object = NULL;
+  w_current->rubber_visible = 0;
+
+  /* Switch drawing of the object back on */
+  g_return_if_fail (object != NULL);
+  object->dont_redraw = FALSE;
+}
+
+
+/*! \brief End process of modifying arc object with grip.
+ *  \par Function Description
+ *  This function ends the grips process specific to an arc object. It erases
+ *  the old arc and write back to the object the new parameters of the arc.
+ *  Depending on the grip selected and moved, the right fields are updated.
+ *  The function handles the conversion from screen unit to world unit before
+ *  updating and redrawing.
+ *
+ *  If the grip at the center of the arc has been moved - modifying the radius
+ *  of the arc -, the new radius is calculated expressed in world unit
+ *  (the center is unchanged). It is updated with the function #o_arc_modify().
+ *
+ *  If one of the end of arc grip has been moved - modifying one of the
+ *  angles describing the arc -, this angle is updated with the
+ *  #o_arc_modify() function.
+ *
+ *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] o_current  Arc OBJECT to end modification on.
+ *  \param [in] whichone   Which grip is pointed to.
+ */
+static void o_grips_end_arc(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                            int whichone)
+{
+  TOPLEVEL *toplevel = w_current->toplevel;
+  int arg1, arg2;
+
+  /* erase the temporary arc */
+  /* o_arc_invalidate_rubber (w_current); */
+
+  /* determination of the parameters to give to o_arc_modify() */
+  switch(whichone) {
+    case ARC_RADIUS:
+      /* get the radius from w_current */
+      arg1 = w_current->distance;
+      /* second parameter is not used */
+      arg2 = -1;
+      break;
+
+    case ARC_START_ANGLE:
+      /* get the start angle from w_current */
+      arg1 = w_current->second_wx;
+      /* second parameter is not used */
+      arg2 = -1;
+      break;
+
+    case ARC_END_ANGLE:
+      /* get the end angle from w_current */
+      arg1 = w_current->second_wy;
+      /* second parameter is not used */
+      arg2 = -1;
+      break;
+
+    default:
+      return;
+  }
+
+  /* modify the arc with the parameters determined above */
+  o_arc_modify(toplevel, o_current, arg1, arg2, whichone);
+}
+
+/*! \todo Finish function documentation!!!
+ *  \brief End process of modifying box object with grip.
+ *  \par Function Description
+ *
+ *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] o_current  Box OBJECT to end modification on.
+ *  \param [in] whichone   Which grip is pointed to.
+ */
+static void o_grips_end_box(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                            int whichone)
+{
+  TOPLEVEL *toplevel = w_current->toplevel;
+  int box_width, box_height;
+
+  box_width  = GET_BOX_WIDTH (w_current);
+  box_height = GET_BOX_HEIGHT(w_current);
+
+  /* don't allow zero width/height boxes
+   * this ends the box drawing behavior
+   * we want this? hack */
+  if ((box_width == 0) || (box_height == 0)) {
+    o_box_invalidate_rubber (w_current);
+    o_invalidate (w_current, o_current);
+    return;
+  }
+
+  o_box_modify(toplevel, o_current, w_current->second_wx, w_current->second_wy, whichone);
+}
+
+/*! \todo Finish function documentation!!!
+ *  \brief End process of modifying path object with grip.
+ *  \par Function Description
+ *
+ *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] o_current  Picture OBJECT to end modification on.
+ *  \param [in] whichone   Which grip is pointed to.
+ */
+static void o_grips_end_path(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                             int whichone)
+{
+  o_path_modify (w_current->toplevel, o_current,
+                 w_current->second_wx, w_current->second_wy, whichone);
+}
+
+/*! \todo Finish function documentation!!!
+ *  \brief End process of modifying picture object with grip.
+ *  \par Function Description
+ *
+ *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] o_current  Picture OBJECT to end modification on.
+ *  \param [in] whichone   Which grip is pointed to.
+ */
+static void o_grips_end_picture(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                                int whichone)
+{
+  TOPLEVEL *toplevel = w_current->toplevel;
+
+  /* don't allow zero width/height picturees
+   * this ends the picture drawing behavior
+   * we want this? hack */
+  if ((GET_PICTURE_WIDTH(w_current) == 0) || (GET_PICTURE_HEIGHT(w_current) == 0)) {
+    o_picture_invalidate_rubber (w_current);
+    o_invalidate (w_current, o_current);
+    return;
+  }
+
+  o_picture_modify(toplevel, o_current, 
+		   w_current->second_wx, w_current->second_wy, whichone);
+
+  g_object_unref (w_current->current_pixbuf);
+  w_current->current_pixbuf = NULL;
+  g_free (w_current->pixbuf_filename);
+  w_current->pixbuf_filename = NULL;
+  w_current->pixbuf_wh_ratio = 0;
+}
+
+/*! \brief End process of modifying circle object with grip.
+ *  \par Function Description
+ *  This function ends the process of modifying the radius of the circle
+ *  object <B>*o_current</B>.
+ *  The modified circle is finally normally drawn.
+ *
+ *  A circle with a null radius is not allowed. In this case, the process
+ *  is stopped and the circle is left unchanged.
+ *
+ *  The last value of the radius is in <B>w_current->distance</B> in screen units.
+ *
+ *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] o_current  Circle OBJECT to end modification on.
+ *  \param [in] whichone   Which grip is pointed to.
+ */
+static void o_grips_end_circle(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                               int whichone)
+{
+  TOPLEVEL *toplevel = w_current->toplevel;
+
+  /* don't allow zero radius circles
+   * this ends the circle drawing behavior
+   * we want this? hack */
+  if (w_current->distance == 0) {
+    o_circle_invalidate_rubber (w_current);
+    o_invalidate (w_current, o_current);
+    return;
+  }
+
+  /* modify the radius of the circle */
+  o_circle_modify(toplevel, o_current, w_current->distance, -1, CIRCLE_RADIUS);
+}
+
+/*! \brief End process of modifying line object with grip.
+ *  \par Function Description
+ *  This function ends the process of modifying one end of the line
+ *  object <B>*o_current</B>.
+ *  This end is identified by <B>whichone</B>. The line object is modified
+ *  according to the <B>whichone</B> parameter and the last position of the
+ *  line end.
+ *  The modified line is finally normally drawn.
+ *
+ *  A line with a null width, i.e. when both ends are identical, is not
+ *  allowed. In this case, the process is stopped and the line unchanged.
+ *
+ *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] o_current  Line OBJECT to end modification on.
+ *  \param [in] whichone   Which grip is pointed to.
+ */
+static void o_grips_end_line(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                             int whichone)
+{
+  TOPLEVEL *toplevel = w_current->toplevel;
+
+  /* don't allow zero length nets / lines / pins
+   * this ends the net drawing behavior
+   * we want this? hack */
+  if ((w_current->first_wx == w_current->second_wx) &&
+      (w_current->first_wy == w_current->second_wy)) {
+    o_box_invalidate_rubber (w_current);
+    o_invalidate (w_current, o_current);
+    return;
+  }
+
+  /* modify the right line end according to whichone */
+  o_line_modify(toplevel, o_current, 
+		w_current->second_wx, w_current->second_wy, whichone);
+}
+
+
+/*! \brief End process of modifying net object with grip.
+ *  \par Function Description
+ *  This function ends the process of modifying one end of the net
+ *  object <B>*o_current</B>.
+ *  This end is identified by <B>whichone</B>. The line object is modified
+ *  according to the <B>whichone</B> parameter and the last position of the
+ *  line end.
+ *  The connections to the modified net are checked and recreated if neccessary.
+ *
+ *  A net with zero length, i.e. when both ends are identical, is not
+ *  allowed. In this case, the process is stopped and the line unchanged.
+ *
+ *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] o_current  Net OBJECT to end modification on.
+ *  \param [in] whichone   Which grip is pointed to.
+ */
+static void o_grips_end_net(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                            int whichone)
+{
+  TOPLEVEL *toplevel = w_current->toplevel;
+  GList *connected_objects;
+
+  /* don't allow zero length net
+   * this ends the net drawing behavior
+   * we want this? hack */
+  if ((w_current->first_wx == w_current->second_wx) &&
+      (w_current->first_wy == w_current->second_wy)) {
+    o_invalidate (w_current, o_current);
+    return;
+  }
+
+  s_conn_remove_object (toplevel, o_current);
+  o_net_modify (toplevel, o_current, w_current->second_wx,
+                w_current->second_wy, w_current->which_grip);
+  s_conn_update_object (toplevel, o_current);
+
+  /* add bus rippers if necessary */
+  connected_objects = s_conn_return_others (NULL, o_current);
+  o_net_add_busrippers (w_current, o_current, connected_objects);
+  g_list_free (connected_objects);
+}
+
+/*! \brief End process of modifying pin object with grip.
+ *  \par Function Description
+ *  This function ends the process of modifying one end of the pin
+ *  object <B>*o_current</B>.
+ *  This end is identified by <B>whichone</B>. The pin object is modified
+ *  according to the <B>whichone</B> parameter and the last position of the
+ *  pin end.
+ *  The connections to the modified pin are checked and recreated if neccessary.
+ *
+ *  A pin with zero length, i.e. when both ends are identical, is not
+ *  allowed. In this case, the process is stopped and the line unchanged.
+ *
+ *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] o_current  Net OBJECT to end modification on.
+ *  \param [in] whichone   Which grip is pointed to.
+ */
+static void o_grips_end_pin(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                            int whichone)
+{
+  TOPLEVEL *toplevel = w_current->toplevel;
+
+  /* don't allow zero length pin
+   * this ends the pin changing behavior
+   * we want this? hack */
+  if ((w_current->first_wx == w_current->second_wx) &&
+      (w_current->first_wy == w_current->second_wy)) {
+    o_invalidate (w_current, o_current);
+    return;
+  }
+
+  s_conn_remove_object (toplevel, o_current);
+  o_pin_modify (toplevel, o_current, w_current->second_wx,
+                w_current->second_wy, w_current->which_grip);
+  s_conn_update_object (toplevel, o_current);
+}
+
+/*! \brief End process of modifying bus object with grip.
+ *  \par Function Description
+ *  This function ends the process of modifying one end of the bus
+ *  object <B>*o_current</B>.
+ *  This end is identified by <B>whichone</B>. The line object is modified
+ *  according to the <B>whichone</B> parameter and the last position of the
+ *  bus end.
+ *  The connections to the modified bus are checked and recreated if neccessary.
+ *
+ *  A bus with zero length, i.e. when both ends are identical, is not
+ *  allowed. In this case, the process is stopped and the bus unchanged.
+ *
+ *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] o_current  bus OBJECT to end modification on.
+ *  \param [in] whichone   Which grip is pointed to.
+ */
+static void o_grips_end_bus(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
+                            int whichone)
+{
+  TOPLEVEL *toplevel = w_current->toplevel;
+
+  /* don't allow zero length bus
+   * this ends the bus changing behavior
+   * we want this? hack */
+  if ((w_current->first_wx == w_current->second_wx) &&
+      (w_current->first_wy == w_current->second_wy)) {
+    o_invalidate (w_current, o_current);
+    return;
+  }
+
+  s_conn_remove_object (toplevel, o_current);
+  o_bus_modify (toplevel, o_current, w_current->second_wx,
+                w_current->second_wy, w_current->which_grip);
+  s_conn_update_object (toplevel, o_current);
+}
+
+
 /*! \brief End process of modifying object with grip.
  *  \par Function Description
  *  This function ends the process of modifying a parameter of an object
@@ -1028,9 +1359,6 @@ void o_grips_end(GSCHEM_TOPLEVEL *w_current)
     i_set_state(w_current, SELECT);
     return;
   }
-
-  /* Switch drawing of the object back on */
-  object->dont_redraw = FALSE;
 
   switch(object->type) {
 
@@ -1083,6 +1411,10 @@ void o_grips_end(GSCHEM_TOPLEVEL *w_current)
     return;
   }
 
+  /* Switch drawing of the object back on */
+  object->dont_redraw = FALSE;
+  o_invalidate (w_current, object);
+
   /* reset global variables */
   w_current->which_grip = -1;
   w_current->which_object = NULL;
@@ -1091,450 +1423,6 @@ void o_grips_end(GSCHEM_TOPLEVEL *w_current)
 
   toplevel->page_current->CHANGED=1;
   o_undo_savestate(w_current, UNDO_ALL);
-}
-
-
-/*! \brief Cancel process of modifying object with grip.
- *
- *  \par Function Description
- *  This function cancels the process of modifying a parameter
- *  of an object with a grip. It's main utility is to reset the
- *  dont_redraw flag on the object which was being modified.
- *
- *  \param [in,out] w_current  The GSCHEM_TOPLEVEL object.
- */
-void o_grips_cancel(GSCHEM_TOPLEVEL *w_current)
-{
-  OBJECT *object = w_current->which_object;
-
-  /* reset global variables */
-  w_current->which_grip = -1;
-  w_current->which_object = NULL;
-  w_current->rubber_visible = 0;
-
-  /* Switch drawing of the object back on */
-  g_return_if_fail (object != NULL);
-  object->dont_redraw = FALSE;
-}
-
-
-/*! \brief End process of modifying arc object with grip.
- *  \par Function Description
- *  This function ends the grips process specific to an arc object. It erases
- *  the old arc and write back to the object the new parameters of the arc.
- *  Depending on the grip selected and moved, the right fields are updated.
- *  The function handles the conversion from screen unit to world unit before
- *  updating and redrawing.
- *
- *  If the grip at the center of the arc has been moved - modifying the radius
- *  of the arc -, the new radius is calculated expressed in world unit
- *  (the center is unchanged). It is updated with the function #o_arc_modify().
- *
- *  If one of the end of arc grip has been moved - modifying one of the
- *  angles describing the arc -, this angle is updated with the
- *  #o_arc_modify() function.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  Arc OBJECT to end modification on.
- *  \param [in] whichone   Which grip is pointed to.
- */
-void o_grips_end_arc(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int arg1, arg2;
-
-  /* erase the temporary arc */
-  /* o_arc_invalidate_rubber (w_current); */
-
-  /* determination of the parameters to give to o_arc_modify() */
-  switch(whichone) {
-    case ARC_RADIUS:
-      /* get the radius from w_current */
-      arg1 = w_current->distance;
-      /* second parameter is not used */
-      arg2 = -1;
-      break;
-
-    case ARC_START_ANGLE:
-      /* get the start angle from w_current */
-      arg1 = w_current->second_wx;
-      /* second parameter is not used */
-      arg2 = -1;
-      break;
-
-    case ARC_END_ANGLE:
-      /* get the end angle from w_current */
-      arg1 = w_current->second_wy;
-      /* second parameter is not used */
-      arg2 = -1;
-      break;
-
-    default:
-      return;
-  }
-
-  /* modify the arc with the parameters determined above */
-  o_arc_modify(toplevel, o_current, arg1, arg2, whichone);
-
-  /* display the new arc */
-  o_invalidate (w_current, o_current);
-
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief End process of modifying box object with grip.
- *  \par Function Description
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  Box OBJECT to end modification on.
- *  \param [in] whichone   Which grip is pointed to.
- */
-void o_grips_end_box(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int box_width, box_height;
-
-  box_width  = GET_BOX_WIDTH (w_current);
-  box_height = GET_BOX_HEIGHT(w_current);
-
-  /* don't allow zero width/height boxes
-   * this ends the box drawing behavior
-   * we want this? hack */
-  if ((box_width == 0) && (box_height == 0)) {
-    o_invalidate (w_current, o_current);
-    return;
-  }
-
-  o_box_modify(toplevel, o_current, w_current->second_wx, w_current->second_wy, whichone);
-
-  /* erase the temporary box */
-  /* o_box_invalidate_rubber (w_current); */
-
-  /* draw the modified box */
-  o_invalidate (w_current, o_current);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief End process of modifying path object with grip.
- *  \par Function Description
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  Picture OBJECT to end modification on.
- *  \param [in] whichone   Which grip is pointed to.
- */
-void o_grips_end_path(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone)
-{
-  /* erase the temporary path */
-  /* if (w_current->rubber_visible) */
-  /*  o_path_invalidate_rubber (w_current); */
-
-  o_path_modify (w_current->toplevel, o_current,
-                 w_current->second_wx, w_current->second_wy, whichone);
-
-  /* draw the modified path */
-  o_invalidate (w_current, o_current);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief End process of modifying picture object with grip.
- *  \par Function Description
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  Picture OBJECT to end modification on.
- *  \param [in] whichone   Which grip is pointed to.
- */
-void o_grips_end_picture(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-
-  /* erase the temporary picture */
-  /* o_picture_invalidate_rubber (w_current); */
-
-  /* don't allow zero width/height picturees
-   * this ends the picture drawing behavior
-   * we want this? hack */
-  if ((GET_PICTURE_WIDTH(w_current) == 0) || (GET_PICTURE_HEIGHT(w_current) == 0)) {
-    o_invalidate (w_current, o_current);
-    return;
-  }
-
-  o_picture_modify(toplevel, o_current, 
-		   w_current->second_wx, w_current->second_wy, whichone);
-
-  /* draw the modified picture */
-  o_invalidate (w_current, o_current);
-
-  w_current->current_pixbuf = NULL;
-  w_current->pixbuf_filename = NULL;
-  w_current->pixbuf_wh_ratio = 0;
-}
-
-/*! \brief End process of modifying circle object with grip.
- *  \par Function Description
- *  This function ends the process of modifying the radius of the circle
- *  object <B>*o_current</B>.
- *  The modified circle is finally normally drawn.
- *
- *  A circle with a null radius is not allowed. In this case, the process
- *  is stopped and the circle is left unchanged.
- *
- *  The last value of the radius is in <B>w_current->distance</B> in screen units.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  Circle OBJECT to end modification on.
- *  \param [in] whichone   Which grip is pointed to.
- */
-void o_grips_end_circle(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-
-  /* erase the temporary circle */
-  /* o_circle_invalidate_rubber (w_current); */
-
-  /* don't allow zero radius circles
-   * this ends the circle drawing behavior
-   * we want this? hack */
-  if (w_current->distance == 0) {
-    o_invalidate (w_current, o_current);
-    return;
-  }
-
-  /* modify the radius of the circle */
-  o_circle_modify(toplevel, o_current, w_current->distance, -1, CIRCLE_RADIUS);
-
-  /* display the new circle */
-  o_invalidate (w_current, o_current);
-}
-
-/*! \brief End process of modifying line object with grip.
- *  \par Function Description
- *  This function ends the process of modifying one end of the line
- *  object <B>*o_current</B>.
- *  This end is identified by <B>whichone</B>. The line object is modified
- *  according to the <B>whichone</B> parameter and the last position of the
- *  line end.
- *  The modified line is finally normally drawn.
- *
- *  A line with a null width, i.e. when both ends are identical, is not
- *  allowed. In this case, the process is stopped and the line unchanged.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  Line OBJECT to end modification on.
- *  \param [in] whichone   Which grip is pointed to.
- */
-void o_grips_end_line(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-
-  /* erase the temporary line */
-  /* o_line_invalidate_rubber (w_current); */
-
-  /* don't allow zero length nets / lines / pins
-   * this ends the net drawing behavior
-   * we want this? hack */
-  if ((w_current->first_wx == w_current->second_wx) &&
-      (w_current->first_wy == w_current->second_wy)) {
-    o_invalidate (w_current, o_current);
-    return;
-  }
-
-  /* modify the right line end according to whichone */
-  o_line_modify(toplevel, o_current, 
-		w_current->second_wx, w_current->second_wy, whichone);
-
-  /* display the new line */
-  o_invalidate (w_current, o_current);
-}
-
-
-/*! \brief End process of modifying net object with grip.
- *  \par Function Description
- *  This function ends the process of modifying one end of the net
- *  object <B>*o_current</B>.
- *  This end is identified by <B>whichone</B>. The line object is modified
- *  according to the <B>whichone</B> parameter and the last position of the
- *  line end.
- *  The connections to the modified net are checked and recreated if neccessary.
- *
- *  A net with zero length, i.e. when both ends are identical, is not
- *  allowed. In this case, the process is stopped and the line unchanged.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  Net OBJECT to end modification on.
- *  \param [in] whichone   Which grip is pointed to.
- */
-void o_grips_end_net(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  GList *prev_conn_objects = NULL;
-  GList *connected_objects = NULL;
-
-  /* erase the temporary line */
-  /* o_line_invalidate_rubber (w_current); */
-
-  /* don't allow zero length net
-   * this ends the net drawing behavior
-   * we want this? hack */
-  if ((w_current->first_wx == w_current->second_wx) &&
-      (w_current->first_wy == w_current->second_wy)) {
-    o_invalidate (w_current, o_current);
-    return;
-  }
-
-  /* remove the old net */
-  o_invalidate (w_current, o_current);
-
-  prev_conn_objects = s_conn_return_others (prev_conn_objects, o_current);
-
-  s_conn_remove_object (toplevel, o_current);
-  o_net_modify (toplevel, o_current, w_current->second_wx,
-                w_current->second_wy, w_current->which_grip);
-  s_conn_update_object (toplevel, o_current);
-
-  /* get the other connected objects and redraw them */
-  connected_objects = s_conn_return_others(connected_objects,
-					   o_current);
-  /* add bus rippers if necessary */
-  o_net_add_busrippers(w_current, o_current, connected_objects);
-
-  /* draw the object objects */
-  o_invalidate_glist (w_current, prev_conn_objects);
-  
-  o_invalidate (w_current, o_current);
-  
-  g_list_free(connected_objects);
-  connected_objects = NULL;
-  
-  /* get the other connected objects and redraw them */
-  connected_objects = s_conn_return_others(connected_objects,
-					   o_current);
-  
-  o_invalidate_glist (w_current, connected_objects);
-
-  g_list_free (prev_conn_objects);
-  prev_conn_objects = NULL;
-  g_list_free(connected_objects);
-  connected_objects = NULL;
-}
-
-/*! \brief End process of modifying pin object with grip.
- *  \par Function Description
- *  This function ends the process of modifying one end of the pin
- *  object <B>*o_current</B>.
- *  This end is identified by <B>whichone</B>. The pin object is modified
- *  according to the <B>whichone</B> parameter and the last position of the
- *  pin end.
- *  The connections to the modified pin are checked and recreated if neccessary.
- *
- *  A pin with zero length, i.e. when both ends are identical, is not
- *  allowed. In this case, the process is stopped and the line unchanged.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  Net OBJECT to end modification on.
- *  \param [in] whichone   Which grip is pointed to.
- */
-void o_grips_end_pin(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  GList *prev_conn_objects = NULL;
-  GList *connected_objects = NULL;
-
-  /* erase the temporary line */
-  /* o_line_invalidate_rubber (w_current); */
-
-  /* don't allow zero length pin
-   * this ends the pin changing behavior
-   * we want this? hack */
-  if ((w_current->first_wx == w_current->second_wx) &&
-      (w_current->first_wy == w_current->second_wy)) {
-    o_invalidate (w_current, o_current);
-    return;
-  }
-
-  /* erase old pin object */
-  o_invalidate (w_current, o_current);
-
-  prev_conn_objects = s_conn_return_others (prev_conn_objects, o_current);
-
-  s_conn_remove_object (toplevel, o_current);
-  o_pin_modify (toplevel, o_current, w_current->second_wx,
-                w_current->second_wy, w_current->which_grip);
-  s_conn_update_object (toplevel, o_current);
-  o_invalidate (w_current, o_current);
-
-  /* redraw the object connections */
-  o_invalidate_glist (w_current, prev_conn_objects);
-
-  /* get the other connected objects and redraw them */
-  connected_objects = s_conn_return_others(connected_objects,
-					   o_current);
-  o_invalidate_glist (w_current, connected_objects);
-
-  /* free the two lists */
-  g_list_free (prev_conn_objects);
-  prev_conn_objects = NULL;
-  g_list_free(connected_objects);
-  connected_objects = NULL;
-}
-
-/*! \brief End process of modifying bus object with grip.
- *  \par Function Description
- *  This function ends the process of modifying one end of the bus
- *  object <B>*o_current</B>.
- *  This end is identified by <B>whichone</B>. The line object is modified
- *  according to the <B>whichone</B> parameter and the last position of the
- *  bus end.
- *  The connections to the modified bus are checked and recreated if neccessary.
- *
- *  A bus with zero length, i.e. when both ends are identical, is not
- *  allowed. In this case, the process is stopped and the bus unchanged.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  bus OBJECT to end modification on.
- *  \param [in] whichone   Which grip is pointed to.
- */
-void o_grips_end_bus(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  GList *prev_conn_objects = NULL;
-  GList *connected_objects = NULL;
-
-  /* erase the temporary line */
-  /* o_line_invalidate_rubber (w_current); */
-
-  /* don't allow zero length bus
-   * this ends the bus changing behavior
-   * we want this? hack */
-  if ((w_current->first_wx == w_current->second_wx) &&
-      (w_current->first_wy == w_current->second_wy)) {
-    o_invalidate (w_current, o_current);
-    return;
-  }
-
-  /* erase the old bus and it's cues */
-  o_invalidate (w_current, o_current);
-
-  prev_conn_objects = s_conn_return_others (prev_conn_objects, o_current);
-  s_conn_remove_object (toplevel, o_current);
-
-  o_bus_modify (toplevel, o_current, w_current->second_wx,
-                w_current->second_wy, w_current->which_grip);
-  s_conn_update_object (toplevel, o_current);
-  o_invalidate (w_current, o_current);
-
-  /* redraw the connected objects */
-  o_invalidate_glist (w_current, prev_conn_objects);
-
-  /* get the other connected objects and redraw them */
-  connected_objects = s_conn_return_others(connected_objects,
-					   o_current);
-  o_invalidate_glist (w_current, connected_objects);
-
-  /* free the two lists */
-  g_list_free (prev_conn_objects);
-  prev_conn_objects = NULL;
-  g_list_free(connected_objects);
-  connected_objects = NULL;
 }
 
 
@@ -1581,8 +1469,8 @@ int o_grips_size(GSCHEM_TOPLEVEL *w_current)
  *  <B>x</B> and <B>y</B> are in screen unit.
  *
  *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] x          Center x world coordinate for drawing grip.
- *  \param [in] y          Center y world coordinate for drawing grip.
+ *  \param [in] wx         Center x world coordinate for drawing grip.
+ *  \param [in] wy         Center y world coordinate for drawing grip.
  */
 void o_grips_draw(GSCHEM_TOPLEVEL *w_current, int wx, int wy)
 {
@@ -1613,19 +1501,14 @@ void o_grips_draw(GSCHEM_TOPLEVEL *w_current, int wx, int wy)
     color = SELECT_COLOR;
   }
 
-  /* A grip is a hollow square centered at (<B>x</B>,<B>y</B>)
-   * with a  width / height of 2 * <B>size</B>.
+  /* You can only tell an offset of the grip when it is very small,
+   * at which point, the object it's on is probably drawn 1px wide.
+   * Pass 0 as a hint that we're centering on a "hardware" line.
    */
-  if (toplevel->DONT_REDRAW == 0) {
-    /* You can only tell an offset of the grip when it is very small,
-     * at which point, the object it's on is probably drawn 1px wide.
-     * Pass 0 as a hint that we're centering on a "hardware" line.
-     */
-    gschem_cairo_center_box (w_current, 0, 0, wx, wy, w_size, w_size);
+  gschem_cairo_center_box (w_current, 0, 0, wx, wy, w_size, w_size);
 
-    gschem_cairo_set_source_color (w_current, x_color_lookup (color));
-    gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, 0, -1, -1);
-  }
+  gschem_cairo_set_source_color (w_current, x_color_lookup (color));
+  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, 0, -1, -1);
 }
 
 

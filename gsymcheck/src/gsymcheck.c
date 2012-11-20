@@ -15,7 +15,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02111-1301 USA.
  */
 
 #include <config.h>
@@ -77,7 +78,7 @@ main_prog(void *closure, int argc, char *argv[])
   g_register_funcs();
 
   pr_current = s_toplevel_new ();
-  g_rc_parse(pr_current, "gsymcheckrc", rc_filename);
+  g_rc_parse (pr_current, argv[0], "gsymcheckrc", rc_filename);
 
   i_vars_set(pr_current);
   
@@ -99,6 +100,7 @@ main_prog(void *closure, int argc, char *argv[])
                  s_page_new (pr_current, filename));
 
     if (!f_open (pr_current,
+                 pr_current->page_current,
                  pr_current->page_current->page_filename,
                  &err)) {
       /* Not being able to load a file is apparently a fatal error */

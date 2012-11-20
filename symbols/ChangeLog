@@ -1,4 +1,87 @@
-commit 79a3ead89fac399440055782ab19dafaf2d47eea
+commit f7fab3715f984c374f41d7c2d74fc2802bbb4e7a
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Nov 14 22:58:12 2012 +0000
+
+    Replace references to geda.seul.org with up-to-date URLs.
+    
+    Update lots of links to seul.org to www.geda-project.org, wiki.geda-project.org, gedasymbols.org and www.gnu.org as appropriate.
+
+commit 0e506ebd5d5cc87a7f373b83b24f2ad3c90fd18b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 14:13:22 2011 +0000
+
+    Remove per-tool INSTALL files.
+    
+    Only one top-level INSTALL file is needed, and that is provided by
+    automake.
+
+commit d5d1a98f0e95589c33bff881198cca01a1b08c7e
+Author: Clif Cox <clif@eugeneweb.com>
+Date:   Mon Jun 13 13:38:39 2011 +0100
+
+    Updated the problematic name attributes in some symbols
+    
+    In some gnetlist backends the name=? attributes cause problems because
+    they look like valid attribute values. eg file=? may be mistaken for a
+    valid filepath, and value=? for an actual value. Changing them to
+    name=unknown is one way to solve this problem in the interim. It's now
+    safe to remove the special checks for these "?" like the one in
+    spice-sdb. This patch updates these problematic name=? attributes in
+    some symbols to name=unknown, and removes FIXME code snipit that
+    checked for the ? value in spice-sdb.
+    
+    It also updates gnetlist tests to reflect these changes. Turns out
+    that the test input file TwoStageAmp.sch had a ? in it, which of couse
+    caused problems.  Then when it was removed vams's output changed so it
+    had to be fixed, which wasn't a very clever fix but seems to work.
+    
+    Closes-bug: lp-698741
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 00d62470ba44f61364ff4d6572ce1a31d051b22c
+Author: Clif Cox <clif@eugeneweb.com>
+Date:   Mon Jun 13 13:38:39 2011 +0100
+
+    symbols: Misc attribute encoding errors.
+    
+    Affects-bug: lp-698741
+
+commit 23383c5d04f17d5fd7491f2c631bfc1e3f15e96f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 18 22:29:08 2011 +0000
+
+    Revert "Updated the problematic name attribute in some symbols"
+    
+    This reverts commit 5b1ee0d69f2fad7400f34543c482d51a55ce08c3.
+    
+    This commit broke the gnetlist testsuite, and another approach will
+    need to be found.
+
+commit 5b1ee0d69f2fad7400f34543c482d51a55ce08c3
+Author: Clif Cox <clif@eugeneweb.com>
+Date:   Mon Jan 17 13:15:50 2011 -0800
+
+    Updated the problematic name attribute in some symbols
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+    Closes-bug: lp-698741
+
+commit 1e93f7bea2cbe0fa8887337c261093b55c31dd6d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 3 23:07:25 2011 +0000
+
+    Revert "Remove some CVS keywords."
+    
+    This reverts commit f5ada1de1372bd3772b4f4bd33afa59803c1dade, which
+    was pushed to the repository in error.
+
+commit f5ada1de1372bd3772b4f4bd33afa59803c1dade
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Dec 21 12:37:10 2010 +0000
+
+    Remove some CVS keywords.
+
+commit 84fae3a8201c2d1a5bc3bf4d0f03a0dcc8b3ee86
 Author: Werner Hoch <werner.ho@gmx.de>
 Date:   Tue Oct 6 19:49:34 2009 +0200
 
@@ -6,7 +89,14 @@ Date:   Tue Oct 6 19:49:34 2009 +0200
     
     Reported by Christian Riggenbach <criggenbach@magahugu.net>
     on geda-user mailing list
-    (cherry picked from commit 84fae3a8201c2d1a5bc3bf4d0f03a0dcc8b3ee86)
+
+commit 3388b0e409c091f93b74b481dc76edc636cf00d1
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Fri Jan 2 12:12:39 2009 +0100
+
+    symbols: reworked two pic16 symbols
+    
+    added pinlabel, pintype and attributes. Fixed text alignments.
 
 commit 1d83fae5a612f52affc5252fa3ef3324d01657a1
 Author: Cesar Strauss <cestrauss@gmail.com>

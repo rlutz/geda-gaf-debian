@@ -162,9 +162,10 @@ gboolean f_has_active_autosave (const gchar *filename, GError **err)
  *
  *  \return 0 on failure, 1 on success.
  */
-int f_open(TOPLEVEL *toplevel, const gchar *filename, GError **err)
+int f_open(TOPLEVEL *toplevel, PAGE *page,
+           const gchar *filename, GError **err)
 {
-  return f_open_flags (toplevel, filename,
+  return f_open_flags (toplevel, page, filename,
                        F_OPEN_RC | F_OPEN_CHECK_BACKUP, err);
 }
 
@@ -187,7 +188,8 @@ int f_open(TOPLEVEL *toplevel, const gchar *filename, GError **err)
  *
  *  \return 0 on failure, 1 on success.
  */
-int f_open_flags(TOPLEVEL *toplevel, const gchar *filename,
+int f_open_flags(TOPLEVEL *toplevel, PAGE *page,
+                 const gchar *filename,
                  const gint flags, GError **err)
 {
   int opened=FALSE;
@@ -202,7 +204,7 @@ int f_open_flags(TOPLEVEL *toplevel, const gchar *filename,
   /* has the head been freed yet? */
   /* probably not hack PAGE */
 
-  set_window(toplevel, toplevel->page_current,
+  set_window(toplevel, page,
              toplevel->init_left, toplevel->init_right,
              toplevel->init_top,  toplevel->init_bottom);
 
@@ -222,9 +224,9 @@ int f_open_flags(TOPLEVEL *toplevel, const gchar *filename,
     return 0;
   }
 
-  /* write full, absolute filename into page_current->page_filename */
-  g_free(toplevel->page_current->page_filename);
-  toplevel->page_current->page_filename = g_strdup(full_filename);
+  /* write full, absolute filename into page->page_filename */
+  g_free(page->page_filename);
+  page->page_filename = g_strdup(full_filename);
 
   /* Before we open the page, let's load the corresponding gafrc. */
   /* First cd into file's directory. */
@@ -240,7 +242,17 @@ int f_open_flags(TOPLEVEL *toplevel, const gchar *filename,
   /* Now open RC and process file */
   if (flags & F_OPEN_RC) {
     full_rcfilename = g_build_filename (file_directory, "gafrc", NULL);
-    g_rc_parse_specified_rc(toplevel, full_rcfilename);
+    g_rc_parse_file (toplevel, full_rcfilename, &tmp_err);
+    if (tmp_err != NULL) {
+      /* Config files are allowed to be missing or skipped; check for
+       * this. */
+      if (!g_error_matches (tmp_err, G_FILE_ERROR, G_FILE_ERROR_NOENT) &&
+          !g_error_matches (tmp_err, EDA_ERROR, EDA_ERROR_RC_TWICE)) {
+        s_log_message ("%s\n", tmp_err->message);
+      }
+      g_error_free (tmp_err);
+      tmp_err = NULL;
+    }
   }
 
   g_free (file_directory);
@@ -281,11 +293,11 @@ int f_open_flags(TOPLEVEL *toplevel, const gchar *filename,
    * the RC file, it's time to read in the file. */
   if (load_backup_file == 1) {
     /* Load the backup file */
-    s_page_append_list (toplevel, toplevel->page_current,
+    s_page_append_list (toplevel, page,
                         o_read (toplevel, NULL, backup_filename, &tmp_err));
   } else {
     /* Load the original file */
-    s_page_append_list (toplevel, toplevel->page_current,
+    s_page_append_list (toplevel, page,
                         o_read (toplevel, NULL, full_filename, &tmp_err));
   }
 
@@ -296,11 +308,11 @@ int f_open_flags(TOPLEVEL *toplevel, const gchar *filename,
 
   if (load_backup_file == 0) {
     /* If it's not the backup file */
-    toplevel->page_current->CHANGED=0; /* added 4/7/98 */
+    page->CHANGED=0; /* added 4/7/98 */
   } else {
     /* We are loading the backup file, so gschem should ask
        the user if save it or not when closing the page. */
-    toplevel->page_current->CHANGED=1;
+    page->CHANGED=1;
   }
 
   g_free(full_filename);
@@ -331,29 +343,20 @@ void f_close(TOPLEVEL *toplevel)
 
 }
 
-/*! \brief Save schematic file and close
- *  \par Function Description
- *  This function will save the current schematic file before closing it.
- *  It also deletes the page_current item in the TOPLEVEL structure.
- *
- *  \param [in,out] toplevel  The TOPLEVEL object containing the schematic.
- *  \param [in]      filename  The file name to save the schematic to.
- */
-void f_save_close(TOPLEVEL *toplevel, char *filename)
-{
-  o_save_curr_page (toplevel, filename);
-  s_page_delete (toplevel, toplevel->page_current);
-}
-
 /*! \brief Save the schematic file
  *  \par Function Description
  *  This function saves the current schematic file in the toplevel object.
  *
+ *  \bug g_access introduces a race condition in certain cases, but
+ *  solves bug #698565 in the normal use-case
+ *
  *  \param [in,out] toplevel  The TOPLEVEL object containing the schematic.
  *  \param [in]      filename  The file name to save the schematic to.
+ *  \param [in,out] err       #GError structure for error reporting, or
+ *                            NULL to disable error reporting
  *  \return 1 on success, 0 on failure.
  */
-int f_save(TOPLEVEL *toplevel, const char *filename)
+int f_save(TOPLEVEL *toplevel, PAGE *page, const char *filename, GError **err)
 {
   gchar *backup_filename;
   gchar *real_filename;
@@ -361,21 +364,34 @@ int f_save(TOPLEVEL *toplevel, const char *filename)
   gchar *dirname;
   mode_t saved_umask, mask;
   struct stat st;
+  GError *tmp_err = NULL;
 
   /* Get the real filename and file permissions */
-  real_filename = follow_symlinks (filename, NULL);
+  real_filename = follow_symlinks (filename, &tmp_err);
 
   if (real_filename == NULL) {
-    s_log_message (_("Can't get the real filename of %s."), filename);
+    g_set_error (err, tmp_err->domain, tmp_err->code,
+                 _("Can't get the real filename of %s: %s"),
+                 filename,
+                 tmp_err->message);
     return 0;
+  }
+
+  /* Check to see if filename is writable */
+  if (g_file_test(filename, G_FILE_TEST_EXISTS) && 
+      g_access(filename, W_OK) != 0) {
+    g_set_error (err, G_FILE_ERROR, G_FILE_ERROR_PERM,
+                 _("File %s is read-only"), filename);
+    return 0;      
   }
   
   /* Get the directory in which the real filename lives */
   dirname = g_path_get_dirname (real_filename);
   only_filename = g_path_get_basename(real_filename);  
 
-  /* Do a backup if it's not an undo file backup and it was never saved. */
-  if (toplevel->page_current->saved_since_first_loaded == 0) {
+  /* Do a backup if it's not an undo file backup and it was never saved.
+   * Only do a backup if backup files are enabled */
+  if (page->saved_since_first_loaded == 0 && toplevel->make_backup_files == TRUE) {
     if ( (g_file_test (real_filename, G_FILE_TEST_EXISTS)) && 
 	 (!g_file_test(real_filename, G_FILE_TEST_IS_DIR)) )
     {
@@ -438,14 +454,14 @@ int f_save(TOPLEVEL *toplevel, const char *filename)
   g_free (dirname);
   g_free (only_filename);
   
-  if (o_save_curr_page (toplevel, real_filename)) {
+  if (o_save (toplevel, s_page_objects (page), real_filename, &tmp_err)) {
 
-    toplevel->page_current->saved_since_first_loaded = 1;
+    page->saved_since_first_loaded = 1;
 
     /* Reset the last saved timer */
-    g_get_current_time (&toplevel->page_current->last_load_or_save_time);
-    toplevel->page_current->ops_since_last_backup = 0;
-    toplevel->page_current->do_autosave_backup = 0;
+    g_get_current_time (&page->last_load_or_save_time);
+    page->ops_since_last_backup = 0;
+    page->do_autosave_backup = 0;
 
     /* Restore permissions. */
     chmod (real_filename, st.st_mode);
@@ -460,6 +476,9 @@ int f_save(TOPLEVEL *toplevel, const char *filename)
     return 1;
   }
   else {
+    g_set_error (err, tmp_err->domain, tmp_err->code,
+                 _("Could NOT save file: %s"), tmp_err->message);
+    g_clear_error (&tmp_err);
     g_free (real_filename);
     return 0;
   }
@@ -520,15 +539,29 @@ gchar *f_normalize_filename (const gchar *name, GError **error)
    * back slashes.
    */
   DWORD len = GetFullPathName (name, MAX_PATH, buf, NULL);
+  gchar *result;
+
   if (len == 0 || len > MAX_PATH - 1) {
-    return g_strdup (name);
+    result = g_strdup (name);
   } else {
     /* The file system is case-preserving but case-insensitive,
      * canonicalize to lowercase, using the codepage associated
      * with the process locale.  */
     CharLowerBuff (buf, len);
-    return g_strdup (buf);
+    result = g_strdup (buf);
   }
+
+  /* Test that the file actually exists, and fail if it doesn't.  We
+   * do this to be consistent with the behaviour on POSIX
+   * platforms. */
+  if (!g_file_test (result, G_FILE_TEST_EXISTS)) {
+    g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_NOENT,
+                 "%s", g_strerror (ENOENT));
+    g_free (result);
+    return NULL;
+  }
+  return result;
+
 #else
 #define ROOT_MARKER_LEN 1
 

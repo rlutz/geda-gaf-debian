@@ -218,6 +218,12 @@ README for utilities
     garchive requires python to run.  
     Run:  garchive -h  for help information.
  
+    
+    schdiff
+    Alan Somers
+    This script is used to produce graphical diffs of gschem files.  It 
+    integrates with Git, Mercurial, and Subversion.  It requires ImageMagick
+    to run.  Run schdiff -h for usage instructions.
 
 - License  
 
@@ -247,9 +253,9 @@ README for utilities
 
 - gEDA Internet resources
 
-        Homepage: http://geda.seul.org
+        Homepage: http://www.geda-project.org
 
-        Mailing lists: http://geda.seul.org/mailinglist
+        Mailing lists: http://wiki.geda-project.org/geda:mailinglists
 
         For any questions related to gEDA/gaf, please subscribe and post
         to the "geda-user" mailing list.

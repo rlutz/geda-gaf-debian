@@ -33,9 +33,6 @@
 #include <dmalloc.h>
 #endif
 
-/*! Default setting for line draw function. */
-void (*line_draw_func)() = NULL;
-
 /*! \brief Create and add line OBJECT to list.
  *  \par Function Description
  *  This function creates a new object representing a line.
@@ -87,10 +84,7 @@ OBJECT *o_line_new(TOPLEVEL *toplevel,
 		     END_NONE, TYPE_SOLID, 0, -1, -1);
   o_set_fill_options(toplevel, new_node,
 		     FILLING_HOLLOW, -1, -1, -1, -1, -1);
-  
-  new_node->draw_func = line_draw_func;
-  new_node->sel_func = select_func;  
-  
+
   /* compute bounding box */
   o_line_recalc(toplevel, new_node);
 
@@ -166,27 +160,29 @@ OBJECT *o_line_copy(TOPLEVEL *toplevel, OBJECT *o_current)
  *  </DL>
  */
 void o_line_modify(TOPLEVEL *toplevel, OBJECT *object,
-		   int x, int y, int whichone)
+                   int x, int y, int whichone)
 {
-	/* change one of the end of the line */
-	switch(whichone) {
-		case LINE_END1:
-		object->line->x[0] = x;
-		object->line->y[0] = y;
-		break;
-		
-		case LINE_END2:
-		object->line->x[1] = x;
-		object->line->y[1] = y;
-		break;
-		
-		default:
-		return;
-	}
-	
-	/* recalculate the bounding box */
-	o_line_recalc(toplevel, object);
-	
+  o_emit_pre_change_notify (toplevel, object);
+
+  /* change one of the end of the line */
+  switch (whichone) {
+    case LINE_END1:
+      object->line->x[0] = x;
+      object->line->y[0] = y;
+      break;
+
+    case LINE_END2:
+      object->line->x[1] = x;
+      object->line->y[1] = y;
+      break;
+
+    default:
+      return;
+  }
+
+  /* recalculate the bounding box */
+  o_line_recalc(toplevel, object);
+  o_emit_change_notify (toplevel, object);
 }
 
 /*! \brief Create line OBJECT from character string.
@@ -208,10 +204,10 @@ void o_line_modify(TOPLEVEL *toplevel, OBJECT *object,
  *  \param [in]  buf             Character string with line description.
  *  \param [in]  release_ver     libgeda release version number.
  *  \param [in]  fileformat_ver  libgeda file format version number.
- *  \return A pointer to the new line object.
+ *  \return A pointer to the new line object, or NULL on error.
  */
-OBJECT *o_line_read (TOPLEVEL *toplevel, char buf[],
-                     unsigned int release_ver, unsigned int fileformat_ver)
+OBJECT *o_line_read (TOPLEVEL *toplevel, const char buf[],
+                     unsigned int release_ver, unsigned int fileformat_ver, GError ** err)
 {
   OBJECT *new_obj;
   char type;
@@ -228,8 +224,11 @@ OBJECT *o_line_read (TOPLEVEL *toplevel, char buf[],
      * not handle the line type and the filling - here filling is irrelevant.
      * They are set to default.
      */
-    sscanf (buf, "%c %d %d %d %d %d\n", &type,
-            &x1, &y1, &x2, &y2, &color);
+    if (sscanf (buf, "%c %d %d %d %d %d\n", &type,
+		&x1, &y1, &x2, &y2, &color) != 6) {
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse line object"));
+      return NULL;
+    }
 
     line_width = 0;
     line_end   = END_NONE;
@@ -242,9 +241,12 @@ OBJECT *o_line_read (TOPLEVEL *toplevel, char buf[],
      * list of characters and numbers in plain ASCII on a single line.
      * The meaning of each item is described in the file format documentation.
      */
-    sscanf (buf, "%c %d %d %d %d %d %d %d %d %d %d\n", &type,
-            &x1, &y1, &x2, &y2, &color,
-            &line_width, &line_end, &line_type, &line_length, &line_space);
+      if (sscanf (buf, "%c %d %d %d %d %d %d %d %d %d %d\n", &type,
+		  &x1, &y1, &x2, &y2, &color,
+		  &line_width, &line_end, &line_type, &line_length, &line_space) != 11) {
+        g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse line object"));
+        return NULL;
+      }
   }
 
   /*
@@ -289,6 +291,7 @@ OBJECT *o_line_read (TOPLEVEL *toplevel, char buf[],
  *  It follows the post-20000704 release file format that handle the
  *  line type and fill options - filling is irrelevant here.
  *
+ *  \param [in] toplevel  a TOPLEVEL structure.
  *  \param [in] object  Line OBJECT to create string from.
  *  \return A pointer to the line OBJECT character string.
  *
@@ -296,7 +299,7 @@ OBJECT *o_line_read (TOPLEVEL *toplevel, char buf[],
  *  Caller must g_free returned character string.
  *
  */
-char *o_line_save(OBJECT *object)
+char *o_line_save(TOPLEVEL *toplevel, OBJECT *object)
 {
   int x1, x2, y1, y2;
   int line_width, line_space, line_length;
@@ -338,8 +341,6 @@ char *o_line_save(OBJECT *object)
 void o_line_translate_world(TOPLEVEL *toplevel,
 			    int dx, int dy, OBJECT *object)
 {
-  if (object == NULL) printf("ltw NO!\n");
-
   /* Update world coords */
   object->line->x[0] = object->line->x[0] + dx;
   object->line->y[0] = object->line->y[0] + dy;
@@ -1130,8 +1131,6 @@ void o_line_print_phantom(TOPLEVEL *toplevel, FILE *fp,
 void o_line_scale_world(TOPLEVEL *toplevel, int x_scale, int y_scale,
 			OBJECT *object)
 {
-  if (object == NULL) printf("lsw NO!\n");
-
   /* scale the line world coords */
   object->line->x[0] = object->line->x[0] * x_scale;
   object->line->y[0] = object->line->y[0] * y_scale;

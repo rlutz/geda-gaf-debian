@@ -1,11 +1,235 @@
-commit 48f3d8aedb5db6f5dfb6232565e65e03d45b5efb
+commit 87f1e0e76965a514277c949dbf2191993962cb88
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 18 15:26:09 2012 +0000
+
+    Update version numbers to 1.8.0-20121118.
+
+commit e9b3fa86d721324688ab6d28bfbc2f417e7828a0
+Author: Joe Mac <joe.eli.mac@gmail.com>
+Date:   Sat Nov 17 21:31:24 2012 +0000
+
+    gattrib: Make "Add new attribute column" actually insert column.
+    
+    I first saw bug 698608, which seems to be a duplicate of this bug, and
+    came up with a patch that corrects the behavior and inserts the empty
+    data column under the right column heading. The problem was that the
+    header gets alphabetically sorted into the others (after device,
+    footprint, and value) but the code immediately following that inserts
+    the new column after the last column, which seems to be making the
+    assumption that the headers do not get sorted.
+    
+    My patch adds a new s_string_list function
+    (s_string_list_find_in_list()) that searches for a given string in the
+    list and returns the index (or -1, if it's not there), unlike the
+    existing function (s_string_list_in_list()) (that I copied from but
+    didn't touch) which just returns 1 as soon as it finds a matching
+    string, or 0, if it's not there. I then added code in
+    s_toplevel_add_new_attrib() that uses the new function to determine
+    where the new column header was placed and insert the new data column
+    at that index (instead of at the end).
+    
+    Closes-bug: lp-698575
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit e6cdf09ad9330c2066363809f7839f698ca2476b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 15 23:22:20 2012 +0000
+
+    Hand-merge Dutch translations from master branch.
+    
+    Merge Dutch translation improvements made by Bert Timmerman in from
+    the unstable branch (commits 4b17c888, f9bd70f6, and a164660f).
+
+commit 8eb5b8724c3ce8c2d3e7db9c030ad97dc585c1ee
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 14 17:32:48 2012 +0000
+
+    gattrib: Import translations from Launchpad
+
+commit 3671d4acdab78025b658cdba81f53c2ecec0208d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jan 10 09:20:26 2012 +0000
+
+    Update translations.
+
+commit e2eda476fb8f3a16aeba8eab0cc8b7fa12e37d6b
 Author: Ales Hvezda <ahvezda@seul.org>
-Date:   Fri Jan 14 23:18:41 2011 -0500
+Date:   Sat Dec 31 16:00:23 2011 -0500
+
+    Updated man page date and version in prep for a new release (1.7.2)
+
+commit 46bfb5cf26f33947a2efc7522dabd1107ce0afe4
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sat Dec 31 15:56:11 2011 -0500
+
+    Updated all po files in prep for a new release (1.7.2)
+
+commit 6b1c656f8833b6f3b893d5c204c72eb789a2221d
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Dec 27 16:57:46 2011 +0400
+
+    gattrib/po, gschem/po: Updated Russian translation
+
+commit 0e506ebd5d5cc87a7f373b83b24f2ad3c90fd18b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 14:13:22 2011 +0000
+
+    Remove per-tool INSTALL files.
+    
+    Only one top-level INSTALL file is needed, and that is provided by
+    automake.
+
+commit ebaead86930b822fcb2629ab24c67a305bd73988
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 4 18:50:07 2011 +0000
+
+    gattrib: Fix some "set but not used" warnings.
+
+commit 12260baebf9f828e9297fc794e911224b8dcd163
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jun 19 10:36:02 2011 -0400
+
+    Updated all man page dates/versions
+
+commit 8e5d7e4b969d7ce70530ad0c693218fce6a178a4
+Author: Ivan Stankovic <pokemon@fly.srk.fer.hr>
+Date:   Fri Jun 17 21:15:34 2011 +0200
+
+    gattrib: g_rc_gattrib_version: remove use of deprecated SCM_STRING_CHARS
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 980e933a85d180019152424023b879c39d7e4aff
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Mar 26 14:04:06 2011 +0000
+
+    gattrib: Preserve visibility of embedded component attributes
+    
+    gattrib was overriding the visibility of pin attributes to match the
+    visibility of the pin. This was not noticed for non-embedded complex
+    objects, as the edited pin attributes are not saved. For embedded
+    components, they are.
+
+commit 7cc025db90267d5cb5b038e2cc39cb15544e0367
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Mar 21 19:21:49 2011 +0000
+
+    Remove OBJECT->sel_func in favour of an OBJECT->selectable flag
+    
+    Only gschem called OBJECT->sel_func anyway, so lets avoid passing vfunc
+    pointers everywhere as a flag. This has the added benefit of removing
+    some dummy functions from gattrib and gschlas which were only present
+    so the status of locked objects could be preserved across load/save.
+
+commit d506039d41aea6ecd9e15e62e7b79de8cca284bd
+Author: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Sat Mar 12 16:07:34 2011 +0100
+
+    libgeda: add GError argument to f_save and o_save
+    
+    o_save and f_save now can report errors during file write using GLib
+    GError mechanism, similar to f_open.
+    
+    Affects-bug: lp-698566
+
+commit 799d67452921ed1447e8b030ee268fe8c34c5785
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jan 16 00:15:29 2011 -0500
+
+    Updated version strings in all man pages
+
+commit 2e2e2bf53458d6fea7e4c8dd7736818470fde248
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jan 16 00:12:48 2011 -0500
 
     Manually ran make update-po in order to prep for the make distcheck
+
+commit 183f9cc1aca8a850ea4f749f8be53934016d8ac4
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Thu Jan 13 00:57:07 2011 +0100
+
+    gattrib: remove references to LEAVE_VISIBILITY_ALONE
     
-    This step is always done right before make distcheck is run to create
-    a release tarball.
+    None of the callers of s_visibility_set_cell passed
+    LEAVE_INVISIBILITY_ALONE as the visibility parameter.
+    
+    Affects-bug: lp-701431
+    
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+
+commit 5eef74de6e885d57df32617395cec3a012c9060b
+Author: Krzysztof Kosciuszkiewicz <k.kosciuszkiewicz@gmail.com>
+Date:   Thu Jan 13 01:37:59 2011 +0100
+
+    gattrib: use accessors for object visibility
+    
+    Affects-bug: lp-701431
+    
+    Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
+
+commit 502ab80495c45e092eca6052edd6cf8e7ff55429
+Merge: 27f7a52 e1c3ba4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 13 19:59:35 2011 +0000
+
+    Merge branch 'stable-1.6'
+    
+    Conflicts:
+    	NEWS
+    	libgeda/include/prototype_priv.h
+    	libgeda/src/gdk-pixbuf-hacks.c
+    	libgeda/src/o_basic.c
+    	libgeda/src/o_complex_basic.c
+    	utils/src/gsch2pcb.c
+
+commit 7ca2b049dbcfb9f0eb8d3dd3fcf21cbd66c0ec95
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Jan 12 17:03:44 2011 +0000
+
+    Print message and exit if rc file load fails.
+    
+    Modifies g_rc_parse() to print useful messages to standard error and
+    exit with non-zero status if an error other than ENOENT occurs while
+    attempting to parse any configuration file.
+    
+    N.b. only copes with rc files loaded at startup; rc files loaded later
+    (e.g. a gafrc auto-loaded while loading a schematic using gschem
+    "File->Open") can't cause the application to die.
+    
+    Since this means that under some circumstances gschem and gattrib can
+    appear to do nothing silently (e.g. when launched from via a .desktop
+    file) subsequent patches need to make gschem and gattrib generate
+    appropriate warning and/or error message dialogs.
+    
+    Affects-bug: lp-698578
+
+commit f300ff057ab77b5ac8f1adef6345ffe2279cac63
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Tue Jan 11 23:20:41 2011 +0000
+
+    gattrib: Add TOPLEVEL * attributes to various functions
+    
+    Rather than using the global variable pr_current, pass the variable
+    explitly where we can. This patch removes all useage of pr_current
+    in s_toplevel.c and s_object.c
+    
+    The remaining usage of pr_current exists in the gui protions of
+    gattrib.
+
+commit 29994756d3dd499dbfc5252085074d47926bd0be
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Tue Jan 11 23:20:31 2011 +0000
+
+    gattrib: Rename TOPLEVELs passed as arguments to "toplevel"
+    
+    Lets us notice the difference between pr_current the global variable
+    and those passed as arguments.
+
+commit 77477fe829b9c056564084748cad5110e564c903
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Tue Jan 11 23:26:42 2011 +0000
+
+    gattrib: Remove unused function s_toplevel_empty_project()
 
 commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
 Author: Peter TB Brett <peter@peter-b.co.uk>
@@ -20,6 +244,85 @@ Date:   Fri Jan 7 22:00:09 2011 +0000
     Only files remaining with old address are wiki files (although the
     wiki has now been updated) and PostScript files.
 
+commit 86c305d9a2c62f062cbd9b63810a0173e4855310
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jan 7 14:53:51 2011 +0000
+
+    Install HTML versions of manpages even without groff.
+    
+    If groff isn't available, try to install HTML manpages anyway.  This
+    allows users to install manpages even if they don't have groff as long
+    as they aren't compiling from git and don't edit the manpages.
+    
+    Closes-bug: lp-698586
+
+commit 7256891e6800b47f29fa9e6f2bbc0507a887fb98
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jan 6 22:33:59 2011 +0000
+
+    gattrib: Add man page.
+
+commit 35c3a2862d6ee68415fbe8163e2c8c06627dba01
+Author: Dima Kogan <dkogan@cds.caltech.edu>
+Date:   Wed Nov 3 21:29:24 2010 -0700
+
+    gattrib: Escape special chars & quote commas in CSV output.
+    
+    Signed-off-by: Dima Kogan <dkogan@cds.caltech.edu>
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 0b94d2379a5bd5d14690f941690e0df761df13c9
+Merge: 63cd6d7 a33839a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 12 09:48:07 2010 +0000
+
+    Merge some changes from Peter Brett.
+    
+    Merge a series of more generally useful changes from Peter Brett's
+    `guile-scheme-api' branch, most of which remove uses of
+    TOPLEVEL.page_current from libgeda.
+
+commit 0db9dce07c52cb5f905c0c68d78b9d7656371c98
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 17 11:59:02 2010 +0000
+
+    Revert po file changes in previous commit.
+    
+    This reverts most of the incorrectly-commited po file updates in
+    commit 5cc5a1743e97.
+
+commit 5cc5a1743e97218325285975bfb68e090d382143
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 17 11:33:25 2010 +0000
+
+    gschem: Make 7-byte SHA-1 prefix using %.7s format specifier.
+    
+    This is slightly more elegant than using g_strndup().
+    
+    Suggested-by: Patrick Bernaud <patrickb@chez.com>
+
+commit 64fc02d71b235f5b1b5a5640f15d9cf3270672a6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 10:40:24 2010 +0000
+
+    desktop-i18n: Don't have misleading ".h" suffixes in .po files.
+
+commit 803ea8cd6ee3203559d99fbaa178a869c2046d38
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 7 13:54:15 2010 +0000
+
+    Update po files, fixing Language and Language-Team strings.
+    
+    Updates all po files using update-po, making sure all po files have
+    their Language string set, and set all Language-Team strings to
+    geda-dev@seul.org.
+
+commit 3abdca2a4ee088184e976822c444069d67e20a20
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 2 10:27:25 2010 +0000
+
+    libgeda: Add PAGE argument to file load/save functions.
+
 commit 4491d031d5f02a43ec72443a3be6668c9cdc58b6
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Mon Nov 1 20:59:11 2010 +0000
@@ -32,6 +335,54 @@ Date:   Mon Nov 1 20:59:11 2010 +0000
     
     Cherry-picked from: e5f32954a1fb23534309d6fa06d887859afbc664
     and subsequent fix: 66e54fd03f75f70d9fcf101d6ed3cad1bb354b13
+
+commit 66e54fd03f75f70d9fcf101d6ed3cad1bb354b13
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Nov 1 20:55:23 2010 +0000
+
+    Fix MINGW LDFLAGS for gattrib
+    
+    Rather embarassingly, I messed this up in commit e5f32954a1 where
+    I claimed to have fixed this very issue!
+    
+    "There was a mistake in gschem and gattrib's Makefile.am, where it
+    included the non-existant MINGW_GUI_CFLAGS rather than pulling in
+    MINGW_GUI_LDFLAGS where the required -mwindows was set."
+    
+    Reported-By: Peter TB Brett <peter@peter-b.co.uk>
+
+commit e5f32954a1fb23534309d6fa06d887859afbc664
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat May 1 13:42:35 2010 +0100
+
+    Fix hiding the command prompt window on Win32 builds with -mwindows
+    
+    There was a mistake in gschem and gattrib's Makefile.am, where it
+    included the non-existant MINGW_GUI_CFLAGS rather than pulling in
+    MINGW_GUI_LDFLAGS where the required -mwindows was set.
+
+commit e85bf2f103667368768939dfc2c40484be8abf8f
+Merge: 0e5defe 93b0370
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Mon Feb 15 20:30:22 2010 +0000
+
+    Merge translations from the stable-1.6 branch
+    
+    NB: Translations were merged manually
+
+commit c31d9a1a90db32dd1e1d41f9d3d5ef5888424ba1
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Feb 14 17:09:45 2010 -0500
+
+    Updated copyright text/header in most source files.
+    
+    Updated all copyright text dates that should be updated for the new year.
+    Fixed a bunch of GNU text typos (these should have been either
+    GPL or gEDA).  Removed some $Id$ tags which are no longer used/needed.
+    Fixed a few file header that were just plain incorrect.
+    
+    (cherry picked from commit bd34cfde2450790b357e574281f9562adce64303)
+    (from stable-1.6 branch)
 
 commit bd34cfde2450790b357e574281f9562adce64303
 Author: Ales Hvezda <ahvezda@seul.org>
@@ -68,6 +419,55 @@ Date:   Mon Feb 8 16:31:00 2010 +0000
 
     Merge translations with those exported from launchpad
 
+commit 99c5e8ce7cb7d2f06d3da3c3b841b0d40c583583
+Merge: 89ad783 d3b0112
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sat Feb 6 21:36:08 2010 +0000
+
+    Manually merge translations from the stable-1.6 branch
+    
+    For newly translated languages, this was fairly simple, using msgmerge
+    to update the stable-1.6 "$LANG.po" files with the current git HEAD
+    translation template ".pot" files.
+    
+    For existing languages, I used msgcat to combine the two, allowing it
+    to choose the "newer" translation - ie.. the one on the stable-1.6
+    branch if there were any conflicts.
+    
+    To assist, I used the following short script:
+    
+    \#!/bin/sh
+    
+    LINGUAS=`cat LINGUAS`
+    TEMPLATE="geda-gschem.pot"
+    NEW_DIR="stable-1.6"
+    OLD_DIR="HEAD"
+    
+    for TR_LANG in $LINGUAS
+    do
+      echo "Attempting to merge for language ${TR_LANG}"
+      if [ -e ${OLD_DIR}/${TR_LANG}.po ]; then
+        echo -n "Old translation exists.. merging"
+        msgcat --use-first ${NEW_DIR}/${TR_LANG}.po ${OLD_DIR}/${TR_LANG}.po -o merge_tmp.po
+        msgmerge merge_tmp.po ${TEMPLATE} -o ${TR_LANG}.po
+      else
+        echo -n "Translation is new, updating"
+        msgmerge ${NEW_DIR}/${TR_LANG}.po ${TEMPLATE} -o ${TR_LANG}.po
+      fi
+    done
+    
+    (Modified appropriately for each */po/ directory.)
+    
+    The current translations were placed in po/HEAD/ and the (newer)
+    stable-1.6 translations were placed in po/stable-1.6/
+    
+    The script requires the LINGUAS file to be updated to include all
+    new languages before it is run.
+    
+    The resulting changes have been reviewed to ensure nothing
+    massively broken happened during the merge, and committed as a merge
+    to show the origin of the translations.
+
 commit d3b0112dd7665d2c97ab70ec8f92496b7f98023e
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Sat Feb 6 20:26:10 2010 +0000
@@ -80,9 +480,68 @@ Date:   Sun Jan 31 10:27:32 2010 +0000
 
     Run make update-po in all */po/ directories
 
+commit bf82ca8680254c7752fed304fb67716fcc0f6023
+Author: Peter Clifton <pcjc2@cam.ac.uk>
+Date:   Sun Jan 31 10:45:01 2010 +0000
+
+    Run make update-po in the */po/ directories
+
+commit 7cf778da5905cf4189eeb043c1b98cb0efa2b305
+Author: Peter Brett <ptbb2@cam.ac.uk>
+Date:   Sat Jan 30 15:54:28 2010 +0000
+
+    Add --from-code=UTF-8 to XGETTEXT_OPTIONS.
+    
+    Some of the translatable strings in the source code contain UTF-8
+    encoded characters.  Without setting the --from-code argument
+    appropriately, xgettext chokes on these strings, which can result in
+    an infinitely-recursing build.
+    
+    Reported-by: Peter <link@penguindevelopment.org>
+
+commit 4885969f50e7942ce4180ff5e59907876ccf39aa
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@users.sourceforge.net>
+Date:   Fri Nov 20 16:09:19 2009 +0000
+
+    Don't use Encoding field in .desktop files [2901187]
+    
+    The .desktop files contain the deprecated Encoding field. The Encoding
+    key is now deprecated by the FreeDesktop standard and all strings are
+    required to be encoded in UTF-8.
+
 commit 4a952841e7aca364018a9ebd81a0c1793c371273
 Author: Werner Hoch <werner.ho@gmx.de>
 Date:   Fri Nov 20 06:58:52 2009 +0000
+
+    gschem, gattrib desktop file: add trailing semicolon
+    
+    the openSUSE buildservice claims that it's necessary to add a
+    trailing semicolon to the Categories list entries.
+
+commit 858982a2a05ff3e128de3621f1d301ecd989f35c
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Changed message on failure to generate doxygen docs
+    
+    If --enable-doxygen was not a configure flag, change the error message
+    on an attempt to build doxygen documentation to suggest the configure
+    flag was the cause of the failure rather than the lack of a doxygen
+    install itself.
+
+commit ea34de8e761f40b697fc4800375ab8c5ef642c60
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Nov 20 06:39:59 2009 +0000
+
+    Don't drop a file called "doxygen"
+    
+    Remove the file redirection that causes a file called "doxygen"
+    to be created in the */docs/ directories if --enable-doxygen
+    is *not* one of the configure flags.
+
+commit 4e558bed59a13d9e3197f68bdd54fcc3ab28c79d
+Author: Werner Hoch <werner.ho@gmx.de>
+Date:   Tue Oct 6 20:12:02 2009 +0200
 
     gschem, gattrib desktop file: add trailing semicolon
     

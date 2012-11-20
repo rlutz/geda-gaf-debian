@@ -45,6 +45,7 @@ s_hierarchy_traverse(TOPLEVEL * pr_current, OBJECT * o_current,
     char *attrib;
     int page_control=-1;
     PAGE *p_current;
+    PAGE *child_page;
     int count = 0;
     int pcount = 0;
     int looking_inside = FALSE;
@@ -93,16 +94,18 @@ s_hierarchy_traverse(TOPLEVEL * pr_current, OBJECT * o_current,
 #if DEBUG
 	    printf("Going down %s\n", current_filename);
 #endif
-	    page_control =
+	    child_page =
 		s_hierarchy_down_schematic_single(pr_current,
 						  current_filename,
 						  pr_current->page_current,
 						  page_control,
                                                   HIERARCHY_FORCE_LOAD);
 
-	    if (page_control == -1) {
+	    if (child_page == NULL) {
 		fprintf(stderr, "Could not open [%s]\n", current_filename);
 	    } else {
+              page_control = child_page->page_control;
+              s_page_goto (pr_current, child_page);
 
 		loaded_flag = TRUE;
 
@@ -512,6 +515,7 @@ char *s_hierarchy_create_netattrib(TOPLEVEL * pr_current, char *basename,
 		case (APPEND):
 		    return_value =
 			g_strconcat (hierarchy_tag, basename, NULL);
+                    break;
 		case (PREPEND):
 		    return_value =
 			g_strconcat (basename, hierarchy_tag, NULL);
@@ -584,7 +588,6 @@ char *s_hierarchy_return_baseuref(TOPLEVEL * pr_current, char *uref)
     char *return_value = NULL;
     char *start_of_base = NULL;
     char *end_of_base = NULL;
-    char *cptr = NULL;
 
     /* use hierarchy separator */
 
@@ -613,8 +616,6 @@ char *s_hierarchy_return_baseuref(TOPLEVEL * pr_current, char *uref)
 	if (end_of_base == NULL) {
 	    return (g_strdup (uref));
 	}
-
-	cptr = uref;
 
 	return_value = g_strndup(uref, end_of_base - uref);
     }

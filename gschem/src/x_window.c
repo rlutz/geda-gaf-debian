@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <config.h>
+#include <missing.h>
 
 #include <stdio.h>
 
@@ -179,6 +180,7 @@ void x_window_setup_draw_events(GSCHEM_TOPLEVEL *w_current)
  * falls back to the bitmap icons provided in the distribution.
  *
  * \param stock Name of the stock icon ("new", "open", etc.)
+ * \param w_current Schematic top level
  * \return Pointer to the new GtkImage object.
  */
 static GtkWidget *x_window_stock_pixmap(const char *stock, GSCHEM_TOPLEVEL *w_current)
@@ -225,10 +227,13 @@ static void x_window_invoke_macro(GtkEntry *entry, void *userdata)
   GSCHEM_TOPLEVEL *w_current = userdata;
   SCM interpreter;
 
-  interpreter = scm_list_2(scm_from_locale_symbol("invoke-macro"),
-			   scm_from_locale_string(gtk_entry_get_text(entry)));
+  interpreter = scm_list_2(scm_from_utf8_symbol("invoke-macro"),
+			   scm_from_utf8_string(gtk_entry_get_text(entry)));
 
+  scm_dynwind_begin (0);
+  g_dynwind_window (w_current);
   g_scm_eval_protected(interpreter, SCM_UNDEFINED);
+  scm_dynwind_end ();
 
   gtk_widget_hide(w_current->macro_box);
   gtk_widget_grab_focus(w_current->drawing_area);
@@ -274,16 +279,16 @@ void x_window_create_main(GSCHEM_TOPLEVEL *w_current)
    	gtk_widget_set_uposition (w_current->main_window, 10, 10);
 
   /* this should work fine */
-  gtk_signal_connect (GTK_OBJECT (w_current->main_window), "delete_event",
-                      GTK_SIGNAL_FUNC (i_callback_close_wm),
-                      w_current);
+  g_signal_connect (G_OBJECT (w_current->main_window), "delete_event",
+                    G_CALLBACK (i_callback_close_wm),
+                    w_current);
 
   /* Containers first */
   main_box = gtk_vbox_new(FALSE, 1);
   gtk_container_border_width(GTK_CONTAINER(main_box), 0);
   gtk_container_add(GTK_CONTAINER(w_current->main_window), main_box);
 
-  get_main_menu(&menubar);
+  menubar = get_main_menu (w_current);
   if (w_current->handleboxes) {
   	handlebox = gtk_handle_box_new ();
   	gtk_box_pack_start(GTK_BOX(main_box), handlebox, FALSE, FALSE, 0);
@@ -416,13 +421,11 @@ void x_window_create_main(GSCHEM_TOPLEVEL *w_current)
 
   if (w_current->scrollbars_flag == TRUE) {
     /* setup scroll bars */
-    w_current->v_adjustment =
-      gtk_adjustment_new (toplevel->init_bottom,
-                          0.0, toplevel->init_bottom,
-                          100.0, 100.0, 10.0);
+    w_current->v_adjustment = GTK_ADJUSTMENT (
+      gtk_adjustment_new (toplevel->init_bottom, 0.0, toplevel->init_bottom,
+                          100.0, 100.0, 10.0));
 
-    w_current->v_scrollbar = gtk_vscrollbar_new (GTK_ADJUSTMENT (
-                                                                 w_current->v_adjustment));
+    w_current->v_scrollbar = gtk_vscrollbar_new (w_current->v_adjustment);
 
     gtk_range_set_update_policy (GTK_RANGE (w_current->v_scrollbar),
                                  GTK_UPDATE_CONTINUOUS);
@@ -430,17 +433,15 @@ void x_window_create_main(GSCHEM_TOPLEVEL *w_current)
     gtk_box_pack_start (GTK_BOX (drawbox), w_current->v_scrollbar,
                         FALSE, FALSE, 0);
 
-    gtk_signal_connect (GTK_OBJECT (w_current->v_adjustment),
-                        "value_changed",
-                        GTK_SIGNAL_FUNC (x_event_vschanged),
-                        w_current);
+    g_signal_connect (w_current->v_adjustment,
+                      "value_changed",
+                      G_CALLBACK (x_event_vschanged),
+                      w_current);
 
-    w_current->h_adjustment = gtk_adjustment_new (0.0, 0.0,
-                                                  toplevel->init_right,
-                                                  100.0, 100.0, 10.0);
+    w_current->h_adjustment = GTK_ADJUSTMENT (
+      gtk_adjustment_new (0.0, 0.0, toplevel->init_right, 100.0, 100.0, 10.0));
 
-    w_current->h_scrollbar = gtk_hscrollbar_new (GTK_ADJUSTMENT (
-                                                                 w_current->h_adjustment));
+    w_current->h_scrollbar = gtk_hscrollbar_new (w_current->h_adjustment);
 
     gtk_range_set_update_policy (GTK_RANGE (w_current->h_scrollbar),
                                  GTK_UPDATE_CONTINUOUS);
@@ -448,10 +449,10 @@ void x_window_create_main(GSCHEM_TOPLEVEL *w_current)
     gtk_box_pack_start (GTK_BOX (main_box), w_current->h_scrollbar,
                         FALSE, FALSE, 0);
 
-    gtk_signal_connect (GTK_OBJECT (w_current->h_adjustment),
-                        "value_changed",
-                        GTK_SIGNAL_FUNC (x_event_hschanged),
-                        w_current);
+    g_signal_connect (w_current->h_adjustment,
+                      "value_changed",
+                      G_CALLBACK (x_event_hschanged),
+                      w_current);
   }
 
   /* macro box */
@@ -460,8 +461,10 @@ void x_window_create_main(GSCHEM_TOPLEVEL *w_current)
 		   G_CALLBACK(&x_window_invoke_macro), w_current);
 
   w_current->macro_box = gtk_hbox_new(FALSE, 0);
+  gtk_box_pack_start(GTK_BOX (w_current->macro_box),
+                     gtk_label_new (_("Evaluate:")), FALSE, FALSE, 2);
   gtk_box_pack_start(GTK_BOX(w_current->macro_box), w_current->macro_entry,
-		     FALSE, FALSE, 2);
+		     TRUE, TRUE, 2);
   gtk_container_border_width(GTK_CONTAINER(w_current->macro_box), 1);
   gtk_box_pack_start (GTK_BOX (main_box), w_current->macro_box,
 		      FALSE, FALSE, 0);
@@ -591,9 +594,6 @@ void x_window_close(GSCHEM_TOPLEVEL *w_current)
   if (w_current->tswindow)
   gtk_widget_destroy(w_current->tswindow);
 
-  if (w_current->abwindow)
-  gtk_widget_destroy(w_current->abwindow);
-
   if (w_current->iwindow)
   gtk_widget_destroy(w_current->iwindow);
 
@@ -634,6 +634,12 @@ void x_window_close(GSCHEM_TOPLEVEL *w_current)
   }
 
   x_window_free_gc(w_current);
+
+  /* Clear Guile smob weak ref */
+  if (w_current->smob != SCM_UNDEFINED) {
+    SCM_SET_SMOB_DATA (w_current->smob, NULL);
+    w_current->smob = SCM_UNDEFINED;
+  }
 
   /* finally close the main window */
   gtk_widget_destroy(w_current->main_window);
@@ -683,7 +689,7 @@ void x_window_close_all(GSCHEM_TOPLEVEL *w_current)
  *
  *  The opened page becomes the current page of <B>toplevel</B>.
  *
- *  \param [in] toplevel The toplevel environment.
+ *  \param [in] w_current The toplevel environment.
  *  \param [in] filename The name of the file to open or NULL for a blank page.
  *  \returns A pointer on the new page.
  *
@@ -730,32 +736,31 @@ x_window_open_page (GSCHEM_TOPLEVEL *w_current, const gchar *filename)
     if (!quiet_mode)
       s_log_message (_("Loading schematic [%s]\n"), fn);
 
-    if (!f_open (toplevel, (gchar *) fn, &err)) {
+    if (!f_open (toplevel, page, (gchar *) fn, &err)) {
       GtkWidget *dialog;
 
       g_warning ("%s\n", err->message);
-      dialog = gtk_message_dialog_new (GTK_WINDOW (w_current->main_window),
-                                       GTK_DIALOG_DESTROY_WITH_PARENT,
-                                       GTK_MESSAGE_ERROR,
-                                       GTK_BUTTONS_CLOSE,
-                                       "%s",
-                                       err->message);
+      dialog = gtk_message_dialog_new_with_markup
+        (GTK_WINDOW (w_current->main_window),
+         GTK_DIALOG_DESTROY_WITH_PARENT,
+         GTK_MESSAGE_ERROR,
+         GTK_BUTTONS_CLOSE,
+         _("<b>An error occurred while loading the requested file.</b>\n\nLoading from '%s' failed: %s. The gschem log may contain more information."),
+         fn, err->message);
       gtk_window_set_title (GTK_WINDOW (dialog), _("Failed to load file"));
       gtk_dialog_run (GTK_DIALOG (dialog));
       gtk_widget_destroy (dialog);
       g_error_free (err);
     } else {
-      recent_files_add (fn);
+      gtk_recent_manager_add_item (recent_manager, g_filename_to_uri(fn, NULL, NULL));
     }
   } else {
     if (!quiet_mode)
       s_log_message (_("New file [%s]\n"),
                      toplevel->page_current->page_filename);
-  }
 
-  if (scm_hook_empty_p (new_page_hook) == SCM_BOOL_F)
-    scm_run_hook (new_page_hook,
-                  scm_cons (g_make_page_smob (toplevel, page), SCM_EOL));
+    g_run_hook_page (w_current, "%new-page-hook", toplevel->page_current);
+  }
 
   a_zoom_extents (w_current,
                   s_page_objects (toplevel->page_current),
@@ -788,8 +793,8 @@ x_window_open_page (GSCHEM_TOPLEVEL *w_current, const gchar *filename)
  *
  *  <B>page</B> has to be in the list of PAGEs attached to <B>toplevel</B>.
  *
- *  \param [in] toplevel The toplevel environment.
- *  \param [in] page     The page to become current page.
+ *  \param [in] w_current The toplevel environment.
+ *  \param [in] page      The page to become current page.
  */
 void
 x_window_set_current_page (GSCHEM_TOPLEVEL *w_current, PAGE *page)
@@ -809,11 +814,9 @@ x_window_set_current_page (GSCHEM_TOPLEVEL *w_current, PAGE *page)
   x_pagesel_update (w_current);
   x_multiattrib_update (w_current);
 
-  toplevel->DONT_REDRAW = 1;
   x_manual_resize (w_current);
   x_hscrollbar_update (w_current);
   x_vscrollbar_update (w_current);
-  toplevel->DONT_REDRAW = 0;
 
   o_invalidate_all (w_current);
 }
@@ -830,9 +833,9 @@ x_window_set_current_page (GSCHEM_TOPLEVEL *w_current, PAGE *page)
  *  <B>page</B> may not be the current page of <B>toplevel</B>. The
  *  current page of <B>toplevel</B> is not affected by this function.
  *
- *  \param [in] toplevel The toplevel environment.
- *  \param [in] page     The page to save.
- *  \param [in] filename The name of the file in which to save page.
+ *  \param [in] w_current The toplevel environment.
+ *  \param [in] page      The page to save.
+ *  \param [in] filename  The name of the file in which to save page.
  *  \returns 1 on success, 0 otherwise.
  */
 gint
@@ -842,6 +845,7 @@ x_window_save_page (GSCHEM_TOPLEVEL *w_current, PAGE *page, const gchar *filenam
   PAGE *old_current;
   const gchar *log_msg, *state_msg;
   gint ret;
+  GError *err = NULL;
 
   g_return_val_if_fail (toplevel != NULL, 0);
   g_return_val_if_fail (page     != NULL, 0);
@@ -853,12 +857,23 @@ x_window_save_page (GSCHEM_TOPLEVEL *w_current, PAGE *page, const gchar *filenam
   /* change to page */
   s_page_goto (toplevel, page);
   /* and try saving current page to filename */
-  ret = (gint)f_save (toplevel, filename);
+  ret = (gint)f_save (toplevel, toplevel->page_current, filename, &err);
   if (ret != 1) {
-    /* an error occured when saving page to file */
     log_msg   = _("Could NOT save page [%s]\n");
     state_msg = _("Error while trying to save");
 
+    GtkWidget *dialog;
+
+    dialog = gtk_message_dialog_new (GTK_WINDOW (w_current->main_window),
+                                     GTK_DIALOG_DESTROY_WITH_PARENT,
+                                     GTK_MESSAGE_ERROR,
+                                     GTK_BUTTONS_CLOSE,
+                                     "%s",
+                                     err->message);
+    gtk_window_set_title (GTK_WINDOW (dialog), _("Failed to save file"));
+    gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
+    g_clear_error (&err);
   } else {
     /* successful save of page to file, update page... */
     /* change page name if necessary and prepare log message */
@@ -875,8 +890,8 @@ x_window_save_page (GSCHEM_TOPLEVEL *w_current, PAGE *page, const gchar *filenam
     /* reset page CHANGED flag */
     page->CHANGED = 0;
 
-    /* update recent file list */
-    recent_files_add(filename);
+    /* add to recent file list */
+    gtk_recent_manager_add_item (recent_manager, g_filename_to_uri(filename, NULL, NULL));
   }
 
   /* log status of operation */
@@ -899,8 +914,8 @@ x_window_save_page (GSCHEM_TOPLEVEL *w_current, PAGE *page, const gchar *filenam
  *  If necessary, the current page of <B>toplevel</B> is changed to
  *  the next valid page or to a new untitled page.
  *
- *  \param [in] toplevel The toplevel environment.
- *  \param [in] page     The page to close.
+ *  \param [in] w_current The toplevel environment.
+ *  \param [in] page      The page to close.
  */
 void
 x_window_close_page (GSCHEM_TOPLEVEL *w_current, PAGE *page)
@@ -967,7 +982,7 @@ x_window_close_page (GSCHEM_TOPLEVEL *w_current, PAGE *page)
  *
  *  \par Function Description
  *  Sets the default window icon by name, to be found in the current icon
- *  theme. The name used is #defined above as GSCHEM_THEME_ICON_NAME.
+ *  theme. The name used is \#defined above as GSCHEM_THEME_ICON_NAME.
  */
 void x_window_set_default_icon( void )
 {

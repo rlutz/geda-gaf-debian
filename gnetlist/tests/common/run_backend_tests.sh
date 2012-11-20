@@ -93,10 +93,14 @@ GNETLIST="${builddir}/../../src/gnetlist"
 GEDADATA="${srcdir}/../.." # HACKHACKHACK
 GEDADATARC="${builddir}/../../lib"
 SCMDIR="${builddir}/../../scheme"
+GEDASCMDIR="${srcdir}/../../../libgeda/scheme"
+GEDABUILTSCMDIR="${builddir}/../../../libgeda/scheme"
 SYMDIR="${srcdir}/../../../symbols"
 export GEDADATA
 export GEDADATARC
 export SCMDIR
+export GEDASCMDIR
+export GEDABUILTSCMDIR
 export SYMDIR
 
 rundir=${here}/run
@@ -141,6 +145,8 @@ GNETLIST:   ${GNETLIST}
 GEDADATA:   ${GEDATADA}
 GEDADATARC: ${GEDATADARC}
 SCMDIR:     ${SCMDIR}
+GEDASCMDIR: ${GEDASCMDIR}
+GEDABUILTSCMDIR: ${GEDABUILTSCMDIR}
 SYMDIR:     ${SYMDIR}
 all_tests:
 
@@ -242,7 +248,15 @@ for t in $all_tests ; do
     fi
     
     if test "X$regen" = "Xyes" ; then
-	cp ${out} ${ref}
+
+        # Copy output on top of golden output, accounting for the case
+        # that no output file was generated.
+        if test -f ${out} ; then
+            cp ${out} ${ref}
+        else
+            rm ${ref}
+        fi
+
 	echo "$rc" > $refcode
 	echo "Regenerated ${ref}"
         good=1
@@ -256,6 +270,10 @@ for t in $all_tests ; do
 
 	if diff -w ${out}.tmp1 ${out}.tmp2 >/dev/null ; then
 	    echo "PASS"
+            good=1
+        # If neither output nor golden file exists, then succeed
+        elif test ! -f ${out} -a ! -f ${ref} ; then
+            echo "PASS"
             good=1
 	else
 	    echo "FAILED:  See diff -w ${ref} ${out}"

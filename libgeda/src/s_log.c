@@ -72,7 +72,7 @@ static guint log_handler_id;
  *  This function opens the file <B>filename</B> to log to and registers the
  *  handler to redirect log message to this file.
  *
- *  \param [in] filename  Character string with file name to log to.
+ *  \param [in] prefix  Character string with file name prefix to log to.
  */
 void s_log_init (const gchar *prefix)
 {
@@ -258,7 +258,7 @@ static void s_log_handler (const gchar *log_domain,
   if (do_logging == FALSE) {
     return;
   }
-  g_assert (logfile_fd != -1);
+  g_return_if_fail (logfile_fd != -1);
   
   status = write (logfile_fd, message, strlen (message));
   if (status == -1) {

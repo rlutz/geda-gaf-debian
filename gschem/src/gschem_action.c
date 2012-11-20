@@ -37,7 +37,7 @@ static GObjectClass *gschem_action_parent_class = NULL;
  *  Just before the GschemAction GObject is finalized, free our
  *  allocated data, and then chain up to the parent's finalize handler.
  *
- *  \param [in] widget  The GObject being finalized.
+ *  \param [in] object The GObject being finalized.
  */
 static void gschem_action_finalize (GObject *object)
 {
@@ -123,14 +123,14 @@ gschem_action_connect_proxy (GtkAction *action,
 
     if (label == NULL) {
       g_object_get (action, "label", &label_string, NULL);
-      label = g_object_new (GSCHEM_TYPE_ACCEL_LABEL,
-                            "use-underline", TRUE,
-                            "xalign", 0.0,
-                            "visible", TRUE,
-                            "parent", proxy,
-                            "label", label_string,
-                            "accel-string", gs_action->multikey_accel,
-                            NULL);
+      (void) g_object_new (GSCHEM_TYPE_ACCEL_LABEL,
+			   "use-underline", TRUE,
+			   "xalign", 0.0,
+			   "visible", TRUE,
+			   "parent", proxy,
+			   "label", label_string,
+			   "accel-string", gs_action->multikey_accel,
+			   NULL);
     }
   }
 

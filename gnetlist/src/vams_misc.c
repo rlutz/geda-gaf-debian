@@ -15,10 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02111-1301 USA.
  */
 
 #include <config.h>
+#include <missing.h>
 
 #include <stdio.h>
 #ifdef HAVE_STRING_H
@@ -55,7 +57,7 @@ vams_get_attribs_list (OBJECT *object)
       val = o_attrib_get_name_value (a_current, &found_name, NULL);
 
       if (val) {
-        list = scm_cons (scm_makfrom0str (found_name), list);
+        list = scm_cons (scm_from_utf8_string (found_name), list);
       }
 
       g_free (found_name);
@@ -75,7 +77,7 @@ vams_get_package_attributes(SCM scm_uref)
   SCM_ASSERT(scm_is_string (scm_uref), scm_uref, SCM_ARG1,
              "gnetlist:vams-get-package-attributes");
 
-  uref = SCM_STRING_CHARS (scm_uref);
+  uref = scm_to_utf8_string (scm_uref);
 
   /* here is where you make it multi page aware */
   nl_current = netlist_head;
@@ -86,10 +88,12 @@ vams_get_package_attributes(SCM scm_uref)
 
     if (nl_current->component_uref &&
         strcmp(nl_current->component_uref, uref) == 0) {
+      free (uref);
       return vams_get_attribs_list (nl_current->object_ptr);
     }
     nl_current = nl_current->next;
   }
 
+  free (uref);
   return SCM_EOL;
 }

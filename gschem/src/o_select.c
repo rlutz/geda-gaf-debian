@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,77 +49,17 @@
  */
 void o_select_run_hooks(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int flag)
 {
-  /*
-   * Run the select_component_hook if the hook has been defined and we
-   * are selecting a component.  This will likely be used for cross probing
-   * between schematics and PCB layout or schematics and simulation results.
-   */
-  if ( (scm_hook_empty_p(deselect_all_hook) == SCM_BOOL_F) 
-       && flag == 2 )
-  {
-    scm_run_hook(deselect_all_hook, 
-		 scm_cons (g_make_attrib_smob_list(w_current, o_current),
-			   SCM_EOL));
-  }
-
-  /*
-   * Run the select_component_hook if the hook has been defined and we
-   * are selecting a component.  This will likely be used for cross probing
-   * between schematics and PCB layout or schematics and simulation results.
-   */
-  if ( (scm_hook_empty_p(select_component_hook) == SCM_BOOL_F) 
-       && o_current
-       && (o_current->type == OBJ_COMPLEX) 
-       && flag == 1 )
-  {
-    scm_run_hook(select_component_hook, 
-		 scm_cons (g_make_attrib_smob_list(w_current, o_current),
-			   SCM_EOL));
-  }
-
-  /*
-   * Run the deselect_component_hook if the hook has been defined and we
-   * are deselecting a component.  This will likely be used for cross probing
-   * between schematics and PCB layout or schematics and simulation results.
-   */
-  if ( (scm_hook_empty_p(deselect_component_hook) == SCM_BOOL_F) 
-       && o_current
-       && (o_current->type == OBJ_COMPLEX) 
-       && flag == 0 )
-  {
-    scm_run_hook(deselect_component_hook, 
-		 scm_cons (g_make_attrib_smob_list(w_current, o_current),
-			   SCM_EOL));
-  }
-
-  /*
-   * Run the select_net_hook if the hook has been defined and we
-   * are selecting a net.  This will likely be used for cross probing
-   * between schematics and PCB layout or schematics and simulation results.
-   */
-  if ( (scm_hook_empty_p(select_net_hook) == SCM_BOOL_F) 
-       && o_current
-       && (o_current->type == OBJ_NET) 
-       && flag == 1) 
-  {
-    scm_run_hook(select_net_hook, 
-		 scm_cons (g_make_attrib_smob_list(w_current, o_current),
-			   SCM_EOL));
-  }
-
-  /*
-   * Run the deselect_net_hook if the hook has been defined and we
-   * are deselecting a net.  This will likely be used for cross probing
-   * between schematics and PCB layout or schematics and simulation results.
-   */
-  if ( (scm_hook_empty_p(select_net_hook) == SCM_BOOL_F) 
-       && o_current
-       && (o_current->type == OBJ_NET) 
-       && flag == 0) 
-  {
-    scm_run_hook(deselect_net_hook, 
-		 scm_cons (g_make_attrib_smob_list(w_current, o_current),
-			   SCM_EOL));
+  switch (flag) {
+  /* If flag == 0, then we are deselecting something. */
+  case 0:
+    g_run_hook_object (w_current, "%deselect-objects-hook", o_current);
+    break;
+  /* If flag == 1, then we are selecting something. */
+  case 1:
+    g_run_hook_object (w_current, "%select-objects-hook", o_current);
+    break;
+  default:
+    g_assert_not_reached ();
   }
 }
 
@@ -163,8 +103,7 @@ void o_select_object(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
           /* condition: for both multiple and single object added */
           /* result: remove all objects from selection */
           if (count == 0 && !CONTROLKEY) {
-            o_select_run_hooks( w_current, NULL, 2 );
-            o_select_unselect_list( w_current, toplevel->page_current->selection_list );
+            o_select_unselect_all(w_current);
           }
           break;
 
@@ -203,8 +142,7 @@ void o_select_object(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
           /* 1st result: remove all objects from selection */
           /* 2nd result: add object to selection */
           if (type == MULTIPLE && count == 0 && !CONTROLKEY) {
-            o_select_run_hooks( w_current, NULL, 2 );
-            o_select_unselect_list( w_current, toplevel->page_current->selection_list );
+            o_select_unselect_all (w_current);
 
             o_select_run_hooks( w_current, o_current, 1 );
             o_selection_add (toplevel,
@@ -216,8 +154,7 @@ void o_select_object(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
           /* 1st result: remove all objects from selection */
           /* 2nd result: add object to selection list */
           if (type == SINGLE && !CONTROLKEY) {
-            o_select_run_hooks( w_current, NULL, 2 );
-            o_select_unselect_list( w_current, toplevel->page_current->selection_list );
+            o_select_unselect_all (w_current);
 
             o_select_run_hooks (w_current, o_current, 1);
             o_selection_add (toplevel, toplevel->page_current->
@@ -241,16 +178,25 @@ void o_select_object(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current,
     /* Remove the invisible attributes from the object list as well,
      * so they don't remain selected without the user knowing.
      */
-    o_attrib_remove_selected_invisible (w_current,
-                                        toplevel->page_current->selection_list,
-                                        o_current);
+    o_attrib_deselect_invisible (w_current,
+                                 toplevel->page_current->selection_list,
+                                 o_current);
   } else {
-    o_attrib_add_selected (w_current, toplevel->page_current->selection_list,
-                           o_current);
+    /* If the type is MULTIPLE (meaning a select box was/is being used), only
+     * select invisible attributes on objects.  Otherwise attributes will be
+     * "double selected", causing them to remain unselected if using
+     * invert-selection (CONTROLKEY is pressed)
+     */
+    if( type == MULTIPLE) {
+      o_attrib_select_invisible (w_current,
+                                 toplevel->page_current->selection_list,
+                                 o_current);
+    } else {
+      /* Select all attributes of the object for a single click select */
+      o_attrib_add_selected (w_current, toplevel->page_current->selection_list,
+                             o_current);
+    }
   }
-
-  /* finally redraw object */
-  o_invalidate (w_current, o_current);
 }
 
 /*! \todo Finish function documentation!!!
@@ -350,6 +296,7 @@ void o_select_box_search(GSCHEM_TOPLEVEL *w_current)
   OBJECT *o_current=NULL;
   int count = 0; /* object count */
   int SHIFTKEY = w_current->SHIFTKEY;
+  int CONTROLKEY = w_current->CONTROLKEY;
   int left, right, top, bottom;
   const GList *iter;
 	
@@ -362,7 +309,7 @@ void o_select_box_search(GSCHEM_TOPLEVEL *w_current)
   while (iter != NULL) {
     o_current = iter->data;
     /* only select visible objects */
-    if (o_current->visibility == VISIBLE || toplevel->show_hidden_text) {
+    if (o_is_visible (toplevel, o_current) || toplevel->show_hidden_text) {
 
       if ( o_current->w_left   >= left &&
            o_current->w_right  <= right  &&
@@ -377,11 +324,10 @@ void o_select_box_search(GSCHEM_TOPLEVEL *w_current)
   }
 
   /* if there were no objects to be found in select box, count will be */
-  /* zero, and you need to deselect anything remaining (unless the shift */
-  /* key was pressed */
-  if (count == 0 && !SHIFTKEY) {
-    o_select_run_hooks( w_current, NULL, 2 );
-    o_select_unselect_list( w_current, toplevel->page_current->selection_list );
+  /* zero, and you need to deselect anything remaining (except when the */
+  /* shift or control keys are pressed) */
+  if (count == 0 && !SHIFTKEY && !CONTROLKEY) {
+    o_select_unselect_all (w_current);
   }
   i_update_menus(w_current);
 }
@@ -425,7 +371,7 @@ void o_select_connected_nets(GSCHEM_TOPLEVEL *w_current, OBJECT* o_net)
       o_current = iter1->data;
       if (o_current->type == OBJ_NET && 
 	  (!o_current->selected || count == 0)) {
-	(*o_current->sel_func)(w_current, o_current, SINGLE, count);
+	o_select_object (w_current, o_current, SINGLE, count);
 	if (w_current->net_selection_state > 1) {
 	  /* collect nets */
 	  netstack = g_list_concat(s_conn_return_others(NULL, o_current), netstack);
@@ -507,26 +453,6 @@ int o_select_selected(GSCHEM_TOPLEVEL *w_current)
 }
 
 
-/*! \brief Unselects all the objects in the given list.
- *  \par Unselects all objects in the given list, does the
- *  needed work to make the objects visually unselected, and redraw them.
- *  \param [in] w_current  GSCHEM_TOPLEVEL struct.
- *  \param [in] head       Pointer to the selection list
- */
-void o_select_unselect_list(GSCHEM_TOPLEVEL *w_current, SELECTION *selection)
-{
-  const GList *list = geda_list_get_glist( selection );
-
-  while ( list != NULL ) {
-    o_selection_unselect (w_current->toplevel, (OBJECT *)list->data);
-    o_invalidate (w_current, (OBJECT *)list->data);
-   list = g_list_next( list );
-  }
-
-  geda_list_remove_all( (GedaList *)selection );
-}
-
-
 /*! \todo Finish function documentation!!!
  *  \brief
  *  \par Function Description
@@ -535,8 +461,67 @@ void o_select_unselect_list(GSCHEM_TOPLEVEL *w_current, SELECTION *selection)
 void o_select_unselect_all(GSCHEM_TOPLEVEL *w_current)
 {
   TOPLEVEL *toplevel = w_current->toplevel;
-  o_select_run_hooks( w_current, NULL, 2 );
-  o_select_unselect_list( w_current, toplevel->page_current->selection_list );
+  SELECTION *selection = toplevel->page_current->selection_list;
+  GList *removed = NULL;
+  GList *iter;
+
+  removed = g_list_copy (geda_list_get_glist (selection));
+  for (iter = removed; iter != NULL; iter = g_list_next (iter)) {
+    o_selection_remove (toplevel, selection, (OBJECT *) iter->data);
+  }
+
+  /* Call hooks */
+  if (removed != NULL) {
+    g_run_hook_object_list (w_current, "%deselect-objects-hook", removed);
+  }
+}
+
+/*! \brief Selects all visible objects on the current page.
+ * \par Function Description
+ * Clears any existing selection, then selects everything visible and
+ * unlocked on the current page, and any attached attributes whether
+ * visible or invisible..
+ *
+ * \param w_current  The current #GSCHEM_TOPLEVEL structure.
+ */
+void
+o_select_visible_unlocked (GSCHEM_TOPLEVEL *w_current)
+{
+  TOPLEVEL *toplevel = w_current->toplevel;
+  SELECTION *selection = toplevel->page_current->selection_list;
+  const GList *iter;
+  GList *added;
+
+  o_select_unselect_all (w_current);
+  for (iter = s_page_objects (toplevel->page_current);
+       iter != NULL;
+       iter = g_list_next (iter)) {
+    OBJECT *obj = (OBJECT *) iter->data;
+
+    /* Skip invisible objects. */
+    if (!o_is_visible (toplevel, obj) && !toplevel->show_hidden_text)
+      continue;
+
+    /* Skip locked objects. */
+    if (!obj->selectable) continue;
+
+    /* Add object to selection. */
+    /*! \bug We can't call o_select_object() because it
+     * behaves differently depending on the state of
+     * w_current->SHIFTKEY and w_current->CONTROLKEY, which may well
+     * be set if this function is called via a keystroke
+     * (e.g. Ctrl-A). */
+    o_selection_add (toplevel, selection, obj);
+
+    /* Add any attributes of object to selection as well. */
+    o_attrib_add_selected (w_current, selection, obj);
+  }
+
+  /* Run hooks for all items selected */
+  added = geda_list_get_glist (selection);
+  if (added != NULL) {
+    g_run_hook_object_list (w_current, "%select-objects-hook", added);
+  }
 }
 
 /*! \todo Finish function documentation!!!

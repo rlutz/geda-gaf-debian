@@ -32,9 +32,6 @@
  *  \brief functions for the net object
  */
 
-/*! Default setting for net draw function. */
-void (*net_draw_func)() = NULL;
-
 /*! \brief get the position of the first net point
  *  \par Function Description
  *  This function gets the position of the first point of a net object.
@@ -100,14 +97,6 @@ OBJECT *o_net_new(TOPLEVEL *toplevel, char type,
 
   o_net_recalc (toplevel, new_node);
 
-  new_node->draw_func = net_draw_func;
-  new_node->sel_func = select_func;
-
-  if (!toplevel->ADDING_SEL) {
-    s_tile_add_object (toplevel, new_node);
-    s_conn_update_object (toplevel, new_node);
-  }
-
   return new_node;
 }
 
@@ -148,15 +137,14 @@ void o_net_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
  *  allocated and appended to the \a object_list.
  *
  *  \param [in] toplevel     The TOPLEVEL object
- *  \param [in] object_list  list of OBJECTS to append a new net
  *  \param [in] buf          a text buffer (usually a line of a schematic file)
  *  \param [in] release_ver  The release number gEDA
  *  \param [in] fileformat_ver a integer value of the file format
- *  \return The object list
+ *  \return The object list, or NULL on error.
  *
  */
-OBJECT *o_net_read (TOPLEVEL *toplevel, char buf[],
-                    unsigned int release_ver, unsigned int fileformat_ver)
+OBJECT *o_net_read (TOPLEVEL *toplevel, const char buf[],
+                    unsigned int release_ver, unsigned int fileformat_ver, GError **err)
 {
   OBJECT *new_obj;
   char type;
@@ -164,7 +152,10 @@ OBJECT *o_net_read (TOPLEVEL *toplevel, char buf[],
   int x2, y2;
   int color;
 
-  sscanf (buf, "%c %d %d %d %d %d\n", &type, &x1, &y1, &x2, &y2, &color);
+  if (sscanf (buf, "%c %d %d %d %d %d\n", &type, &x1, &y1, &x2, &y2, &color) != 6) {
+        g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse net object"));
+    return NULL;
+  }
 
   if (x1 == x2 && y1 == y2) {
     s_log_message (_("Found a zero length net [ %c %d %d %d %d %d ]\n"),
@@ -192,10 +183,11 @@ OBJECT *o_net_read (TOPLEVEL *toplevel, char buf[],
  *  This function takes a net \a object and return a string
  *  according to the file format definition.
  *
+ *  \param [in] toplevel  a TOPLEVEL structure
  *  \param [in] object  a net OBJECT
  *  \return the string representation of the net OBJECT
  */
-char *o_net_save(OBJECT *object)
+char *o_net_save(TOPLEVEL *toplevel, OBJECT *object)
 {
   int x1, x2, y1, y2;
   char *buf;
@@ -222,9 +214,6 @@ char *o_net_save(OBJECT *object)
 void o_net_translate_world(TOPLEVEL *toplevel, int dx, int dy,
 			   OBJECT *object)
 {
-  if (object == NULL)
-    printf("ntw NO!\n");
-
   /* Update world coords */
   object->line->x[0] = object->line->x[0] + dx;
   object->line->y[0] = object->line->y[0] + dy;
@@ -274,8 +263,7 @@ OBJECT *o_net_copy(TOPLEVEL *toplevel,  OBJECT *o_current)
 void o_net_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
 		 int origin_x, int origin_y)
 {
-  int offset, offset2;
-  int cross, net_width;
+  int net_width;
   int x1, y1;
   int x2, y2;
 
@@ -283,11 +271,6 @@ void o_net_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
     printf("got null in o_net_print\n");
     return;
   }
-
-  offset = 7 * 6;
-  offset2 = 7;
-
-  cross = offset;
 
   f_print_set_color(toplevel, fp, o_current->color);
 
@@ -530,15 +513,16 @@ static int o_net_consolidate_segments (TOPLEVEL *toplevel, OBJECT *object)
   GList *c_current;
   CONN *conn;
   OBJECT *other_object;
+  PAGE *page;
   int changed = 0;
 
-  if (object == NULL) {
-    return(0);
-  }
+  g_return_val_if_fail ((toplevel != NULL), 0);
+  g_return_val_if_fail ((object != NULL), 0);
+  g_return_val_if_fail ((object->type == OBJ_NET), 0);
 
-  if (object->type != OBJ_NET) {
-    return(0);
-  }
+  /* It's meaningless to do anything here if the object isn't in a page. */
+  page = o_get_page (toplevel, object);
+  g_return_val_if_fail ((page != NULL), 0);
 
   object_orient = o_net_orientation(object);
 
@@ -569,18 +553,16 @@ static int o_net_consolidate_segments (TOPLEVEL *toplevel, OBJECT *object)
 
           changed++;
           if (other_object->selected == TRUE ) {
-            o_selection_remove (toplevel, toplevel->page_current->selection_list, other_object);
+            o_selection_remove (toplevel, page->selection_list, other_object);
 
             /* If we're consolidating with a selected object,
              * ensure we select the resulting object.
              */
             if (object->selected == FALSE) {
-              o_selection_add (toplevel, toplevel->page_current->selection_list, object);
+              o_selection_add (toplevel, page->selection_list, object);
             }
           }
 
-          s_conn_remove_object (toplevel, other_object);
-          s_page_remove (toplevel, toplevel->page_current, other_object);
           s_delete_object (toplevel, other_object);
           o_net_recalc(toplevel, object);
           s_tile_update_object(toplevel, object);
@@ -599,19 +581,22 @@ static int o_net_consolidate_segments (TOPLEVEL *toplevel, OBJECT *object)
 
 /*! \brief consolidate all net objects
  *  \par Function Description
- *  This function consolidates all net objects until no more consolidations
- *  are posible.
+ *  This function consolidates all net objects in a page until no more
+ *  consolidations are possible.
  *
- *  \param toplevel  The TOPLEVEL object
- *
+ *  \param toplevel  The TOPLEVEL object.
+ *  \param page      The PAGE to consolidate nets in.
  */
-void o_net_consolidate(TOPLEVEL *toplevel)
+void o_net_consolidate(TOPLEVEL *toplevel, PAGE *page)
 {
   OBJECT *o_current;
   const GList *iter;
   int status = 0;
 
-  iter = s_page_objects (toplevel->page_current);
+  g_return_if_fail (toplevel != NULL);
+  g_return_if_fail (page != NULL);
+
+  iter = s_page_objects (page);
 
   while (iter != NULL) {
     o_current = (OBJECT *)iter->data;
@@ -621,7 +606,7 @@ void o_net_consolidate(TOPLEVEL *toplevel)
     }
 
     if (status == -1) {
-      iter = s_page_objects (toplevel->page_current);
+      iter = s_page_objects (page);
       status = 0;
     } else {
       iter = g_list_next (iter);
@@ -651,4 +636,157 @@ void o_net_modify(TOPLEVEL *toplevel, OBJECT *object,
   o_net_recalc (toplevel, object);
 
   s_tile_update_object(toplevel, object);
+}
+
+/*! \brief Refresh & cache number of connected entities.
+ *
+ *  \par Function Description
+ *  Traverse all network segments reachable from this net and count
+ *  total number of unique entities connected to all net segments.
+ *
+ *  For the purpose of this function, an entity is:
+ *    - pin
+ *    - bus
+ *    - attached netname attribute
+ *
+ *  Computed number of entities is afterwards stored in all traversed
+ *  net segments.
+ *
+ *  The algorithm does not handle corner cases, ie two bus segments
+ *  belonging to the same bus will be counted twice.
+ *
+ *  \param [in] toplevel    The TOPLEVEL object
+ *  \param [in] o_current   The NET OBJECT to check connectivity of
+ */
+void o_net_refresh_conn_cache(TOPLEVEL *toplevel, OBJECT *o_current)
+{
+  gint            num_conns = 0;
+  GHashTable     *visited;
+  GHashTableIter  iter;
+  GList          *stack = NULL;
+  OBJECT         *obj;
+  gpointer       key;
+
+  g_return_if_fail (toplevel);
+  g_return_if_fail (o_current);
+  g_return_if_fail (o_current->type == OBJ_NET);
+
+  /* Keep track of visited nets, pins and buses in the hash table.
+   * This way we short-circuit the search and avoid loops.
+   */
+  visited = g_hash_table_new (NULL, NULL);
+
+  /*
+   * Add the starting net to the hash so:
+   *   1. it is not traversed twice
+   *   2. it is updated at the end if no connections are found
+   */
+  g_hash_table_insert (visited, o_current, o_current);
+
+  /* Check if a netname= is attached to the starting net segment */
+  if (NULL != o_attrib_search_object_attribs_by_name (o_current,
+                                                      "netname",
+                                                      0)) {
+    num_conns += 1;
+  }
+
+  /* Keep track of connections to search at each net segment in a stack.
+   * Each stack entry points to an entry in obj->conn_list.
+   * Pop the stack when we have no more connections to check.
+   * Push next entry on the stack if we encounter a net segment.
+   */
+
+  /* Initialise the stack for the starting net segment. */
+  stack = g_list_prepend (stack, o_current->conn_list);
+
+  while (stack != NULL) {
+    /* At start of the loop, take a new connection from the stack. */
+    GList *conn_list = (GList*) stack->data;
+    CONN *conn;
+
+    if (conn_list == NULL) {
+      /* No more connections to check at this level. Pop the stack. */
+      stack = g_list_delete_link (stack, stack);
+      continue;
+    }
+
+    /* Extract the next connected object and advance the connection list. */
+    conn = (CONN*) conn_list->data;
+    stack->data = (gpointer) g_list_next (conn_list);
+
+    if (conn == NULL)
+        /* should not happen */
+        continue;
+    obj = conn->other_object;
+    if (obj == NULL)
+        /* should not happen */
+        continue;
+
+    /* Act upon the object that is connected to the segment. */
+    switch (obj->type) {
+      case OBJ_PIN:
+      case OBJ_BUS:
+        if (NULL == g_hash_table_lookup (visited, obj)) {
+          g_hash_table_insert (visited, obj, obj);
+          num_conns += 1;
+        }
+        break;
+      case OBJ_NET:
+        if (NULL == g_hash_table_lookup (visited, obj)) {
+          g_hash_table_insert (visited, obj, obj);
+          /* Check if a netname= is attached to this net segment */
+          if (NULL != o_attrib_search_object_attribs_by_name (obj,
+                                                              "netname",
+                                                              0)) {
+            num_conns += 1;
+          }
+          /* Push new list of connections to check onto the stack */
+          stack = g_list_prepend (stack, obj->conn_list);
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  /* Cache value of num_conns in all visited objects */
+  g_hash_table_iter_init (&iter, visited);
+
+  while (g_hash_table_iter_next (&iter, &key, NULL)) {
+    obj = (OBJECT*) key;
+    if (obj->type == OBJ_NET) {
+      obj->net_num_connected = num_conns;
+      obj->valid_num_connected = TRUE;
+    }
+  }
+
+  g_hash_table_destroy (visited);
+  g_list_free (stack);
+}
+
+/*! \brief Check if net is fully connected.
+ *
+ *  \par Function Description
+ *  Net is fully connected when it connects at least
+ *  two separate entities.
+ *
+ *  \sa o_net_refresh_conn_cache
+ *
+ *  \param [in] toplevel    The TOPLEVEL object
+ *  \param [in] o_current   The OBJECT to check connectivity of
+ *  \return TRUE if net is fully connected, FALSE otherwise
+ */
+gboolean o_net_is_fully_connected (TOPLEVEL *toplevel,
+                                   OBJECT   *o_current)
+{
+  g_return_val_if_fail (toplevel, FALSE);
+  g_return_val_if_fail (o_current, FALSE);
+  g_return_val_if_fail (o_current->type == OBJ_NET, FALSE);
+
+  if (!o_current->valid_num_connected)
+    o_net_refresh_conn_cache (toplevel, o_current);
+
+  g_return_val_if_fail (o_current->valid_num_connected, FALSE);
+
+  return o_current->net_num_connected > 1 ? TRUE : FALSE;
 }

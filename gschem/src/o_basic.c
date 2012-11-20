@@ -42,7 +42,6 @@ void o_redraw_rects (GSCHEM_TOPLEVEL *w_current,
 {
   TOPLEVEL *toplevel = w_current->toplevel;
   gboolean draw_selected;
-  int redraw_state = toplevel->DONT_REDRAW;
   int grip_half_size;
   int cue_half_size;
   int bloat;
@@ -51,11 +50,9 @@ void o_redraw_rects (GSCHEM_TOPLEVEL *w_current,
   GList *iter;
   BOX *world_rects;
 
-  if (!toplevel->DONT_REDRAW) {
-    for (i = 0; i < n_rectangles; i++) {
-      x_repaint_background_region (w_current, rectangles[i].x, rectangles[i].y,
-                                   rectangles[i].width, rectangles[i].height);
-    }
+  for (i = 0; i < n_rectangles; i++) {
+    x_repaint_background_region (w_current, rectangles[i].x, rectangles[i].y,
+                                 rectangles[i].width, rectangles[i].height);
   }
 
   g_return_if_fail (toplevel != NULL);
@@ -89,19 +86,15 @@ void o_redraw_rects (GSCHEM_TOPLEVEL *w_current,
                     ((w_current->event_state == MOVE) ||
                      (w_current->event_state == ENDMOVE)));
 
-  w_current->inside_redraw = 1;
   for (iter = obj_list; iter != NULL; iter = g_list_next (iter)) {
     OBJECT *o_current = iter->data;
 
-    if (o_current->draw_func != NULL) {
-      toplevel->DONT_REDRAW = redraw_state ||
-                              o_current->dont_redraw ||
-                              (!draw_selected && o_current->selected);
-      (*o_current->draw_func)(w_current, o_current);
-    }
+    if (o_current->dont_redraw ||
+        (!draw_selected && o_current->selected))
+      continue;
+
+    o_redraw_single (w_current, o_current);
   }
-  w_current->inside_redraw = 0;
-  toplevel->DONT_REDRAW = redraw_state;
 
   o_cue_redraw_all (w_current, obj_list, draw_selected);
 
@@ -196,24 +189,18 @@ void o_redraw_rects (GSCHEM_TOPLEVEL *w_current,
  */
 void o_redraw (GSCHEM_TOPLEVEL *w_current, GList *object_list, gboolean draw_selected)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   OBJECT *o_current;
   GList *iter;
-  int redraw_state = toplevel->DONT_REDRAW;
 
-  iter = object_list;
-  while (iter != NULL) {
+  for (iter = object_list; iter != NULL; iter = g_list_next (iter)) {
     o_current = (OBJECT *)iter->data;
-    if (o_current->draw_func != NULL) {
-      toplevel->DONT_REDRAW = redraw_state ||
-                              o_current->dont_redraw ||
-                              (!draw_selected && o_current->selected);
-      (*o_current->draw_func)(w_current, o_current);
-    }
 
-    iter = g_list_next (iter);
+    if (o_current->dont_redraw ||
+        (!draw_selected && o_current->selected))
+      continue;
+
+    o_redraw_single (w_current, o_current);
   }
-  toplevel->DONT_REDRAW = redraw_state;
 }
 
 /*! \brief Redraw an object on the screen.
@@ -226,17 +213,31 @@ void o_redraw (GSCHEM_TOPLEVEL *w_current, GList *object_list, gboolean draw_sel
  */
 void o_redraw_single(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  void (*func) (GSCHEM_TOPLEVEL *, OBJECT *) = NULL;
 
   if (o_current == NULL)
-  return;
+    return;
 
-  if (toplevel->DONT_REDRAW) /* highly experimental */
-  return;
-
-  if (o_current->draw_func != NULL) {
-    (*o_current->draw_func)(w_current, o_current);
+  switch (o_current->type) {
+      case OBJ_LINE:    func = o_line_draw;    break;
+      case OBJ_NET:     func = o_net_draw;     break;
+      case OBJ_BUS:     func = o_bus_draw;     break;
+      case OBJ_BOX:     func = o_box_draw;     break;
+      case OBJ_PICTURE: func = o_picture_draw; break;
+      case OBJ_CIRCLE:  func = o_circle_draw;  break;
+      case OBJ_PLACEHOLDER:
+      case OBJ_COMPLEX: func = o_complex_draw; break;
+      case OBJ_TEXT:    func = o_text_draw;    break;
+      case OBJ_PATH:    func = o_path_draw;    break;
+      case OBJ_PIN:     func = o_pin_draw;     break;
+      case OBJ_ARC:     func = o_arc_draw;     break;
+      default:
+        g_critical ("o_redraw_single: object %p has bad type '%c'\n",
+                    o_current, o_current->type);
   }
+
+  if (func != NULL)
+    (*func) (w_current, o_current);
 }
 
 
@@ -522,7 +523,6 @@ void o_invalidate_rect (GSCHEM_TOPLEVEL *w_current,
  *  of NULL, causing the entire drawing area to be invalidated.
  *
  *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] object     The OBJECT invalidated on screen.
  */
 void o_invalidate_all (GSCHEM_TOPLEVEL *w_current)
 {

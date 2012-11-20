@@ -15,7 +15,8 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with this program; if not, write to the Free Software
-;;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+;;; MA 02111-1301 USA.
 
 ;; --------------------------------------------------------------------------
 ;;
@@ -226,17 +227,12 @@
 ;; what when not defined?
 ;;      problem is slotted components e.g. ../examples/singlenet_1.sch
 ;;
-(define spice:write-net-name-of-component
-  (lambda (uref number-of-pin port)
-    (if (> number-of-pin 0)
-      (begin                                   
-            ;; first find pin1 and then start writing the connected net name
-        (spice:write-net-name-of-component uref (- number-of-pin 1) port)
-            ;; generate a pin-name e.g. pin1, pin2, pin3 ...
-        (let ((pin-name (number->string number-of-pin)))  
-          (display (car (spice:get-net uref (gnetlist:get-attribute-by-pinseq uref pin-name "pinnumber"))) port)
-          (write-char #\space port))))))
-
+(define (spice:write-net-name-of-component uref number-of-pin port)
+  (do ((i 1 (1+ i)))
+      ((> i number-of-pin))
+    (let ((pin-name (number->string i)))
+      (display (car (spice:get-net uref (gnetlist:get-attribute-by-pinseq uref pin-name "pinnumber"))) port)
+      (write-char #\space port))))
 
 ;;
 ;; Given a uref, returns the device attribute value as string

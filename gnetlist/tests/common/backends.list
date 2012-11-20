@@ -7,11 +7,13 @@ cascade
 drc2
 drc
 eagle
+ewnet
 futurenet2
 geda
 gossip
 gsch2pcb
 liquidpcb
+makedepend
 mathematica
 maxascii
 osmond

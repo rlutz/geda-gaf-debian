@@ -60,7 +60,6 @@ static void preview_get_property (GObject *object,
                                   GParamSpec *pspec);
 static void preview_dispose (GObject *self);
 
-
 /*! \brief Completes initialitation of the widget after realization.
  *  \par Function Description
  *  This function terminates the initialization of preview's GSCHEM_TOPLEVEL
@@ -94,8 +93,6 @@ preview_callback_realize (GtkWidget *widget,
 
   preview_page = s_page_new (preview_toplevel, "unknown");
   s_page_goto (preview_toplevel, preview_page);
-
-  preview_toplevel->DONT_REDRAW = 0;
 
   a_zoom_extents(preview_w_current,
                  s_page_objects (preview_page),
@@ -206,6 +203,7 @@ preview_update (Preview *preview)
   TOPLEVEL *preview_toplevel = preview_w_current->toplevel;
   int left, top, right, bottom;
   int width, height;
+  GError * err = NULL;
 
   if (preview_toplevel->page_current == NULL) {
     return;
@@ -220,18 +218,28 @@ preview_update (Preview *preview)
     g_assert ((preview->filename == NULL) || (preview->buffer == NULL));
     if (preview->filename != NULL) {
       /* open up file in current page */
-      f_open_flags (preview_toplevel, preview->filename,
+      f_open_flags (preview_toplevel, preview_toplevel->page_current,
+                    preview->filename,
                     F_OPEN_RC | F_OPEN_RESTORE_CWD, NULL);
       /* test value returned by f_open... - Fix me */
       /* we should display something if there an error occured - Fix me */
     }
     if (preview->buffer != NULL) {
-
       /* Load the data buffer */
-      s_page_append_list (preview_toplevel, preview_toplevel->page_current,
-                          o_read_buffer (preview_toplevel,
-                                         NULL, preview->buffer, -1,
-                                         _("Preview Buffer")));
+      GList * objects = o_read_buffer (preview_toplevel,
+                                       NULL, preview->buffer, -1,
+                                       _("Preview Buffer"), &err);
+
+      if (err == NULL) {
+        s_page_append_list (preview_toplevel, preview_toplevel->page_current,
+                            objects);
+      }
+      else {
+        s_page_append (preview_toplevel, preview_toplevel->page_current,
+                       o_text_new(preview_toplevel, OBJ_TEXT, 2, 100, 100, LOWER_MIDDLE, 0,
+                                  err->message, 10, VISIBLE, SHOW_NAME_VALUE));
+        g_error_free(err);
+      }
     }
   }
 
@@ -324,14 +332,10 @@ preview_event_configure (GtkWidget         *widget,
                          gpointer           user_data)
 {
   gboolean retval;
-  int save_redraw;
   GSCHEM_TOPLEVEL *preview_w_current = PREVIEW (widget)->preview_w_current;
   PAGE     *preview_page = preview_w_current->toplevel->page_current;
 
-  save_redraw = preview_w_current->toplevel->DONT_REDRAW;
-  preview_w_current->toplevel->DONT_REDRAW = 1;
   retval = x_event_configure (widget, event, preview_w_current);
-  preview_w_current->toplevel->DONT_REDRAW = save_redraw;
   if (preview_page != NULL) {
     a_zoom_extents(preview_w_current, s_page_objects (preview_page), 0);
   }
@@ -375,6 +379,11 @@ preview_init (Preview *preview)
   o_text_set_rendered_bounds_func (preview_w_current->toplevel,
                                    o_text_get_rendered_bounds,
                                    preview_w_current);
+
+  o_add_change_notify (preview_w_current->toplevel,
+                       (ChangeNotifyFunc) o_invalidate,
+                       (ChangeNotifyFunc) o_invalidate,
+                       preview_w_current);
 
   i_vars_set (preview_w_current);
 

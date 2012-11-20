@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,15 +43,13 @@
  */
 void o_line_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   int x1, y1, x2, y2;
 
   if (o_current->line == NULL) {
     return;
   }
 
-  if ( (toplevel->DONT_REDRAW == 1) ||
-       (!o_line_visible (w_current, o_current->line, &x1, &y1, &x2, &y2)) ) {
+  if (!o_line_visible (w_current, o_current->line, &x1, &y1, &x2, &y2)) {
     return;
   }
 
@@ -175,9 +173,9 @@ void o_line_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
                         w_current->second_wx, w_current->second_wy);
   s_page_append (toplevel, toplevel->page_current, new_obj);
 
-  /* draw it */
-  o_invalidate (w_current, new_obj);
-  
+  /* Call add-objects-hook */
+  g_run_hook_object (w_current, "%add-objects-hook", new_obj);
+
   toplevel->page_current->CHANGED=1;
   o_undo_savestate(w_current, UNDO_ALL);
 }
@@ -273,7 +271,7 @@ void o_line_draw_grips(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
 /*! \brief
  *  \par Function Description
  *
- *  \param [in] toplevel  The TOPLEVEL object.
+ *  \param [in] w_current  The TOPLEVEL object.
  *  \param [in] line
  *  \param [in] x1
  *  \param [in] y1

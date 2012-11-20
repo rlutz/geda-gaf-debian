@@ -15,7 +15,10 @@
 ;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with this program; if not, write to the Free Software
-;;; Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+;;; MA 02111-1301 USA.
+
+(use-modules (ice-9 optargs))
 
 ;; --------------------------------------------------------------------------
 ;;
@@ -113,6 +116,12 @@
 ;; ...more net options...
 ;; }
 ;;
+
+;; We redefine the newline function, because this file format requires
+;; Windows-style "\r\n" line endings rather than Unix-style "\n"
+;; endings.
+(define* (newline #:optional port)
+  (display "\r\n" (or port (current-output-port))))
 
 ;;
 ;; Top level header

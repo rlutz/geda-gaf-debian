@@ -60,6 +60,7 @@
  */
 
 #include <config.h>
+#include <missing.h>
 
 #include <stdio.h>
 #include <math.h>
@@ -89,8 +90,13 @@
  */
 #define GEDA_FONT_FACTOR 1.3
 
-/*! Default setting for text draw function. */
-void (*text_draw_func)() = NULL;
+/*! \brief Scale factor font height and line-spacing (for print only)
+ *
+ *  \par Description
+ *  Specifies the scale factor between the nominal font size and the inter-
+ *  line spacing used to render it when printing.
+ */
+#define PRINT_LINE_SPACING 1.12
 
 /*! Size of a tab in characters */
 int tab_in_chars = 8;
@@ -102,7 +108,7 @@ int tab_in_chars = 8;
  *  This functions updates the text->disp_string according
  *  to the object->show_name_value settings
  *  
- *  \param [in] o  The OBJECT to update
+ *  \param [in] object  The OBJECT to update
  */
 static void update_disp_string (OBJECT *object)
 {
@@ -249,8 +255,6 @@ OBJECT *o_text_new(TOPLEVEL *toplevel,
 {
   OBJECT *new_node=NULL;
   TEXT *text;
-  char *name = NULL;
-  char *value = NULL;
 
   if (string == NULL) {
     return(NULL);
@@ -271,9 +275,6 @@ OBJECT *o_text_new(TOPLEVEL *toplevel,
 
   new_node->text = text;
 
-  new_node->draw_func = text_draw_func;  
-  new_node->sel_func = select_func;  
-
   new_node->color = color;
   o_set_visibility (toplevel, new_node, visibility);
   new_node->show_name_value = show_name_value;
@@ -283,8 +284,6 @@ OBJECT *o_text_new(TOPLEVEL *toplevel,
   /* Update bounding box */
   new_node->w_bounds_valid = FALSE;
 
-  g_free(name);
-  g_free(value);
   return new_node;
 }
 
@@ -322,18 +321,18 @@ void o_text_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
  *  create and appended to the \a object_list.
  *  
  *  \param [in] toplevel     The TOPLEVEL object
- *  \param [in] object_list  list of OBJECTS to append a new text
  *  \param [in] first_line   the first line of the text
  *  \param [in] tb           a text buffer (usually a line of a schematic file)
  *  \param [in] release_ver  The release number gEDA
  *  \param [in] fileformat_ver a integer value of the file format
- *  \return The object list
+ *  \return The object list, or NULL on error.
  */
 OBJECT *o_text_read (TOPLEVEL *toplevel,
 		    const char *first_line,
 		    TextBuffer *tb,
 		    unsigned int release_ver,
-		    unsigned int fileformat_ver)
+            unsigned int fileformat_ver,
+            GError **err)
 {
   OBJECT *new_obj;
   char type; 
@@ -350,24 +349,33 @@ OBJECT *o_text_read (TOPLEVEL *toplevel,
   GString *textstr;
 
   if (fileformat_ver >= 1) {
-    sscanf(first_line, "%c %d %d %d %d %d %d %d %d %d\n", &type, &x, &y, 
-           &color, &size,
-           &visibility, &show_name_value, 
-           &angle, &alignment, &num_lines);	
+    if (sscanf(first_line, "%c %d %d %d %d %d %d %d %d %d\n", &type, &x, &y, 
+	       &color, &size,
+	       &visibility, &show_name_value, 
+	       &angle, &alignment, &num_lines) != 10) {
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse text object"));
+      return NULL;
+    }
   } else if (release_ver < VERSION_20000220) {
     /* yes, above less than (not less than and equal) is correct. The format */
     /* change occurred in 20000220 */
-    sscanf(first_line, "%c %d %d %d %d %d %d %d\n", &type, &x, &y, 
-           &color, &size,
-           &visibility, &show_name_value, 
-           &angle);	
+    if (sscanf(first_line, "%c %d %d %d %d %d %d %d\n", &type, &x, &y, 
+	       &color, &size,
+	       &visibility, &show_name_value, 
+	       &angle) != 8) {
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse text object"));
+      return NULL;
+    }
     alignment = LOWER_LEFT; /* older versions didn't have this */
     num_lines = 1; /* only support a single line */
   } else {
-    sscanf(first_line, "%c %d %d %d %d %d %d %d %d\n", &type, &x, &y, 
-           &color, &size,
-           &visibility, &show_name_value, 
-           &angle, &alignment);	
+    if (sscanf(first_line, "%c %d %d %d %d %d %d %d %d\n", &type, &x, &y, 
+	       &color, &size,
+	       &visibility, &show_name_value, 
+           &angle, &alignment) != 9) {
+      g_set_error (err, EDA_ERROR, EDA_ERROR_PARSE, _("Failed to parse text object"));
+      return NULL;
+    }
     num_lines = 1; /* only support a single line */
   }
 
@@ -423,14 +431,17 @@ OBJECT *o_text_read (TOPLEVEL *toplevel,
 
   textstr = g_string_new ("");
   for (i = 0; i < num_lines; i++) {
-    gchar *line;
+    const gchar *line;
     
     line = s_textbuffer_next_line (tb);
 
-    if (line != NULL)
-      {
-	textstr = g_string_append (textstr, line);
-      }
+    if (line == NULL) {
+      g_string_free (textstr, TRUE);
+      g_set_error(err, EDA_ERROR, EDA_ERROR_PARSE, _("Unexpected end-of-file after %d lines"), i);
+      return NULL;
+    }
+
+    textstr = g_string_append (textstr, line);
   }
   /* retrieve the character string from the GString */
   string = g_string_free (textstr, FALSE);
@@ -467,10 +478,11 @@ OBJECT *o_text_read (TOPLEVEL *toplevel,
  *  This function takes a text \a object and return a string
  *  according to the file format definition.
  *
+ *  \param [in] toplevel  a TOPLEVEL structure
  *  \param [in] object  a text OBJECT
  *  \return the string representation of the text OBJECT
  */
-char *o_text_save(OBJECT *object)
+char *o_text_save(TOPLEVEL *toplevel, OBJECT *object)
 {
   int x, y;
   int size;
@@ -488,7 +500,8 @@ char *o_text_save(OBJECT *object)
   num_lines = o_text_num_lines(string);
 
   buf = g_strdup_printf ("%c %d %d %d %d %d %d %d %d %d\n%s", object->type,
-                         x, y, object->color, size, object->visibility,
+                         x, y, object->color, size,
+                         o_is_visible (toplevel, object) ? VISIBLE : INVISIBLE,
                          object->show_name_value, object->text->angle,
                          object->text->alignment, num_lines, string);
 
@@ -505,15 +518,10 @@ char *o_text_save(OBJECT *object)
  */
 void o_text_recreate(TOPLEVEL *toplevel, OBJECT *o_current)
 {
-  char *name = NULL;
-  char *value = NULL;
-
+  o_emit_pre_change_notify (toplevel, o_current);
   update_disp_string (o_current);
-
   o_current->w_bounds_valid = FALSE;
-
-  g_free(name);
-  g_free(value);
+  o_emit_change_notify (toplevel, o_current);
 }
 
 /*! \brief move a text object
@@ -553,7 +561,7 @@ OBJECT *o_text_copy(TOPLEVEL *toplevel, OBJECT *o_current)
                         o_current->text->angle,
                         o_current->text->string,
                         o_current->text->size,
-                        o_current->visibility,
+                        o_is_visible (toplevel, o_current) ? VISIBLE : INVISIBLE,
                         o_current->show_name_value);
 
   return new_obj;
@@ -574,7 +582,7 @@ OBJECT *o_text_copy(TOPLEVEL *toplevel, OBJECT *o_current)
 void o_text_print_text_string(FILE *fp, char *string, int unicode_count, 
 			      gunichar *unicode_table)
 {
-  int len, j;
+  int j;
   gchar *aux;
   gunichar current_char, c;
 
@@ -584,8 +592,7 @@ void o_text_print_text_string(FILE *fp, char *string, int unicode_count,
   }
 
   aux = string;
-  len = g_utf8_strlen(string, -1);
-  
+
   fprintf(fp, "(");
 
   while (aux && ((gunichar) (*aux) != 0)) {
@@ -621,35 +628,6 @@ void o_text_print_text_string(FILE *fp, char *string, int unicode_count,
 }
 
 
-/*! \brief calculates the height of a text string
- *  \par Function Description
- *  This function calculates the height of a \a string depending
- *  on it's text \a size. The number of lines and the spacing
- *  between the lines are taken into account.
- * 
- *  \param [in] string  the text string
- *  \param [in] size    the text size of the character
- *  \return the total height of the text string
- */
-static int o_text_height(const char *string, int size) 
-{
-  int line_count = 0;
-
-  if (string == NULL) {
-    return 0;
-  }
-
-  /* Get the number of lines in the string */
-  line_count = o_text_num_lines(string);
-  
-  /* 26 is the height of a single char (in mils) */
-  /* which represents a character which is 2 pts high */
-  /* So size has to be divided in half */
-  /* and it's added the LINE_SPACING*character_height of each line */
-  return(26*size/2*(1+LINE_SPACING*(line_count-1)));
-}
-
-
 /*! \brief print a text object into a postscript file
  *  \par Function Description
  *  This function writes the postscript representation of the text object
@@ -672,7 +650,7 @@ void o_text_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
   char *output_string = NULL;
   char *name = NULL;
   char *value = NULL;
-  int x, y, angle, len, char_height;
+  int x, y, angle, len;
   float font_size;
 
 
@@ -712,6 +690,10 @@ void o_text_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
           output_string = g_strdup("invalid");
         }
         break;
+
+    default:
+      g_return_if_reached ();
+
     }
   } else {
     output_string = g_strdup(o_current->text->string);
@@ -777,8 +759,9 @@ void o_text_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
     break;
   }
 
-  char_height = o_text_height("a", o_current->text->size);
-  fprintf(fp,"%s %f [",centering_control,(float)(char_height*LINE_SPACING));
+  font_size = o_text_get_font_size_in_points (toplevel, o_current)
+                / 72.0 * 1000.0;
+  fprintf(fp,"%s %f [",centering_control, font_size * PRINT_LINE_SPACING);
 
   /* split the line at each newline and print them */
   p = output_string;   /* Current point */
@@ -801,8 +784,6 @@ void o_text_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
   /* Collect pertinent info about the text location */
   x = o_current->text->x;
   y = o_current->text->y;
-  font_size = o_text_get_font_size_in_points (toplevel, o_current)
-                / 72.0 * 1000.0;
   fprintf(fp,"] %d %d %d %f text\n",angle,x,y,font_size);
 
   
@@ -988,6 +969,11 @@ void o_text_set_string (TOPLEVEL *toplevel, OBJECT *obj,
 
   g_free (obj->text->string);
   obj->text->string = g_strdup (new_string);
+
+  o_text_recreate (toplevel, obj);
+
+  if (obj->attached_to != NULL)
+    o_attrib_emit_attribs_changed (toplevel, obj->attached_to);
 }
 
 
@@ -1016,6 +1002,7 @@ const gchar *o_text_get_string (TOPLEVEL *toplevel, OBJECT *obj)
  *  Set the function to be used to calculate text bounds for a given
  *  #TOPLEVEL.
  *
+ *  \param [in] toplevel     The TOPLEVEL object
  *  \param [in] func      Function to use.
  *  \param [in] user_data User data to be passed to the function.
  */

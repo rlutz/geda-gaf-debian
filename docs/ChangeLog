@@ -1,16 +1,391 @@
-commit 0a2711ce62dd3f19ae81ecdfd893231de390da9a
+commit ab37d4abc3e64078aeb2b6e5bda69f7afefc31bd
+Merge: 22b71fb 3d3d9b7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 18 17:14:21 2012 +0000
+
+    Merge branch 'wiki-import' into stable-1.8.
+
+commit 3d3d9b7b71e05e0d1fbeef81bf95a75a05f6d3df
+Author: Peter TB Brett <peter-b@geda-project.org>
+Date:   Sun Nov 18 10:46:11 2012 -0500
+
+    Automatic wiki import (Sun Nov 18 15:46:11 UTC 2012)
+
+commit 9b3d4d13339ee0f20ddb6d19bf294e3a2e97aabd
+Merge: 928786d 846f4cf
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 17 20:35:18 2012 +0000
+
+    Merge branch 'wiki-import' into stable-1.8
+    
+    Conflicts:
+    	configure.ac
+    	docs/Makefile.am
+
+commit 846f4cfa3a6c75e7e443a95a1f0e969f0334d313
+Author: Peter TB Brett <peter-b@geda-project.org>
+Date:   Sat Nov 17 15:16:46 2012 -0500
+
+    Automatic wiki import (Sat Nov 17 20:16:46 UTC 2012)
+
+commit e5f92e7eb4800a2e00a3d1bfd7f5c2922ce9976a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 17 19:01:43 2012 +0000
+
+    docs: Remove wiki-related scripts that are no longer needed.
+
+commit 7036a55451875d323e833a85c32133e1a63333fa
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 17 18:48:11 2012 +0000
+
+    Drastically simplify wiki Makefiles.
+    
+    Removes the need to explicitly list all wiki files in the Makefiles
+    and keep those lists up-to-date when the wiki changes.
+
+commit 5d69c79dbc7be5516cd87d47765a63bdb2dcdd33
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Tue Jan 3 00:24:54 2012 +0100
+
+    Renamed exception invalid-string to string-format in documentation.
+
+commit 09bd3be24aff7139ca4c8d3dc99f520c873a8b2d
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Wed Sep 7 20:31:00 2011 +0200
+
+    Fixed missing end of function.
+
+commit d1305adf92982b3a159707c940bafb8c293223fe
+Author: Eivind Kvedalen <eivind@kvedalen.name>
+Date:   Tue Jun 28 21:43:13 2011 +0200
+
+    Partial fix for bug #700448.
+    
+    NULL is returned from o_*_read and o_read_buffer functions if parsing of the input buffer fails.
+    An error object is returned in these cases, describing in detail what error occured.
+    
+    gnetlist is updated to exit with status code 2 if the input file can't be read.
+    
+    gschem is updated to report errors when using o_read_buffer.
+    
+    TODO:
+    * Prone to segfaults on bad input files (separate patch)
+
+commit 5751075dd5f5e0429cae9859cab3d6873b21c772
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 31 23:51:30 2011 +0000
+
+    Revert disabling of geda-scheme.info file.
+    
+    This reverts commit c2e926e58e63 and a2465ee90bac, because `make
+    distcheck' works just fine.
+
+commit a2465ee90baccab631911049d39257309e3b419b
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sat Dec 31 17:13:36 2011 -0500
+
+    Temporarily removed the processing/shipping of the scheme-api doc.
+    
+    For some unknown reason, make distcheck did not like the scheme-api texi
+    document.  Need to investigate and then revert this commit.
+
+commit 6fac0c0f99b51a845f8ab7be2c358f703a54d61f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 21 15:14:03 2011 +0000
+
+    scheme-api: Add 'snap-point' function to (gschem window) module.
+    
+    The snap-point function returns the closest on-grid position to a
+    given point. Suggested by Luigi Palese.
+    
+    Affects-bug: lp-905294
+
+commit 4a1b54fdf119538e90f5b0dbc73a5a9d8ddc56da
+Author: Luigi S. Palese <quadword@gmail.com>
+Date:   Tue Dec 13 11:20:34 2011 +0100
+
+    scheme-api: Added expand-env-variables function to the os module.
+    
+    Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
+
+commit 0e506ebd5d5cc87a7f373b83b24f2ad3c90fd18b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 14:13:22 2011 +0000
+
+    Remove per-tool INSTALL files.
+    
+    Only one top-level INSTALL file is needed, and that is provided by
+    automake.
+
+commit 6c0f45f324813ee0c1565f50c0a6e0a7debee9d8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 12 13:55:18 2011 +0000
+
+    docs: Correct documentation for (user-data-dir).
+
+commit 326a4eca0d36eed80a33b201bcbed4942046f61c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 9 21:09:45 2011 +0000
+
+    scheme-api: Create and manipulate picture objects.
+    
+    Closes-bug: lp-898379
+
+commit ae070b080856b6eef1059ee50dede82cc4f0afe8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 8 17:23:10 2011 +0000
+
+    scheme-api: Add (geda os) module.
+    
+    Add the (geda os) module, which provides operating system information
+    and services, including:
+    
+    - host operating system classification
+    - gEDA standard paths
+    - directory and search path separators
+
+commit 30fa50eb42e33e4c8ff616eef7c4ba10eb65d228
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 8 18:04:31 2011 +0000
+
+    scheme-api: Add show-uri and show-file functions to (gschem util).
+
+commit 1ceef2c85bdbc454205d7330c86498381f167cc0
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Dec 4 22:22:53 2011 +0000
+
+    scheme-api: Add path manipulation functions.
+    
+    Closes-bug: lp-898377
+
+commit 54bb85c55e147a0222a41f415e3200194d3e70ac
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 30 18:43:57 2011 +0000
+
+    gschem: Recursive keymaps.
+    
+    Adds the bind-keys! and lookup-keys functions, which are
+    used to work with key sequences and sub-keymaps.
+
+commit d29eb4d67b08065be7e7961725d9b40a234ef1f7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 30 18:44:06 2011 +0000
+
+    gschem: Basic keymaps.
+    
+    Adds a basic keymap type.  A keymap maps key combinations to "bindable
+    objects", which at the moment are expected (but not required) to be
+    thunks or other keymaps.
+
+commit 675c01fe262c1bbc912a43a74c3c96ca78dc88e2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Nov 30 19:24:06 2011 +0000
+
+    gschem: Key sequences.
+    
+    Adds some Scheme API functions for working with key sequences.  A key
+    sequence is a vector of key combinations.
+
+commit 5a3917a2fe89a1b3e43d0fe9f7ee6a466f65e57c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 29 16:33:28 2011 +0000
+
+    gschem: Key combinations as first-class objects.
+    
+    Adds a new Scheme type to gschem that represents a key combination
+    (e.g. Ctrl+Shift+A).  The interface for working with them simply wraps
+    the GTK+ accelerator handling API, which means it's easy to convert
+    the key combination smobs either into a precise representation for
+    storing or into a properly-translated "pretty" representation for
+    display.
+
+commit 8f90f5022d2f0c0d24dd4cc7b377116308a9181d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jun 27 20:40:23 2011 +0100
+
+    Add some files to .gitignore.
+
+commit 242562c9b0513f451c9ec2b25b1d8df4c71d01e6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jun 27 08:19:48 2011 +0100
+
+    scheme-api: Add info directory macros.
+
+commit 31fcff837375b3db8649f1f1854dd0daa98e901a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 16 21:45:27 2011 +0100
+
+    scheme-api: Converting pages to/from strings.
+
+commit 71621e0f9d6ed201ac3968823b0b6b852fe3f070
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 25 11:57:55 2011 +0100
+
+    scheme-api: Add mirror-objects! function.
+
+commit 01e9ab2b42bff0de6386706ba3eb11e7a7c6f5e9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 25 11:19:20 2011 +0100
+
+    scheme-api: Add rotate-objects! function.
+
+commit 208984c6815066a90c7d1d3583f271524344797e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jun 25 10:14:03 2011 +0100
+
+    scheme-api: Add translate-objects! function.
+
+commit 9ac7ddffcdd09ae0bbf9c62af0457ff957510081
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 22:37:41 2011 +0100
+
+    scheme-api: Minor documentation fix-ups.
+    
+    Corrected encoding, made CC licence URL a proper link, and corrected
+    case.
+
+commit 2fa4f5712cf6decb4bf3b90002634ba607b1aec4
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 20:24:57 2011 +0100
+
+    scheme-api: gschem API documentation (misc).
+
+commit 4f6d3a0fd5810d8fabd93a1629495f5c916ae4d3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 20:04:21 2011 +0100
+
+    scheme-api: gschem API documentation (hooks).
+
+commit e53af99b5b907819da60a2f6d7666038d351ddd6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 19:54:29 2011 +0100
+
+    scheme-api: gschem API documentation (selections).
+
+commit 01e10f7f71a380e2c6aa192d4da6bf8204cbfe2f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 19:49:59 2011 +0100
+
+    scheme-api: gschem API documentation (windows and views).
+
+commit 7c88e88e38bcd20f6ad3e46604f2b117b6fef0a6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 14:00:10 2011 +0100
+
+    scheme-api: Core API documentation (attributes).
+
+commit dd5b9c7c08307104ce360661f6e696ce87c77389
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Jun 24 08:08:44 2011 +0100
+
+    scheme-api: Core API documentation (component objects).
+
+commit 224e3edec54febcf055810e6d4220369e50f1ade
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 22:02:55 2011 +0100
+
+    scheme-api: Core API documentation (text objects).
+
+commit 1e9d73ec74c6abd2ddfcf18cccadc9c0c44ff7ff
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 21:07:17 2011 +0100
+
+    scheme-api: Core API documentation (picture and path objects).
+
+commit 832af3a116fd37db9c8a647918179522ee0a10ab
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 20:46:57 2011 +0100
+
+    scheme-api: Core API documentation (arc objects).
+
+commit be7d5d316bbf944f9e0a618ddff795a073de9183
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 19:47:20 2011 +0100
+
+    scheme-api: Core API documentation (circle objects).
+
+commit e7ed5291067d56419efe3764190d22fa7714937e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 18:44:07 2011 +0100
+
+    scheme-api: Core API documentation (box objects).
+
+commit b1ca0b60c9218db51132272ffdf0c1815d29b80f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 18:11:21 2011 +0100
+
+    scheme-api: Core API documentation (pin objects).
+
+commit 623b9fe2ad30c517053b2c8b40723435903e2474
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 16:59:03 2011 +0100
+
+    scheme-api: Core API documentation (net and bus objects).
+
+commit 37338045adf382ecef00d5ee5f337c4da250b996
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 13:07:59 2011 +0100
+
+    scheme-api: Core API documentation (line objects).
+
+commit fd1e63aefad0097b1f99cf6cdb31998efec5c407
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Jun 23 16:33:15 2011 +0100
+
+    scheme-api: Core API documentation (general objects).
+
+commit bcd036f9432335473d5ad64e18d83df669947eb3
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Jun 21 21:19:45 2011 +0100
+
+    scheme-api: Core API documentation (pages).
+
+commit 4a3a197ab3519928c1fdb2b31a0cbc272ba75f12
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Jun 19 22:04:48 2011 +0100
+
+    scheme-api: Add documentation skeleton.
+
+commit 5497774003ce85443f774937b8f10df319b2a168
+Author: Ales Hvezda <ahvezda@seul.org>
+Date:   Sun Jan 16 00:58:07 2011 -0500
+
+    Updated docs from the gEDA wiki
+
+commit 1e93f7bea2cbe0fa8887337c261093b55c31dd6d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Jan 3 23:07:25 2011 +0000
+
+    Revert "Remove some CVS keywords."
+    
+    This reverts commit f5ada1de1372bd3772b4f4bd33afa59803c1dade, which
+    was pushed to the repository in error.
+
+commit f5ada1de1372bd3772b4f4bd33afa59803c1dade
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Dec 21 12:37:10 2010 +0000
+
+    Remove some CVS keywords.
+
+commit d34cd2260f47ce12fcd31441a66087462673e43e
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Feb 14 18:30:45 2010 -0500
 
     Removed a bunch of obsolete wiki snapshot creation/cleanup scripts
+    
+    (cherry picked from commit 0a2711ce62dd3f19ae81ecdfd893231de390da9a)
+    (from stable-1.6)
 
-commit 1b200e957de912ec369124a2efebe16ec4e6b531
+commit 88391eddcb73dd9fe9e61aeab61843f568b33918
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Feb 14 18:26:23 2010 -0500
 
     Updated the wiki snapshot from the official wiki
+    
+    (cherry picked from commit 1b200e957de912ec369124a2efebe16ec4e6b531)
+    (from stable-1.6)
 
-commit 19e4de650dad95977bc07bae4f897ab6b9d7b110
+commit f556ef7d48cbda4a068db2916ea6e6abad2eb693
 Author: Ales Hvezda <ahvezda@seul.org>
 Date:   Sun Feb 14 18:00:02 2010 -0500
 
@@ -18,6 +393,9 @@ Date:   Sun Feb 14 18:00:02 2010 -0500
     
     Eventually these scripts should be fixed or rewritten so that they
     do not have any hardcoded paths.
+    
+    (cherry picked from commit 19e4de650dad95977bc07bae4f897ab6b9d7b110)
+    (from stable-1.6)
 
 commit b7ca06041ea464b0d064bfa965843d2907a83571
 Author: Ales Hvezda <ahvezda@seul.org>

@@ -2,6 +2,8 @@
 
 /* gschem_toplevel.c */
 GSCHEM_TOPLEVEL *gschem_toplevel_new();
+void gschem_toplevel_alloc_libgeda_toplevel(GSCHEM_TOPLEVEL *w_current);
+
 /* a_pan.c */
 void a_pan_general(GSCHEM_TOPLEVEL *w_current, double world_cx, double world_cy,
 		   double relativ_zoom_factor, int flags);
@@ -17,6 +19,8 @@ void a_zoom_box_motion(GSCHEM_TOPLEVEL *w_current, int x, int y);
 void a_zoom_box_invalidate_rubber(GSCHEM_TOPLEVEL *w_current);
 void a_zoom_box_draw_rubber(GSCHEM_TOPLEVEL *w_current);
 void correct_aspect(GSCHEM_TOPLEVEL *w_current);
+/* g_attrib.c */
+void g_init_attrib ();
 /* g_funcs.c */
 SCM g_funcs_print(SCM filename);
 SCM g_funcs_postscript(SCM filename);
@@ -26,29 +30,17 @@ SCM g_funcs_log(SCM msg);
 SCM g_funcs_msg(SCM msg);
 SCM g_funcs_confirm(SCM msg);
 SCM g_funcs_filesel(SCM msg, SCM templ, SCM flags);
-SCM g_funcs_browse_wiki(SCM wikiname);
 SCM g_funcs_use_rc_values(void);
 SCM get_selected_component_attributes(GSCHEM_TOPLEVEL *w_current);
-SCM get_selected_filename(GSCHEM_TOPLEVEL *w_current);
 /* g_hook.c */
-SCM g_make_attrib_smob_list(GSCHEM_TOPLEVEL *w_current, OBJECT *object);
-SCM g_set_attrib_value_x(SCM attrib_smob, SCM scm_value);
-SCM g_add_attrib(SCM object, SCM attrib_name, 
-		 SCM attrib_value, SCM scm_vis, SCM scm_show);
-SCM g_get_pin_ends(SCM object);
-SCM
-g_set_attrib_text_properties(SCM attrib_smob, SCM scm_colorname, SCM scm_size, 
-			     SCM scm_alignment, SCM scm_rotation, SCM scm_x,
-			     SCM scm_y);
-SCM g_get_object_bounds (SCM object_smob, SCM scm_exclude_attribs, SCM scm_exclude_object_type);
-SCM g_get_object_pins (SCM object_smob);
-SCM g_add_component(SCM page_smob, SCM scm_comp_name, SCM scm_x, SCM scm_y, 
-		    SCM scm_angle, SCM scm_selectable, SCM scm_mirror);
-SCM g_get_objects_in_page(SCM page_smob);
-SCM g_get_current_page(void);
+void g_init_hook ();
+void g_run_hook_object (GSCHEM_TOPLEVEL *w_current, const char *name, OBJECT *obj);
+void g_run_hook_object_list (GSCHEM_TOPLEVEL *w_current, const char *name, GList *obj_lst);
+void g_run_hook_page (GSCHEM_TOPLEVEL *w_current, const char *name, PAGE *page);
 /* g_keys.c */
-int g_keys_execute(GSCHEM_TOPLEVEL *w_current, int state, int keyval);
-GArray *g_keys_dump_keymap (void);
+void g_keys_reset (GSCHEM_TOPLEVEL *w_current);
+int g_keys_execute(GSCHEM_TOPLEVEL *w_current, GdkEventKey *event);
+GtkListStore *g_keys_to_list_store (void);
 SCM g_keys_file_new(SCM rest);
 SCM g_keys_file_new_window(SCM rest);
 SCM g_keys_file_open(SCM rest);
@@ -63,6 +55,8 @@ SCM g_keys_file_quit(SCM rest);
 SCM g_keys_edit_undo(SCM rest);
 SCM g_keys_edit_redo(SCM rest);
 SCM g_keys_edit_select(SCM rest);
+SCM g_keys_edit_select_all(SCM rest);
+SCM g_keys_edit_deselect(SCM rest);
 SCM g_keys_edit_copy(SCM rest);
 SCM g_keys_edit_copy_hotkey(SCM rest);
 SCM g_keys_edit_mcopy(SCM rest);
@@ -89,7 +83,6 @@ SCM g_keys_edit_embed(SCM rest);
 SCM g_keys_edit_unembed(SCM rest);
 SCM g_keys_edit_update(SCM rest);
 SCM g_keys_edit_show_hidden(SCM rest);
-SCM g_keys_edit_make_visible(SCM rest);
 SCM g_keys_edit_find(SCM rest);
 SCM g_keys_edit_show_text(SCM rest);
 SCM g_keys_edit_hide_text(SCM rest);
@@ -133,9 +126,9 @@ SCM g_keys_view_pan_right(SCM rest);
 SCM g_keys_view_pan_up(SCM rest);
 SCM g_keys_view_pan_down(SCM rest);
 SCM g_keys_view_pan_hotkey(SCM rest);
-SCM g_keys_view_update_cues(SCM rest);
 SCM g_keys_view_dark_colors(SCM rest);
 SCM g_keys_view_light_colors(SCM rest);
+SCM g_keys_view_bw_colors(SCM rest);
 SCM g_keys_page_manager(SCM rest);
 SCM g_keys_page_next(SCM rest);
 SCM g_keys_page_prev(SCM rest);
@@ -167,7 +160,6 @@ SCM g_keys_add_pin_hotkey(SCM rest);
 SCM g_keys_hierarchy_down_schematic(SCM rest);
 SCM g_keys_hierarchy_down_symbol(SCM rest);
 SCM g_keys_hierarchy_up(SCM rest);
-SCM g_keys_hierarchy_documentation(SCM rest);
 SCM g_keys_attributes_attach(SCM rest);
 SCM g_keys_attributes_detach(SCM rest);
 SCM g_keys_attributes_show_name(SCM rest);
@@ -192,8 +184,7 @@ SCM g_keys_misc3(SCM rest);
 SCM g_keys_help_about(SCM rest);
 SCM g_keys_help_hotkeys(SCM rest);
 SCM g_keys_cancel(SCM rest);
-SCM g_get_selected_filename(void);
-SCM g_get_selected_component_attributes(void);
+void g_init_keys ();
 /* g_rc.c */
 void g_rc_parse_gtkrc();
 SCM g_rc_gschem_version(SCM version);
@@ -216,7 +207,6 @@ SCM g_rc_embed_components(SCM mode);
 SCM g_rc_component_dialog_attributes(SCM stringlist);
 SCM g_rc_text_size(SCM size);
 SCM g_rc_text_caps_style(SCM mode);
-SCM g_rc_postscript_font_scale(SCM scale);
 SCM g_rc_snap_size(SCM size);
 SCM g_rc_logging_destination(SCM mode);
 SCM g_rc_attribute_name(SCM path);
@@ -266,7 +256,6 @@ SCM g_rc_dots_grid_fixed_threshold(SCM spacing);
 SCM g_rc_mesh_grid_display_threshold(SCM spacing);
 SCM g_rc_add_attribute_offset(SCM offset);
 SCM g_rc_auto_save_interval(SCM seconds);
-SCM g_rc_drag_can_move(SCM mode);
 SCM g_rc_mousepan_gain(SCM mode);
 SCM g_rc_keyboardpan_gain(SCM mode);
 SCM g_rc_print_command(SCM mode);
@@ -277,6 +266,14 @@ SCM g_rc_display_color_map (SCM scm_map);
 SCM g_rc_display_outline_color_map (SCM scm_map);
 /* g_register.c */
 void g_register_funcs(void);
+/* g_select.c */
+void g_init_select ();
+/* g_util.c */
+void g_init_util ();
+/* g_window.c */
+GSCHEM_TOPLEVEL *g_current_window ();
+void g_dynwind_window (GSCHEM_TOPLEVEL *w_current);
+void g_init_window ();
 /* globals.c */
 /* gschem.c */
 typedef void (*gschem_atexit_func)(gpointer data);
@@ -323,6 +320,8 @@ void i_callback_edit_redo(gpointer data, guint callback_action, GtkWidget *widge
 void i_callback_toolbar_edit_redo(GtkWidget *widget, gpointer data);
 void i_callback_edit_select(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_toolbar_edit_select(GtkWidget *widget, gpointer data);
+void i_callback_edit_select_all(gpointer data, guint callback_action, GtkWidget *widget);
+void i_callback_edit_deselect(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_edit_copy(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_edit_copy_hotkey(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_edit_mcopy(gpointer data, guint callback_action, GtkWidget *widget);
@@ -347,7 +346,6 @@ void i_callback_edit_embed(gpointer data, guint callback_action, GtkWidget *widg
 void i_callback_edit_unembed(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_edit_update(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_edit_show_hidden(gpointer data, guint callback_action, GtkWidget *widget);
-void i_callback_edit_make_visible(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_edit_find(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_edit_hide_text(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_edit_show_text(gpointer data, guint callback_action, GtkWidget *widget);
@@ -369,9 +367,9 @@ void i_callback_view_pan_right(gpointer data, guint callback_action, GtkWidget *
 void i_callback_view_pan_up(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_view_pan_down(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_view_pan_hotkey(gpointer data, guint callback_action, GtkWidget *widget);
-void i_callback_view_update_cues(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_view_dark_colors(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_view_light_colors(gpointer data, guint callback_action, GtkWidget *widget);
+void i_callback_view_bw_colors(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_page_manager(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_page_next(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_page_prev(gpointer data, guint callback_action, GtkWidget *widget);
@@ -431,7 +429,6 @@ void i_callback_add_pin_hotkey(gpointer data, guint callback_action, GtkWidget *
 void i_callback_hierarchy_down_schematic(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_hierarchy_down_symbol(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_hierarchy_up(gpointer data, guint callback_action, GtkWidget *widget);
-void i_callback_hierarchy_documentation(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_attributes_attach(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_attributes_detach(gpointer data, guint callback_action, GtkWidget *widget);
 void i_callback_attributes_show_name(gpointer data, guint callback_action, GtkWidget *widget);
@@ -486,7 +483,8 @@ void o_arc_draw_rubber(GSCHEM_TOPLEVEL *w_current);
 void o_arc_draw_grips(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current);
 /* o_attrib.c */
 void o_attrib_add_selected(GSCHEM_TOPLEVEL *w_current, SELECTION *selection, OBJECT *selected);
-void o_attrib_remove_selected_invisible(GSCHEM_TOPLEVEL *w_current, SELECTION *selection, OBJECT *selected);
+void o_attrib_deselect_invisible(GSCHEM_TOPLEVEL *w_current, SELECTION *selection, OBJECT *selected);
+void o_attrib_select_invisible(GSCHEM_TOPLEVEL *w_current, SELECTION *selection, OBJECT *selected);
 void o_attrib_toggle_visibility(GSCHEM_TOPLEVEL *w_current, OBJECT *object);
 void o_attrib_toggle_show_name_value(GSCHEM_TOPLEVEL *w_current, OBJECT *object, int new_show_name_value);
 OBJECT *o_attrib_add_attrib(GSCHEM_TOPLEVEL *w_current, const char *text_string, int visibility, int show_name_value, OBJECT *object);
@@ -505,10 +503,6 @@ void o_invalidate_glist(GSCHEM_TOPLEVEL *w_current, GList *list);
 COLOR *o_drawing_color(GSCHEM_TOPLEVEL *w_current, OBJECT *object);
 /* o_box.c */
 void o_box_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current);
-void o_box_fill_hollow(GdkDrawable *w, GdkGC *gc, COLOR *color, GSCHEM_TOPLEVEL *w_current, BOX *box, gint fill_width, gint angle1, gint pitch1, gint angle2, gint pitch2);
-void o_box_fill_fill(GdkDrawable *w, GdkGC *gc, COLOR *color, GSCHEM_TOPLEVEL *w_current, BOX *box, gint fill_width, gint angle1, gint pitch1, gint angle2, gint pitch2);
-void o_box_fill_hatch(GdkDrawable *w, GdkGC *gc, COLOR *color, GSCHEM_TOPLEVEL *w_current, BOX *box, gint fill_width, gint angle1, gint pitch1, gint angle2, gint pitch2);
-void o_box_fill_mesh(GdkDrawable *w, GdkGC *gc, COLOR *color, GSCHEM_TOPLEVEL *w_current, BOX *box, gint fill_width, gint angle1, gint pitch1, gint angle2, gint pitch2);
 void o_box_invalidate_rubber(GSCHEM_TOPLEVEL *w_current);
 void o_box_draw_place(GSCHEM_TOPLEVEL *w_current, int dx, int dy, OBJECT *o_current);
 void o_box_start(GSCHEM_TOPLEVEL *w_current, int x, int y);
@@ -533,10 +527,6 @@ void o_bus_draw_rubber(GSCHEM_TOPLEVEL *w_current);
 void o_bus_invalidate_rubber(GSCHEM_TOPLEVEL *w_current);
 /* o_circle.c */
 void o_circle_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current);
-void o_circle_fill_hollow(GdkDrawable *w, GdkGC *gc, COLOR *color, GSCHEM_TOPLEVEL *w_current, CIRCLE *circle, gint fill_width, gint angle1, gint pitch1, gint angle2, gint pitch2);
-void o_circle_fill_fill(GdkDrawable *w, GdkGC *gc, COLOR *color, GSCHEM_TOPLEVEL *w_current, CIRCLE *circle, gint fill_width, gint angle1, gint pitch1, gint angle2, gint pitch2);
-void o_circle_fill_hatch(GdkDrawable *w, GdkGC *gc, COLOR *color, GSCHEM_TOPLEVEL *w_current, CIRCLE *circle, gint fill_width, gint angle1, gint pitch1, gint angle2, gint pitch2);
-void o_circle_fill_mesh(GdkDrawable *w, GdkGC *gc, COLOR *color, GSCHEM_TOPLEVEL *w_current, CIRCLE *circle, gint fill_width, gint angle1, gint pitch1, gint angle2, gint pitch2);
 void o_circle_invalidate_rubber(GSCHEM_TOPLEVEL *w_current);
 void o_circle_draw_place(GSCHEM_TOPLEVEL *w_current, int dx, int dy, OBJECT *o_current);
 void o_circle_start(GSCHEM_TOPLEVEL *w_current, int x, int y);
@@ -549,7 +539,6 @@ void o_complex_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current);
 void o_complex_draw_place(GSCHEM_TOPLEVEL *w_current, int dx, int dy, OBJECT *complex);
 void o_complex_prepare_place(GSCHEM_TOPLEVEL *w_current, const CLibSymbol *sym);
 void o_complex_place_changed_run_hook(GSCHEM_TOPLEVEL *w_current);
-void o_complex_end(GSCHEM_TOPLEVEL *w_current, int x, int y, int continue_placing);
 void o_complex_translate_all(GSCHEM_TOPLEVEL *w_current, int offset);
 /* o_copy.c */
 void o_copy_start(GSCHEM_TOPLEVEL *w_current, int x, int y);
@@ -577,24 +566,9 @@ OBJECT *o_grips_search_picture_world(GSCHEM_TOPLEVEL *w_current, OBJECT *o_curre
 OBJECT *o_grips_search_circle_world(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int x, int y, int size, int *whichone);
 OBJECT *o_grips_search_line_world(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int x, int y, int size, int *whichone);
 int o_grips_start(GSCHEM_TOPLEVEL *w_current, int x, int y);
-void o_grips_start_arc(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int x, int y, int whichone);
-void o_grips_start_box(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int x, int y, int whichone);
-void o_grips_start_path(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int x, int y, int whichone);
-void o_grips_start_picture(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int x, int y, int whichone);
-void o_grips_start_circle(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int x, int y, int whichone);
-void o_grips_start_line(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int x, int y, int whichone);
 void o_grips_motion(GSCHEM_TOPLEVEL *w_current, int x, int y);
 void o_grips_end(GSCHEM_TOPLEVEL *w_current);
 void o_grips_cancel(GSCHEM_TOPLEVEL *w_current);
-void o_grips_end_arc(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone);
-void o_grips_end_box(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone);
-void o_grips_end_path(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone);
-void o_grips_end_picture(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone);
-void o_grips_end_circle(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone);
-void o_grips_end_line(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone);
-void o_grips_end_net(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone);
-void o_grips_end_pin(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone);
-void o_grips_end_bus(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current, int whichone);
 int o_grips_size(GSCHEM_TOPLEVEL *w_current);
 void o_grips_draw(GSCHEM_TOPLEVEL *w_current, int x, int y);
 void o_grips_draw_rubber(GSCHEM_TOPLEVEL *w_current);
@@ -613,19 +587,17 @@ void o_edit(GSCHEM_TOPLEVEL *w_current, GList *list);
 void o_lock(GSCHEM_TOPLEVEL *w_current);
 void o_unlock(GSCHEM_TOPLEVEL *w_current);
 void o_rotate_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery, int angle, GList *list);
-void o_rotate_call_hooks(GSCHEM_TOPLEVEL *w_current, GList *list);
 void o_mirror_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery, GList *list);
 void o_edit_show_hidden_lowlevel(GSCHEM_TOPLEVEL *w_current, const GList *o_list);
 void o_edit_show_hidden(GSCHEM_TOPLEVEL *w_current, const GList *o_list);
-void o_edit_make_visible(GSCHEM_TOPLEVEL *w_current, const GList *o_list);
 int o_edit_find_text(GSCHEM_TOPLEVEL *w_current, const GList *o_list, char *stext, int descend, int skip);
 void o_edit_hide_specific_text(GSCHEM_TOPLEVEL *w_current, const GList *o_list, char *stext);
 void o_edit_show_specific_text(GSCHEM_TOPLEVEL *w_current, const GList *o_list, char *stext);
-void o_update_component(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current);
+OBJECT *o_update_component(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current);
 void o_autosave_backups(GSCHEM_TOPLEVEL *w_current);
 /* o_move.c */
 void o_move_start(GSCHEM_TOPLEVEL *w_current, int x, int y);
-void o_move_end_lowlevel(GSCHEM_TOPLEVEL *w_current, OBJECT *object, int diff_x, int diff_y, GList **other_objects, GList **connected_objects);
+void o_move_end_lowlevel(GSCHEM_TOPLEVEL *w_current, OBJECT *object, int diff_x, int diff_y);
 void o_move_end(GSCHEM_TOPLEVEL *w_current);
 void o_move_cancel(GSCHEM_TOPLEVEL *w_current);
 void o_move_motion(GSCHEM_TOPLEVEL *w_current, int x, int y);
@@ -635,7 +607,7 @@ int o_move_return_whichone(OBJECT *object, int x, int y);
 void o_move_check_endpoint(GSCHEM_TOPLEVEL *w_current, OBJECT *object);
 void o_move_prep_rubberband(GSCHEM_TOPLEVEL *w_current);
 int o_move_zero_length(OBJECT *object);
-void o_move_end_rubberband(GSCHEM_TOPLEVEL *w_current, int world_diff_x, int world_diff_y, GList **objects, GList **other_objects, GList **connected_objects);
+void o_move_end_rubberband(GSCHEM_TOPLEVEL *w_current, int world_diff_x, int world_diff_y, GList **objects);
 /* o_net.c */
 void o_net_reset(GSCHEM_TOPLEVEL *w_current); 
 void o_net_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current);
@@ -661,7 +633,7 @@ void o_picture_draw_rubber(GSCHEM_TOPLEVEL *w_current);
 void o_picture_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current);
 void o_picture_draw_grips(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current);
 void o_picture_draw_place(GSCHEM_TOPLEVEL *w_current, int dx, int dy, OBJECT *o_current);
-void o_picture_exchange(GSCHEM_TOPLEVEL *w_current, GdkPixbuf *pixbuf, const gchar *filename);
+gboolean o_picture_exchange(GSCHEM_TOPLEVEL *w_current, const gchar *filename, GError **error);
 void picture_change_filename_dialog (GSCHEM_TOPLEVEL *w_current);
 void o_picture_set_pixbuf(GSCHEM_TOPLEVEL *w_current, GdkPixbuf *pixbuf, char *filename);
 
@@ -685,7 +657,7 @@ void o_pin_draw_rubber(GSCHEM_TOPLEVEL *w_current);
 void o_pin_invalidate_rubber(GSCHEM_TOPLEVEL *w_current);
 /* o_place.c */
 void o_place_start(GSCHEM_TOPLEVEL *w_current, int x, int y);
-void o_place_end(GSCHEM_TOPLEVEL *w_current, int x, int y, int continue_placing, GList **ret_new_objects);
+void o_place_end(GSCHEM_TOPLEVEL *w_current, int x, int y, int continue_placing, GList **ret_new_objects, const char *hook_name);
 void o_place_motion(GSCHEM_TOPLEVEL *w_current, int x, int y);
 void o_place_invalidate_rubber(GSCHEM_TOPLEVEL *w_current, int drawing);
 void o_place_draw_rubber(GSCHEM_TOPLEVEL *w_current, int drawing);
@@ -702,8 +674,8 @@ void o_select_box_search(GSCHEM_TOPLEVEL *w_current);
 void o_select_connected_nets(GSCHEM_TOPLEVEL *w_current, OBJECT* o_current);
 OBJECT *o_select_return_first_object(GSCHEM_TOPLEVEL *w_current);
 int o_select_selected(GSCHEM_TOPLEVEL *w_current);
-void o_select_unselect_list(GSCHEM_TOPLEVEL *w_current, SELECTION *selection);
 void o_select_unselect_all(GSCHEM_TOPLEVEL *w_current);
+void o_select_visible_unlocked(GSCHEM_TOPLEVEL *w_current);
 void o_select_move_to_place_list(GSCHEM_TOPLEVEL *w_current);
 /* o_slot.c */
 void o_slot_start(GSCHEM_TOPLEVEL *w_current, OBJECT *object);
@@ -725,8 +697,12 @@ void o_undo_callback(GSCHEM_TOPLEVEL *w_current, int type);
 void o_undo_cleanup(void);
 void o_undo_remove_last_undo(GSCHEM_TOPLEVEL *w_current);
 /* parsecmd.c */
-void usage(char *cmd);
 int parse_commandline(int argc, char *argv[]);
+/* s_stretch.c */
+GList *s_stretch_add(GList *list, OBJECT *object, int whichone);
+GList *s_stretch_remove(GList *list, OBJECT *object);
+void s_stretch_print_all(GList *list);
+void s_stretch_destroy_all(GList *list);
 /* x_attribedit.c */
 gint option_menu_get_history(GtkOptionMenu *option_menu);
 void attrib_edit_dialog_ok(GtkWidget *w, GSCHEM_TOPLEVEL *w_current);
@@ -763,7 +739,7 @@ void select_all_text_in_textview(GtkTextView *textview);
 void destroy_window(GtkWidget *widget, GtkWidget **window);
 void text_input_dialog_apply(GtkWidget *w, GSCHEM_TOPLEVEL *w_current);
 void text_input_dialog(GSCHEM_TOPLEVEL *w_current);
-gint change_alignment(GtkWidget *w, GSCHEM_TOPLEVEL *w_current);
+gint change_alignment(GtkComboBox *w, GSCHEM_TOPLEVEL *w_current);
 void text_edit_dialog_ok(GtkWidget *w, GSCHEM_TOPLEVEL *w_current);
 void text_edit_dialog(GSCHEM_TOPLEVEL *w_current, const char *string, int text_size, int text_alignment);
 void line_type_dialog(GSCHEM_TOPLEVEL *w_current);
@@ -831,16 +807,15 @@ void x_log_close ();
 void x_log_message (const gchar *log_domain,
                     GLogLevelFlags log_level,
                     const gchar *message);
+/* x_misc.c */
+gboolean x_show_uri (GSCHEM_TOPLEVEL *w_current, const gchar *buf, GError **err);
 /* x_menus.c */
-void get_main_menu(GtkWidget **menubar);
+GtkWidget *get_main_menu(GSCHEM_TOPLEVEL *w_current);
 GtkWidget *get_main_popup(GSCHEM_TOPLEVEL *w_current);
 gint do_popup(GSCHEM_TOPLEVEL *w_current, GdkEventButton *event);
 void x_menus_sensitivity(GSCHEM_TOPLEVEL *w_current, const char *buf, int flag);
 void x_menus_popup_sensitivity(GSCHEM_TOPLEVEL *w_current, const char *buf, int flag);
 void x_menu_attach_recent_files_submenu(GSCHEM_TOPLEVEL *w_current);
-void recent_files_load();
-void recent_files_save(gpointer user_data);
-void recent_files_add(const char *filename);
 /* x_multiattrib.c */
 void x_multiattrib_open (GSCHEM_TOPLEVEL *w_current);
 void x_multiattrib_close (GSCHEM_TOPLEVEL *w_current);
@@ -853,6 +828,8 @@ void x_pagesel_update (GSCHEM_TOPLEVEL *w_current);
 /* x_preview.c */
 /* x_print.c */
 void x_print_setup(GSCHEM_TOPLEVEL *w_current, char *filename);
+/* x_rc.c */
+void x_rc_parse_gschem (GSCHEM_TOPLEVEL *w_current, const gchar *rcfile);
 /* x_script.c */
 void setup_script_selector(GSCHEM_TOPLEVEL *w_current);
 /* x_stroke.c */

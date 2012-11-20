@@ -8,7 +8,7 @@ dnl directory.
 # Set up configuration system
 #####################################################################
 
-AC_INIT([gEDA/gaf], [1.6.2], [geda-bug@seul.org], [geda-gaf])
+AC_INIT([gEDA/gaf], [1.8.0], [https://bugs.launchpad.net/geda], [geda-gaf])
 AC_PREREQ([2.60])
 
 AC_CONFIG_SRCDIR([libgeda/src/libgeda.c])
@@ -24,7 +24,7 @@ AC_GNU_SOURCE # FIXME for some reason this is needed?
 # Do version number magic
 #####################################################################
 
-AX_GIT_VERSION([20110115])
+AX_GIT_VERSION([20121118])
 
 # This is used for keeping the ChangeLog files up-to-date
 AC_SUBST([CHANGELOG_BASE], [1.0-20070526])
@@ -72,17 +72,17 @@ PKG_PROG_PKG_CONFIG
 
 AX_CHECK_GUILE([1.8.0])
 
-PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.12.0], ,
-  AC_MSG_ERROR([GLib 2.12.0 or later is required.]))
+PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.20.0], ,
+  AC_MSG_ERROR([GLib 2.20.0 or later is required.]))
 
-PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.10.0], ,
-  AC_MSG_ERROR([GTK+ 2.10.0 or later is required.]))
+PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.16.0], ,
+  AC_MSG_ERROR([GTK+ 2.16.0 or later is required.]))
 
-PKG_CHECK_MODULES(GDK_PIXBUF, [gdk-pixbuf-2.0 >= 0.15.0], ,
-  AC_MSG_ERROR([GDK_PIXBUF 0.15.0 or later is required.]))
+PKG_CHECK_MODULES(GDK_PIXBUF, [gdk-pixbuf-2.0 >= 2.16.0], ,
+  AC_MSG_ERROR([GDK_PIXBUF 2.16.0 or later is required.]))
 
-PKG_CHECK_MODULES(CAIRO, [cairo >= 1.2.0], ,
-  AC_MSG_ERROR([CAIRO 1.2.0 or later is required.]))
+PKG_CHECK_MODULES(CAIRO, [cairo >= 1.8.0], ,
+  AC_MSG_ERROR([CAIRO 1.8.0 or later is required.]))
 
 #####################################################################
 # Header files & particular functions
@@ -112,11 +112,12 @@ AC_CHECK_HEADERS([errno.h fcntl.h])
 # to be able to build gschem/src/gschem.c
 AC_CHECK_HEADERS([locale.h])
 
-# Check for rint in math library. FIXME do we actually need to test
-# this? Should we use lrint instead?
+# Check for lrint in math library.
 AC_CHECK_LIB([m], [lrint],
              AC_DEFINE([HAVE_LRINT], 1,
                        [If your math library has lrint in it, define this]))
+
+AC_CHECK_LIB([m], [atan2])
 
 AC_CHECK_FUNCS([chown getlogin])
 
@@ -137,6 +138,8 @@ AX_AWK_FEATURES
 
 # Assertions
 AX_OPTION_ASSERT
+# Viewing documentation
+AX_OPTION_URI_VIEWER
 # API documentation
 AX_OPTION_DOXYGEN
 # XDG desktop files
@@ -159,7 +162,7 @@ AX_DATA_DIRS
 # Where should PCB footprints be searched for?
 AX_PCB_DIRS
 # Set up libgeda with the correct ld version number
-AX_LIBGEDA([38:2:0])
+AX_LIBGEDA([41:0:0])
 
 #####################################################################
 # Generate output
@@ -172,6 +175,7 @@ AC_CONFIG_FILES([Makefile
                  libgeda/libgeda.pc
                  libgeda/po/domain.mak
                  libgeda/po/Makefile.in
+                 libgeda/shell/Makefile
                  libgeda/data/Makefile
                  libgeda/docs/Makefile
                  libgeda/docs/images/Makefile
@@ -189,7 +193,6 @@ AC_CONFIG_FILES([Makefile
                  gschem/src/Makefile
                  gschem/examples/Makefile
                  gschem/lib/Makefile
-                 gschem/lib/system-gschemrc
                  gschem/data/Makefile
                  gschem/bitmap/Makefile
                  gschem/tests/Makefile
@@ -236,7 +239,6 @@ AC_CONFIG_FILES([Makefile
                  gnetlist/scripts/annotate.sh
                  gnetlist/scripts/bom_xref.sh
                  gnetlist/scripts/bompp.sh
-                 gnetlist/scripts/sw2asc
                  gnetlist/lib/system-gnetlistrc
 
                  utils/Makefile
@@ -250,8 +252,8 @@ AC_CONFIG_FILES([Makefile
                  utils/include/Makefile
                  utils/lib/Makefile
                  utils/lib/system-gschlasrc
-                 utils/man/Makefile
                  utils/scripts/Makefile
+                 utils/scripts/sw2asc
                  utils/src/Makefile
                  utils/tests/Makefile
                  utils/tests/gxyrs/Makefile
@@ -265,19 +267,10 @@ AC_CONFIG_FILES([Makefile
                  symbols/documentation/Makefile
 
                  docs/Makefile
-                 docs/scripts/Makefile
+                 docs/scheme-api/Makefile
                  docs/toplevel/Makefile
                  docs/toplevel/gedadocs.html
                  docs/wiki/Makefile
-                 docs/wiki/images/smileys/Makefile
-                 docs/wiki/images/Makefile
-                 docs/wiki/images/interwiki/Makefile
-                 docs/wiki/media/geda/Makefile
-                 docs/wiki/media/wiki/Makefile
-                 docs/wiki/media/tragesym/tragesym/Makefile
-                 docs/wiki/media/tragesym/Makefile
-                 docs/wiki/media/Makefile
-                 docs/wiki/media/devel_tips/Makefile
 
                  examples/Makefile
                  examples/RF_Amp/Makefile
