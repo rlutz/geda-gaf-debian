@@ -1,3 +1,23 @@
+commit d088ec192ac9fbc1dff3509527cb238520c2ee33
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 23 21:24:42 2012 +0000
+
+    Update version numbers to 1.8.1.
+
+commit 128b2532fd733616037fb1363f4d0f21a804a36b
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@sabily.org>
+Date:   Fri Nov 23 21:11:20 2012 +0000
+
+    Various manpage fixes
+    
+     * Fix typo in gxyrs manpage
+     * Fix whatis entry in gmk_sym manpage
+     * Fix hyphens
+    
+    Closes-bug: lp-1081303
+    
+    (imported from commit 2db16cd536b95ffb98721946aa36984f8a41d896)
+
 commit 87f1e0e76965a514277c949dbf2191993962cb88
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Sun Nov 18 15:26:09 2012 +0000
