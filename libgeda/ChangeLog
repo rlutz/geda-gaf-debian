@@ -1,3 +1,23 @@
+commit 988e63ef358d7d44e447e08f4be58ac15f008d3e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 23 21:32:49 2012 +0000
+
+    Update translations.
+
+commit 4e4079ff803cd8e8d3b25934a5308866432c9f68
+Author: Eugene Mikhantiev <mikhantiev@gmail.com>
+Date:   Wed Nov 21 22:06:05 2012 +0000
+
+    libgeda: Fix errors in hu.po
+    
+    Closes-bug: lp-1081594
+    
+    (imported from commit 4cfce9a6cda682f8093a261a6bf65bf35e6799f7)
+
+commit 2f5799e3936040e186db0ebc9c5188e62a2706d8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 20 00:18:50 2012 +0000
+
 commit bbb663612afa98c274279edbe167f86dd7b3f6d8
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Sun Nov 18 16:03:31 2012 +0000

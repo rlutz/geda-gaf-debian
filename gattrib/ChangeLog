@@ -1,3 +1,15 @@
+commit d088ec192ac9fbc1dff3509527cb238520c2ee33
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 23 21:24:42 2012 +0000
+
+    Update version numbers to 1.8.1.
+
+commit 988e63ef358d7d44e447e08f4be58ac15f008d3e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 23 21:32:49 2012 +0000
+
+    Update translations.
+
 commit 87f1e0e76965a514277c949dbf2191993962cb88
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Sun Nov 18 15:26:09 2012 +0000

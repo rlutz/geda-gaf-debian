@@ -1,3 +1,25 @@
+commit d088ec192ac9fbc1dff3509527cb238520c2ee33
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 23 21:24:42 2012 +0000
+
+    Update version numbers to 1.8.1.
+
+commit 988e63ef358d7d44e447e08f4be58ac15f008d3e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 23 21:32:49 2012 +0000
+
+    Update translations.
+
+commit 79c242437c4ba0a32c499a8c922f41759398c23e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 23 21:18:03 2012 +0000
+
+    gschem: Update copyright date in usage & 'About' dialog.
+
+commit 2f5799e3936040e186db0ebc9c5188e62a2706d8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 20 00:18:50 2012 +0000
+
 commit bbb663612afa98c274279edbe167f86dd7b3f6d8
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Sun Nov 18 16:03:31 2012 +0000

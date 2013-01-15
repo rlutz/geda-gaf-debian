@@ -1,5 +1,5 @@
 <!-- Creator     : groff version 1.21 -->
-<!-- CreationDate: Sun Nov 18 15:53:33 2012 -->
+<!-- CreationDate: Fri Nov 23 21:34:34 2012 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -277,8 +277,9 @@ del_line</b> <i>checklist</i><b>;</b></p>
 <p style="margin-left:22%;">Delete the line (global
 variable <b>LINE</b>) if <i>checklist</i> is matched.</p>
 
-<p style="margin-left:22%; margin-top: 1em">Returns -1 if
-error, 0 if not match, 1 if match and changed.</p>
+<p style="margin-left:22%; margin-top: 1em">Returns
+&minus;1 if error, 0 if not match, 1 if match and
+changed.</p>
 
 <p style="margin-left:11%;"><b>rotate_comp</b>
 <i>angle_col</i><b>,</b> <i>angle</i><b>,</b>
@@ -292,7 +293,7 @@ is matched.</p>
 column number is <i>angle_col</i>.</p>
 
 <p style="margin-left:22%; margin-top: 1em">Returns 1 if
-match and changed, 0 if not match, -1 if error.</p>
+match and changed, 0 if not match, &minus;1 if error.</p>
 
 <p style="margin-left:11%;"><b>subst_col_val</b>
 <i>col</i><b>,</b> <i>value</i><b>,</b>
@@ -302,7 +303,7 @@ match and changed, 0 if not match, -1 if error.</p>
 new value <i>value</i>, if <i>checklist</i> is matched.</p>
 
 <p style="margin-left:22%; margin-top: 1em">Returns 1 if
-match and changed, 0 if not match, -1 if error.</p>
+match and changed, 0 if not match, &minus;1 if error.</p>
 
 <p style="margin-left:11%;"><b>change_col_units</b>
 <i>units</i><b>,</b> <i>column_numbers</i><b>;</b></p>
@@ -328,8 +329,9 @@ changed.</p>
 given column number. Note: offset and the value to be
 changed can be in different units.</p>
 
-<p style="margin-left:22%; margin-top: 1em">Returns -1 if
-error, -2 if warning, and 1 if success.</p>
+<p style="margin-left:22%; margin-top: 1em">Returns
+&minus;1 if error, &minus;2 if warning, and 1 if
+success.</p>
 
 <p style="margin-left:11%;"><b>translate_col_val</b>
 <i>col_number</i><b>,</b> <i>string</i><b>,</b>
@@ -344,8 +346,9 @@ matched.</p>
 is an expression with the new string. Old column value can
 be used here.</p>
 
-<p style="margin-left:22%; margin-top: 1em">Returns -1 if
-error, 0 if not match, 1 if match and changed.</p>
+<p style="margin-left:22%; margin-top: 1em">Returns
+&minus;1 if error, 0 if not match, 1 if match and
+changed.</p>
 
 <p style="margin-left:22%; margin-top: 1em">Example: <br>
 translate 2,
@@ -371,8 +374,9 @@ specified column number <i>col_number</i> by the given
 <p style="margin-left:22%; margin-top: 1em">The number in
 the specified column number may have units at the end.</p>
 
-<p style="margin-left:22%; margin-top: 1em">Returns -1 if
-error, 0 if not match, 1 if match and changed.</p>
+<p style="margin-left:22%; margin-top: 1em">Returns
+&minus;1 if error, 0 if not match, 1 if match and
+changed.</p>
 
 <p style="margin-left:11%;"><b>swap_columns</b>
 <i>col_number1</i><b>,</b> <i>col_number2</i><b>,</b>
@@ -381,8 +385,9 @@ error, 0 if not match, 1 if match and changed.</p>
 <p style="margin-left:22%;">Swap columns <i>col_number1</i>
 and <i>col_number2</i> if <i>checklist</i> is matched.</p>
 
-<p style="margin-left:22%; margin-top: 1em">Returns -1 if
-error, 0 if not match, 1 if match and changed.</p>
+<p style="margin-left:22%; margin-top: 1em">Returns
+&minus;1 if error, 0 if not match, 1 if match and
+changed.</p>
 
 <p style="margin-left:11%;"><b>insert_column</b>
 <i>col_number</i><b>,</b>
@@ -393,8 +398,8 @@ given <i>col_number</i> position (0 if it&rsquo;s going to
 be the first column), with the value
 <i>new_column_value</i>.</p>
 
-<p style="margin-left:22%; margin-top: 1em">Returns -1 if
-error, 1 if the new column was inserted.</p>
+<p style="margin-left:22%; margin-top: 1em">Returns
+&minus;1 if error, 1 if the new column was inserted.</p>
 
 <h2>RETURN VALUE
 <a name="RETURN VALUE"></a>
@@ -405,16 +410,16 @@ error, 1 if the new column was inserted.</p>
 value of <b>gxyrs</b> is an integer with the following
 possible values: <br>
 1 if the command found a match and the execution was
-succesful</p>
+successful</p>
 
 <p style="margin-left:11%; margin-top: 1em">0 if there was
 no match</p>
 
-<p style="margin-left:11%; margin-top: 1em">-1 if there was
-an error</p>
+<p style="margin-left:11%; margin-top: 1em">&minus;1 if
+there was an error</p>
 
-<p style="margin-left:11%; margin-top: 1em">-2 if there was
-a warning</p>
+<p style="margin-left:11%; margin-top: 1em">&minus;2 if
+there was a warning</p>
 
 <h2>FILES
 <a name="FILES"></a>
@@ -519,8 +524,8 @@ action file:</b></p>
 file <i>output_file.txt</i>:</p>
 
 <p style="margin-left:22%; margin-top: 1em">gxyrs
-your_xyrs_file.txt --adjust your_commands.txt --output
-output_file.txt</p>
+your_xyrs_file.txt &minus;&minus;adjust your_commands.txt
+&minus;&minus;output output_file.txt</p>
 
 <p style="margin-left:11%;"><b>Run a command specified in
 the command line:</b></p>
@@ -531,7 +536,8 @@ the command line:</b></p>
 file <i>output_file.txt</i>:</p>
 
 <p style="margin-left:22%; margin-top: 1em">gxyrs
-your_xyrs_file.txt --eval &quot;your_commands&quot; --output
+your_xyrs_file.txt &minus;&minus;eval
+&quot;your_commands&quot; &minus;&minus;output
 output_file.txt</p>
 
 <p style="margin-left:11%;"><b>Delete some lines matching a
@@ -543,8 +549,9 @@ followed by a number in column number 2, and write the
 output result to the file <i>output_file.txt</i>:</p>
 
 <p style="margin-left:22%; margin-top: 1em">gxyrs
-your_xyrs_file.txt --eval &quot;del 2,
-&rsquo;R[0-9]+&rsquo;;&quot; --output output_file.txt</p>
+your_xyrs_file.txt &minus;&minus;eval &quot;del 2,
+&rsquo;R[0&minus;9]+&rsquo;;&quot; &minus;&minus;output
+output_file.txt</p>
 
 <p style="margin-left:11%;"><b>Delete some lines matching a
 pattern, using the column number guessed <br>
@@ -564,8 +571,9 @@ write the output result to the file
 <td width="85%">
 
 
-<p>gxyrs your_xyrs_file.txt --eval &quot;del \$REF_COL,
-&rsquo;R[0-9]+&rsquo;;&quot; --output output_file.txt</p></td></tr>
+<p>gxyrs your_xyrs_file.txt &minus;&minus;eval &quot;del
+\$REF_COL, &rsquo;R[0&minus;9]+&rsquo;;&quot;
+&minus;&minus;output output_file.txt</p></td></tr>
 </table>
 
 <p style="margin-left:11%;"><b>Rotate some lines matching a
@@ -586,9 +594,10 @@ column number guessed by <i>gxyrs</i>:</p>
 <td width="85%">
 
 
-<p>gxyrs your_xyrs_file.txt --eval &quot;rotate
-\$ANGLE_COL, 90, \$REF_COL, &rsquo;R[0-9]+&rsquo;;&quot;
---output output_file.txt</p></td></tr>
+<p>gxyrs your_xyrs_file.txt &minus;&minus;eval &quot;rotate
+\$ANGLE_COL, 90, \$REF_COL,
+&rsquo;R[0&minus;9]+&rsquo;;&quot; &minus;&minus;output
+output_file.txt</p> </td></tr>
 </table>
 
 <p style="margin-left:11%;"><b>Change all numbers to
@@ -607,8 +616,9 @@ to the file <i>output_file.txt</i>:</p>
 <td width="85%">
 
 
-<p>gxyrs your_xyrs_file.txt --eval &quot;change_units
-&rsquo;mm&rsquo;, 3, 5;&quot; --output output_file.txt</p></td></tr>
+<p>gxyrs your_xyrs_file.txt &minus;&minus;eval
+&quot;change_units &rsquo;mm&rsquo;, 3, 5;&quot;
+&minus;&minus;output output_file.txt</p></td></tr>
 </table>
 
 <p style="margin-left:11%;"><b>Replace a value matching a
@@ -628,9 +638,9 @@ and write the output result to the file
 <td width="85%">
 
 
-<p>gxyrs your_xyrs_file.txt --eval &quot;subst 3 ,
-&rsquo;100nF&rsquo;, 3, &rsquo;0.1u&rsquo;&quot; --output
-output_file.txt</p> </td></tr>
+<p>gxyrs your_xyrs_file.txt &minus;&minus;eval &quot;subst
+3 , &rsquo;100nF&rsquo;, 3, &rsquo;0.1u&rsquo;&quot;
+&minus;&minus;output output_file.txt</p></td></tr>
 </table>
 
 <p style="margin-left:11%;"><b>Change the reference of a
@@ -650,9 +660,10 @@ component with a value matching a pattern.</b></p>
 <td width="85%">
 
 
-<p>gxyrs your_xyrs_file.txt --eval &quot;subst \$REF_COL ,
-&rsquo;D1&rsquo;, \$VALUE_COL, &rsquo;1n4148&rsquo;;&quot;
---output output_file.txt</p></td></tr>
+<p>gxyrs your_xyrs_file.txt &minus;&minus;eval &quot;subst
+\$REF_COL , &rsquo;D1&rsquo;, \$VALUE_COL,
+&rsquo;1n4148&rsquo;;&quot; &minus;&minus;output
+output_file.txt</p> </td></tr>
 </table>
 
 <p style="margin-left:11%;"><b>Adds an offset to the X
@@ -677,9 +688,10 @@ X coordinate column, and write the output result to the file
 <td width="85%">
 
 
-<p>gxyrs your_xyrs_file.txt --eval &quot;offset \$X_COL,
-&rsquo;102.5mm&rsquo;, \$REF_COL, &rsquo;R[0-9]+&rsquo;
-;&quot; --output output_file.txt</p></td></tr>
+<p>gxyrs your_xyrs_file.txt &minus;&minus;eval &quot;offset
+\$X_COL, &rsquo;102.5mm&rsquo;, \$REF_COL,
+&rsquo;R[0&minus;9]+&rsquo; ;&quot; &minus;&minus;output
+output_file.txt</p> </td></tr>
 </table>
 
 <p style="margin-left:11%;"><b>Multiply the value of the X
@@ -705,9 +717,10 @@ file <i>output_file.txt</i>.</p>
 <td width="85%">
 
 
-<p>gxyrs your_xyrs_file.txt --eval &quot;mul_col_val
-\$X_COL, 2.5, \$REF_COL, &rsquo;R[0-9]+&rsquo; ;&quot;
---output output_file.txt</p></td></tr>
+<p>gxyrs your_xyrs_file.txt &minus;&minus;eval
+&quot;mul_col_val \$X_COL, 2.5, \$REF_COL,
+&rsquo;R[0&minus;9]+&rsquo; ;&quot; &minus;&minus;output
+output_file.txt</p> </td></tr>
 </table>
 
 <p style="margin-left:11%;"><b>Swap two columns.</b></p>
@@ -725,9 +738,9 @@ output result to the file <i>output_file.txt</i>:</p>
 <td width="85%">
 
 
-<p>gxyrs your_xyrs_file.txt --eval &quot;swap_columns 3, 4,
-4, &rsquo;R[0-9]+&rsquo; ;&quot; --output
-output_file.txt</p> </td></tr>
+<p>gxyrs your_xyrs_file.txt &minus;&minus;eval
+&quot;swap_columns 3, 4, 4, &rsquo;R[0&minus;9]+&rsquo;
+;&quot; &minus;&minus;output output_file.txt</p></td></tr>
 </table>
 
 <p style="margin-left:11%;"><b>Insert a column.</b></p>
@@ -744,9 +757,9 @@ Column value is &rsquo;new_column_value&rsquo;:</p>
 <td width="85%">
 
 
-<p>gxyrs your_xyrs_file.txt --eval &quot;insert_column 0,
-&rsquo;new_column_value&rsquo;;&quot; --output
-output_file.txt</p> </td></tr>
+<p>gxyrs your_xyrs_file.txt &minus;&minus;eval
+&quot;insert_column 0, &rsquo;new_column_value&rsquo;;&quot;
+&minus;&minus;output output_file.txt</p></td></tr>
 </table>
 
 <h2>SEE ALSO

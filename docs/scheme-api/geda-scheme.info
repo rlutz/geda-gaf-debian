@@ -6,7 +6,7 @@ START-INFO-DIR-ENTRY
 * gEDA Scheme: (geda-scheme).  gEDA extensibility with Guile Scheme.
 END-INFO-DIR-ENTRY
 
-   This manual is for gEDA/gaf, version 1.8.0.
+   This manual is for gEDA/gaf, version 1.8.1.
 
    Copyright (C) 2011 Peter TB Brett
 
@@ -25,7 +25,7 @@ File: geda-scheme.info,  Node: Top,  Next: Introduction,  Up: (dir)
 gEDA Scheme Reference Manual
 ****************************
 
-This manual is for gEDA/gaf, version 1.8.0.
+This manual is for gEDA/gaf, version 1.8.1.
 
    Copyright (C) 2011 Peter TB Brett
 
