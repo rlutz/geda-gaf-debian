@@ -1,3 +1,9 @@
+commit 875406c9d1211fd88e3e7e1ee5349cba41a7becf
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Sep 25 22:17:56 2013 +0100
+
+    Update NEWS and version information for 1.8.2.
+
 commit d088ec192ac9fbc1dff3509527cb238520c2ee33
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Fri Nov 23 21:24:42 2012 +0000

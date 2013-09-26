@@ -1,3 +1,22 @@
+commit 875406c9d1211fd88e3e7e1ee5349cba41a7becf
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Sep 25 22:17:56 2013 +0100
+
+    Update NEWS and version information for 1.8.2.
+
+commit 1dd3f5d77dc013624f6848801f4885c485595425
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Sep 25 22:34:27 2013 +0100
+
+    build-sys: Don't use Automake test driver unless actually necessary.
+    
+    Most of the tests in geda-gaf actually provide their own test drivers
+    in the form of a shell script.  It's actually better just to run them
+    directly in a check-local rule than to use the Automake test driver
+    (which eats all the output now that parallel tests are being used).
+    
+    (imported from commit b7a373f8846fa91c92e4a628e0691b7f865af3e0)
+
 commit d088ec192ac9fbc1dff3509527cb238520c2ee33
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Fri Nov 23 21:24:42 2012 +0000
