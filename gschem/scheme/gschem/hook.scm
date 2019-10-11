@@ -24,6 +24,8 @@
 
 (define-public add-objects-hook %add-objects-hook)
 
+(define-public copy-objects-hook %copy-objects-hook)
+
 (define-public remove-objects-hook %remove-objects-hook)
 
 (define-public move-objects-hook %move-objects-hook)
@@ -43,3 +45,7 @@
 (define-public deselect-objects-hook %deselect-objects-hook)
 
 (define-public new-page-hook %new-page-hook)
+
+(define-public action-property-hook %action-property-hook)
+
+(define-public bind-keys-hook %bind-keys-hook)

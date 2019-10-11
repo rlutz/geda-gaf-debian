@@ -133,6 +133,8 @@ SCM_DEFINE (page_filename, "%page-filename", 1, 0, 0,
 
 
   page = edascm_to_page (page_s);
+  if (page->is_untitled)
+    return SCM_BOOL_F;
   return scm_from_utf8_string (page->page_filename);
 }
 
@@ -161,6 +163,7 @@ SCM_DEFINE (set_page_filename_x, "%set-page-filename!", 2, 0, 0,
     g_free (page->page_filename);
   }
   page->page_filename = g_strdup (new_fn);
+  page->is_untitled = FALSE;
   free (new_fn);
 
   return page_s;
@@ -389,9 +392,8 @@ SCM_DEFINE (page_to_string, "%page->string", 1, 0, 0,
               SCM_ARG1, s_page_to_string);
 
   PAGE *page = edascm_to_page (page_s);
-  TOPLEVEL *toplevel = edascm_c_current_toplevel ();
 
-  gchar *buf = o_save_buffer (toplevel, s_page_objects (page));
+  gchar *buf = o_save_buffer (s_page_objects (page));
   scm_dynwind_begin (0);
   scm_dynwind_unwind_handler (g_free, buf, SCM_F_WIND_EXPLICITLY);
   SCM result = scm_from_utf8_string (buf);
@@ -471,7 +473,7 @@ init_module_geda_core_page ()
  * \brief Initialise the basic gEDA page manipulation procedures.
  * \par Function Description
  * Registers some Scheme procedures for working with #PAGE
- * smobs. Should only be called by scheme_api_init().
+ * smobs. Should only be called by edascm_init().
  */
 void
 edascm_init_page ()

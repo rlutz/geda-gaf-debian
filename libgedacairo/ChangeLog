@@ -1,0 +1,162 @@
+commit a1bebce61206600770771d451d68c12a735bbe22
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 17:50:47 2019 +0200
+
+    Update copyright years
+
+commit 0e2c79f2d6b954d23384069d8d3a110f5b3a5351
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 21:57:14 2019 +0200
+
+    libgedacairo: Add missing cast to PangoContext
+
+commit 3393f636833d6b3fbe70634636cf634f4687309a
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Oct 6 15:50:27 2019 +0200
+
+    libgedacairo: Fix overbar redraw issues
+
+commit bdcb9cffcaaa46f3df13b7bc6417f29201f33984
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sat Jul 27 15:18:08 2019 +0200
+
+    Fix abs(3) vs. fabs(3)
+
+commit 19a910cba43172a70be2fb71913c0d55bdf5719d
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jul 19 13:37:12 2019 +0200
+
+    libgedacairo: Comment out unused functions
+
+commit 57afc7921a9aba3810d56d1760d8e1cd9dbc034b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 23 21:09:11 2016 +0000
+
+    build: Generate an empty ChangeLog when git history unavailable
+    
+    When no git history is available -- for example, when the git
+    repository was cloned using the `--depth` option to limit the amount
+    of git history downloaded -- the changelog-generation rule can fail
+    because the changelog's base git commit (i.e. the 1.0 release tag)
+    isn't available in the repository.
+    
+    This patch makes generation of `ChangeLog` succeed in that situation,
+    by creating an empty log and printing a warning to stderr.  It allows
+    `make dist` and `make distcheck` to pass on shallow clones.
+
+commit 0f7ed942dc106a8710a08854ac19a5c2e68444e0
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Mon Jan 18 18:59:16 2016 -0800
+
+    libgeda: update text object size in points getter
+    
+    Remove unused parameter and add validity checks.
+
+commit 6c80fcd3dbaae71dff9d929357b2b8176f0ad534
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Sat Jan 9 09:49:43 2016 -0800
+
+    libgeda: divide by floating point to fix coverity warning
+
+commit 2b6c5bf60df72619349f48ca3959b5bb532313e5
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Sat Jan 2 10:48:10 2016 -0800
+
+    libgeda: replace arc width and height with radius
+
+commit e5f688e0fbc825e7b361df8a807a813a0664db90
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Mon Dec 28 16:38:11 2015 -0800
+
+    libgedacairo: simplify inequality in arc drawing
+
+commit 383ee7cade42356b960d96d4113445d8e9e9d3cc
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Sun Dec 27 15:57:47 2015 -0800
+
+    libgeda: rename end_angle to sweep_angle (because it is)
+
+commit 4cc1c7ce5c485e8c2362a3a7a3fbf26bc06818b2
+Author: Sergey Stepanov <no.such.process@gmail.com>
+Date:   Tue Oct 6 23:28:50 2015 +0500
+
+    libgedacairo: fix errors: Value stored to '...' is never read
+    
+    also remove FIXME, as this operations has effect now: changes applies to the
+    screen coordinates instead of world coordinates.
+
+commit bfbc954b4d9f21dbe9fbe93a8c5e52cd3da76ef4
+Author: Sergey Stepanov <no.such.process@gmail.com>
+Date:   Tue Oct 6 23:04:15 2015 +0500
+
+    libgedacairo: fix warning: Value stored to 'renderer' is never read
+
+commit 171a12172eb4efb8ccb2b3534a6911d8584b0306
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Feb 21 13:22:44 2014 +0400
+
+    libgeda: fix segfault on failing to load picture
+    
+    The functionality of fallback picture loading is moved back to libgeda.
+    Decision of what to do with any files is not in the competence of
+    edarenderer.
+    
+    Closes-bug: lp-1274516
+    Reported-by: Sergey Alyoshin <alyoshin.s@gmail.com>
+
+commit 95aadff9e3456793e168dcc8e4fe1be6543f197f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Sep 11 09:17:07 2013 +0100
+
+    libgedacairo: Draw bezier control point handles as circles.
+
+commit 31e25dcb0b57479782c156eb412be30bf1a8650c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Sep 10 23:37:01 2013 +0100
+
+    libgedacairo: Draw grips one device unit wide.
+    
+    Make sure grips are drawn using a line 1 device unit wide even when
+    zoomed way in.  This makes them look nicer!
+
+commit 5b2e09eded958e815e94db38247bb2face2cf8b2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Sep 10 23:57:08 2013 +0100
+
+    libgedacairo: Draw filled grips.
+    
+    Fill grip boxes with BACKGROUND_COLOR.  This allows grips to be
+    visible even against a background of solid SELECT_COLOR.
+
+commit 7b3b70a7629dee72ffdccbe491e27cc09da3986c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 17 16:50:06 2012 +0000
+
+    libgedacairo: Fix unbalanced overbar rendering.
+    
+    eda_pango_parse_overbars() was not generating a PangoAttribute for
+    unbalanced overbars.  Although finding a "\0" would trigger the
+    creation of a PangoAttribute, the terminating "\0" of a string wasn't
+    being included in the overbar parsing loop.
+    
+    Closes-bug: lp-1091314
+
+commit 7cd37ba360bdc84bec57d89ce97b681e402288e8
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 1 20:18:36 2012 +0000
+
+    libgedacairo: Remove no-op expression.
+    
+    Removes warning when compiling with clang.
+
+commit da6154dbd2430d0ad22fba7f6e7e8093a28671b5
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 26 12:45:50 2012 +0000
+
+    libgedacairo: Better function argument sanity checking.
+
+commit be4ed1c509e9cd808222f7e32e6ee2e602f58662
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Nov 22 09:23:32 2012 +0000
+
+    Add libgedacairo renderer library.

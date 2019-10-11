@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschlas - gEDA Load and Save
  * Copyright (C) 2002-2010 Ales Hvezda
- * Copyright (C) 2002-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 2002-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
  */
 
 #include <config.h>
+#include <version.h>
+
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -35,26 +37,38 @@
 #include "../include/globals.h"
 #include "../include/prototype.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 void
 gschlas_quit(void)
 {
-  
+
   s_clib_free();
   s_slib_free();
 
 }
 
-void 
+/*! \brief The "real" main for gschlas.
+ *
+ * This is the main program body for gschlas. A pointer to this
+ * function is passed to scm_boot_guile() at startup.
+ *
+ * This function:
+ * - initialises libgeda;
+ * - parses the command line;
+ * - starts logging;
+ * - registers the Scheme functions with Guile;
+ * - parses the RC files;
+ *
+ * \param closure
+ * \param argc Number of command line arguments
+ * \param argv Command line arguments
+ */
+void
 main_prog(void *closure, int argc, char *argv[])
 {
   int i;
   int argv_index;
   char *cwd;
-  
+
   TOPLEVEL *pr_current;
 
   argv_index = parse_commandline(argc, argv);
@@ -65,22 +79,23 @@ main_prog(void *closure, int argc, char *argv[])
   /* create log file right away */
   /* even if logging is enabled */
   s_log_init ("gschlas");
-	
-  logging_dest=STDOUT_TTY;
 
 #if defined(__MINGW32__) && defined(DEBUG)
   fprintf(stderr, "This is the MINGW32 port.\n");
-#endif  
+#endif
 
-  logging_dest=-1; /* don't output to the screen for now */
-  
+  s_log_message
+    ("gEDA/gschlas version %s%s.%s\ngEDA/gschlas comes with ABSOLUTELY NO WARRANTY; see COPYING for more details.\nThis is free software, and you are welcome to redistribute it under certain\nconditions; please see the COPYING file for more details.\n\n",
+     PREPEND_VERSION_STRING, PACKAGE_DOTTED_VERSION,
+     PACKAGE_DATE_VERSION);
+
   /* register guile (scheme) functions */
   g_register_funcs();
 
   pr_current = s_toplevel_new ();
-  g_rc_parse (pr_current, argv[0], "gschlasrc", rc_filename);
+  g_rc_parse (pr_current, argv[0], "gschlasrc", NULL);
   i_vars_set(pr_current);
-  
+
   i = argv_index;
   while (argv[i] != NULL) {
 
@@ -100,7 +115,6 @@ main_prog(void *closure, int argc, char *argv[])
     if (!f_open (pr_current, pr_current->page_current,
                  pr_current->page_current->page_filename, &err)) {
       /* Not being able to load a file is apparently a fatal error */
-      logging_dest = STDOUT_TTY;
       g_warning ("%s\n", err->message);
       g_error_free (err);
       exit(2);
@@ -118,13 +132,10 @@ main_prog(void *closure, int argc, char *argv[])
   }
 
   g_free(cwd);
-
-  logging_dest=STDOUT_TTY;
-
-#if DEBUG 
+#if DEBUG
   s_page_print_all(pr_current);
 #endif
-  
+
   if (!quiet_mode) s_log_message("\n");
 
   if (embed_mode) {
@@ -133,7 +144,7 @@ main_prog(void *closure, int argc, char *argv[])
 
   if (unembed_mode) {
     s_util_embed(pr_current, FALSE);
-  }	
+  }
 
   /* save all the opened files */
   s_page_save_all(pr_current);
@@ -144,14 +155,17 @@ main_prog(void *closure, int argc, char *argv[])
   exit(0);
 }
 
-int 
+/*! \brief Entry point to gschlas
+ *
+ * This is just a wrapper which invokes the guile stuff, and
+ * points to the real main program main_prog().
+ *
+ * \param argc Number of command line arguments
+ * \param argv Command line arguments
+ */
+int
 main (int argc, char *argv[])
 {
-  /* disable the deprecated warnings in guile 1.6.3 */
-  /* Eventually the warnings will need to be fixed */
-  if(getenv("GUILE_WARN_DEPRECATED")==NULL)
-    putenv("GUILE_WARN_DEPRECATED=no");
-
   scm_boot_guile (argc, argv, main_prog, NULL);
   return 0;
 }

@@ -1,0 +1,325 @@
+# Russian translation for gEDA gaf
+# Copyright (c) 2012-2019 gEDA Developers
+# Copyright (c) Sergey Alyoshin <alyoshin.s@gmail.com>, 2012.
+# Copyright (c) Vladimir Zhbanov <vzhbanov@gmail.com>, 2014.
+#
+# This file is distributed under the same license as the gEDA gaf package.
+#
+# Переводчикам: см. примечания в libgeda/po/ru.po
+msgid ""
+msgstr ""
+"Project-Id-Version: gaf_ru\n"
+"Report-Msgid-Bugs-To: https://bugs.launchpad.net/geda\n"
+"POT-Creation-Date: 2019-10-08 20:33+0200\n"
+"PO-Revision-Date: 2014-03-08 20:49+0400\n"
+"Last-Translator: Vladimir Zhbanov <vzhbanov@gmail.com>\n"
+"Language-Team: geda-user@delorie.com\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: gaf/gaf.c:66
+#, c-format
+msgid ""
+"Usage: gaf [OPTION...] COMMAND [ARGS ...]\n"
+"\n"
+"gEDA/gaf command-line utility.\n"
+"\n"
+"General options:\n"
+"  --no-rcfiles   inhibit loading of 'gafrc' files\n"
+"  -h, --help     display usage information and exit\n"
+"  -V, --version  display version information and exit\n"
+"\n"
+"Commonly-used commands (type `gaf <cmd> --help' for usage):\n"
+"  shell          Scheme REPL for interactive gEDA data processing\n"
+"  config         Edit gEDA configuration\n"
+"  export         Export gEDA files in various image formats.\n"
+"\n"
+"Please report bugs to %s.\n"
+msgstr ""
+"Использование: gaf [КЛЮЧ...] КОМАНДА [АРГУМЕНТЫ...]\n"
+"\n"
+"Утилита командной строки gEDA/gaf.\n"
+"\n"
+"Общие ключи:\n"
+"  --no-rcfiles   запрет загрузки файлов gafrc\n"
+"  -h, --help     справка об использовании и выход\n"
+"  -V, --version  вывод версии утилиты и выход\n"
+"\n"
+"Команды (для справки по использованию наберите «gaf <команда> --help»):\n"
+"  shell          командная оболочка Scheme для интерактивной обработки\n"
+"                 данных gEDA;\n"
+"  config         редактирование настроек gEDA;\n"
+"  export         экспорт файлов gEDA в различные форматы изображений.\n"
+"\n"
+"Сообщайте об ошибках по адресу: %s\n"
+
+#: gaf/gaf.c:89
+#, c-format
+msgid ""
+"gEDA/gaf %s (g%.7s)\n"
+"Copyright (C) 1998-2019 gEDA developers\n"
+"This is free software, and you are welcome to redistribute it under\n"
+"certain conditions. For details, see the file `COPYING', which is\n"
+"included in the gEDA distribution.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+"gEDA/gaf %s (g%.7s)\n"
+"Copyright (C) 1998-2019 разработчики gEDA\n"
+"Это свободное программное обеспечение, и вы можете его распространять\n"
+"на определённых условиях. Подробности см. в файле COPYING в дистрибутиве\n"
+"gEDA. Нет НИКАКИХ ГАРАНТИЙ в рамках, допустимых имеющимся "
+"законодательством.\n"
+
+#: gaf/gaf.c:137
+#, c-format
+msgid ""
+"\n"
+"Run `gaf --help' for more information.\n"
+msgstr ""
+"\n"
+"Подробности см. в выводе команды «gaf --help».\n"
+
+#: gaf/gaf.c:149
+#, c-format
+msgid ""
+"ERROR: You must specify a command to run.\n"
+"\n"
+"Run `gaf --help' for more information.\n"
+msgstr ""
+"ОШИБКА: укажите команду для выполнения.\n"
+"\n"
+"Подробности см. в выводе команды «gaf --help».\n"
+
+#: gaf/gaf.c:167
+#, c-format
+msgid ""
+"ERROR: Unrecognised command `%s'.\n"
+"\n"
+"Run `gaf --help' for more information.\n"
+msgstr ""
+"ОШИБКА: неизвестная команда «%s».\n"
+"\n"
+"Подробности см. в выводе команды «gaf --help».\n"
+
+#: gaf/config.c:46
+#, c-format
+msgid ""
+"Usage: gaf config [OPTION] [GROUP KEY [VALUE]]\n"
+"\n"
+"View and modify gEDA configuration.\n"
+"\n"
+"  -p, --project[=PATH]  select project configuration [PATH=.]\n"
+"  -u, --user     select user configuration\n"
+"  -s, --system   select system configuration\n"
+"  -h, --help     display usage information and exit\n"
+"\n"
+"If GROUP and KEY are specified, retrieves the value of that\n"
+"configuration parameter.  If a VALUE was specified, sets the value of\n"
+"the parameter.  The -p, -u and -s options can be used to select the\n"
+"configuration store affected (by default, the project configuration\n"
+"store for the current directory). If no GROUP and KEY were provided,\n"
+"outputs the filename of the selected configuration store.\n"
+"\n"
+"Please report bugs to %s.\n"
+msgstr ""
+"Использование: gaf config [КЛЮЧ] [ГРУППА КЛЮЧЕВОЕ_СЛОВО [ЗНАЧЕНИЕ]]\n"
+"\n"
+"Просмотр и изменение настроек gEDA.\n"
+"\n"
+"  -p, --project[=ПУТЬ]  выбрать работу с настройками проекта [ПУТЬ=.]\n"
+"  -u, --user     выбрать работу с пользовательскими настройками\n"
+"  -s, --system   выбрать работу с системными настройками\n"
+"  -h, --help     показать информацию об использовании и выйти\n"
+"\n"
+"Если указаны ГРУППА и КЛЮЧЕВОЕ_СЛОВО, выдаётся значение этого\n"
+"параметра. Если указано ЗНАЧЕНИЕ, в него устанавливается значение\n"
+"этого параметра. Ключи -p, -u и -s могут использоваться для выбора\n"
+"хранилища настроек (по умолчанию это хранилище настроек проекта в\n"
+"текущем каталоге). Если не указаны ни ГРУППА, ни КЛЮЧЕВОЕ_СЛОВО,\n"
+"выводится имя файла выбранного хранилища настроек.\n"
+"\n"
+"Сообщайте об ошибках по адресу: %s.\n"
+
+#: gaf/config.c:67
+msgid ""
+"\n"
+"Run `gaf config --help' for more information.\n"
+msgstr ""
+"\n"
+"Подробности см. в выводе команды «gaf config --help».\n"
+
+#: gaf/config.c:68
+msgid "ERROR: You may only specify a single configuration store.\n"
+msgstr "ОШИБКА: можно указать только одно хранилище настроек.\n"
+
+#: gaf/config.c:157
+#, c-format
+msgid "WARNING: Could not load '%s': %s.\n"
+msgstr "ВНИМАНИЕ: не удалось загрузить «%s»: %s.\n"
+
+#: gaf/config.c:169
+#, c-format
+msgid "ERROR: You must specify both configuration group and key.\n"
+msgstr "ОШИБКА: необходимо указать и группу настроек, и ключевое слово.\n"
+
+#: gaf/config.c:181 gaf/config.c:195 gaf/export.c:316
+#, c-format
+msgid "ERROR: %s.\n"
+msgstr "ОШИБКА: %s.\n"
+
+#: gaf/export.c:145
+#, c-format
+msgid "ERROR: Bad argument '%s' to %s option.\n"
+msgstr "ОШИБКА: Недопустимый аргумент «%s» для опции «%s».\n"
+
+#: gaf/export.c:146
+msgid ""
+"\n"
+"Run `gaf export --help' for more information.\n"
+msgstr ""
+"\n"
+"Подробности см. в выводе команды «gaf export --help».\n"
+
+#: gaf/export.c:186
+#, c-format
+msgid "ERROR: Cannot infer output format from filename '%s'.\n"
+msgstr "ОШИБКА: не удалось определить формат выходного файла «%s».\n"
+
+#: gaf/export.c:203
+#, c-format
+msgid "ERROR: Cannot find supported format for filename '%s'.\n"
+msgstr "ОШИБКА: не удалось найти поддерживаемый формат для файла «%s».\n"
+
+#: gaf/export.c:208
+#, c-format
+msgid "ERROR: Unsupported output format '%s'.\n"
+msgstr "ОШИБКА: вывод в формате «%s» не поддерживается.\n"
+
+#: gaf/export.c:220
+#, c-format
+msgid "ERROR: Selected output format does not support multipage output\n"
+msgstr ""
+"ОШИБКА: многостраничный вывод не поддерживается для выбранного выходного "
+"формата.\n"
+
+#: gaf/export.c:232
+#, c-format
+msgid "ERROR: Failed to load '%s': %s\n"
+msgstr "ОШИБКА: не удалось загрузить «%s»: %s.\n"
+
+#: gaf/export.c:238
+#, c-format
+msgid "ERROR: Failed to change directory to '%s': %s\n"
+msgstr "ОШИБКА: Не удалось изменить каталог на «%s»: %s.\n"
+
+#: gaf/export.c:902
+#, c-format
+msgid ""
+"Usage: gaf export [OPTION ...] -o OUTPUT [--] FILE ...\n"
+"\n"
+"Export gEDA files in various image formats.\n"
+"\n"
+"  -f, --format=TYPE      output format (normally autodetected)\n"
+"  -o, --output=OUTPUT    output filename\n"
+"  -p, --paper=NAME       select paper size by name\n"
+"  -s, --size=WIDTH;HEIGHT  specify exact paper size\n"
+"  -k, --scale=FACTOR     specify output scale factor\n"
+"  -l, --layout=ORIENT    page orientation\n"
+"  -m, --margins=TOP;LEFT;BOTTOM;RIGHT\n"
+"                           set page margins\n"
+"  -a, --align=HALIGN;VALIGN\n"
+"                           set alignment of drawing within page\n"
+"  -d, --dpi=DPI          pixels-per-inch for raster outputs\n"
+"  -c, --color            enable color output\n"
+"  --no-color             disable color output\n"
+"  -F, --font=NAME        set font family for printing text\n"
+"  -h, --help     display usage information and exit\n"
+"\n"
+"Please report bugs to %s.\n"
+msgstr ""
+"Использование: gaf export [КЛЮЧ ...] -o ВЫХОДНОЙ_ФАЙЛ [--] ФАЙЛ ...\n"
+"\n"
+"Экспорт файлов gEDA в различные форматы изображений.\n"
+"\n"
+"  -f, --format=ТИП            выходной формат (обычно\n"
+"                              определяется автоматически)\n"
+"  -o, --output=ВЫХОДНОЙ_ФАЙЛ  имя выходного файла\n"
+"  -p, --paper=ФОРМАТ          выбор формата по его названию\n"
+"  -s, --size=ШИРИНА;ВЫСОТА    задание точных размеров бумаги\n"
+"  -k, --scale=КОЭФФИЦИЕНТ     задание коэффициента\n"
+"                              масштабирования выхода\n"
+"  -l, --layout=ОРИЕНТАЦИЯ     ориентация страницы\n"
+"  -m, --margins=СВЕРХУ;СЛЕВА;СНИЗУ;СПРАВА\n"
+"                              установка полей страницы\n"
+"  -a, --align=ГОРИЗ_ВЫРАВНИВАНИЕ;ВЕРТ_ВЫРАВНИВАНИЕ\n"
+"                              установка выравнивания чертежа\n"
+"                              на странице\n"
+"  -d, --dpi=DPI               количество точек на дюйм для\n"
+"                              растровых изображений\n"
+"  -c, --color                 цветной вывод\n"
+"  --no-color                  монохромный вывод\n"
+"  -F, --font=ИМЯ_ШРИФТА       имя шрифта для вывода текста\n"
+"  -h, --help                  справка по использованию и выход\n"
+"\n"
+"Отчёты об ошибках отправляйте по адресу %s.\n"
+
+#: gaf/export.c:1081
+#, c-format
+msgid "ERROR: You must specify at least one input filename.\n"
+msgstr "ОШИБКА: необходимо задать имя хотя бы одного входного файла.\n"
+
+#: gaf/export.c:1090
+#, c-format
+msgid "ERROR: You must specify an output filename.\n"
+msgstr "ОШИБКА: необходимо задать имя выходного файла.\n"
+
+#: gaf/shell.c:46
+#, c-format
+msgid ""
+"Usage: gaf shell [OPTION ...]\n"
+"\n"
+"Shell for interactive processing of gEDA data using Scheme.\n"
+"\n"
+"  -s FILE        load Scheme source code from FILE, and exit\n"
+"  -c EXPR        evaluate Scheme expression EXPR, and exit\n"
+"  --             stop scanning arguments; run interactively\n"
+"\n"
+"The above switches stop argument processing, and pass all\n"
+"remaining arguments as the value of (command-line).\n"
+"\n"
+"  -L DIRECTORY   add DIRECTORY to the front of the Scheme load path\n"
+"  -l FILE        load Scheme source code from FILE\n"
+"  -h, --help     display usage information and exit\n"
+"\n"
+"Please report bugs to %s.\n"
+msgstr ""
+"Использование: gaf shell [КЛЮЧ ...]\n"
+"\n"
+"Командная оболочка интерпретатора Scheme для интерактивной работы\n"
+"с данными gEDA.\n"
+"\n"
+"  -s ФАЙЛ        загрузить исходный код Scheme из ФАЙЛА и выйти\n"
+"  -c ВЫРАЖЕНИЕ   вычислить ВЫРАЖЕНИЕ Scheme и выйти\n"
+"  --             прекратить сканирование аргументов; перейти в\n"
+"                 интерактивный режим\n"
+"\n"
+"При задании указанных выше ключей обработка аргументов\n"
+"прекращается, все оставшиеся аргументы передаются как значение\n"
+"в виде (строка-команды).\n"
+"\n"
+"  -L КАТАЛОГ     добавить КАТАЛОГ в начало пути загрузки Scheme\n"
+"  -l ФАЙЛ        загрузить исходный код Scheme из ФАЙЛА\n"
+"  -h, --help     вывести справку по использованию и выйти\n"
+"\n"
+"Отчёты об ошибках отправляйте по адресу %s.\n"
+
+#: gaf/shell.c:102
+#, c-format
+msgid ""
+"\n"
+"Run `gaf shell --help' for more information.\n"
+msgstr ""
+"\n"
+"Подробности см. в выводе команды «gaf shell --help».\n"

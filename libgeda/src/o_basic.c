@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 /*! \file o_basic.c
  *  \brief functions for the basic object type
- *  
+ *
  *  This file contains the code used to handle OBJECTs (st_object).
  *  The object is the basic type of all elements stored in schematic
  *  and symbol files.
@@ -37,7 +37,7 @@
  *  The complex object can carry many primary objects. If the complex
  *  object is a symbol, then the complex symbol contains all the pins,
  *  the text and the graphics.
- *  
+ *
  *  \image html o_object_relations.png
  *  \image latex o_object_relations.pdf "object relations" width=14cm
  */
@@ -53,10 +53,6 @@
 #endif
 
 #include "libgeda_priv.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 
 /*! \brief Check if point is inside a region
@@ -75,91 +71,6 @@
 int inside_region(int xmin, int ymin, int xmax, int ymax, int x, int y)
 {
   return ((x >= xmin && x <= xmax && y >= ymin && y <= ymax) ? 1 : 0);
-}
-
-/*! \brief Recalculate position of the given object.
- *  \par Function Description
- *  This function will take an object and recalculate its
- *  position on the screen.
- *
- *  \param [in]     toplevel    The TOPLEVEL object.
- *  \param [in,out] o_current    OBJECT to recalculate.
- *
- */
-void o_recalc_single_object(TOPLEVEL *toplevel, OBJECT *o_current)
-{
-  if (o_current != NULL) {
-    switch(o_current->type) {
-
-      case(OBJ_LINE):
-        o_line_recalc(toplevel, o_current);
-        break;
-
-      case(OBJ_NET):
-        o_net_recalc(toplevel, o_current);
-        break;
-
-      case(OBJ_BUS):
-        o_bus_recalc(toplevel, o_current);
-        break;
-
-      case(OBJ_BOX):
-        o_box_recalc(toplevel, o_current);
-        break;
-
-      case(OBJ_PATH):
-        o_path_recalc(toplevel, o_current);
-        break;
-
-      case(OBJ_PICTURE):
-        o_picture_recalc(toplevel, o_current);
-        break;
-
-      case(OBJ_CIRCLE):
-        o_circle_recalc(toplevel, o_current);
-        break;
-
-      case(OBJ_COMPLEX):
-      case(OBJ_PLACEHOLDER):
-        o_complex_recalc(toplevel, o_current);
-        break;
-
-      case(OBJ_PIN):
-        o_pin_recalc(toplevel, o_current);
-        break;
-
-      case(OBJ_ARC):
-        o_arc_recalc(toplevel, o_current);
-        break;
-
-      case(OBJ_TEXT):
-        o_text_recalc(toplevel, o_current);
-        break;
-    }
-  }
-}
-
-
-/*! \brief Recalculate position of a list (GList) of objects.
- *  \par Function Description
- *  This function will take a list (GList) of objects and recalculate their
- *  positions on the screen.
- *
- *  \param [in]     toplevel    The TOPLEVEL object.
- *  \param [in,out] object_glist  OBJECT list to recalculate.
- *
- */
-void
-o_recalc_object_glist(TOPLEVEL *toplevel, GList *object_glist)
-{
-  GList *list = object_glist;
-  OBJECT *o_current;
-
-  while (list != NULL) {
-    o_current = (OBJECT *) list->data;
-    o_recalc_single_object(toplevel, o_current);
-   list = g_list_next(list);
-  }
 }
 
 
@@ -182,37 +93,37 @@ o_recalc_object_glist(TOPLEVEL *toplevel, GList *object_glist)
  */
 void o_set_line_options(TOPLEVEL *toplevel, OBJECT *o_current,
 			OBJECT_END end, OBJECT_TYPE type,
-			int width, int length, int space) 
+			int width, int length, int space)
 {
-  if(o_current == NULL) {
-    return;
-  }
+  g_return_if_fail (o_current != NULL);
 
   /* do some error checking / correcting */
   switch(type) {
+    case(TYPE_SOLID):
+      length = -1;
+      space = -1;
+      break;
     case(TYPE_DOTTED):
-    if (space < 1) {
-      space = 100;
-      s_log_message (_("Invalid space specified, setting to 100\n"));
-    }
+      length = -1;
+      if (space < 1) {
+        space = 100;
+      }
     break;
     case(TYPE_DASHED):
     case(TYPE_CENTER):
     case(TYPE_PHANTOM):
-    if (length < 1) {
-      length = 100;
-      s_log_message (_("Invalid length specified, setting to 100\n"));
-    }
-    if (space < 1) {
-      space = 100;
-      s_log_message (_("Invalid space specified, setting to 100\n"));
-    }
+      if (length < 1) {
+        length = 100;
+      }
+      if (space < 1) {
+        space = 100;
+      }
     break;
     default:
-    
+
     break;
   }
-  
+
   o_emit_pre_change_notify (toplevel, o_current);
 
   o_current->line_width = width;
@@ -223,7 +134,7 @@ void o_set_line_options(TOPLEVEL *toplevel, OBJECT *o_current,
   o_current->line_space  = space;
 
   /* Recalculate the object's bounding box */
-  o_recalc_single_object( toplevel, o_current );
+  o_current->w_bounds_valid_for = NULL;
   o_emit_change_notify (toplevel, o_current);
 
 }
@@ -281,10 +192,55 @@ gboolean o_get_line_options(OBJECT *object,
 void o_set_fill_options(TOPLEVEL *toplevel, OBJECT *o_current,
 			OBJECT_FILLING type, int width,
 			int pitch1, int angle1,
-			int pitch2, int angle2) 
+			int pitch2, int angle2)
 {
   if(o_current == NULL) {
     return;
+  }
+
+  /* do some error checking / correcting */
+  switch(type) {
+    case(FILLING_MESH):
+      if (width < 0) {
+        width = 1;
+      }
+      if (angle1 < 0) {
+        angle1 = 45;
+      }
+      if (pitch1 < 0) {
+        pitch1 = 100;
+      }
+      if (angle2 < 0) {
+        angle2 = 135;
+      }
+      if (pitch2 < 0) {
+        pitch2 = 100;
+      }
+      break;
+
+    case(FILLING_HATCH):
+      if (width < 0) {
+        width = 1;
+      }
+      if (angle1 < 0) {
+        angle1 = 45;
+      }
+      if (pitch1 < 0) {
+        pitch1 = 100;
+      }
+      angle2 = -1;
+      pitch2 = -1;
+      break;
+
+    case(FILLING_HOLLOW):
+    case(FILLING_FILL):
+    default:
+      width = -1;
+      angle1 = -1;
+      pitch1 = -1;
+      angle2 = -1;
+      pitch2 = -1;
+      break;
   }
 
   o_emit_pre_change_notify (toplevel, o_current);
@@ -340,15 +296,16 @@ gboolean o_get_fill_options(OBJECT *object,
  *  \par Function Description
  *  This function gets the position of an object in world coordinates.
  *
- *  \param [in] toplevel The toplevel environment.
+ *  \param [in] object   The object to get the position.
  *  \param [out] x       pointer to the x-position
  *  \param [out] y       pointer to the y-position
- *  \param [in] object   The object to get the position.
  *  \return TRUE if successfully determined the position, FALSE otherwise
  */
-gboolean o_get_position (TOPLEVEL *toplevel, gint *x, gint *y, OBJECT *object)
+gboolean o_get_position (OBJECT *object, gint *x, gint *y)
 {
-  gboolean (*func) (TOPLEVEL*, int*, int*, OBJECT*) = NULL;
+  gboolean (*func) (OBJECT*, int*, int*) = NULL;
+
+  g_return_val_if_fail (object != NULL, FALSE);
 
   switch (object->type) {
       case OBJ_LINE:    func = o_line_get_position;    break;
@@ -369,7 +326,7 @@ gboolean o_get_position (TOPLEVEL *toplevel, gint *x, gint *y, OBJECT *object)
   }
 
   if (func != NULL) {
-    return (*func) (toplevel, x, y, object);
+    return (*func) (object, x, y);
   }
   return FALSE;
 }
@@ -380,14 +337,13 @@ gboolean o_get_position (TOPLEVEL *toplevel, gint *x, gint *y, OBJECT *object)
  *  This function translates the object <B>object</B> by
  *  <B>dx</B> and <B>dy</B>.
  *
- *  \param [in] toplevel The toplevel environment.
+ *  \param [in] object   The object to translate.
  *  \param [in] dx       Amount to horizontally translate object
  *  \param [in] dy       Amount to vertically translate object
- *  \param [in] object   The object to translate.
  */
-void o_translate_world (TOPLEVEL *toplevel, gint dx, gint dy, OBJECT *object)
+void o_translate_world (OBJECT *object, gint dx, gint dy)
 {
-  void (*func) (TOPLEVEL*, int, int, OBJECT*) = NULL;
+  void (*func) (OBJECT*, int, int) = NULL;
 
   switch (object->type) {
       case OBJ_LINE:    func = o_line_translate_world;    break;
@@ -408,7 +364,7 @@ void o_translate_world (TOPLEVEL *toplevel, gint dx, gint dy, OBJECT *object)
   }
 
   if (func != NULL) {
-    (*func) (toplevel, dx, dy, object);
+    (*func) (object, dx, dy);
   }
 }
 
@@ -493,6 +449,7 @@ void o_mirror_world (TOPLEVEL *toplevel, int world_centerx, int world_centery, O
 /*! \brief Calculates the distance between the given point and the closest
  * point on the given object.
  *
+ *  \param [in] toplevel     The TOPLEVEL object.
  *  \param [in] object       The given object.
  *  \param [in] x            The x coordinate of the given point.
  *  \param [in] y            The y coordinate of the given point.
@@ -501,14 +458,15 @@ void o_mirror_world (TOPLEVEL *toplevel, int world_centerx, int world_centery, O
  *  number (G_MAXDOUBLE).  If an error occurs, this function returns
  *  G_MAXDOUBLE.
  */
-double o_shortest_distance (OBJECT *object, int x, int y)
+double o_shortest_distance (TOPLEVEL *toplevel, OBJECT *object, int x, int y)
 {
-  return o_shortest_distance_full (object, x, y, FALSE);
+  return o_shortest_distance_full (toplevel, object, x, y, FALSE);
 }
 
 /*! \brief Calculates the distance between the given point and the closest
  * point on the given object. Allows forcing objects to solid.
  *
+ *  \param [in] toplevel     The TOPLEVEL object.
  *  \param [in] object       The given object.
  *  \param [in] x            The x coordinate of the given point.
  *  \param [in] y            The y coordinate of the given point.
@@ -518,10 +476,11 @@ double o_shortest_distance (OBJECT *object, int x, int y)
  *  number (G_MAXDOUBLE).  If an error occurs, this function returns
  *  G_MAXDOUBLE.
  */
-double o_shortest_distance_full (OBJECT *object, int x, int y, int force_solid)
+double o_shortest_distance_full (TOPLEVEL *toplevel, OBJECT *object,
+                                 int x, int y, int force_solid)
 {
   double shortest_distance = G_MAXDOUBLE;
-  double (*func) (OBJECT *, int, int, int) = NULL;
+  double (*func) (TOPLEVEL *, OBJECT *, int, int, int) = NULL;
 
   g_return_val_if_fail (object != NULL, G_MAXDOUBLE);
 
@@ -544,7 +503,7 @@ double o_shortest_distance_full (OBJECT *object, int x, int y, int force_solid)
   }
 
   if (func != NULL) {
-    shortest_distance = (*func) (object, x, y, force_solid);
+    shortest_distance = (*func) (toplevel, object, x, y, force_solid);
   }
 
   return shortest_distance;
@@ -557,15 +516,18 @@ double o_shortest_distance_full (OBJECT *object, int x, int y, int force_solid)
  *  will be recalculated next time the OBJECT's bounds are requested
  *  (e.g. via world_get_single_object_bounds() ).
  *  \param [in] toplevel
- *  \param [in] obj
+ *  \param [in] object
  *
  *  \todo Turn this into a macro?
  */
-void o_bounds_invalidate(TOPLEVEL *toplevel, OBJECT *obj)
+void o_bounds_invalidate (TOPLEVEL *toplevel, OBJECT *object)
 {
-  do {
-      obj->w_bounds_valid = FALSE;
-  } while ((obj = obj->parent) != NULL);
+  OBJECT *iter = object;
+
+  while (iter != NULL) {
+    iter->w_bounds_valid_for = NULL;
+    iter = iter->parent;
+  }
 }
 
 
@@ -610,37 +572,6 @@ o_get_page (TOPLEVEL *toplevel, OBJECT *object)
     return o_get_page (toplevel, object->parent);
   }
   return object->page;
-}
-
-/*! \brief Get an object's parent PAGE, or fall back to global current page.
- *
- * \par Function Description
- * If set, returns the PAGE structure which owns \a object.  If \a
- * object does not have a parent page set, returns the global current
- * page from \a toplevel.  If the object parent page is inconsistent
- * with the global current page, a critical-level error message is
- * emitted.
- *
- * \warning This function is primarily intended to assist in the
- * migration of code from using the TOPLEVEL current page to using the
- * o_get_page().  It should not be used in new code.
- *
- * \deprecated Use o_get_page() in new code.
- *
- * \param [in] toplevel  The TOPLEVEL structure.
- * \param [in] object    The OBJECT for which to retrieve the parent PAGE.
- * \return The PAGE which owns \a object, the global current PAGE, or NULL.
- */
-PAGE *
-o_get_page_compat (TOPLEVEL *toplevel, OBJECT *object) {
-  PAGE *page = o_get_page (toplevel, object);
-  if (page != toplevel->page_current) {
-    g_critical ("o_get_page_compat: OBJECT.page = %p, TOPLEVEL.page_current = %p",
-                page, toplevel->page_current);
-    return toplevel->page_current;
-  } else {
-    return page;
-  }
 }
 
 /*! \brief Get an object's containing complex object.
@@ -793,12 +724,11 @@ o_emit_change_notify (TOPLEVEL *toplevel, OBJECT *object)
  *  \par Function Description
  *  Attribute getter for the visible field within the object.
  *
- *  \param toplevel The TOPLEVEL structure
  *  \param object   The OBJECT structure to be queried
  *  \return TRUE when VISIBLE, FALSE otherwise
  */
 gboolean
-o_is_visible (TOPLEVEL *toplevel, OBJECT *object)
+o_is_visible (OBJECT *object)
 {
   g_return_val_if_fail (object != NULL, FALSE);
   return object->visibility == VISIBLE;

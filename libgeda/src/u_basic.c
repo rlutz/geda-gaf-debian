@@ -2,7 +2,7 @@
  * libgeda - gEDA's library
  * Copyright (C) 1998, 1999, 2000 Kazu Hirata / Ales Hvezda
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,10 +30,6 @@
 
 #include "libgeda_priv.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 /*! \todo Finish function documentation!!!
  *  \brief
  *  \par Function Description
@@ -48,8 +44,7 @@ char *u_basic_breakup_string(char *string, char delimiter, int count)
   int done=FALSE;
   char *return_value;
 
-  g_return_val_if_fail ((string != NULL),
-                        NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
   /* skip over any leading white space */
   while(string[i] == ' ' && !string[i]) {

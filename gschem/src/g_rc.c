@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <config.h>
-#include <missing.h>
 #include <version.h>
 
 #include <stdio.h>
@@ -35,10 +34,6 @@
 #endif
 
 #include "gschem.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 /*! \todo Finish function documentation!!!
  *  \brief
@@ -72,10 +67,7 @@ void g_rc_parse_gtkrc()
  */
 SCM g_rc_gschem_version(SCM scm_version)
 {
-  SCM ret;
   char *version;
-  SCM rc_filename;
-  char *sourcefile;
   
   SCM_ASSERT (scm_is_string (scm_version), scm_version,
               SCM_ARG1, "gschem-version");
@@ -86,58 +78,36 @@ SCM g_rc_gschem_version(SCM scm_version)
 
   if (g_utf8_collate (g_utf8_casefold (version,-1),
 		      g_utf8_casefold (PACKAGE_DATE_VERSION,-1)) != 0) {
-    sourcefile = NULL;
+    SCM rc_filename;
+    char *sourcefile;
+    GtkWidget *dialog;
+
     rc_filename = g_rc_rc_filename ();
+    if (scm_is_false (rc_filename))
+      rc_filename = scm_from_utf8_string (_("(filename can't be determined)"));
     sourcefile = scm_to_utf8_string (rc_filename);
     scm_dynwind_free (sourcefile);
-    fprintf(stderr,
-            "You are running gEDA/gaf version [%s%s.%s],\n",
-            PREPEND_VERSION_STRING, PACKAGE_DOTTED_VERSION,
-            PACKAGE_DATE_VERSION);
-    fprintf(stderr,
-            "but you have a version [%s] gschemrc file:\n[%s]\n",
-            version, sourcefile);
-    fprintf(stderr,
-            "Please be sure that you have the latest rc file.\n");
-    ret = SCM_BOOL_F;
-  } else {
-    ret = SCM_BOOL_T;
+
+    dialog = gtk_message_dialog_new (
+      NULL,
+      GTK_DIALOG_MODAL,
+      GTK_MESSAGE_ERROR,
+      GTK_BUTTONS_CLOSE,
+      _("You are running gEDA/gaf version %s (%s%s),\n"
+        "but you have a gschemrc file for version %s:\n%s\n"
+        "Please be sure that you have the latest data files installed."),
+      PACKAGE_DATE_VERSION,
+      PREPEND_VERSION_STRING, PACKAGE_DOTTED_VERSION,
+      version, sourcefile);
+    gtk_window_set_title (GTK_WINDOW (dialog), _("gschem"));
+    gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
+
+    exit (1);
   }
+
   scm_dynwind_end();
-  return ret;
-}
-
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_net_endpoint_mode(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {FILLEDBOX, "filledbox"}
-  };
-
-  RETURN_G_RC_MODE("net-endpoint-mode",
-		   default_net_endpoint_mode,
-		   1);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_net_midpoint_mode(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {FILLED, "filled"}
-  };
-
-  RETURN_G_RC_MODE("net-midpoint-mode",
-		   default_net_midpoint_mode,
-		   1);
+  return SCM_BOOL_T;
 }
 
 /*! \todo Finish function documentation!!!
@@ -180,74 +150,6 @@ SCM g_rc_net_selection_mode(SCM mode)
  *  \par Function Description
  *
  */
-SCM g_rc_net_style(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {THIN , "thin" },
-    {THICK, "thick"}
-  };
-
-  RETURN_G_RC_MODE("net-style",
-		   default_net_style,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_bus_style(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {THIN , "thin" },
-    {THICK, "thick"}
-  };
-
-  RETURN_G_RC_MODE("bus-style",
-		   default_bus_style,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_pin_style(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {THIN , "thin" },
-    {THICK, "thick"}
-  };
-
-  RETURN_G_RC_MODE("pin-style",
-		   default_pin_style,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_line_style(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {THIN , "thin" },
-    {THICK, "thick"}
-  };
-
-  RETURN_G_RC_MODE("line-style",
-		   default_line_style,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
 SCM g_rc_action_feedback_mode(SCM mode)
 {
   static const vstbl_entry mode_table[] = {
@@ -274,81 +176,6 @@ SCM g_rc_zoom_with_pan(SCM mode)
 
   RETURN_G_RC_MODE("zoom-with-pan",
 		   default_zoom_with_pan,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_text_feedback(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {ALWAYS            , "always"            },
-    {ONLY_WHEN_READABLE, "only-when-readable"}
-  };
-
-  RETURN_G_RC_MODE("text-feedback",
-		   default_text_feedback,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_text_display_zoomfactor(SCM zoomfactor)
-{
-  int val;
-  
-  SCM_ASSERT (scm_is_integer (zoomfactor), zoomfactor,
-              SCM_ARG1, "test-display-zoom-factor");
-
-  val = scm_to_int (zoomfactor);
-  if (val == 0) {
-    fprintf(stderr,
-            _("Invalid zoomfactor [%d] passed to %s\n"),
-            val,
-            "text-display-zoom-factor");
-    val = 10; /* absolute default */
-  }
-
-  default_text_display_zoomfactor = val;
-
-  return SCM_BOOL_T;
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_scrollbar_update(SCM scmmode)
-{
-  SCM ret = SCM_BOOL_T;
-
-  SCM_ASSERT (scm_is_string (scmmode), scmmode,
-              SCM_ARG1, "scrollbar-update");
-  
-  return ret;
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_object_clipping(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {TRUE , "enabled" },
-    {FALSE, "disabled"}
-  };
-
-  RETURN_G_RC_MODE("object-clipping",
-		   default_object_clipping,
 		   2);
 }
 
@@ -385,61 +212,6 @@ SCM g_rc_embed_components(SCM mode)
 		   default_embed_complex,
 		   2);
 }
-
-static void
-free_string_glist(void *data)
-{
-  GList *iter, *glst = *((GList **) data);
-
-  for (iter = glst; iter != NULL; iter = g_list_next (iter)) {
-    g_free (iter->data);
-  }
-  g_list_free (glst);
-}
-
-/*! \brief read the configuration string list for the component dialog
- *  \par Function Description
- *  This function reads the string list from the component-dialog-attributes
- *  configuration parameter and converts the list into a GList.
- *  The GList is stored in the global default_component_select_attrlist variable.
- */
-SCM g_rc_component_dialog_attributes(SCM stringlist)
-{
-  int length, i;
-  GList *list=NULL;
-  gchar *attr;
-
-  SCM_ASSERT(scm_list_p(stringlist), stringlist, SCM_ARG1, "scm_is_list failed");
-  length = scm_ilength(stringlist);
-
-  /* If the command is called multiple times, remove the old list before
-     recreating it */
-  g_list_foreach(default_component_select_attrlist, (GFunc)g_free, NULL);
-  g_list_free(default_component_select_attrlist);
-
-  scm_dynwind_begin(0);
-  scm_dynwind_unwind_handler(free_string_glist, (void *) &list, 0);
-
-  /* convert the scm list into a GList */
-  for (i=0; i < length; i++) {
-    char *str;
-    SCM elem = scm_list_ref(stringlist, scm_from_int(i));
-
-    SCM_ASSERT(scm_is_string(elem), elem, SCM_ARG1, "list element is not a string");
-
-    str = scm_to_utf8_string(elem);
-    attr = g_strdup(str);
-    free(str);
-    list = g_list_prepend(list, attr);
-  }
-
-  scm_dynwind_end();
-
-  default_component_select_attrlist = g_list_reverse(list);
-
-  return SCM_BOOL_T;
-}
-
 
 /*! \todo Finish function documentation!!!
  *  \brief
@@ -575,100 +347,6 @@ SCM g_rc_scrollbars(SCM mode)
  *  \par Function Description
  *
  */
-SCM g_rc_paper_size(SCM width, SCM height)
-#define FUNC_NAME "paper-size"
-{
-  SCM_ASSERT (SCM_NIMP (width) && SCM_REALP (width), width,
-              SCM_ARG1, FUNC_NAME);
-  SCM_ASSERT (SCM_NIMP (height) && SCM_REALP (height), height,
-              SCM_ARG2, FUNC_NAME);
-  
-  /* yes this is legit, we are casting the resulting double to an int */
-  default_paper_width  = (int) (scm_to_double (width)  * MILS_PER_INCH);
-  default_paper_height = (int) (scm_to_double (height) * MILS_PER_INCH);
-
-  return SCM_BOOL_T;
-}
-#undef FUNC_NAME
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_paper_sizes(SCM scm_papername, SCM scm_width, SCM scm_height)
-#define FUNC_NAME "paper-sizes"
-{
-  int width;
-  int height;
-  char *papername;
-  SCM ret;
-
-  SCM_ASSERT (scm_is_string (scm_papername), scm_papername,
-              SCM_ARG1, FUNC_NAME);
-  SCM_ASSERT (SCM_NIMP (scm_width) && SCM_REALP (scm_width), scm_width,
-              SCM_ARG2, FUNC_NAME);
-  SCM_ASSERT (SCM_NIMP (scm_height) && SCM_REALP (scm_height), scm_height,
-              SCM_ARG3, FUNC_NAME);
-
-  width  = (int) (scm_to_double (scm_width)  * MILS_PER_INCH);
-  height = (int) (scm_to_double (scm_height) * MILS_PER_INCH);
-  papername = scm_to_utf8_string (scm_papername);
-
-  if (!s_papersizes_uniq(papername)) {
-    ret = SCM_BOOL_F;
-  } else {
-    s_papersizes_add_entry(papername, width, height);
-    ret = SCM_BOOL_T;
-  }
-
-  free(papername);
-  return ret;
-}
-#undef FUNC_NAME
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- *  \todo this keyword needs a better name ...
- */
-SCM g_rc_output_type(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {WINDOW, "current window" },
-    {EXTENTS, "limits" },  /* deprecated */
-    {EXTENTS, "extents" },
-    {EXTENTS_NOMARGINS, "extents no margins" },
-  };
-
-  RETURN_G_RC_MODE("output-type",
-		   default_print_output_type,
-		   4);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_output_orientation(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {PORTRAIT , "portrait" },
-    {LANDSCAPE, "landscape"},
-  };
-  
-  RETURN_G_RC_MODE("output-orientation",
-		   default_print_orientation,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
 SCM g_rc_image_color(SCM mode)
 {
   static const vstbl_entry mode_table[] = {
@@ -696,42 +374,6 @@ SCM g_rc_image_size(SCM width, SCM height)
   default_image_height = scm_to_int (height);
 
   return SCM_BOOL_T;
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_output_color(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {TRUE , "enabled" },
-    {FALSE, "disabled"},
-  };
-
-  /* this variable is inconsistantly named with the rest */
-  RETURN_G_RC_MODE("output-color",
-		   default_print_color,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_output_capstyle(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {BUTT_CAP , "butt" },
-    {ROUND_CAP , "round" },
-    {SQUARE_CAP, "square"},
-  };
-
-  RETURN_G_RC_MODE("output-capstyle",
-		   default_print_output_capstyle,
-		   3);
 }
 
 /*! \todo Finish function documentation!!!
@@ -782,6 +424,32 @@ SCM g_rc_third_button(SCM mode)
 
   RETURN_G_RC_MODE("third-button",
 		   default_third_button,
+		   2);
+}
+
+/*! \brief Verify if the third button cancel mode is set in the RC
+ *         file under evaluation.
+ *  \par Function Description
+ *
+ *  Implements the Scheme function "third-button-cancel". Tests
+ *  the mode string in the argument against the third button
+ *  cancel mode of the application itself.
+ *
+ *  \param [in] mode Scheme object containing the third button
+ *                   cancel mode string
+ *
+ *  \returns #t if the third button cancel mode specified in the
+ *              RC file matches the application, else #f.
+ */
+SCM g_rc_third_button_cancel(SCM mode)
+{
+  static const vstbl_entry mode_table[] = {
+    {TRUE , "enabled" },
+    {FALSE, "disabled"},
+  };
+
+  RETURN_G_RC_MODE("third-button-cancel",
+		   default_third_button_cancel,
 		   2);
 }
 
@@ -870,23 +538,6 @@ SCM g_rc_enforce_hierarchy(SCM mode)
 
   RETURN_G_RC_MODE("enforce-hierarchy",
 		   default_enforce_hierarchy,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_text_origin_marker(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {TRUE , "enabled" },
-    {FALSE, "disabled"},
-  };
-
-  RETURN_G_RC_MODE("text-origin-marker",
-		   default_text_origin_marker,
 		   2);
 }
 
@@ -1069,51 +720,15 @@ SCM g_rc_magnetic_net_mode(SCM mode)
  *  \par Function Description
  *
  */
-SCM g_rc_sort_component_library(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {TRUE , "enabled" },
-    {FALSE, "disabled"},
-  };
-
-  RETURN_G_RC_MODE("sort_component_library",
-                   default_sort_component_library, 
-                   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_add_menu(SCM scm_menu_name, SCM scm_menu_items)
-{
-  char *menu_name;
-
-  SCM_ASSERT (scm_is_string (scm_menu_name), scm_menu_name,
-              SCM_ARG1, "add-menu");
-  SCM_ASSERT (SCM_NIMP (scm_menu_items) && SCM_CONSP (scm_menu_items), scm_menu_items,
-              SCM_ARG2, "add-menu");
-
-  menu_name = scm_to_utf8_string (scm_menu_name);
-  s_menu_add_entry(menu_name, scm_menu_items);
-  free (menu_name);
-
-  return SCM_BOOL_T;
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
 SCM g_rc_window_size(SCM width, SCM height)
 {
   SCM_ASSERT (scm_is_integer (width),  width,  SCM_ARG1, "window-size");
   SCM_ASSERT (scm_is_integer (height), height, SCM_ARG2, "window-size");
-  
-  default_width  = scm_to_int (width);
-  default_height = scm_to_int (height);
+
+  /* no effect--window geometry is now saved/restored automatically */
+
+  (void) scm_to_int (width);
+  (void) scm_to_int (height);
 
   return SCM_BOOL_T;
 }
@@ -1166,40 +781,6 @@ SCM g_rc_handleboxes(SCM mode)
 
   RETURN_G_RC_MODE("handleboxes",
 		   default_handleboxes,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_setpagedevice_orientation(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {TRUE , "enabled" },
-    {FALSE, "disabled"},
-  };
-
-  RETURN_G_RC_MODE("setpagedevice-orientation",
-                   default_setpagedevice_orientation,
-		   2);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_rc_setpagedevice_pagesize(SCM mode)
-{
-  static const vstbl_entry mode_table[] = {
-    {TRUE , "enabled" },
-    {FALSE, "disabled"},
-  };
-
-  RETURN_G_RC_MODE("setpagedevice-pagesize",
-                   default_setpagedevice_pagesize,
 		   2);
 }
 
@@ -1276,6 +857,31 @@ SCM g_rc_force_boundingbox(SCM mode)
   RETURN_G_RC_MODE("force-boundingbox",
 		   default_force_boundingbox,
 		   2);
+}
+
+/*! \brief Verify the grid mode set in the RC file under evaluation.
+ *  \par Function Description
+ *
+ *  Implements the Scheme function "grid-mode". Tests the grid mode
+ *  string in the argument against the grid mode of the application
+ *  itself.
+ *
+ *  \param [in] mode Scheme object containing the grid mode string
+ *
+ *  \returns #t if the grid mode specified in the RC file matches the
+ *           application, else #f.
+ */
+SCM g_rc_grid_mode (SCM mode)
+{
+  static const vstbl_entry mode_table[] = {
+    {GRID_MODE_NONE, "none" },
+    {GRID_MODE_DOTS, "dots" },
+    {GRID_MODE_MESH, "mesh" }
+  };
+
+  RETURN_G_RC_MODE ("grid-mode",
+                    default_grid_mode,
+                    3);
 }
 
 /*! \todo Finish function documentation!!!
@@ -1470,29 +1076,6 @@ SCM g_rc_keyboardpan_gain(SCM gain)
  *  \par Function Description
  *
  */
-SCM g_rc_print_command(SCM scm_command)
-#define FUNC_NAME "print-command"
-{
-  char *command;
-
-  SCM_ASSERT (scm_is_string (scm_command), scm_command,
-              SCM_ARG1, FUNC_NAME);
-  
-  command = scm_to_utf8_string (scm_command);
-
-  g_free (default_print_command);
-  default_print_command = g_strdup (command);
-  free (command);
-
-  return SCM_BOOL_T;
-}
-#undef FUNC_NAME
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
 SCM g_rc_select_slack_pixels(SCM pixels)
 {
   int val;
@@ -1568,7 +1151,7 @@ extern COLOR display_outline_colors[MAX_COLORS];
 
 SCM g_rc_display_color_map (SCM scm_map)
 {
-  if (scm_map == SCM_UNDEFINED) {
+  if (SCM_UNBNDP (scm_map)) {
     return s_color_map_to_scm (display_colors);
   }
 
@@ -1581,7 +1164,7 @@ SCM g_rc_display_color_map (SCM scm_map)
 
 SCM g_rc_display_outline_color_map (SCM scm_map)
 {
-  if (scm_map == SCM_UNDEFINED) {
+  if (SCM_UNBNDP (scm_map)) {
     return s_color_map_to_scm (display_outline_colors);
   }
 

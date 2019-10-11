@@ -45,10 +45,7 @@
 #include "../include/struct.h"     /* typdef and struct declarations */
 #include "../include/prototype.h"  /* function prototypes */
 #include "../include/globals.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
+#include "../include/gettext.h"
 
 
 /*------------------------------------------------------------------
@@ -131,7 +128,7 @@ s_object_add_net_attrib_to_object (TOPLEVEL *toplevel,
  * \param toplevel TOPLEVEL structure
  * \param o_current Pointer to pin object
  * \param new_attrib_name Name of attribute to add
- * \parma new_attrib_value Value of attribute to add
+ * \param new_attrib_value Value of attribute to add
  * \todo Do I really need separate fcns for comps, nets, and
  * pins???
  */
@@ -218,7 +215,7 @@ void s_object_replace_attrib_in_object(TOPLEVEL *toplevel,
   /* if we get here, it's because we have failed to find the attrib on the component.
    * This is an error condition. */
   fprintf(stderr, 
-	 "In s_object_replace_attrib_in_object, we have failed to find the attrib %s on the component.  Exiting . . .\n", 
+	 _("In s_object_replace_attrib_in_object, we have failed to find the attrib %s on the component.  Exiting . . .\n"),
 	 new_attrib_name);
   exit(-1);
 }
@@ -277,7 +274,7 @@ s_object_remove_attrib_in_object (TOPLEVEL *toplevel,
   /* if we get here, it's because we have failed to find the attrib on the component.
    * This is an error condition. */
   fprintf(stderr, 
-	 "In s_object_remove_attrib_in_object, we have failed to find the attrib %s on the component.  Exiting . . .\n", 
+	 _("In s_object_remove_attrib_in_object, we have failed to find the attrib %s on the component.  Exiting . . .\n"),
 	 new_attrib_name);
   exit(-1);
 }
@@ -311,8 +308,6 @@ s_object_attrib_add_attrib_in_object (TOPLEVEL *toplevel,
   OBJECT *o_current;
   OBJECT *new_obj;
 
-  color = DETACHED_ATTRIBUTE_COLOR;
-
   o_current = object;
 
   /* creating a toplevel or unattached attribute */
@@ -332,7 +327,7 @@ s_object_attrib_add_attrib_in_object (TOPLEVEL *toplevel,
       break;
 
     default:
-      fprintf(stderr, "In s_object_attrib_add_attrib_in_object, trying to add attrib to non-complex or non-net!\n");
+      fprintf(stderr, _("In s_object_attrib_add_attrib_in_object, trying to add attrib to non-complex or non-net!\n"));
       exit(-1);
     }
   } else {    /* This must be a floating attrib, but what is that !?!?!?!?!  */
@@ -358,7 +353,7 @@ s_object_attrib_add_attrib_in_object (TOPLEVEL *toplevel,
   printf("     show_name_value = %d \n", show_name_value);
 #endif
 
-  new_obj = o_text_new (toplevel, OBJ_TEXT, color, world_x, world_y,
+  new_obj = o_text_new (toplevel, color, world_x, world_y,
                         LOWER_LEFT, 0, /* zero is angle */
                         text_string, DEFAULT_TEXT_SIZE,
                         visibility, show_name_value);

@@ -2,7 +2,7 @@
  'gschem and Friends' Electronic Design Suite
 ==============================================
 
-Copyright (C) 1998-2013 gEDA Developers
+Copyright (C) 1998-2019 gEDA Developers
 
 Introduction
 ============
@@ -26,6 +26,43 @@ making sure the tools run on other platforms as well.
 The gEDA/gaf suite (this package) provides schematic capture,
 netlisting, bill of materials generation, and many other features.
 
+Tools in the gEDA suite
+=======================
+
+The major components of the gEDA suite are:
+
+`libgeda'
+  A library of functions for manipulating gEDA schematics and symbols.
+
+`gschem'
+  A schematic editor.
+
+`gattrib'
+  A spreadsheet-like program for bulk editing of component attributes.
+
+`gnetlist'
+  A highly-flexible, hierarchy-aware utility which parses schematics
+  to generate a number of outputs, including netlists for a wide
+  variety of PCB layout tools.  It can also generate bills of
+  materials and DRC reports for your schematics.
+
+`gsch2pcb'
+  A command-line utility for streamlining the workflow where `PCB'
+  <http://pcb.geda-project.org/> and `gschem' are used together.
+
+`gsymcheck'
+  A utility for checking for common errors in schematic symbol files.
+
+`gaf'
+  A utility for interactive and batch mode working with gEDA Scheme
+  API, exporting schematics into various formats, and
+  configuring all the programs of the suite.
+
+`xorn'
+  A commmand-line utility working with the new Python API which
+  converts gEDA files between formats and extracts embedded symbols
+  and pixmaps from a schematic.
+
 Installation
 ============
 
@@ -38,16 +75,19 @@ Dependencies
 In order to compile gEDA from the distributed source archives, you
 *must* have the following tools and libraries installed:
 
- - A C compiler and standard library (GCC/glibc are recommended).
+ - A C/C++ compiler and standard library (GCC/glibc are recommended).
 
  - The `pkg-config' tool for managing shared libraries.
    <http://pkgconfig.freedesktop.org/>
 
  - Guile ("GNU's Ubiquitous Intelligent Language for Extensions"),
-   version 1.8.0 or later.  <http://www.gnu.org/software/guile/>
+   version 2.0.0 or later.  <http://www.gnu.org/software/guile/>
 
- - GTK+ (the Gimp Toolkit), version 2.16.0 or later.
+ - GTK+ (the Gimp Toolkit), version 2.18.0 or later.
    <http://www.gtk.org/>
+
+ - GNU `gettext', version 0.18 or newer.
+   <http://www.gnu.org/software/gettext/>
 
  - The `lex' tool for generating lexical scanners.  The `flex'
    implementation recommended.  <http://flex.sourceforge.net/>
@@ -55,10 +95,10 @@ In order to compile gEDA from the distributed source archives, you
  - The `awk' tool for data processing.  GNU Awk (`gawk') is
    recommended.  <http://www.gnu.org/software/gawk/>
 
-The following tools and libraries are *highly recommended*:
+ - The CPython interpreter, version 2.7, including the development
+   headers.  <https://www.python.org/downloads/>
 
- - GNU `gettext', version 0.16 or newer.
-   <http://www.gnu.org/software/gettext/>
+The following tools and libraries are *highly recommended*:
 
  - GNU `troff' (`groff'). <http://www.gnu.org/software/groff/>
 
@@ -68,15 +108,27 @@ The following tools and libraries are *highly recommended*:
  - The freedesktop.org utilities for manipulating .desktop files.
    <http://www.freedesktop.org/software/desktop-file-utils>
 
-The following tools and libraries are optional:
+ - The FAM or Gamin daemon and corresponding `libfam' or `libgamin'
+   client library (Gamin is recommended).  If this is available,
+   gschem will detect if files have been changed on disk by another
+   application.  <https://people.gnome.org/~veillard/gamin/>
 
- - `libstroke', a stroke and gesture recognition library.  If this is
-   available, gschem will support mouse gesture recognition.
-   <http://www.etla.net/libstroke/>
+The following tools and libraries are optional:
 
  - The `doxygen' API documentation tool.  This is required for
    building the gEDA developer API documentation, not for the regular
    user documentation.  <http://www.stack.nl/~dimitri/doxygen/>
+
+ - `Inkscape' or `ImageMagic' for svg to png or pdf conversion
+   This is required for building the gEDA developer API documentation,
+   not for the regular user documentation.
+   <http://inkscape.org/>
+   <http://www.imagemagick.org/script/index.php>
+
+ - `Graphviz' for drawing directed graphs.
+   This is required for building the gEDA developer API documentation,
+   not for the regular user documentation.
+   <http://www.graphviz.org/>
 
 Troubleshooting dependencies
 ----------------------------
@@ -103,10 +155,10 @@ First extract the archive to a sensible place:
 
   tar -xzvf gEDA-gaf-<version>.tar.gz && cd gEDA-gaf-<version>
 
-Run the configuration script.  You'll probably want to specify a
-custom directory to install gEDA to, for example:
+Run the configuration script.  You'll probably want to specify silent
+rules and a custom directory to install gEDA to, for example:
 
-  ./configure --prefix=$HOME/geda
+  ./configure --prefix=$HOME/geda --enable-silent-rules
 
 You can then compile gEDA:
 
@@ -146,7 +198,7 @@ tools *in addition to* the ones listed above:
 Once you have these installed, you need to clone the gEDA `git'
 repository:
 
-  git clone git://git.gpleda.org/gaf.git
+  git clone git://git.geda-project.org/geda-gaf.git
 
 To generate the configure script, run:
 
@@ -156,39 +208,35 @@ You can then procede to configure and build gEDA as described above.
 For more information on working with the gEDA `git' repository, see
 <http://wiki.geda-project.org/geda:scm>.
 
-Tools in the gEDA suite
-=======================
+Building gEDA developer API documentation
+=========================================
 
-The major components of the gEDA suite are:
+Several of the gEDA libraries and applications have doxygen API
+documentation available.  To generate the API documentation from the
+source code, install doxygen (see `Dependencies' above).  Next, add
+`--enable-doxygen' to your configure command line, i.e.:
 
-`libgeda'
-  A library of functions for manipulating gEDA schematics and symbols.
+  ./configure --enable-doxygen
 
-`gschem'
-  A schematic editor.
+To compile the documentation (quite a slow process), run:
 
-`gattrib'
-  A spreadsheet-like program for bulk editing of component attributes.
+  make doxygen
 
-`gnetlist'
-  A highly-flexible, hierarchy-aware utility which parses schematics
-  to generate a number of outputs, including netlists for a wide
-  variety of PCB layout tools.  It can also generate bills of
-  materials and DRC reports for your schematics.
+The documentation can then be found in:
 
-`gsch2pcb'
-  A command-line utility for streamlining the workflow where `PCB'
-  <http://pcb.gpleda.org/> and `gschem' are used together.
+  */docs/html/index.html
 
-`gsymcheck'
-  A utility for checking for common errors in schematic symbol files.
+The PDF version of the documentation isn't generated by default.
+If you want it, you have to build it explicitly, e.g.:
+
+  cd $(srcdir)/libgeda/docs/latex && make
 
 Getting help
 ============
 
 There are several ways to get help with installing and using gEDA:
 
- - The gEDA website <http://www.gpleda.org> has more extensive
+ - The gEDA website <http://www.geda-project.org> has more extensive
    information on the gEDA tools, and links to some successful
    projects which use gEDA.
 

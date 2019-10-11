@@ -1,12 +1,481 @@
-commit 875406c9d1211fd88e3e7e1ee5349cba41a7becf
-Author: Peter TB Brett <peter@peter-b.co.uk>
-Date:   Wed Sep 25 22:17:56 2013 +0100
+commit e54df31f9f124dd4d813315eb2bdb6cc60729a22
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 17:51:35 2019 +0200
 
-    Update NEWS and version information for 1.8.2.
+    Add missing copyright notices in header files
 
-commit 1dd3f5d77dc013624f6848801f4885c485595425
+commit a1bebce61206600770771d451d68c12a735bbe22
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 17:50:47 2019 +0200
+
+    Update copyright years
+
+commit 1e84095451714063aab4717001b4bcc93395fc8f
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 14:15:39 2019 +0200
+
+    Add silent rules for HTML generation
+
+commit 6e9c900c781bb24f5d5941bd21480ba13883bb49
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 14:00:50 2019 +0200
+
+    Add silent rules for manpage generation
+
+commit 53c643e1df6ab1f5f7e78a594a031632e1e9cda0
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Oct 6 16:59:31 2019 +0200
+
+    Fix changed flag update for embed/unembed actions
+
+commit 502f962ab50e769f4485132d3043e7ff0f10d255
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Oct 3 10:59:16 2019 +0200
+
+    Don't use `==' and `!=' on SCM values
+
+commit 45cd7d2d2f1c15ac710d4705dba03c310b5a4c74
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Sep 9 14:42:14 2019 +0200
+
+    API documentation: Disable include and call graphs
+    
+    These graphs aren't very helpful and increase both documentation size
+    and generation time.
+
+commit 1b7422f8868dcd41dc5329aac44133e95e48e8c2
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sat Jul 27 14:45:51 2019 +0200
+
+    utils/grenum: Remove loop initialization without effect
+    
+    This appears to be correct.  Remove the initialization so the compiler
+    doesn't warn about it.
+
+commit 1b5de6ea805515e1b595ac6f896e2c5676a7be10
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 21:37:43 2019 +0100
+
+    utils/tests: Remove top-level Makefile
+
+commit d610b5891fe668ce40628759b387f82a8c11379a
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 18:41:27 2019 +0100
+
+    utils/tests: Keep run directory if test fails
+
+commit f959831618097d0e8aa0c4c5b958a0daa604c3e2
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 17:25:16 2019 +0100
+
+    utils/tests: Clean up `run-test'
+
+commit 3cd5298a59f8e752a3a936719213a6a4540882fd
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 17:07:46 2019 +0100
+
+    utils/tests: Add proper braces and quoting to `run-test'
+
+commit 80046d5155e340eea5c8766723db3c06c2ac3c39
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 15:53:25 2019 +0100
+
+    utils/tests: Use parallel test harness
+
+commit 7c5ed0217e73a47105e9638a4a9934f5321d60a7
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 16:35:54 2019 +0100
+
+    utils/tests: Fix handling of relative paths
+
+commit 45beafbb78355b47fb8f34845233ac7e34412b57
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 16:10:13 2019 +0100
+
+    utils/tests: Pass tool invocation to test scripts
+
+commit 09455c07eac15c4834dd3a1004baf4d0bad2f9ad
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 15:34:33 2019 +0100
+
+    utils/tests/gxyrs: Pass reference file name to `run-test' script
+
+commit 6db83bc1a0411586b4d86b2e41fc631fda144222
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 15:24:19 2019 +0100
+
+    utils/tests: Use test-specific run directories
+
+commit 1c05198cf3886b9b6e5aef424e6a82ebcf64ee6a
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 15:23:27 2019 +0100
+
+    utils/tests: Allow specifying regeneration via environment variable
+
+commit 54be4f0ef7091217cec6f554afb59ed040265d8b
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 15:30:24 2019 +0100
+
+    utils/tests: Fix alphabetic sorting in file list
+
+commit 4a008ee1990f2ae93274b852b7ecc85b0c702be5
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 15:05:39 2019 +0100
+
+    utils/tests: Change reference file naming schemes
+
+commit 4db6e058df2b7592e130848f340f545a6c36d6c7
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 14:51:41 2019 +0100
+
+    utils/tests: Split `run_tests.sh' into framework and actual test
+
+commit e4f2f67231d3dc97ed0f5e34eecee569ba6c2c1a
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 14:30:33 2019 +0100
+
+    utils/tests: Use one non-recursive Makefile per test suite
+
+commit 69d278d369b02c05bf610abbc23a99fd2d6ce100
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 20:56:22 2019 +0100
+
+    utils/tests: Remove extra .gitignore files
+
+commit 0f46207e25b7cfcfc8ac7d43a6c77d8bf7b2657d
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 14:06:28 2019 +0100
+
+    utils/tests: Remove unnecessary cleaning directives
+
+commit 4964fec411ea4e2bdbed9a08b65b25fb981b3990
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 18:51:44 2019 +0100
+
+    utils/tests: Rename README files
+
+commit c556378fba77644a4398bb06ff8b5e9764d22f57
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 18:56:10 2019 +0100
+
+    Remove version control artifacts
+
+commit 3991fcc0fa68f092e40d72f8113650a811e6216e
+Merge: ccea85e64 53ec83330
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Jan 10 17:05:35 2019 +0100
+
+    Merge fixes from master into unstable-1.9
+
+commit e6d2b4c11e7c1fd7a64045ee7792dfb8271db2eb
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 13 15:59:28 2018 +0200
+
+    Fix `make doxygen' for VPATH builds
+
+commit 57afc7921a9aba3810d56d1760d8e1cd9dbc034b
 Author: Peter TB Brett <peter@peter-b.co.uk>
-Date:   Wed Sep 25 22:34:27 2013 +0100
+Date:   Sat Jan 23 21:09:11 2016 +0000
+
+    build: Generate an empty ChangeLog when git history unavailable
+    
+    When no git history is available -- for example, when the git
+    repository was cloned using the `--depth` option to limit the amount
+    of git history downloaded -- the changelog-generation rule can fail
+    because the changelog's base git commit (i.e. the 1.0 release tag)
+    isn't available in the repository.
+    
+    This patch makes generation of `ChangeLog` succeed in that situation,
+    by creating an empty log and printing a warning to stderr.  It allows
+    `make dist` and `make distcheck` to pass on shallow clones.
+
+commit 66bc95199157b8ef524ecb89d0640edc3c796f82
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 16 11:26:32 2016 +0000
+
+    Remove uses of deprecated g_strcasecmp().
+    
+    The deprecated GLib function `g_strcasecmp()` is used very rarely in
+    the engine, and in exactly two places:
+    
+    * Checking the version from an rc file: in this case, we can ensure
+      that the compiled-in `PACKAGE_DATE_VERSION` string is ASCII and
+      safely use `g_ascii_strcasecmp()`.
+    
+    * Checking whether a page has a particular filename in
+      `s_page_search()`.  For most of the platforms we support, the
+      filesystem is case-insensitive, so it may well be possible to have a
+      `FOO.sch` and `foo.sch` open at the same time.  For now, replace the
+      filesystem comparion with a straightforward `strcmp()` call.
+
+commit 9b3bf135f2ceb372e3f04c6a70ca8e68bb92112f
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Mar 5 17:34:52 2017 +0100
+
+    Fix `gxyrs' utility
+
+commit a6026cb26708227e1e0b37591a8053ca5938bc53
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 23 21:09:11 2016 +0000
+
+    build: Generate an empty ChangeLog when git history unavailable
+    
+    When no git history is available -- for example, when the git
+    repository was cloned using the `--depth` option to limit the amount
+    of git history downloaded -- the changelog-generation rule can fail
+    because the changelog's base git commit (i.e. the 1.0 release tag)
+    isn't available in the repository.
+    
+    This patch makes generation of `ChangeLog` succeed in that situation,
+    by creating an empty log and printing a warning to stderr.  It allows
+    `make dist` and `make distcheck` to pass on shallow clones.
+
+commit b16b8565a7348af7032c9fe5381254caa5b5f257
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 16 11:26:32 2016 +0000
+
+    Remove uses of deprecated g_strcasecmp().
+    
+    The deprecated GLib function `g_strcasecmp()` is used very rarely in
+    the engine, and in exactly two places:
+    
+    * Checking the version from an rc file: in this case, we can ensure
+      that the compiled-in `PACKAGE_DATE_VERSION` string is ASCII and
+      safely use `g_ascii_strcasecmp()`.
+    
+    * Checking whether a page has a particular filename in
+      `s_page_search()`.  For most of the platforms we support, the
+      filesystem is case-insensitive, so it may well be possible to have a
+      `FOO.sch` and `foo.sch` open at the same time.  For now, replace the
+      filesystem comparion with a straightforward `strcmp()` call.
+
+commit a28576df7fed33442320d8eb4675b47a3b951dad
+Merge: 4cc1c7ce5 8fd737c25
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Thu Oct 8 13:00:11 2015 +0300
+
+    Merge branch 'unstable-1.9'
+
+commit 2181abe63512c7b5ad2279ab4609878586d497a2
+Author: Sergey Stepanov <no.such.process@gmail.com>
+Date:   Tue Oct 6 22:41:35 2015 +0500
+
+    utils/gsch2pcb: fix bugs:
+    
+    * expand_dir(): Dereference of null pointer (loaded from variable 'dir')
+    * possible resource leak (as pointer to allocated memory by expand_dir() is lost after printf())
+
+commit cf60e1d772c2d2b1dc820748b5048cf8381fa289
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Sep 27 15:47:36 2015 +0300
+
+    Automatically update Copyright in man pages.
+
+commit c03c25ed78494cae26fe1339a1e7d77b55889638
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Aug 12 14:25:22 2015 +0300
+
+    gschlas: Added version output into log.
+
+commit 2f9497b58d169c6ba67d0cd722f2e30a186f2b8d
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Aug 12 14:16:44 2015 +0300
+
+    gschlas: Removed unused variables, functions and headers.
+
+commit b22205de1d41672d68b94211267ce4620ee0405d
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Aug 12 14:38:00 2015 +0300
+
+    gschlas: Added doxygen comments for several functions and files.
+
+commit 1d12700f608502e016389d496353dab246200d01
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Aug 12 13:58:17 2015 +0300
+
+    gschlas: Whitespace fixes.
+
+commit 2e702f019ac11ba221818712b74eaa7b6c9d8e74
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Apr 20 10:19:10 2015 +0300
+
+    Drop compatibility with guile 1.8.
+    
+    Revert "build-sys: Test for scm_{to,from}_utf8_string()."
+    This reverts commit 3dbc8982a4e598a3435dfa7857c48c1b64fbe721.
+    and facilitates building geda-gaf in MinGW with guile 2.0.
+
+commit fda37d67334d41abdd9988053b11930ea4f30ffe
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Jul 14 22:54:34 2015 +0300
+
+    Replaced non-portable 'date -d' with a portable guile script.
+    
+    Closes-bug: lp-1473456
+
+commit fd130bf9c522faa902e06232548c5ca7dd0bdf90
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Jun 26 15:55:50 2015 +0300
+
+    gsch2pcb: Define pcb m4 dir before invoking usage().
+    
+    This patch fixes output of the m4 dir when the user calls gsch2pcb
+    without args. Before now, the directory was not defined in such a case
+    and gsch2pcb output "(null)". Now it behaves the same way as if '--help'
+    was given.
+
+commit 317a042ab4ae3044018e1fa4f141245833ff95fa
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Jun 26 15:46:52 2015 +0300
+
+    gsch2pcb: Slightly shift down text to make m4-pcbdir more visible.
+
+commit 6248ea34c2e3a200c4a3eff87e73ce31ee2275bf
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Jun 26 15:26:41 2015 +0300
+
+    gsch2pcb: Fixed incorrect setting of the pcb m4 directory.
+    
+    In commit 9303b37, instead of using the PCBM4DIR variable set in the
+    configure script the literal string "PCBM4DIR" was used as the pcb m4
+    directory, which is obviously wrong. This patch adds another constant
+    storing the configured value of PCBM4DIR which will be used if the env
+    var PCBDATA is not set. If neither PCBM4DIR nor PCBDATA are set, the
+    fallback path "./m4" is used.
+    
+    Affects-bug: lp-1463178
+
+commit 9303b37847a2f12b8c00e1acd1cfa1481879defc
+Author: Lev <leva@jive>
+Date:   Tue Jun 9 17:39:37 2015 +0200
+
+    gsch2pcb: Fix crashes when m4-pcbdir option is given in the project file.
+    
+    The m4-pcbdir variable defining the default m4 location was set at the
+    compile time to a static value. Freeing of the variable by g_free() led
+    to crashes. Now, the memory for the variable is allocated, so the free()
+    calls will be successful.
+    
+    Closes-bug: lp-1463178
+
+commit af398d231f31389e8958384a3dfceab359fcb10d
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Jun 22 00:50:23 2014 +0400
+
+    gsch2pcb: use proper paths to m4 files
+    
+    Fixed the relative m4 data path in the pcb install directory.
+    
+    Reported-by: Philipp Klostermann
+
+commit 08d1344b886436bff27d6380c7c308d9f23df51a
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sat Mar 15 20:23:53 2014 +0000
+
+    utils: add -h,--help command line flag to some utilities and update manpages
+    
+    Added either -h or --help to gsymfix, refdes_renum and garchive and
+    updated the respective manpages. Also some editing for formatting while
+    I was in the manpages.
+    
+    Closes-bug: lp-1218833
+
+commit bed779018a0f3ba8b9be26ab5d222d50b6081033
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sat Mar 15 19:59:20 2014 +0000
+
+    utils: Update manpages for gsymcheck, gschlas
+    
+    Update the manpages for both gsymcheck and gschlas to add the new long
+    format command line options, and also take the opportunity to fix some
+    of the formatting to align with man-pages(7) guidelines.
+
+commit 39fe9af5aaf5014786a815d77663eba2af0ee1af
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sat Mar 15 17:48:35 2014 +0000
+
+    utils: Add getopt-long command line switch parsing to gschlas
+    
+    Affects-bug: lp-1218833
+
+commit 38231c2c2f7ec00478c5e0b7f8551601266ee6cd
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Mar 14 20:34:36 2014 +0000
+
+    utils: remove superseded utilities from distribution
+    
+    gpstoimage has been superseded by gaf, and convert_sym.awk by
+    convert_sym. Remove both superseded tools.
+
+commit 1c68a814ec1f8dfde872328587a8507eae2c4c7b
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Mar 14 20:15:15 2014 +0000
+
+    utils: move remaining legacy scripts into contrib directory
+    
+    Move gnet_hier_verilog.sh, pads_backannotate, sw2asc and sarlacc_sym
+    and manpages into contrib/scripts. Update NEWS and tidy up a couple of
+    straggling .gitignore files from previous commits on the same topic.
+    
+    Affects-bug: lp-1218833
+
+commit e570a1a89622d38eb6d66465ec40a4c7c07080fb
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Fri Mar 14 08:37:51 2014 +0000
+
+    utils: move sarlacc_schem and associated manpage to contrib directory
+    
+    Affects-bug: lp-1218833
+
+commit 2151dcd7e1be57c5b24792e7a84b1c70c037ac18
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Thu Mar 13 21:45:21 2014 +0000
+
+    utils: move convert_sym and gmk_sym to contrib/ directory
+    
+    Affects-bug: lp-1218833
+
+commit d9d21c25771021fb89145ef20dcfe9bf8db7f4df
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Thu Mar 13 21:52:03 2014 +0000
+
+    contrib: move the olib docs over from utils
+
+commit a593585695be2d6998447ee73d1249ae4a084e9c
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Thu Mar 13 08:40:46 2014 +0000
+
+    utils: move olib to contrib directory
+    
+    Affects-bug: lp-1218833
+
+commit a1737621600b09f14c347dd2aa7ffc4729383011
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Mar 12 22:07:50 2014 +0000
+
+    Update gitgnore files for new smash_megafile location
+
+commit 1ae0edf4472bb149be1b1e62c4407486ef7ba2ea
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Wed Mar 12 07:06:15 2014 +0000
+
+    utils: Move smash_megafile from utils/ to contrib/ directory
+
+commit 840b69010618be9919a79eaa24ea698870b89951
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Feb 5 11:37:36 2014 +0400
+
+    Updated the gEDA site addresses in several places
+
+commit 26447bcd088f55f7a48b6140f8216271ef24a3ee
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Sep 29 09:36:04 2013 +0100
+
+    Remove all libdmalloc cruft.
+
+commit b7a373f8846fa91c92e4a628e0691b7f865af3e0
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Aug 31 09:33:37 2013 +0100
 
     build-sys: Don't use Automake test driver unless actually necessary.
     
@@ -14,18 +483,122 @@ Date:   Wed Sep 25 22:34:27 2013 +0100
     in the form of a shell script.  It's actually better just to run them
     directly in a check-local rule than to use the Automake test driver
     (which eats all the output now that parallel tests are being used).
-    
-    (imported from commit b7a373f8846fa91c92e4a628e0691b7f865af3e0)
 
-commit d088ec192ac9fbc1dff3509527cb238520c2ee33
+commit 143c46d43b7b25a4008c888f9c3f614d4a885b6a
 Author: Peter TB Brett <peter@peter-b.co.uk>
-Date:   Fri Nov 23 21:24:42 2012 +0000
+Date:   Thu Dec 13 23:02:28 2012 +0000
 
-    Update version numbers to 1.8.1.
+    Avoid using getenv for GEDADATA/GEDADATARC in rc files.
+    
+    Affects-bug: lp-1088724
 
-commit 128b2532fd733616037fb1363f4d0f21a804a36b
+commit c0cb29fc0c85f604a6628a56d19797392baa24ae
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 12 12:12:08 2012 +0000
+
+    Don't suppress warnings about deprecated Guile features.
+    
+    Don't set GUILE_WARN_DEPRECATED=no when not set in the environment;
+    use the setting compiled into Guile.
+
+commit ffa2ca61b33721ca2825240cf03d75515dc10d3b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 5 12:06:17 2012 +0000
+
+    utils: Don't use addsuffix make function variable.
+    
+    We do use GNU make-specific function variables in some i18n rules
+    installed by `desktop-i18n', but this patch stops automake from
+    whinging.
+
+commit f74515efcd70f0669b5ada908e62b9ef36a29fc7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Dec 4 10:25:23 2012 +0000
+
+    Add built manpages to .gitignore files.
+
+commit 06d228d70301d8a5178b9b979e5e8268b9821f34
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 20:12:32 2012 +0000
+
+    Automatically update man page version/date info.
+
+commit 6243f3b4586b7ce0a2d17539444083eed97287e9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 17:45:36 2012 +0000
+
+    Update version numbers for 1.9.0.
+
+commit aa42e0c3026b64b9797316bfc645022ab3262a1f
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 14:26:39 2012 +0000
+
+    Remove gsch2pdf.
+    
+    `gaf export' now does everything gsch2pdf does, but with more
+    flexibility and supporting more file formats.
+
+commit 66c3b97b90d6e4245e554f6e0ca4416f5e07eeb3
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Dec 1 19:42:05 2012 +0100
+
+    Correction of a typo in MINGW_CFLAGS.
+    
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit e13aef3ebd98660b54f9315be6e1ccbf6b260cd2
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 27 13:31:55 2012 +0000
+
+    gsch2pdf: Use eda_renderer_draw_cues().
+    
+    Removes gsch2pdf's own junction tracking system and uses libgeda's
+    instead.  This wasn't done sooner because of the issue fixed in commit
+    e8d8b02af8cd.
+
+commit 1fd3bd304a1dbaa72aee9f7c2e35fea9ccc9d014
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 27 09:28:33 2012 +0000
+
+    gsch2pdf: Register text_rendered_bounds().
+    
+    Register the rendered bounds function with libgeda to enable text
+    bounds calculations.
+
+commit 340e52faf1233fcb13d26f15c64f958ccb2b196d
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Sat Nov 24 12:19:08 2012 -0800
+
+    gsch2pdf: Added command line option to specify output filename.
+
+commit 559085e40206929ff95b1d35bb60c9ba1c784df5
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 24 17:51:07 2012 +0000
+
+    gsch2pdf: Dispose of Cairo surface *after* drawing to it.
+
+commit 351be342363b731d684831d63aee59559b824d43
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Nov 24 17:43:31 2012 +0000
+
+    gsch2pdf: Get drawn area extents without using recording surface.
+
+commit 8d0c460cc37c168861587030d91d2500ea385ab7
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Fri Nov 23 19:44:38 2012 -0800
+
+    gsch2pdf: Automatically update man page version info.
+
+commit df6cd1c290bb96de67bbf007ff393c32c825ee16
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Fri Nov 23 17:55:02 2012 -0800
+
+    gsch2pdf: Modified to use the libgedacairo shared library.
+
+commit 2db16cd536b95ffb98721946aa36984f8a41d896
 Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@sabily.org>
-Date:   Fri Nov 23 21:11:20 2012 +0000
+Date:   Wed Nov 21 20:12:57 2012 +0000
 
     Various manpage fixes
     
@@ -34,8 +607,42 @@ Date:   Fri Nov 23 21:11:20 2012 +0000
      * Fix hyphens
     
     Closes-bug: lp-1081303
+
+commit c0d38ce9b4d9383f0953598304d84e1657af1916
+Merge: ffb0349ec 2f5799e39
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 20 11:47:53 2012 +0000
+
+    Merge branch 'stable-1.8' branch into 'master'.
     
-    (imported from commit 2db16cd536b95ffb98721946aa36984f8a41d896)
+    Conflicts:
+            gattrib/po/ar.po
+            gattrib/po/bg.po
+            gattrib/po/de.po
+            gattrib/po/es.po
+            gattrib/po/fr.po
+            gattrib/po/hu.po
+            gattrib/po/it.po
+            gattrib/po/ml.po
+            gattrib/po/nl.po
+            gattrib/po/pl.po
+            gattrib/po/pt.po
+            gattrib/po/pt_BR.po
+            gattrib/po/ru.po
+            gattrib/po/tr.po
+            gattrib/po/zh_CN.po
+            gattrib/po/zh_TW.po
+            gschem/po/nl.po
+            gschem/src/o_arc.c
+            gschem/src/o_cue.c
+            libgeda/po/nl.po
+            libgeda/src/s_hierarchy.c
+
+commit 57940f94c53a8c9d740e1c74a5aa6e4db0f0f5b6
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 19 07:42:44 2012 +0000
+
+    gsch2pdf: Make sure all necessary files are distributed.
 
 commit 87f1e0e76965a514277c949dbf2191993962cb88
 Author: Peter TB Brett <peter@peter-b.co.uk>
@@ -83,6 +690,50 @@ Date:   Sun Mar 18 11:36:59 2012 +0000
     Street location.
     
     Closes-bug: lp-934934
+
+commit 24ae745516be383a68b518777eadba3b131c00a1
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Mon Oct 29 18:18:03 2012 +0000
+
+    Add a gitignore file for gsch2pdf
+
+commit 5b72f3914cfbd981f3f6e58588fa054b47c5270f
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sun Mar 18 11:36:59 2012 +0000
+
+    Update FSF mailing address.
+    
+    Change all references to the FSF mailing address to the new Franklin
+    Street location.
+    
+    Closes-bug: lp-934934
+
+commit 323fe113dbd5a702a0a028b2ca150b5b5e64982a
+Author: Bas Gieltjes <bas@gieltjes.dds.nl>
+Date:   Mon Oct 8 19:24:26 2012 -0700
+
+    Prevent overwriting of output file.
+    
+    Prevents creation or overwriting of the "output.pdf" file. It checks if a valid schematic is opened and after
+    that it creates the cairo context.
+
+commit 940c184c5f8501bb40b5e0d56fecaa6ac99e80e4
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Sat Sep 29 00:02:03 2012 -0700
+
+    Implement printing of junctions
+
+commit 139df6ab8f1b4e2b494f26a4196a959f9e8fcf8e
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Fri Sep 28 14:20:24 2012 -0700
+
+    Add configuration items for junctions
+
+commit 39ac4ab6ff834d60ccbe57f2fb944bafb17dd837
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Thu Sep 27 23:41:56 2012 -0700
+
+    Added command line utility for generating PDF schematics
 
 commit e2eda476fb8f3a16aeba8eab0cc8b7fa12e37d6b
 Author: Ales Hvezda <ahvezda@seul.org>
@@ -441,7 +1092,7 @@ Date:   Wed Feb 23 11:33:00 2011 +0100
 
     Better reflect the current homepage situation in the URLs
     
-    	modified:   utils/src/gsch2pcb.c
+            modified:   utils/src/gsch2pcb.c
     
     * Don't link explicitely to the wiki. Almost the whole geda homepage
     is wikified now. This link is dead, anyway:
@@ -454,7 +1105,7 @@ Date:   Wed Feb 23 11:33:00 2011 +0100
     
     * point to gpleda.org as home page of gEDA
     
-    	modified:   utils/scripts/pcb_backannotate
+            modified:   utils/scripts/pcb_backannotate
     * Yet another link to sourceforge replaced by pcb.gpleda.org
     
     Reviewed-by: Krzysztof Kościuszkiewicz <k.kosciuszkiewicz@gmail.com>
@@ -578,19 +1229,19 @@ Date:   Sun Jan 16 00:15:29 2011 -0500
     Updated version strings in all man pages
 
 commit 502ab80495c45e092eca6052edd6cf8e7ff55429
-Merge: 27f7a52 e1c3ba4
+Merge: 27f7a522a e1c3ba4c4
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Thu Jan 13 19:59:35 2011 +0000
 
     Merge branch 'stable-1.6'
     
     Conflicts:
-    	NEWS
-    	libgeda/include/prototype_priv.h
-    	libgeda/src/gdk-pixbuf-hacks.c
-    	libgeda/src/o_basic.c
-    	libgeda/src/o_complex_basic.c
-    	utils/src/gsch2pcb.c
+            NEWS
+            libgeda/include/prototype_priv.h
+            libgeda/src/gdk-pixbuf-hacks.c
+            libgeda/src/o_basic.c
+            libgeda/src/o_complex_basic.c
+            utils/src/gsch2pcb.c
 
 commit 7ca2b049dbcfb9f0eb8d3dd3fcf21cbd66c0ec95
 Author: Peter TB Brett <peter@peter-b.co.uk>
@@ -1168,7 +1819,7 @@ Date:   Sat Mar 28 15:22:19 2009 -0400
     Updated all ChangeLogs
     
     Updated the ChangeLogs by running:
-    	./update-changelogs.sh 1.0-20070526..master
+            ./update-changelogs.sh 1.0-20070526..master
     in the toplevel directory
 
 commit 21e8c0b232e08927fd091a1d46413990b4c61358
@@ -1860,7 +2511,7 @@ Date:   Fri Dec 7 17:20:55 2007 +0000
     concise, and will be addressed in later patches.
 
 commit ae225157603f063747709fa3d639ed8cdf63f6b1
-Merge: 1abfd25 43b5713
+Merge: 1abfd25bf 43b571362
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Tue Nov 27 07:53:37 2007 +0000
 

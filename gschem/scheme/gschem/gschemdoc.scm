@@ -1,6 +1,6 @@
 ;; gEDA - GPL Electronic Design Automation
 ;; libgeda - gEDA's library - Scheme API
-;; Copyright (C) 2011 Peter Brett <peter@peter-b.co.uk>
+;; Copyright (C) 2011-2014 Peter Brett <peter@peter-b.co.uk>
 ;;
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ Get the directory where gEDA documentation is stored."
   ;; Given a gEDA data directory path, guess the installation prefix.
   (define (guess-prefix dir)
     (let ((ofs (string-contains
-                dir (string-append separator "share"))))
+                dir (string-append file-name-separator-string "share"))))
       (and ofs (substring dir 0 ofs))))
 
   ;; Guess the gEDA documentation directory, using the gEDA data
@@ -51,7 +51,7 @@ Get the directory where gEDA documentation is stored."
        (let ((docdir
               (string-join (list (guess-prefix dir)
                                  "share" "doc" "geda-gaf")
-                           separator)))
+                           file-name-separator-string)))
          (and (false-if-exception
                (eq? 'directory (stat:type (stat docdir))))
               docdir)))
@@ -62,6 +62,15 @@ Get the directory where gEDA documentation is stored."
       (if (platform? 'win32-native)
           #f
           %configured-sys-doc-dir)))
+
+(define-public (user-doc-dir)
+  "user-doc-dir
+
+Get the directory where per-user gEDA documentation is stored."
+
+  (string-join (list (user-data-dir)
+                     "doc" "geda-gaf")
+               file-name-separator-string))
 
 ;; Munge a wiki page name so that it can be used in a filename
 (define (wiki-munge name)
@@ -84,7 +93,7 @@ wiki."
   (show-uri
    (string-append "file://"
                   (string-join (list (sys-doc-dir) "wiki")
-                               separator 'suffix)
+                               file-name-separator-string 'suffix)
                   (wiki-munge page)
                   ".html")))
 
@@ -113,10 +122,10 @@ wiki."
            (lambda ()
              (do ((entry (readdir dir) (readdir dir)))
                  ((eof-object? entry))
-               (case entry
-                 ((".." ".") #f)
-                 (else (let ((result (proc entry)))
-                         (if result (return result) #f))))))
+               (if (member entry '(".." "."))
+                 #f
+                 (let ((result (proc entry)))
+                   (if result (return result) #f)))))
            (lambda () (closedir dir))))
      #f)))
 
@@ -126,7 +135,7 @@ wiki."
 ;; case-insensitively.  If no file was found, returns #f.
 (define* (directory-doc-search dirname basename #:optional (ext ""))
   (define (test-dir-entry entry)
-    (let ((filename (string-append dirname separator entry)))
+    (let ((filename (string-append dirname file-name-separator-string entry)))
       (and (string-prefix-ci? basename entry)
            (string-suffix-ci? ext entry)
            (file-exists? filename)
@@ -154,10 +163,10 @@ wiki."
 
 Find the documentation for COMPONENT, by inspecting (in order) its
 \"documentation\", \"device\" and \"value\" attributes, and its
-component basename, and searching in the current directory, the system
-gEDA documentation directory, and Google.  In most cases, results are
-restricted to \".pdf\" files.  The documentation is displayed in the
-system associated viewer application."
+component basename, and searching in the current directory, the user
+and system gEDA documentation directories, and Google.  In most cases,
+results are restricted to \".pdf\" files.  The documentation is
+displayed in the system associated viewer application."
 
 
   (let ((documentation (attribute-value-by-name obj "documentation"))
@@ -176,11 +185,12 @@ system associated viewer application."
        ;; a) First check the obvious -- does the documentation
        ;;    attribute match a file in the current directory?
        (directory-doc-search (getcwd) documentation)
-       ;; b) What about in the documentation directory?
+       ;; b) What about in the documentation directories?
+       (directory-doc-search (user-doc-dir) documentation)
        (directory-doc-search (sys-doc-dir) documentation)
        ;; c) Does the documentation attribute look like a URL?
        (and (any (lambda (prefix) (string-prefix? prefix documentation))
-                 '("http://" "ftp://" "file://"))
+                 '("http://" "https://" "ftp://" "file://"))
             (show-uri documentation))
 
        ;; d) If a documentation attribute was specified at all, search
@@ -190,17 +200,20 @@ system associated viewer application."
      ;; 2) Checks based on "device=" and "value=" attributes
      (and
       device value
-      (or
-       ;; a) Look for a DEVICE-VALUE*.PDF file in the current directory
-       (directory-doc-search (getcwd) (string-append device "-" value) ".pdf")
-       ;; b) Look for a DEVICE-VALUE*.PDF file in the documentation directory
-       (directory-doc-search (sys-doc-dir) (string-append device "-" value) ".pdf")))
+      (let ((device-value (string-append device "-" value)))
+        (or
+         ;; a) Look for a DEVICE-VALUE*.PDF file in the current directory
+         (directory-doc-search (getcwd)  ".pdf")
+         ;; b) Look for a DEVICE-VALUE*.PDF file in the documentation directories
+         (directory-doc-search (user-doc-dir) device-value ".pdf")
+         (directory-doc-search (sys-doc-dir) device-value ".pdf"))))
      (and
       device
       (or
        ;; c) Look for a DEVICE*.PDF file in the current directory
        (directory-doc-search (getcwd) device ".pdf")
-       ;; d) Look for a DEVICE*.PDF file in the documentation directory
+       ;; d) Look for a DEVICE*.PDF file in the documentation directories
+       (directory-doc-search (user-doc-dir) device ".pdf")
        (directory-doc-search (sys-doc-dir) device ".pdf")
        ;; d) If there's a device attribute, search for it with Google.
        (internet-doc-search device)))
@@ -218,8 +231,27 @@ system associated viewer application."
         (or
          ;; a) Look for BASENAME*.PDF file in current directory
          (directory-doc-search (getcwd) name ".pdf")
-         ;; b) Look for BASENAME*.PDF file in documentation directory
+         ;; b) Look for BASENAME*.PDF file in documentation directories
+         (directory-doc-search (user-doc-dir) name ".pdf")
          (directory-doc-search (sys-doc-dir) name ".pdf"))))
 
      ;; 4) Fail miserably
      (error (_ "No documentation found")))))
+
+(define-public (show-component-documentation-or-error-msg obj)
+  "show-component-documentation-or-error-msg COMPONENT
+
+Search for and display documentation corresponding to COMPONENT in a
+browser or PDF viewer. If no documentation can be found, show a dialog
+with an error message."
+
+  (catch 'misc-error
+
+   (lambda ()
+     (show-component-documentation obj))
+
+   (lambda (key subr msg args . rest)
+     ((module-ref (interaction-environment) 'gschem-msg)
+      (string-append
+       (_ "Could not show documentation for selected component:\n\n")
+       (apply format #f msg args))))))

@@ -1,21 +1,21 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's Library
  * Copyright (C) 1998-2010 Ales Hvezda
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02111-1301 USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /*! \file defines.h
@@ -47,7 +47,9 @@
 #define PREPEND_VERSION_STRING ""
 
 /* for color mechanism used in gschem */
-#define MAX_COLORS 25
+#define MAX_COLORS 26
+/* colors usable as object colors */
+#define MAX_OBJECT_COLORS 21
 
 /* X's obsession with *64 */
 #define FULL_CIRCLE 360*64
@@ -68,18 +70,16 @@
 #define THICK           1
 
 /* various thicknesses (in mils) */
-#define LINE_WIDTH	10
-#define NET_WIDTH	10
-#define PIN_WIDTH_NET	10
-#define BUS_WIDTH	30
-#define PIN_WIDTH_BUS	30
+#define LINE_WIDTH       10
+#define NET_WIDTH        10
+#define PIN_WIDTH_NET    (NET_WIDTH)
+#define BUS_WIDTH        30
+#define PIN_WIDTH_BUS    (BUS_WIDTH)
 
 /* various visual cue sizes (in mils) */
-#define CUE_BOX_SIZE 		30
-#define JUNCTION_CUE_SIZE_NET	50
-#define JUNCTION_CUE_SIZE_BUS	30
-#define PIN_CUE_SIZE_NET	30
-#define PIN_CUE_SIZE_BUS	50
+#define CUE_BOX_SIZE             30
+#define JUNCTION_CUE_SIZE_NET    (NET_WIDTH + 40)
+#define JUNCTION_CUE_SIZE_BUS    (BUS_WIDTH + 40)
 
 /* For text location on component not found graphics */
 #define NOT_FOUND_TEXT_X	100
@@ -96,11 +96,6 @@
 #define READ_DIR	1
 #define CLOSE_DIR	2
 #define SET_COUNT	3
-
-/* for s_slib_search() */
-#define SLIB_SEARCH_START	0
-#define SLIB_SEARCH_NEXT	1
-#define SLIB_SEARCH_DONE	2
 
 /* for text alignment */
 /*   2 -- 5 -- 8  */
@@ -126,10 +121,6 @@
 #define CONN_NULL               0
 #define CONN_ENDPOINT		1
 #define CONN_MIDPOINT		2
-
-/* used by world_tiles to set the size of the array */
-#define MAX_TILES_X		10
-#define MAX_TILES_Y		10
 
 /* used for undo_savestate flag */
 #define UNDO_ALL		0
@@ -172,19 +163,12 @@
 /* for print dialog box */
 #define LANDSCAPE		0
 #define PORTRAIT 		1
-
-/* for type to s_cue_output_all */
-#define POSTSCRIPT		0
-#define PNG			1
+#define AUTOLAYOUT 		2
 
 /* for o_net_orientation */
 #define NEITHER			0
 #define HORIZONTAL		1
 #define VERTICAL		2
-#define HORIZONTAL_ABOVE	3
-#define HORIZONTAL_BELOW	4
-#define VERTICAL_LEFT		5
-#define VERTICAL_RIGHT		6
 
 /* for pin_type */
 #define PIN_TYPE_NET		0

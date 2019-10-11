@@ -25,7 +25,6 @@
  */
 
 #include <config.h>
-#include <missing.h>
 #include <version.h>
 
 #include <stdio.h>
@@ -49,11 +48,7 @@
 #include "../include/prototype.h"  /* function prototypes */
 #include "../include/globals.h"
 #include "../include/i_vars.h"     /* This holds all the guile variable defs */
-
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
+#include "../include/gettext.h"
 
 /*------------------------------------------------------------------*/
 /*! \brief Test the version of gattrib and gEDA/gaf
@@ -70,16 +65,11 @@ SCM g_rc_gattrib_version(SCM scm_version)
 	      SCM_ARG1, "gattrib-version");
 
   version = scm_to_utf8_string (scm_version);
-  if (g_strcasecmp (version, PACKAGE_DATE_VERSION) != 0) {
+  if (g_ascii_strcasecmp (version, PACKAGE_DATE_VERSION) != 0) {
     fprintf(stderr,
-            "You are running gEDA/gaf version [%s%s.%s],\n",
+            _("You are running gEDA/gaf version [%s%s.%s],\nbut you have a version [%s] gattribrc file.\nPlease be sure that you have the latest rc file.\n"),
             PREPEND_VERSION_STRING, PACKAGE_DOTTED_VERSION,
-            PACKAGE_DATE_VERSION);
-    fprintf(stderr,
-            "but you have a version [%s] gattribrc file.\n",
-            version);
-    fprintf(stderr,
-            "Please be sure that you have the latest rc file.\n");
+            PACKAGE_DATE_VERSION, version);
     ret = SCM_BOOL_F;
   }
 

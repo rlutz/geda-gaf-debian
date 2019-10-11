@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <config.h>
-#include <missing.h>
 
 #include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
+#include "gdk/gdk.h"
+#ifdef GDK_WINDOWING_X11
+#include "gdk/gdkx.h"
+#endif
 
 #include "gschem.h"
+#include "actions.decl.x"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
+#include "gschem_compselect_dockable.h"
+#include "gschem_object_properties_dockable.h"
+#include "gschem_text_properties_dockable.h"
+#include "gschem_multiattrib_dockable.h"
+#include "gschem_options_dockable.h"
+#include "gschem_log_dockable.h"
+#include "gschem_find_text_dockable.h"
+#include "gschem_patch_dockable.h"
+#include "gschem_pagesel_dockable.h"
 
 #define GSCHEM_THEME_ICON_NAME "geda-gschem"
 
@@ -35,9 +48,9 @@
  *  \par Function Description
  *
  */
-void x_window_setup (GSCHEM_TOPLEVEL *w_current)
+void x_window_setup (GschemToplevel *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
 
   /* immediately setup user params */
   i_vars_set(w_current);
@@ -48,25 +61,18 @@ void x_window_setup (GSCHEM_TOPLEVEL *w_current)
   /* Initialize the clipboard callback */
   x_clipboard_init (w_current);
 
-  /* x_window_setup_world() - BEGIN */
-  toplevel->init_left = -45;
-  toplevel->init_top  = -45;
-  /* init_right and _bottom are set before this function is called */
-
-  toplevel->width  = default_width;
-  toplevel->height = default_height;
-
-  w_current->win_width  = toplevel->width;
-  w_current->win_height = toplevel->height;
-  /* x_window_setup_world() - END */
-
   /* Add to the list of windows */
   global_window_list = g_list_append (global_window_list, w_current);
 
   /* X related stuff */
+  x_menus_create_submenus (w_current);
   x_window_create_main (w_current);
 
-  x_menu_attach_recent_files_submenu(w_current);
+  gschem_action_set_sensitive (action_add_last_component, FALSE, w_current);
+
+  /* disable terminal REPL action if stdin is not a terminal */
+  gschem_action_set_sensitive (action_file_repl, isatty (STDIN_FILENO),
+                               w_current);
 }
 
 /*! \todo Finish function documentation!!!
@@ -74,35 +80,10 @@ void x_window_setup (GSCHEM_TOPLEVEL *w_current)
  *  \par Function Description
  *
  */
-void x_window_setup_gc(GSCHEM_TOPLEVEL *w_current)
-{
-  w_current->gc = gdk_gc_new(w_current->window);
-
-  if (w_current->gc == NULL) {
-    fprintf(stderr, _("Couldn't allocate gc\n"));
-    exit(-1);
-  }
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-void x_window_free_gc(GSCHEM_TOPLEVEL *w_current)
-{
-  gdk_gc_unref(w_current->gc);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-void x_window_create_drawing(GtkWidget *drawbox, GSCHEM_TOPLEVEL *w_current)
+void x_window_create_drawing(GtkWidget *scrolled, GschemToplevel *w_current)
 {
   /* drawing next */
-  w_current->drawing_area = gtk_drawing_area_new ();
+  w_current->drawing_area = GTK_WIDGET (gschem_page_view_new_with_page (w_current->toplevel->page_current));
   /* Set the size here.  Be sure that it has an aspect ratio of 1.333
    * We could calculate this based on root window size, but for now
    * lets just set it to:
@@ -110,24 +91,23 @@ void x_window_create_drawing(GtkWidget *drawbox, GSCHEM_TOPLEVEL *w_current)
    * 1.3333333 is the desired aspect ratio!
    */
 
-  gtk_drawing_area_size (GTK_DRAWING_AREA (w_current->drawing_area),
-                         w_current->win_width,
-                         w_current->win_height);
+  gtk_container_add(GTK_CONTAINER(scrolled), w_current->drawing_area);
 
-  gtk_box_pack_start (GTK_BOX (drawbox), w_current->drawing_area,
-                      TRUE, TRUE, 0);
   GTK_WIDGET_SET_FLAGS (w_current->drawing_area, GTK_CAN_FOCUS );
   gtk_widget_grab_focus (w_current->drawing_area);
   gtk_widget_show (w_current->drawing_area);
-
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
+/*! \brief Set up callbacks for window events that affect drawing.
  *  \par Function Description
  *
+ * Installs GTK+ callback handlers for signals that are emitted by
+ * the drawing area, and some for the main window that affect the drawing
+ * area.
+ *
+ * \param [in] w_current The toplevel environment.
  */
-void x_window_setup_draw_events(GSCHEM_TOPLEVEL *w_current)
+void x_window_setup_draw_events(GschemToplevel *w_current)
 {
   struct event_reg_t {
     gchar *detailed_signal;
@@ -135,18 +115,21 @@ void x_window_setup_draw_events(GSCHEM_TOPLEVEL *w_current)
   };
 
   struct event_reg_t drawing_area_events[] = {
-    { "expose_event",         G_CALLBACK(x_event_expose)          },
-    { "button_press_event",   G_CALLBACK(x_event_button_pressed)  },
-    { "button_release_event", G_CALLBACK(x_event_button_released) },
-    { "motion_notify_event",  G_CALLBACK(x_event_motion)          },
-    { "configure_event",      G_CALLBACK(x_event_configure)       },
-    { "key_press_event",      G_CALLBACK(x_event_key)             },
-    { "key_release_event",    G_CALLBACK(x_event_key)             },
-    { NULL,                   NULL                                } };
+    { "expose_event",         G_CALLBACK(x_event_expose)                       },
+    { "expose_event",         G_CALLBACK(x_event_raise_dialog_boxes)           },
+    { "button_press_event",   G_CALLBACK(x_event_button_pressed)               },
+    { "button_release_event", G_CALLBACK(x_event_button_released)              },
+    { "motion_notify_event",  G_CALLBACK(x_event_motion)                       },
+    { "configure_event",      G_CALLBACK(x_event_configure)                    },
+    { "key_press_event",      G_CALLBACK(x_event_key)                          },
+    { "key_release_event",    G_CALLBACK(x_event_key)                          },
+    { "scroll_event",         G_CALLBACK(x_event_scroll)                       },
+    { "update-grid-info",     G_CALLBACK(i_update_grid_info_callback)          },
+    { "notify::page",         G_CALLBACK(gschem_toplevel_notify_page_callback) },
+    { NULL,                   NULL                                             } };
   struct event_reg_t main_window_events[] = {
-    { "enter_notify_event",   G_CALLBACK(x_event_enter)           },
-    { "scroll_event",         G_CALLBACK(x_event_scroll)          },
-    { NULL,                   NULL                                } };
+    { "enter_notify_event",   G_CALLBACK(x_event_enter)              },
+    { NULL,                   NULL                                   } };
   struct event_reg_t *tmp;
 
   /* is the configure event type missing here? hack */
@@ -170,96 +153,498 @@ void x_window_setup_draw_events(GSCHEM_TOPLEVEL *w_current)
                       tmp->detailed_signal,
                       tmp->c_handler,
                       w_current);
-  }			  
+  }
 }
 
 
-/*! \brief Creates a new GtkImage displaying a GTK stock icon if available.
- *
- * If a stock GTK icon with the requested name was not found, this function
- * falls back to the bitmap icons provided in the distribution.
- *
- * \param stock Name of the stock icon ("new", "open", etc.)
- * \param w_current Schematic top level
- * \return Pointer to the new GtkImage object.
- */
-static GtkWidget *x_window_stock_pixmap(const char *stock, GSCHEM_TOPLEVEL *w_current)
+static void
+x_window_find_text (GtkWidget *widget, gint response, GschemToplevel *w_current)
 {
-  GtkWidget *wpixmap = NULL;
-  GdkPixmap *pixmap;
-  GdkBitmap *mask;
-  GtkStockItem item;
+  gint close = FALSE;
+  int count;
 
-  GdkWindow *window=w_current->main_window->window;
-  GdkColor *background=&w_current->main_window->style->bg[GTK_STATE_NORMAL];
+  g_return_if_fail (w_current != NULL);
+  g_return_if_fail (w_current->toplevel != NULL);
 
-  gchar *filename=g_strconcat(w_current->toplevel->bitmap_directory,
-                              G_DIR_SEPARATOR_S, 
-                              "gschem-", stock, ".xpm", NULL);
+  switch (response) {
+  case GTK_RESPONSE_OK:
+    count = gschem_find_text_dockable_find (
+        GSCHEM_FIND_TEXT_DOCKABLE (w_current->find_text_dockable),
+        geda_list_get_glist (w_current->toplevel->pages),
+        gschem_find_text_widget_get_find_type (GSCHEM_FIND_TEXT_WIDGET (w_current->find_text_widget)),
+        gschem_find_text_widget_get_find_text_string (GSCHEM_FIND_TEXT_WIDGET (w_current->find_text_widget)),
+        gschem_find_text_widget_get_descend (GSCHEM_FIND_TEXT_WIDGET (w_current->find_text_widget)));
+    if (count > 0) {
+      gschem_dockable_present (w_current->find_text_dockable);
+      close = TRUE;
+    };
+    break;
 
-  gchar *stockid=g_strconcat("gtk-", stock, NULL);
+  case GTK_RESPONSE_CANCEL:
+  case GTK_RESPONSE_DELETE_EVENT:
+    close = TRUE;
+    break;
 
-  /* First check if GTK knows this stock icon */
-  if(gtk_stock_lookup(stockid, &item)) {
-    wpixmap = gtk_image_new_from_stock(stockid, 
-                                       GTK_ICON_SIZE_SMALL_TOOLBAR);
-  } else {
-    /* Fallback to the original custom icon */
-    pixmap = gdk_pixmap_create_from_xpm (window, &mask, 
-                                         background, filename);
-    if (pixmap != NULL) {
-      wpixmap = gtk_image_new_from_pixmap (pixmap, mask);
-    } else {
-     s_log_message("Could not find image at file: %s.\n", filename);
-     wpixmap = gtk_image_new_from_stock(GTK_STOCK_MISSING_IMAGE , 
-					GTK_ICON_SIZE_SMALL_TOOLBAR);
+  default:
+    printf("x_window_find_text(): strange signal %d\n", response);
+  }
+
+  if (close) {
+    gtk_widget_grab_focus (w_current->drawing_area);
+    gtk_widget_hide (GTK_WIDGET (widget));
+  }
+}
+
+
+
+static void
+x_window_hide_text (GtkWidget *widget, gint response, GschemToplevel *w_current)
+{
+  g_return_if_fail (w_current != NULL);
+  g_return_if_fail (w_current->toplevel != NULL);
+
+  if (response == GTK_RESPONSE_OK) {
+    o_edit_hide_specific_text (w_current,
+                               s_page_objects (w_current->toplevel->page_current),
+                               gschem_show_hide_text_widget_get_text_string (GSCHEM_SHOW_HIDE_TEXT_WIDGET (widget)));
+  }
+
+  gtk_widget_grab_focus (w_current->drawing_area);
+  gtk_widget_hide (GTK_WIDGET (widget));
+}
+
+
+static void
+x_window_show_text (GtkWidget *widget, gint response, GschemToplevel *w_current)
+{
+  g_return_if_fail (w_current != NULL);
+  g_return_if_fail (w_current->toplevel != NULL);
+
+  if (response == GTK_RESPONSE_OK) {
+    o_edit_show_specific_text (w_current,
+                               s_page_objects (w_current->toplevel->page_current),
+                               gschem_show_hide_text_widget_get_text_string (GSCHEM_SHOW_HIDE_TEXT_WIDGET (widget)));
+  }
+
+  gtk_widget_grab_focus (w_current->drawing_area);
+  gtk_widget_hide (GTK_WIDGET (widget));
+}
+
+
+static void
+x_window_invoke_macro (GschemMacroWidget *widget, int response, GschemToplevel *w_current)
+{
+  if (response == GTK_RESPONSE_OK) {
+    const char *macro = gschem_macro_widget_get_macro_string (widget);
+
+    SCM interpreter = scm_list_2(scm_from_utf8_symbol("invoke-macro"),
+                                 scm_from_utf8_string(macro));
+
+    scm_dynwind_begin (0);
+    g_dynwind_window (w_current);
+    g_scm_eval_protected(interpreter, SCM_UNDEFINED);
+    scm_dynwind_end ();
+  }
+
+  gtk_widget_grab_focus (w_current->drawing_area);
+  gtk_widget_hide (GTK_WIDGET (widget));
+}
+
+static void
+x_window_select_text (GschemFindTextDockable *dockable, OBJECT *object, GschemToplevel *w_current)
+{
+  GschemPageView *view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (view != NULL);
+
+  OBJECT *page_obj;
+
+  g_return_if_fail (object != NULL);
+  page_obj = gschem_page_get_page_object(object);
+  g_return_if_fail (page_obj != NULL);
+
+  x_window_set_current_page (w_current, page_obj->page);
+
+  gschem_page_view_zoom_text (view, object, TRUE);
+}
+
+static gboolean
+x_window_state_event (GtkWidget *widget,
+                      GdkEventWindowState *event,
+                      gpointer user_data)
+{
+  eda_config_set_string (
+    eda_config_get_user_context (),
+    "gschem.window-geometry", "state",
+    (event->new_window_state &
+       GDK_WINDOW_STATE_FULLSCREEN) ? "fullscreen" :
+    (event->new_window_state &
+       GDK_WINDOW_STATE_MAXIMIZED) ? "maximized" : "normal");
+
+  return FALSE;  /* propagate the event further */
+}
+
+static void
+x_window_save_menu_geometry (GtkMenuShell *menu_shell,
+                             GschemToplevel *w_current)
+{
+  for (GList *l = gtk_container_get_children (GTK_CONTAINER (menu_shell));
+       l != NULL; l = l->next) {
+    GtkMenuItem *menu_item = GTK_MENU_ITEM (l->data);
+
+    GtkWidget *menu = menu_item->submenu;
+    if (menu == NULL)
+      /* not a submenu */
+      continue;
+
+    char *settings_name = g_object_get_data (G_OBJECT (menu), "settings-name");
+    if (settings_name == NULL)
+      /* menu doesn't have a settings name set */
+      continue;
+
+    gint coords[4];
+    gsize length = 0;
+
+    if (GTK_MENU (menu)->torn_off) {
+      GtkWidget *window = GTK_MENU (menu)->tearoff_window;
+      g_return_if_fail (window != NULL);
+
+      gtk_window_get_position (GTK_WINDOW (window), &coords[0], &coords[1]);
+      gtk_window_get_size (GTK_WINDOW (window), &coords[2], &coords[3]);
+      length = 4;
+    }
+
+    eda_config_set_int_list (
+      eda_config_get_user_context (),
+      "gschem.menu-geometry", settings_name, coords, length);
+
+    x_window_save_menu_geometry (GTK_MENU_SHELL (menu), w_current);
+  }
+}
+
+static void
+x_window_save_geometry (GschemToplevel *w_current)
+{
+  gchar *window_state;
+  GtkAllocation allocation;
+
+  /* save window geometry */
+  window_state = eda_config_get_string (eda_config_get_user_context (),
+                                        "gschem.window-geometry",
+                                        "state", NULL);
+  if (window_state != NULL && strcmp (window_state, "normal") == 0) {
+    gint width = -1, height = -1;
+    gtk_window_get_size (GTK_WINDOW (w_current->main_window), &width, &height);
+    if (width > 0 && height > 0) {
+      eda_config_set_int (eda_config_get_user_context (),
+                          "gschem.window-geometry", "width", width);
+      eda_config_set_int (eda_config_get_user_context (),
+                          "gschem.window-geometry", "height", height);
     }
   }
 
-  g_free(filename);
-  g_free(stockid);
+  /* save torn-off menus */
+  if (w_current->menubar != NULL)
+    x_window_save_menu_geometry (
+      GTK_MENU_SHELL (w_current->menubar), w_current);
 
-  return wpixmap;
+  /* save dock area geometry */
+  gtk_widget_get_allocation (w_current->left_notebook, &allocation);
+  if (allocation.width > 0)
+    eda_config_set_int (eda_config_get_user_context (),
+                        "gschem.dock-geometry.left",
+                        "size", allocation.width);
+
+  gtk_widget_get_allocation (w_current->bottom_notebook, &allocation);
+  if (allocation.height > 0)
+    eda_config_set_int (eda_config_get_user_context (),
+                        "gschem.dock-geometry.bottom",
+                        "size", allocation.height);
+
+  gtk_widget_get_allocation (w_current->right_notebook, &allocation);
+  if (allocation.width > 0)
+    eda_config_set_int (eda_config_get_user_context (),
+                        "gschem.dock-geometry.right",
+                        "size", allocation.width);
 }
 
-static void x_window_invoke_macro(GtkEntry *entry, void *userdata)
+static void
+x_window_restore_menu_geometry (GtkMenuShell *menu_shell,
+                                GschemToplevel *w_current)
 {
-  GSCHEM_TOPLEVEL *w_current = userdata;
-  SCM interpreter;
+  for (GList *l = gtk_container_get_children (GTK_CONTAINER (menu_shell));
+       l != NULL; l = l->next) {
+    GtkMenuItem *menu_item = GTK_MENU_ITEM (l->data);
 
-  interpreter = scm_list_2(scm_from_utf8_symbol("invoke-macro"),
-			   scm_from_utf8_string(gtk_entry_get_text(entry)));
+    GtkWidget *menu = menu_item->submenu;
+    if (menu == NULL)
+      /* not a submenu */
+      continue;
 
-  scm_dynwind_begin (0);
-  g_dynwind_window (w_current);
-  g_scm_eval_protected(interpreter, SCM_UNDEFINED);
-  scm_dynwind_end ();
+    char *settings_name = g_object_get_data (G_OBJECT (menu), "settings-name");
+    if (settings_name == NULL)
+      /* menu doesn't have a settings name set */
+      continue;
 
-  gtk_widget_hide(w_current->macro_box);
-  gtk_widget_grab_focus(w_current->drawing_area);
+    gsize length = 0;
+    gint *coords = eda_config_get_int_list (
+      eda_config_get_user_context (),
+      "gschem.menu-geometry", settings_name, &length, NULL);
+
+    if (coords != NULL && length == 4) {
+      gtk_menu_set_tearoff_state (GTK_MENU (menu), TRUE);
+
+      GtkWidget *window = GTK_MENU (menu)->tearoff_window;
+      g_return_if_fail (window != NULL);
+
+      gtk_window_move (GTK_WINDOW (window), coords[0], coords[1]);
+      gtk_window_resize (GTK_WINDOW (window), coords[2], coords[3]);
+    }
+    g_free(coords);
+
+    x_window_restore_menu_geometry (GTK_MENU_SHELL (menu), w_current);
+  }
 }
+
+static gboolean
+x_window_restore_all_menu_geometry (GschemToplevel *w_current)
+{
+  g_signal_handlers_disconnect_by_func(
+    G_OBJECT (w_current->main_window),
+    G_CALLBACK (x_window_restore_all_menu_geometry), w_current);
+
+  if (w_current->menubar != NULL)
+    x_window_restore_menu_geometry (
+      GTK_MENU_SHELL (w_current->menubar), w_current);
+
+  return FALSE;
+}
+
+static void
+x_window_restore_geometry (GschemToplevel *w_current)
+{
+  gint width, height, dock_size;
+  gchar *window_state;
+
+  /* restore main window size */
+  width = eda_config_get_int (eda_config_get_user_context (),
+                              "gschem.window-geometry", "width", NULL);
+  height = eda_config_get_int (eda_config_get_user_context (),
+                               "gschem.window-geometry", "height", NULL);
+  if (width <= 0 || height <= 0) {
+    width = 1200;
+    height = 900;
+  }
+  g_object_set (w_current->main_window,
+                "default-width", width,
+                "default-height", height,
+                NULL);
+
+  /* restore main window state */
+  window_state = eda_config_get_string (eda_config_get_user_context (),
+                                        "gschem.window-geometry",
+                                        "state", NULL);
+  if (window_state != NULL && strcmp (window_state, "fullscreen") == 0)
+    gtk_window_fullscreen (GTK_WINDOW (w_current->main_window));
+  else if (window_state != NULL && strcmp (window_state, "maximized") == 0)
+    gtk_window_maximize (GTK_WINDOW (w_current->main_window));
+
+  /* defer restoring torn-off menus until main window is shown */
+  g_signal_connect_swapped (
+    G_OBJECT (w_current->main_window), "focus-in-event",
+    G_CALLBACK (x_window_restore_all_menu_geometry), w_current);
+
+  /* restore docking area dimensions */
+  dock_size = eda_config_get_int (eda_config_get_user_context (),
+                                  "gschem.dock-geometry.left", "size", NULL);
+  if (dock_size <= 0)
+    dock_size = 300;
+  gtk_widget_set_size_request (w_current->left_notebook, dock_size, 0);
+
+  dock_size = eda_config_get_int (eda_config_get_user_context (),
+                                  "gschem.dock-geometry.bottom", "size", NULL);
+  if (dock_size <= 0)
+    dock_size = 150;
+  gtk_widget_set_size_request (w_current->bottom_notebook, 0, dock_size);
+
+  dock_size = eda_config_get_int (eda_config_get_user_context (),
+                                  "gschem.dock-geometry.right", "size", NULL);
+  if (dock_size <= 0)
+    dock_size = 300;
+  gtk_widget_set_size_request (w_current->right_notebook, dock_size, 0);
+}
+
+
+/*! \todo Finish function documentation!!!
+ *  \brief
+ *  \par Function Description
+ *
+ *  \note
+ *  When invoked (via signal delete_event), closes the current window
+ *  if this is the last window, quit gschem
+ *  used when you click the close button on the window which sends a DELETE
+ *  signal to the app
+ */
+static gboolean
+x_window_close_wm (GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+  GschemToplevel *w_current = GSCHEM_TOPLEVEL (data);
+  g_return_val_if_fail ((w_current != NULL), TRUE);
+
+  x_window_close(w_current);
+
+  /* stop further propagation of the delete_event signal for window: */
+  /*   - if user has cancelled the close the window should obvioulsy */
+  /*   not be destroyed */
+  /*   - otherwise window has already been destroyed, nothing more to */
+  /*   do */
+  return TRUE;
+}
+
+
+void
+x_window_update_file_change_notification (GschemToplevel *w_current,
+                                          PAGE *page)
+{
+  if (page->is_untitled) {
+    g_object_set (w_current->file_change_notification,
+                  "gschem-page", page,
+                  "path",        NULL,
+                  NULL);
+    return;
+  }
+
+  gchar *basename = g_path_get_basename (page->page_filename);
+  gchar *markup = page->exists_on_disk
+    ? g_markup_printf_escaped (
+        _("<b>The file \"%s\" has changed on disk.</b>\n\n%s"),
+        basename,
+        page->CHANGED
+          ? _("Do you want to drop your changes and reload the file?")
+          : _("Do you want to reload it?"))
+    : g_markup_printf_escaped (
+        _("<b>The file \"%s\" has been created on disk.</b>\n\n%s"),
+        basename,
+        page->CHANGED
+          ? _("Do you want to drop your changes and load the file?")
+          : _("Do you want to open it?"));
+  g_object_set (w_current->file_change_notification,
+                "gschem-page",     page,
+                "path",            page->page_filename,
+                "has-known-mtime", page->exists_on_disk,
+                "known-mtime",     &page->last_modified,
+                "button-stock-id", page->CHANGED
+                                     ? GTK_STOCK_REVERT_TO_SAVED
+                                     : page->exists_on_disk ? GTK_STOCK_REFRESH
+                                                            : GTK_STOCK_OPEN,
+                "button-label",    page->CHANGED
+                                     ? _("_Revert")
+                                     : page->exists_on_disk ? _("_Reload")
+                                                            : _("_Open"),
+                "markup",          markup,
+                NULL);
+  g_free (markup);
+  g_free (basename);
+}
+
+static void
+x_window_file_change_response (GschemChangeNotification *chnot,
+                               gint response_id, gpointer user_data)
+{
+  if (response_id == GTK_RESPONSE_ACCEPT)
+    x_lowlevel_revert_page (chnot->w_current, chnot->page);
+  else {
+    chnot->page->exists_on_disk = chnot->has_current_mtime;
+    chnot->page->last_modified = chnot->current_mtime;
+    x_window_update_file_change_notification (chnot->w_current, chnot->page);
+  }
+}
+
+
+void
+x_window_update_patch_change_notification (GschemToplevel *w_current,
+                                           PAGE *page)
+{
+  gchar *patch_filename = x_patch_guess_filename (page);
+  gchar *basename, *markup;
+
+  if (patch_filename == NULL) {
+    basename = NULL;
+    markup = NULL;
+  } else {
+    struct stat buf;
+    basename = g_path_get_basename (patch_filename);
+    if (page->patch_filename != NULL)
+      markup = g_markup_printf_escaped (
+        _("<b>The back-annotation patch \"%s\" has been updated.</b>\n\n"
+          "Do you want to re-import it?"),
+        basename);
+    else if (page->patch_seen_on_disk)
+      markup = g_markup_printf_escaped (
+        _("<b>The back-annotation patch \"%s\" has been updated.</b>\n\n"
+          "Do you want to import it?"),
+        basename);
+    else if (stat (patch_filename, &buf) != -1)
+      markup = g_markup_printf_escaped (
+        _("<b>This file appears to have a back-annotation patch \"%s\" "
+          "associated with it.</b>\n\nDo you want to import it?"),
+        basename);
+    else
+      markup = g_markup_printf_escaped (
+        _("<b>A back-annotation patch \"%s\" has been created.</b>\n\n"
+          "Do you want to import it?"),
+        basename);
+  }
+
+  g_object_set (w_current->patch_change_notification,
+                "gschem-page",     page,
+                "path",            patch_filename,
+                "has-known-mtime", page->patch_seen_on_disk,
+                "known-mtime",     &page->patch_mtime,
+                "button-label",    _("_Import"),
+                "markup",          markup,
+                NULL);
+  g_free (markup);
+  g_free (basename);
+  g_free (patch_filename);
+}
+
+static void
+x_window_patch_change_response (GschemChangeNotification *chnot,
+                                gint response_id, gpointer user_data)
+{
+  if (response_id == GTK_RESPONSE_ACCEPT) {
+    if (chnot->page->patch_filename == NULL)
+      chnot->page->patch_filename = g_strdup (chnot->path);
+    x_patch_do_import (chnot->w_current, chnot->page);
+  } else {
+    chnot->page->patch_seen_on_disk = chnot->has_current_mtime;
+    chnot->page->patch_mtime = chnot->current_mtime;
+    x_window_update_patch_change_notification (chnot->w_current, chnot->page);
+  }
+}
+
 
 /*! \todo Finish function documentation!!!
  *  \brief
  *  \par Function Description
  *
  */
-void x_window_create_main(GSCHEM_TOPLEVEL *w_current)
+void x_window_create_main(GschemToplevel *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
 
-  GtkWidget *label=NULL;
+  GtkPolicyType policy;
   GtkWidget *main_box=NULL;
-  GtkWidget *menubar=NULL;
-  GtkWidget *drawbox=NULL;
-  GtkWidget *bottom_box=NULL;
-  GtkWidget *toolbar=NULL;
   GtkWidget *handlebox=NULL;
+  GtkWidget *scrolled;
+  GtkAdjustment *hadjustment;
+  GtkAdjustment *vadjustment;
+  char *right_button_text;
+  GtkWidget *left_hpaned, *right_hpaned;
+  GtkWidget *vpaned;
+  GtkWidget *work_box;
 
-  /* used to signify that the window isn't mapped yet */
-  w_current->window = NULL; 
-
-  w_current->main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  w_current->main_window = GTK_WIDGET (gschem_main_window_new ());
 
   gtk_widget_set_name (w_current->main_window, "gschem");
   gtk_window_set_policy (GTK_WINDOW (w_current->main_window), TRUE, TRUE, TRUE);
@@ -269,7 +654,7 @@ void x_window_create_main(GSCHEM_TOPLEVEL *w_current)
    * see below
    */
 
-   /* 
+   /*
     * normally we let the window manager handle locating and sizing
     * the window.  However, for some batch processing of schematics
     * (generating a pdf of all schematics for example) we want to
@@ -280,259 +665,344 @@ void x_window_create_main(GSCHEM_TOPLEVEL *w_current)
 
   /* this should work fine */
   g_signal_connect (G_OBJECT (w_current->main_window), "delete_event",
-                    G_CALLBACK (i_callback_close_wm),
-                    w_current);
+                    G_CALLBACK (x_window_close_wm), w_current);
 
   /* Containers first */
   main_box = gtk_vbox_new(FALSE, 1);
-  gtk_container_border_width(GTK_CONTAINER(main_box), 0);
+  gtk_container_set_border_width (GTK_CONTAINER (main_box), 0);
   gtk_container_add(GTK_CONTAINER(w_current->main_window), main_box);
 
-  menubar = get_main_menu (w_current);
-  if (w_current->handleboxes) {
-  	handlebox = gtk_handle_box_new ();
-  	gtk_box_pack_start(GTK_BOX(main_box), handlebox, FALSE, FALSE, 0);
-  	gtk_container_add (GTK_CONTAINER (handlebox), menubar);
-  } else {
-  	gtk_box_pack_start(GTK_BOX(main_box), menubar, FALSE, FALSE, 0);
+  x_menus_create_main_menu (w_current);
+  if (w_current->menubar != NULL) {
+    if (w_current->handleboxes) {
+      handlebox = gtk_handle_box_new ();
+      gtk_box_pack_start (GTK_BOX (main_box), handlebox, FALSE, FALSE, 0);
+      gtk_container_add (GTK_CONTAINER (handlebox), w_current->menubar);
+    } else {
+      gtk_box_pack_start (GTK_BOX (main_box), w_current->menubar,
+                          FALSE, FALSE, 0);
+    }
   }
+  gschem_action_set_sensitive (action_view_menubar, w_current->menubar != NULL,
+                               w_current);
+  gschem_action_set_active (action_view_menubar, w_current->menubar != NULL,
+                            w_current);
 
-  w_current->menubar = menubar;
   gtk_widget_realize (w_current->main_window);
 
-  if (w_current->handleboxes && w_current->toolbars) {
-  	handlebox = gtk_handle_box_new ();
-  	gtk_box_pack_start (GTK_BOX (main_box), handlebox, FALSE, FALSE, 0);
-  }
- 
-  if (w_current->toolbars) {
-    toolbar = gtk_toolbar_new();
-    gtk_toolbar_set_orientation (GTK_TOOLBAR(toolbar), 
-                                 GTK_ORIENTATION_HORIZONTAL);
-    gtk_toolbar_set_style (GTK_TOOLBAR(toolbar), GTK_TOOLBAR_ICONS);
-
+  x_menus_create_toolbar (w_current);
+  if (w_current->toolbar != NULL) {
     if (w_current->handleboxes) {
-      gtk_container_add (GTK_CONTAINER (handlebox), toolbar);
+      handlebox = gtk_handle_box_new ();
+      gtk_box_pack_start (GTK_BOX (main_box), handlebox, FALSE, FALSE, 0);
+      gtk_container_add (GTK_CONTAINER (handlebox), w_current->toolbar);
+      gtk_widget_set_visible (handlebox, w_current->toolbars);
+      gtk_widget_set_no_show_all (handlebox, TRUE);
     } else {
-      gtk_box_pack_start(GTK_BOX(main_box), toolbar, FALSE, FALSE, 0);
+      gtk_box_pack_start (GTK_BOX (main_box), w_current->toolbar,
+                          FALSE, FALSE, 0);
+      gtk_widget_set_visible (w_current->toolbar, w_current->toolbars);
+      gtk_widget_set_no_show_all (w_current->toolbar, TRUE);
     }
+  }
+  gschem_action_set_sensitive (action_view_toolbar, w_current->toolbar != NULL,
+                               w_current);
+  gschem_action_set_active (action_view_toolbar,
+                            w_current->toolbars && w_current->toolbar != NULL,
+                            w_current);
 
-    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar), 
-                             _("New"), 
-                             _("New file"), 
-                             "toolbar/new", 
-                             x_window_stock_pixmap("new", w_current),
-                             (GtkSignalFunc) i_callback_toolbar_file_new, 
-                             w_current);
-    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar), 
-                             _("Open"), 
-                             _("Open file..."), 
-                             "toolbar/open",
-                             x_window_stock_pixmap("open", w_current),
-                             (GtkSignalFunc) i_callback_toolbar_file_open, 
-                             w_current);
-    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar), 
-                             _("Save"), 
-                             _("Save file"), 
-                             "toolbar/save", 
-                             x_window_stock_pixmap("save", w_current),
-                             (GtkSignalFunc) i_callback_toolbar_file_save, 
-                             w_current);
-    gtk_toolbar_append_space (GTK_TOOLBAR(toolbar)); 
-    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar), 
-                             _("Undo"), 
-                             _("Undo last operation"), 
-                             "toolbar/undo", 
-                             x_window_stock_pixmap("undo", w_current),
-                             (GtkSignalFunc) i_callback_toolbar_edit_undo, 
-                             w_current);
-    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar), 
-                             _("Redo"), 
-                             _("Redo last undo"), 
-                             "toolbar/redo", 
-                             x_window_stock_pixmap("redo", w_current),
-                             (GtkSignalFunc) i_callback_toolbar_edit_redo, 
-                             w_current);
-    gtk_toolbar_append_space (GTK_TOOLBAR(toolbar)); 
-    /* not part of any radio button group */
-    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar), 
-                             _("Component"), 
-                             _("Add component...\nSelect library and component from list, move the mouse into main window, click to place\nRight mouse button to cancel"), 
-                             "toolbar/component", 
-                             x_window_stock_pixmap("comp", w_current),
-                             (GtkSignalFunc) i_callback_toolbar_add_component, 
-                             w_current);
-    w_current->toolbar_net = 
-      gtk_toolbar_append_element(GTK_TOOLBAR(toolbar),
-                                 GTK_TOOLBAR_CHILD_RADIOBUTTON,
-                                 NULL,
-                                 _("Nets"),
-                                 _("Add nets mode\nRight mouse button to cancel"),
-                                 "toolbar/nets",
-                                 x_window_stock_pixmap("net", w_current),
-                                 (GtkSignalFunc) i_callback_toolbar_add_net,
-                                 w_current);
-    w_current->toolbar_bus = 
-      gtk_toolbar_append_element(GTK_TOOLBAR(toolbar),
-                                 GTK_TOOLBAR_CHILD_RADIOBUTTON,
-                                 w_current->toolbar_net,
-                                 _("Bus"),
-                                 _("Add buses mode\nRight mouse button to cancel"),
-                                 "toolbar/bus",
-                                 x_window_stock_pixmap("bus", w_current),
-                                 (GtkSignalFunc) i_callback_toolbar_add_bus,
-                                 w_current);
-    /* not part of any radio button group */
-    gtk_toolbar_append_item (GTK_TOOLBAR (toolbar), 
-                             _("Text"), 
-                             _("Add Text..."), 
-                             "toolbar/text", 
-                             x_window_stock_pixmap("text", w_current),
-                             (GtkSignalFunc) i_callback_toolbar_add_text, 
-                             w_current);
-    gtk_toolbar_append_space (GTK_TOOLBAR(toolbar)); 
-    w_current->toolbar_select = 
-      gtk_toolbar_append_element(GTK_TOOLBAR(toolbar),
-                                 GTK_TOOLBAR_CHILD_RADIOBUTTON,
-                                 w_current->toolbar_bus,
-                                 _("Select"),
-                                 _("Select mode"),
-                                 "toolbar/select",
-                                 x_window_stock_pixmap("select", w_current),
-                                 (GtkSignalFunc) i_callback_toolbar_edit_select, 
-                                 w_current);
+  left_hpaned = gtk_hpaned_new ();
+  gtk_container_add (GTK_CONTAINER(main_box), left_hpaned);
 
+  w_current->left_notebook = gtk_notebook_new ();
+  gtk_paned_pack1 (GTK_PANED (left_hpaned),
+                   w_current->left_notebook,
+                   FALSE,
+                   TRUE);
+  gtk_notebook_set_group_name (GTK_NOTEBOOK (w_current->left_notebook),
+                               "gschem-dock");
 
-    gtk_toolbar_append_space (GTK_TOOLBAR(toolbar)); 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w_current->toolbar_select),
-                                 TRUE);
-  } 
+  right_hpaned = gtk_hpaned_new ();
+  gtk_paned_pack2 (GTK_PANED (left_hpaned),
+                   right_hpaned,
+                   TRUE,
+                   TRUE);
 
+  w_current->right_notebook = gtk_notebook_new ();
+  gtk_paned_pack2 (GTK_PANED (right_hpaned),
+                   w_current->right_notebook,
+                   FALSE,
+                   TRUE);
+  gtk_notebook_set_group_name (GTK_NOTEBOOK (w_current->right_notebook),
+                               "gschem-dock");
+
+  vpaned = gtk_vpaned_new ();
+  gtk_paned_pack1 (GTK_PANED (right_hpaned),
+                   vpaned,
+                   TRUE,
+                   TRUE);
+
+  w_current->bottom_notebook = gtk_notebook_new ();
+  gtk_paned_pack2 (GTK_PANED (vpaned),
+                   w_current->bottom_notebook,
+                   FALSE,
+                   TRUE);
+  gtk_notebook_set_group_name (GTK_NOTEBOOK (w_current->bottom_notebook),
+                               "gschem-dock");
+
+  work_box = gtk_vbox_new (FALSE, 0);
+  gtk_paned_pack1 (GTK_PANED (vpaned),
+                   work_box,
+                   TRUE,
+                   TRUE);
+
+  w_current->file_change_notification =
+    g_object_new (GSCHEM_TYPE_CHANGE_NOTIFICATION,
+                  "gschem-toplevel", w_current,
+                  "message-type", GTK_MESSAGE_QUESTION,
+                  NULL);
+  g_signal_connect (w_current->file_change_notification, "response",
+                    G_CALLBACK (x_window_file_change_response), NULL);
+  gtk_box_pack_start (GTK_BOX (work_box),
+                      w_current->file_change_notification->info_bar,
+                      FALSE, FALSE, 0);
+
+  w_current->patch_change_notification =
+    g_object_new (GSCHEM_TYPE_CHANGE_NOTIFICATION,
+                  "gschem-toplevel", w_current,
+                  "message-type", GTK_MESSAGE_INFO,
+                  NULL);
+  g_signal_connect (w_current->patch_change_notification, "response",
+                    G_CALLBACK (x_window_patch_change_response), NULL);
+  gtk_box_pack_start (GTK_BOX (work_box),
+                      w_current->patch_change_notification->info_bar,
+                      FALSE, FALSE, 0);
 
   /*  Try to create popup menu (appears in right mouse button  */
-  w_current->popup_menu = (GtkWidget *) get_main_popup(w_current);
+  x_menus_create_main_popup (w_current);
 
-  drawbox = gtk_hbox_new(FALSE, 0);
-  gtk_container_border_width(GTK_CONTAINER(drawbox), 0);
-  gtk_container_add(GTK_CONTAINER(main_box), drawbox);
 
-  x_window_create_drawing(drawbox, w_current);
+  /* Setup a GtkScrolledWindow for the drawing area */
+  hadjustment = GTK_ADJUSTMENT (gtk_adjustment_new (0.0,
+                                                    toplevel->init_left,
+                                                    toplevel->init_right,
+                                                    100.0,
+                                                    100.0,
+                                                    10.0));
+
+  vadjustment = GTK_ADJUSTMENT (gtk_adjustment_new (toplevel->init_bottom,
+                                                    0.0,
+                                                    toplevel->init_bottom - toplevel->init_top,
+                                                    100.0,
+                                                    100.0,
+                                                    10.0));
+
+  scrolled = gtk_scrolled_window_new (hadjustment, vadjustment);
+  gtk_container_add (GTK_CONTAINER (work_box), scrolled);
+  x_window_create_drawing(scrolled, w_current);
   x_window_setup_draw_events(w_current);
 
-  if (w_current->scrollbars_flag == TRUE) {
-    /* setup scroll bars */
-    w_current->v_adjustment = GTK_ADJUSTMENT (
-      gtk_adjustment_new (toplevel->init_bottom, 0.0, toplevel->init_bottom,
-                          100.0, 100.0, 10.0));
+  policy = (w_current->scrollbars_flag) ? GTK_POLICY_ALWAYS : GTK_POLICY_NEVER;
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled), policy, policy);
+  gschem_action_set_active (action_view_scrollbars, w_current->scrollbars_flag,
+                            w_current);
 
-    w_current->v_scrollbar = gtk_vscrollbar_new (w_current->v_adjustment);
+  /* find text box */
+  w_current->find_text_widget = GTK_WIDGET (g_object_new (GSCHEM_TYPE_FIND_TEXT_WIDGET, NULL));
 
-    gtk_range_set_update_policy (GTK_RANGE (w_current->v_scrollbar),
-                                 GTK_UPDATE_CONTINUOUS);
+  gtk_box_pack_start (GTK_BOX (work_box),
+                      w_current->find_text_widget,
+                      FALSE,
+                      FALSE,
+                      0);
 
-    gtk_box_pack_start (GTK_BOX (drawbox), w_current->v_scrollbar,
-                        FALSE, FALSE, 0);
+  g_signal_connect (w_current->find_text_widget,
+                    "response",
+                    G_CALLBACK (&x_window_find_text),
+                    w_current);
 
-    g_signal_connect (w_current->v_adjustment,
-                      "value_changed",
-                      G_CALLBACK (x_event_vschanged),
-                      w_current);
+  /* hide text box */
+  w_current->hide_text_widget = GTK_WIDGET (g_object_new (GSCHEM_TYPE_SHOW_HIDE_TEXT_WIDGET,
+                                                          "button-text", pgettext ("actuate", "Hide"),
+                                                          "label-text",  _("Hide text starting with:"),
+                                                          NULL));
 
-    w_current->h_adjustment = GTK_ADJUSTMENT (
-      gtk_adjustment_new (0.0, 0.0, toplevel->init_right, 100.0, 100.0, 10.0));
+  gtk_box_pack_start (GTK_BOX (work_box),
+                      w_current->hide_text_widget,
+                      FALSE,
+                      FALSE,
+                      0);
 
-    w_current->h_scrollbar = gtk_hscrollbar_new (w_current->h_adjustment);
+  g_signal_connect (w_current->hide_text_widget,
+                    "response",
+                    G_CALLBACK (&x_window_hide_text),
+                    w_current);
 
-    gtk_range_set_update_policy (GTK_RANGE (w_current->h_scrollbar),
-                                 GTK_UPDATE_CONTINUOUS);
+  /* show text box */
+  w_current->show_text_widget = GTK_WIDGET (g_object_new (GSCHEM_TYPE_SHOW_HIDE_TEXT_WIDGET,
+                                                          "button-text", pgettext ("actuate", "Show"),
+                                                          "label-text",  _("Show text starting with:"),
+                                                          NULL));
 
-    gtk_box_pack_start (GTK_BOX (main_box), w_current->h_scrollbar,
-                        FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (work_box),
+                      w_current->show_text_widget,
+                      FALSE,
+                      FALSE,
+                      0);
 
-    g_signal_connect (w_current->h_adjustment,
-                      "value_changed",
-                      G_CALLBACK (x_event_hschanged),
-                      w_current);
-  }
+  g_signal_connect (w_current->show_text_widget,
+                    "response",
+                    G_CALLBACK (&x_window_show_text),
+                    w_current);
 
   /* macro box */
-  w_current->macro_entry = gtk_entry_new();
-  g_signal_connect(w_current->macro_entry, "activate",
-		   G_CALLBACK(&x_window_invoke_macro), w_current);
+  w_current->macro_widget = GTK_WIDGET (g_object_new (GSCHEM_TYPE_MACRO_WIDGET, NULL));
 
-  w_current->macro_box = gtk_hbox_new(FALSE, 0);
-  gtk_box_pack_start(GTK_BOX (w_current->macro_box),
-                     gtk_label_new (_("Evaluate:")), FALSE, FALSE, 2);
-  gtk_box_pack_start(GTK_BOX(w_current->macro_box), w_current->macro_entry,
-		     TRUE, TRUE, 2);
-  gtk_container_border_width(GTK_CONTAINER(w_current->macro_box), 1);
-  gtk_box_pack_start (GTK_BOX (main_box), w_current->macro_box,
-		      FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (work_box),
+                      w_current->macro_widget,
+                      FALSE,
+                      FALSE,
+                      0);
+
+  g_signal_connect (w_current->macro_widget,
+                    "response",
+                    G_CALLBACK (&x_window_invoke_macro),
+                    w_current);
+
+
+  w_current->compselect_dockable = g_object_new (
+    GSCHEM_TYPE_COMPSELECT_DOCKABLE,
+    "title", _("Library"),
+    "settings-name", "compselect",
+    "cancellable", TRUE,
+    "initial-state", GSCHEM_DOCKABLE_STATE_DOCKED_RIGHT,
+    "initial-width", 500,
+    "initial-height", 600,
+    "gschem-toplevel", w_current,
+    NULL);
+
+  w_current->object_properties_dockable = g_object_new (
+    GSCHEM_TYPE_OBJECT_PROPERTIES_DOCKABLE,
+    "title", _("Object"),
+    "settings-name", "object-properties",  /* line-type */
+    "initial-state", GSCHEM_DOCKABLE_STATE_DOCKED_RIGHT,
+    "initial-width", 400,
+    "initial-height", 600,
+    "gschem-toplevel", w_current,
+    NULL);
+
+  w_current->text_properties_dockable = g_object_new (
+    GSCHEM_TYPE_TEXT_PROPERTIES_DOCKABLE,
+    "title", _("Text"),
+    "settings-name", "text-edit",
+    "initial-state", GSCHEM_DOCKABLE_STATE_DOCKED_RIGHT,
+    "initial-width", 400,
+    "initial-height", 450,
+    "gschem-toplevel", w_current,
+    NULL);
+
+  w_current->multiattrib_dockable = g_object_new (
+    GSCHEM_TYPE_MULTIATTRIB_DOCKABLE,
+    "title", _("Attributes"),
+    "settings-name", "multiattrib",
+    "initial-state", GSCHEM_DOCKABLE_STATE_DOCKED_RIGHT,
+    "initial-width", 450,
+    "initial-height", 450,
+    "gschem-toplevel", w_current,
+    NULL);
+
+  w_current->options_dockable = g_object_new (
+    GSCHEM_TYPE_OPTIONS_DOCKABLE,
+    "title", _("Options"),
+    "settings-name", "options",  /* snap-size */
+    "initial-state", GSCHEM_DOCKABLE_STATE_HIDDEN,
+    "initial-width", 320,
+    "initial-height", 350,
+    "gschem-toplevel", w_current,
+    NULL);
+
+  w_current->log_dockable = g_object_new (
+    GSCHEM_TYPE_LOG_DOCKABLE,
+    "title", _("Status"),
+    "settings-name", "log",
+    "initial-state", GSCHEM_DOCKABLE_STATE_DOCKED_BOTTOM,
+    "initial-width", 640,
+    "initial-height", 480,
+    "gschem-toplevel", w_current,
+    NULL);
+
+  w_current->find_text_dockable = g_object_new (
+    GSCHEM_TYPE_FIND_TEXT_DOCKABLE,
+    "title", _("Search results"),
+    "settings-name", "find-text",
+    "initial-state", GSCHEM_DOCKABLE_STATE_DOCKED_BOTTOM,
+    "initial-width", 500,
+    "initial-height", 300,
+    "gschem-toplevel", w_current,
+    NULL);
+  g_signal_connect (w_current->find_text_dockable,
+                    "select-object",
+                    G_CALLBACK (&x_window_select_text),
+                    w_current);
+
+  w_current->patch_dockable = g_object_new (
+    GSCHEM_TYPE_PATCH_DOCKABLE,
+    "title", _("Patch"),
+    "settings-name", "patch",
+    "initial-state", GSCHEM_DOCKABLE_STATE_HIDDEN,
+    "initial-width", 500,
+    "initial-height", 300,
+    "gschem-toplevel", w_current,
+    NULL);
+
+  w_current->pagesel_dockable = g_object_new (
+    GSCHEM_TYPE_PAGESEL_DOCKABLE,
+    "title", _("Pages"),
+    "settings-name", "pagesel",
+    "initial-state", GSCHEM_DOCKABLE_STATE_HIDDEN,
+    "initial-width", 515,
+    "initial-height", 180,
+    "gschem-toplevel", w_current,
+    NULL);
+
+  gschem_dockable_initialize_toplevel (w_current);
+
 
   /* bottom box */
-  bottom_box = gtk_hbox_new(FALSE, 0);
-  gtk_container_border_width(GTK_CONTAINER(bottom_box), 1);
-  gtk_box_pack_start (GTK_BOX (main_box), bottom_box, FALSE, FALSE, 0);
-
-  /*	label = gtk_label_new ("Mouse buttons:");
-        gtk_box_pack_start (GTK_BOX (bottom_box), label, FALSE, FALSE, 10);
-  */
-
-  label = gtk_label_new (" ");
-  gtk_box_pack_start (GTK_BOX (bottom_box), label, FALSE, FALSE, 2);
-
-  w_current->left_label = gtk_label_new (_("Pick"));
-  gtk_box_pack_start (GTK_BOX (bottom_box), w_current->left_label,
-                      FALSE, FALSE, 0);
-
-  label = gtk_label_new ("|");
-  gtk_box_pack_start (GTK_BOX (bottom_box), label, FALSE, FALSE, 5);
-
-  if (w_current->middle_button == STROKE) {
-#ifdef HAVE_LIBSTROKE
-    w_current->middle_label = gtk_label_new (_("Stroke"));
-#else
-    w_current->middle_label = gtk_label_new (_("none"));
-#endif
-  } else if (w_current->middle_button == ACTION) {
-    w_current->middle_label = gtk_label_new (_("Action"));
-  } else {
-    w_current->middle_label = gtk_label_new (_("Repeat/none"));
-  }
-
-  gtk_box_pack_start (GTK_BOX (bottom_box), w_current->middle_label,
-                      FALSE, FALSE, 0);
-
-  label = gtk_label_new ("|");
-  gtk_box_pack_start (GTK_BOX (bottom_box), label, FALSE, FALSE, 5);
-
   if (default_third_button == POPUP_ENABLED) {
-    w_current->right_label = gtk_label_new (_("Menu/Cancel"));
+    right_button_text = _("Menu/Cancel");
   } else {
-    w_current->right_label = gtk_label_new (_("Pan/Cancel"));
+    right_button_text = _("Pan/Cancel");
   }
-  gtk_box_pack_start (GTK_BOX (bottom_box), w_current->right_label,
-                      FALSE, FALSE, 0);
 
-  label = gtk_label_new (" ");
-  gtk_box_pack_start (GTK_BOX (bottom_box), label, FALSE, FALSE, 5);
+  w_current->bottom_widget = GTK_WIDGET (g_object_new (GSCHEM_TYPE_BOTTOM_WIDGET,
+      "grid-mode",          gschem_options_get_grid_mode (w_current->options),
+      "grid-size",          gschem_options_get_snap_size (w_current->options), /* x_grid_query_drawn_spacing (w_current), -- occurs before the page is set */
+      "left-button-text",   _("Pick"),
+      "middle-button-text", _("none"),
+      "right-button-text",  right_button_text,
+      "snap-mode",          gschem_options_get_snap_mode (w_current->options),
+      "snap-size",          gschem_options_get_snap_size (w_current->options),
+      "status-text",        _("Select Mode"),
+      NULL));
 
-  w_current->grid_label = gtk_label_new (" ");
-  gtk_box_pack_start (GTK_BOX (bottom_box), w_current->grid_label,
-                      FALSE, FALSE, 10);
+  i_update_middle_button (w_current, NULL, NULL);
 
-  w_current->status_label = gtk_label_new (_("Select Mode"));
-  gtk_box_pack_end (GTK_BOX (bottom_box), w_current->status_label, FALSE,
-                    FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (main_box), w_current->bottom_widget, FALSE, FALSE, 0);
+
+  x_window_restore_geometry (w_current);
+  g_signal_connect (G_OBJECT (w_current->main_window), "window-state-event",
+                    G_CALLBACK (x_window_state_event), w_current);
 
   gtk_widget_show_all (w_current->main_window);
-  gtk_widget_hide(w_current->macro_box);
 
-  w_current->window = w_current->drawing_area->window;
-
-  w_current->drawable = w_current->window;
-
-  x_window_setup_gc(w_current);
+  /* hide unused notebooks */
+  if (gtk_notebook_get_n_pages (GTK_NOTEBOOK (w_current->left_notebook)) == 0)
+    gtk_widget_hide (w_current->left_notebook);
+  if (gtk_notebook_get_n_pages (GTK_NOTEBOOK (w_current->bottom_notebook)) == 0)
+    gtk_widget_hide (w_current->bottom_notebook);
+  if (gtk_notebook_get_n_pages (GTK_NOTEBOOK (w_current->right_notebook)) == 0)
+    gtk_widget_hide (w_current->right_notebook);
 }
 
 /*! \todo Finish function documentation!!!
@@ -540,17 +1010,15 @@ void x_window_create_main(GSCHEM_TOPLEVEL *w_current)
  *  \par Function Description
  *
  */
-void x_window_close(GSCHEM_TOPLEVEL *w_current)
+void x_window_close(GschemToplevel *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   gboolean last_window = FALSE;
 
-  /* If we're closing whilst inside a move action, re-wind the
+  /* If we're closing whilst inside an action, re-wind the
    * page contents back to their state before we started */
-  if (w_current->inside_action &&
-      (w_current->event_state == MOVE ||
-       w_current->event_state == ENDMOVE)) {
-    o_move_cancel (w_current);
+  if (w_current->inside_action) {
+    i_cancel (w_current);
   }
 
   /* last chance to save possible unsaved pages */
@@ -565,49 +1033,42 @@ void x_window_close(GSCHEM_TOPLEVEL *w_current)
   o_conn_print_hash(w_current->page_current->conn_table);
 #endif
 
+  w_current->dont_invalidate = TRUE;
+
+  /* save window geometry */
+  x_window_save_geometry (w_current);
+
   /* close all the dialog boxes */
   if (w_current->sowindow)
   gtk_widget_destroy(w_current->sowindow);
 
-  if (w_current->cswindow)
-  gtk_widget_destroy(w_current->cswindow);
-
   if (w_current->tiwindow)
   gtk_widget_destroy(w_current->tiwindow);
-
-  if (w_current->tewindow)
-  gtk_widget_destroy(w_current->tewindow);
 
   if (w_current->aawindow)
   gtk_widget_destroy(w_current->aawindow);
 
-  x_multiattrib_close (w_current);
-
   if (w_current->aewindow)
   gtk_widget_destroy(w_current->aewindow);
-
-  if (w_current->trwindow)
-  gtk_widget_destroy(w_current->trwindow);
-
-  x_pagesel_close (w_current);
-
-  if (w_current->tswindow)
-  gtk_widget_destroy(w_current->tswindow);
-
-  if (w_current->iwindow)
-  gtk_widget_destroy(w_current->iwindow);
 
   if (w_current->hkwindow)
   gtk_widget_destroy(w_current->hkwindow);
 
-  if (w_current->cowindow)
-  gtk_widget_destroy(w_current->cowindow);
-
-  if (w_current->clwindow)
-  gtk_widget_destroy(w_current->clwindow);
-
   if (w_current->sewindow)
   gtk_widget_destroy(w_current->sewindow);
+
+  /* save dock window geometry, close dock windows, disconnect signals */
+  gschem_dockable_cleanup_toplevel (w_current);
+
+  g_clear_object (&w_current->compselect_dockable);
+  g_clear_object (&w_current->object_properties_dockable);
+  g_clear_object (&w_current->text_properties_dockable);
+  g_clear_object (&w_current->multiattrib_dockable);
+  g_clear_object (&w_current->options_dockable);
+  g_clear_object (&w_current->log_dockable);
+  g_clear_object (&w_current->find_text_dockable);
+  g_clear_object (&w_current->patch_dockable);
+  g_clear_object (&w_current->pagesel_dockable);
 
   if (g_list_length (global_window_list) == 1) {
     /* no more window after this one, remember to quit */
@@ -633,20 +1094,18 @@ void x_window_close(GSCHEM_TOPLEVEL *w_current)
     o_buffer_free (w_current);
   }
 
-  x_window_free_gc(w_current);
-
-  /* Clear Guile smob weak ref */
-  if (w_current->smob != SCM_UNDEFINED) {
+  /* Allow Scheme value for this window to be garbage-collected */
+  if (!SCM_UNBNDP (w_current->smob)) {
     SCM_SET_SMOB_DATA (w_current->smob, NULL);
+    scm_gc_unprotect_object (w_current->smob);
     w_current->smob = SCM_UNDEFINED;
   }
 
   /* finally close the main window */
   gtk_widget_destroy(w_current->main_window);
 
-  s_toplevel_delete (toplevel);
   global_window_list = g_list_remove (global_window_list, w_current);
-  g_free (w_current);
+  gschem_toplevel_free (w_current);
 
   /* just closed last window, so quit */
   if (last_window) {
@@ -659,128 +1118,18 @@ void x_window_close(GSCHEM_TOPLEVEL *w_current)
  *  \par Function Description
  *
  */
-void x_window_close_all(GSCHEM_TOPLEVEL *w_current)
+void x_window_close_all(GschemToplevel *w_current)
 {
-  GSCHEM_TOPLEVEL *current;
+  GschemToplevel *current;
   GList *list_copy, *iter;
 
   iter = list_copy = g_list_copy (global_window_list);
   while (iter != NULL ) {
-    current = (GSCHEM_TOPLEVEL *)iter->data;
+    current = (GschemToplevel *)iter->data;
     iter = g_list_next (iter);
     x_window_close (current);
   }
   g_list_free (list_copy);
-}
-
-/*! \brief Opens a new page from a file.
- *  \par Function Description
- *  This function opens the file whose name is <B>filename</B> in a
- *  new PAGE of <B>toplevel</B>.
- *
- *  If there is no page for <B>filename</B> in <B>toplevel</B>'s list
- *  of pages, it creates a new PAGE, loads the file in it and returns
- *  a pointer on the new page. Otherwise it returns a pointer on the
- *  existing page.
- *
- *  If the filename passed is NULL, this function creates an empty,
- *  untitled page.  The name of the untitled page is build from
- *  configuration data ('untitled-name') and a counter for uniqueness.
- *
- *  The opened page becomes the current page of <B>toplevel</B>.
- *
- *  \param [in] w_current The toplevel environment.
- *  \param [in] filename The name of the file to open or NULL for a blank page.
- *  \returns A pointer on the new page.
- *
- *  \bug This code should check to make sure any untitled filename
- *  does not conflict with a file on disk.
- */
-PAGE*
-x_window_open_page (GSCHEM_TOPLEVEL *w_current, const gchar *filename)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  PAGE *old_current, *page;
-  gchar *fn;
-
-  g_return_val_if_fail (toplevel != NULL, NULL);
-
-  /* Generate untitled filename if none was specified */
-  if (filename == NULL) {
-    gchar *cwd, *tmp;
-    cwd = g_get_current_dir ();
-    tmp = g_strdup_printf ("%s_%d.sch",
-                           toplevel->untitled_name,
-                           ++w_current->num_untitled);
-    fn = g_build_filename (cwd, tmp, NULL);
-    g_free(cwd);
-    g_free(tmp);
-  } else {
-    fn = g_strdup (filename);
-  }
-
-  /* Return existing page if it is already loaded */
-  page = s_page_search (toplevel, fn);
-  if ( page != NULL ) {
-    g_free(fn);
-    return page;
-  }
-
-  old_current = toplevel->page_current;
-  page = s_page_new (toplevel, fn);
-  s_page_goto (toplevel, page);
-
-  /* Load from file if necessary, otherwise just print a message */
-  if (filename != NULL) {
-    GError *err = NULL;
-    if (!quiet_mode)
-      s_log_message (_("Loading schematic [%s]\n"), fn);
-
-    if (!f_open (toplevel, page, (gchar *) fn, &err)) {
-      GtkWidget *dialog;
-
-      g_warning ("%s\n", err->message);
-      dialog = gtk_message_dialog_new_with_markup
-        (GTK_WINDOW (w_current->main_window),
-         GTK_DIALOG_DESTROY_WITH_PARENT,
-         GTK_MESSAGE_ERROR,
-         GTK_BUTTONS_CLOSE,
-         _("<b>An error occurred while loading the requested file.</b>\n\nLoading from '%s' failed: %s. The gschem log may contain more information."),
-         fn, err->message);
-      gtk_window_set_title (GTK_WINDOW (dialog), _("Failed to load file"));
-      gtk_dialog_run (GTK_DIALOG (dialog));
-      gtk_widget_destroy (dialog);
-      g_error_free (err);
-    } else {
-      gtk_recent_manager_add_item (recent_manager, g_filename_to_uri(fn, NULL, NULL));
-    }
-  } else {
-    if (!quiet_mode)
-      s_log_message (_("New file [%s]\n"),
-                     toplevel->page_current->page_filename);
-
-    g_run_hook_page (w_current, "%new-page-hook", toplevel->page_current);
-  }
-
-  a_zoom_extents (w_current,
-                  s_page_objects (toplevel->page_current),
-                  A_PAN_DONT_REDRAW);
-
-  o_undo_savestate (w_current, UNDO_ALL);
-
-  if ( old_current != NULL )
-    s_page_goto (toplevel, old_current);
-
-  /* This line is generally un-needed, however if some code
-   * wants to open a page, yet not bring it to the front, it is
-   * needed needed to add it into the page manager. Otherwise,
-   * it will get done in x_window_set_current_page(...)
-   */
-  x_pagesel_update (w_current); /* ??? */
-
-  g_free (fn);
-
-  return page;
 }
 
 /*! \brief Changes the current page.
@@ -797,186 +1146,87 @@ x_window_open_page (GSCHEM_TOPLEVEL *w_current, const gchar *filename)
  *  \param [in] page      The page to become current page.
  */
 void
-x_window_set_current_page (GSCHEM_TOPLEVEL *w_current, PAGE *page)
+x_window_set_current_page (GschemToplevel *w_current, PAGE *page)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
+  GList *iter;
 
+  g_return_if_fail (page_view != NULL);
   g_return_if_fail (toplevel != NULL);
   g_return_if_fail (page != NULL);
 
+  g_warn_if_fail (page_view->page == toplevel->page_current ||
+                  page_view->page == NULL);
+
+  if (page == toplevel->page_current && page_view->page != NULL)
+    /* nothing to do */
+    return;
+
   o_redraw_cleanstates (w_current);
 
-  s_page_goto (toplevel, page);
+  gschem_page_view_set_page (page_view, page);
+
+  gschem_action_set_sensitive (action_page_revert,
+                               page->is_untitled == FALSE &&
+                               g_file_test (page->page_filename,
+                                            G_FILE_TEST_EXISTS |
+                                            G_FILE_TEST_IS_REGULAR),
+                               w_current);
+
+  o_undo_update_actions (w_current, page);
+
+  iter = g_list_find (geda_list_get_glist (toplevel->pages), page);
+  gschem_action_set_sensitive (action_page_prev,
+                               w_current->enforce_hierarchy
+                                 ? s_hierarchy_find_prev_page (
+                                     toplevel->pages, page) != NULL
+                                 : iter != NULL && iter->prev != NULL,
+                               w_current);
+  gschem_action_set_sensitive (action_page_next,
+                               w_current->enforce_hierarchy
+                                 ? s_hierarchy_find_next_page(
+                                     toplevel->pages, page) != NULL
+                                 : iter != NULL && iter->next != NULL,
+                               w_current);
+  gschem_action_set_sensitive (action_hierarchy_up, page->up >= 0, w_current);
 
   i_update_menus (w_current);
-  i_set_filename (w_current, page->page_filename);
+  /* i_set_filename (w_current, page->page_filename); */
+
+  x_window_update_file_change_notification (w_current, page);
+  x_window_update_patch_change_notification (w_current, page);
 
   x_pagesel_update (w_current);
   x_multiattrib_update (w_current);
-
-  x_manual_resize (w_current);
-  x_hscrollbar_update (w_current);
-  x_vscrollbar_update (w_current);
-
-  o_invalidate_all (w_current);
 }
 
-/*! \brief Saves a page to a file.
- *  \par Function Description
- *  This function saves the page <B>page</B> to a file named
- *  <B>filename</B>.
+/*! \brief Raise the main window to the front.
  *
- *  It returns the value returned by function <B>f_save()</B> trying
- *  to save page <B>page</B> to file <B>filename</B> (1 on success, 0
- *  on failure).
+ * This is mostly equivalent to
+ *   gtk_window_present (GTK_WINDOW (w_current->main_window));
  *
- *  <B>page</B> may not be the current page of <B>toplevel</B>. The
- *  current page of <B>toplevel</B> is not affected by this function.
+ * One of the two actions that \c gtk_window_present performs on an
+ * already-visible window (\c gdk_window_show) is triggering a bug
+ * with toolbar icon drawing, the other (\c gdk_window_focus) is the
+ * one we actually want.  In order to work around that bug, just call
+ * \c gdk_window_focus directly.
  *
- *  \param [in] w_current The toplevel environment.
- *  \param [in] page      The page to save.
- *  \param [in] filename  The name of the file in which to save page.
- *  \returns 1 on success, 0 otherwise.
+ * \param [in] w_current  the toplevel environment
  */
-gint
-x_window_save_page (GSCHEM_TOPLEVEL *w_current, PAGE *page, const gchar *filename)
+void x_window_present (GschemToplevel *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
-  PAGE *old_current;
-  const gchar *log_msg, *state_msg;
-  gint ret;
-  GError *err = NULL;
+  //gdk_window_show (w_current->main_window->window);  /* the culprit */
 
-  g_return_val_if_fail (toplevel != NULL, 0);
-  g_return_val_if_fail (page     != NULL, 0);
-  g_return_val_if_fail (filename != NULL, 0);
+#ifdef GDK_WINDOWING_X11
+  GdkDisplay *display = gtk_widget_get_display (w_current->main_window);
+  guint32 timestamp = gdk_x11_display_get_user_time (display);
+#else
+  guint32 timestamp = gtk_get_current_event_time ();
+#endif
 
-  /* save current page for restore after opening */
-  old_current = toplevel->page_current;
-
-  /* change to page */
-  s_page_goto (toplevel, page);
-  /* and try saving current page to filename */
-  ret = (gint)f_save (toplevel, toplevel->page_current, filename, &err);
-  if (ret != 1) {
-    log_msg   = _("Could NOT save page [%s]\n");
-    state_msg = _("Error while trying to save");
-
-    GtkWidget *dialog;
-
-    dialog = gtk_message_dialog_new (GTK_WINDOW (w_current->main_window),
-                                     GTK_DIALOG_DESTROY_WITH_PARENT,
-                                     GTK_MESSAGE_ERROR,
-                                     GTK_BUTTONS_CLOSE,
-                                     "%s",
-                                     err->message);
-    gtk_window_set_title (GTK_WINDOW (dialog), _("Failed to save file"));
-    gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
-    g_clear_error (&err);
-  } else {
-    /* successful save of page to file, update page... */
-    /* change page name if necessary and prepare log message */
-    if (g_ascii_strcasecmp (page->page_filename, filename) != 0) {
-      g_free (page->page_filename);
-      page->page_filename = g_strdup (filename);
-
-      log_msg = _("Saved as [%s]\n");
-    } else {
-      log_msg = _("Saved [%s]\n");
-    }
-    state_msg = _("Saved");
-
-    /* reset page CHANGED flag */
-    page->CHANGED = 0;
-
-    /* add to recent file list */
-    gtk_recent_manager_add_item (recent_manager, g_filename_to_uri(filename, NULL, NULL));
-  }
-
-  /* log status of operation */
-  s_log_message (log_msg, filename);
-
-  /* update display and page manager */
-  x_window_set_current_page (w_current, old_current);
-
-  i_set_state_msg  (w_current, SELECT, state_msg);
-  i_update_toolbar (w_current);
-
-  return ret;
+  gdk_window_focus (w_current->main_window->window, timestamp);
 }
-
-/*! \brief Closes a page.
- *  \par Function Description
- *  This function closes the page <B>page</B> of toplevel
- *  <B>toplevel</B>.
- *
- *  If necessary, the current page of <B>toplevel</B> is changed to
- *  the next valid page or to a new untitled page.
- *
- *  \param [in] w_current The toplevel environment.
- *  \param [in] page      The page to close.
- */
-void
-x_window_close_page (GSCHEM_TOPLEVEL *w_current, PAGE *page)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  PAGE *new_current = NULL;
-  GList *iter;
-
-  g_return_if_fail (toplevel != NULL);
-  g_return_if_fail (page     != NULL);
-
-  g_assert (page->pid != -1);
-
-  /* If we're closing whilst inside a move action, re-wind the
-   * page contents back to their state before we started */
-  if (w_current->inside_action &&
-      (w_current->event_state == MOVE ||
-       w_current->event_state == ENDMOVE)) {
-    o_move_cancel (w_current);
-  }
-
-  if (page == toplevel->page_current) {
-    /* as it will delete current page, select new current page */
-    /* first look up in page hierarchy */
-    new_current = s_page_search_by_page_id (toplevel->pages, page->up);
-
-    if (new_current == NULL) {
-      /* no up in hierarchy, choice is prev, next, new page */
-      iter = g_list_find( geda_list_get_glist( toplevel->pages ), page );
-
-      if ( g_list_previous( iter ) ) {
-        new_current = (PAGE *)g_list_previous( iter )->data;
-      } else if ( g_list_next( iter ) ) {
-        new_current = (PAGE *)g_list_next( iter )->data;
-      } else {
-        /* need to add a new untitled page */
-        new_current = NULL;
-      }
-    }
-    /* new_current will be the new current page at the end of the function */
-  }
-
-  s_log_message (page->CHANGED ?
-                 _("Discarding page [%s]\n") : _("Closing [%s]\n"),
-                 page->page_filename);
-  /* remove page from toplevel list of page and free */
-  s_page_delete (toplevel, page);
-
-  /* Switch to a different page if we just removed the current */
-  if (toplevel->page_current == NULL) {
-
-    /* Create a new page if there wasn't another to switch to */
-    if (new_current == NULL) {
-      new_current = x_window_open_page (w_current, NULL);
-    }
-
-    /* change to new_current and update display */
-    x_window_set_current_page (w_current, new_current);
-  }
-}
-
 
 /*! \brief Setup default icon for GTK windows
  *
@@ -987,4 +1237,56 @@ x_window_close_page (GSCHEM_TOPLEVEL *w_current, PAGE *page)
 void x_window_set_default_icon( void )
 {
   gtk_window_set_default_icon_name( GSCHEM_THEME_ICON_NAME );
+}
+
+/*! \brief Setup icon search paths.
+ * \par Function Description
+ * Add the icons installed by gschem to the search path for the
+ * default icon theme, so that they can be automatically found by GTK.
+ */
+void
+x_window_init_icons (void)
+{
+  gchar *icon_path;
+
+  g_return_if_fail (s_path_sys_data () != NULL);
+
+  icon_path = g_build_filename (s_path_sys_data (), "icons", NULL);
+  gtk_icon_theme_append_search_path (gtk_icon_theme_get_default (),
+                                     icon_path);
+  g_free (icon_path);
+}
+
+/*! \brief Creates a new X window.
+ *
+ * \par Function description
+ *
+ * Creates and initializes new GschemToplevel object and then sets
+ * and setups its libgeda \a toplevel.
+ *
+ * \param toplevel The libgeda TOPLEVEL object.
+ * \return Pointer to the new GschemToplevel object.
+ */
+GschemToplevel* x_window_new (TOPLEVEL *toplevel)
+{
+  GschemToplevel *w_current;
+
+  w_current = gschem_toplevel_new ();
+  gschem_toplevel_set_toplevel (w_current,
+                                (toplevel != NULL) ? toplevel : s_toplevel_new ());
+
+  gschem_toplevel_get_toplevel (w_current)->load_newer_backup_func = x_fileselect_load_backup;
+  gschem_toplevel_get_toplevel (w_current)->load_newer_backup_data = w_current;
+
+  o_text_set_rendered_bounds_func (gschem_toplevel_get_toplevel (w_current),
+                                   o_text_get_rendered_bounds, w_current);
+
+  /* Damage notifications should invalidate the object on screen */
+  o_add_change_notify (gschem_toplevel_get_toplevel (w_current),
+                       (ChangeNotifyFunc) o_invalidate,
+                       (ChangeNotifyFunc) o_invalidate, w_current);
+
+  x_window_setup (w_current);
+
+  return w_current;
 }

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,17 +24,13 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 
 /* magnetic options */
 /* half size of the magnetic marker on the screen. */
 #define MAGNETIC_HALFSIZE 6
 
 /* define how far the cursor could be to activate magnetic */
-#define MAGNETIC_PIN_REACH 50 
+#define MAGNETIC_PIN_REACH 50
 #define MAGNETIC_NET_REACH 20
 #define MAGNETIC_BUS_REACH 30
 
@@ -52,140 +48,38 @@
 
 /*! \brief Reset all variables used for net drawing
  *  \par Function Description
- *  This function resets all variables from GSCHEM_TOPLEVEL that are used
+ *  This function resets all variables from GschemToplevel that are used
  *  for net drawing. This function should be called when escaping from
  *  a net drawing action or before entering it.
  */
-void o_net_reset(GSCHEM_TOPLEVEL *w_current) 
+void o_net_reset(GschemToplevel *w_current)
 {
+  o_net_invalidate_rubber (w_current);
   w_current->first_wx = w_current->first_wy = -1;
   w_current->second_wx = w_current->second_wy = -1;
   w_current->third_wx = w_current->third_wy = -1;
   w_current->magnetic_wx = w_current->magnetic_wy = -1;
   w_current->rubber_visible = 0;
+  i_action_stop (w_current);
 }
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-void o_net_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int x1, y1, x2, y2;
-  int size = 0;
-
-#if NET_DEBUG /* debug */
-  char *tempstring;
-  GdkFont *font;
-#endif
-
-  if (o_current == NULL) {
-    return;
-  }
-
-  if (o_current->line == NULL) {
-    return;
-  }
-
-  /* reuse line's routine */
-  if (!o_line_visible (w_current, o_current->line, &x1, &y1, &x2, &y2)) {
-    return;
-  }
-
-  if (toplevel->net_style == THICK)
-    size = NET_WIDTH;
-
-  gschem_cairo_line (w_current, END_SQUARE, size, x1, y1, x2, y2);
-  gschem_cairo_set_source_color (w_current,
-                                 o_drawing_color (w_current, o_current));
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_SQUARE, size, -1, -1);
-
-  if (o_current->selected && w_current->draw_grips) {
-    o_line_draw_grips (w_current, o_current);
-  }
-}
-
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-void o_net_draw_place (GSCHEM_TOPLEVEL *w_current, int dx, int dy, OBJECT *o_current)
-{
-  int size = 0;
-
-  if (o_current->line == NULL) {
-    return;
-  }
-
-  if (w_current->toplevel->net_style == THICK)
-    size = NET_WIDTH;
-
-  gschem_cairo_line (w_current, END_NONE, size,
-                     o_current->line->x[0] + dx, o_current->line->y[0] + dy,
-                     o_current->line->x[1] + dx, o_current->line->y[1] + dy);
-  gschem_cairo_set_source_color (w_current,
-                                 x_color_lookup_dark (o_current->color));
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, size, -1, -1);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-void o_net_draw_stretch (GSCHEM_TOPLEVEL *w_current,
-                         int dx, int dy, int whichone, OBJECT *o_current)
-{
-  int dx1 = -1, dx2 = -1, dy1 = -1,dy2 = -1;
-
-  if (o_current->line == NULL) {
-    return;
-  }
-
-  if (whichone == 0) {
-    dx1 = dx;
-    dy1 = dy;
-    dx2 = dy2 = 0;
-  } else if (whichone == 1) {
-    dx1 = dy1 = 0;
-    dx2 = dx;
-    dy2 = dy;
-  } else {
-    fprintf(stderr, _("Got an invalid which one in o_net_draw_stretch\n"));
-  }
-
-  gschem_cairo_line (w_current, END_NONE, 0,
-                     o_current->line->x[0] + dx1, o_current->line->y[0] + dy1,
-                     o_current->line->x[1] + dx2, o_current->line->y[1] + dy2);
-
-  gschem_cairo_set_source_color (w_current,
-                                 x_color_lookup_dark (o_current->color));
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, 0, -1, -1);
-}
-
 
 /*! \brief guess the best direction for the next net drawing action
  *  \par Function Description
  *  This function checks all connectable objects at a starting point.
  *  It determines the best drawing direction for each quadrant of the
  *  possible net endpoint.
- *  
- *  The directions are stored in the GSCHEM_TOPLEVEL->net_direction variable
+ *
+ *  The directions are stored in the GschemToplevel->net_direction variable
  *  as a bitfield.
  */
-void o_net_guess_direction(GSCHEM_TOPLEVEL *w_current,
+void o_net_guess_direction(GschemToplevel *w_current,
 			   int wx, int wy)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   int up=0, down=0, left=0, right=0;
   int x1, y1, x2, y2;
   int xmin, ymin, xmax, ymax;
   int orientation;
-  GList *objectlists, *iter1, *iter2;
+  GList *object_list, *iter1, *iter2;
   OBJECT *o_current;
 
   int *current_rules;
@@ -193,11 +87,16 @@ void o_net_guess_direction(GSCHEM_TOPLEVEL *w_current,
   const int pin_rules[] = {100, 50, 0};
   const int bus_rules[] = {90, 0, 40};
   const int net_rules[] = {80, 30, 0};
-  
-  objectlists = s_tile_get_objectlists(toplevel, toplevel->page_current,
-                                       wx, wy, wx, wy);
 
-  for (iter1 = objectlists; iter1 != NULL; iter1 = g_list_next(iter1)) {
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
+
+  PAGE *page = gschem_page_view_get_page (page_view);
+  g_return_if_fail (page != NULL);
+
+  object_list = g_list_append (NULL, page->connectible_list);
+
+  for (iter1 = object_list; iter1 != NULL; iter1 = g_list_next(iter1)) {
     for (iter2 = (GList*) iter1->data; iter2 != NULL; iter2 = g_list_next(iter2)) {
       o_current = (OBJECT*) iter2->data;
 
@@ -217,17 +116,17 @@ void o_net_guess_direction(GSCHEM_TOPLEVEL *w_current,
       default:
 	g_assert_not_reached ();
       }
-      
+
       x1 = o_current->line->x[0];
       x2 = o_current->line->x[1];
       y1 = o_current->line->y[0];
       y2 = o_current->line->y[1];
-      
+
       xmin = min(x1, x2);
       ymin = min(y1, y2);
       xmax = max(x1, x2);
       ymax = max(y1, y2);
-      
+
       if (orientation == HORIZONTAL && wy == y1) {
 	if (wx == xmin) {
 	  up = max(up, current_rules[1]);
@@ -276,7 +175,7 @@ void o_net_guess_direction(GSCHEM_TOPLEVEL *w_current,
       }
     }
   }
-  
+
   w_current->net_direction = 0;
   w_current->net_direction |= up >= right ? 0 : QUADRANT1;
   w_current->net_direction |= up >= left ? 0 : QUADRANT2;
@@ -287,30 +186,35 @@ void o_net_guess_direction(GSCHEM_TOPLEVEL *w_current,
   printf("o_net_guess_direction: up=%d down=%d left=%d right=%d direction=%d\n",
 	 up, down, left, right, w_current->net_direction);
 #endif
-  g_list_free(objectlists);
+  g_list_free (object_list);
 }
 
 /*! \brief find the closest possible location to connect to
  *  \par Function Description
- *  This function calculates the distance to all connectable objects 
+ *  This function calculates the distance to all connectable objects
  *  and searches the closest connection point.
  *  It searches for pins, nets and busses.
- *  
- *  The connection point is stored in GSCHEM_TOPLEVEL->magnetic_wx and
- *  GSCHEM_TOPLEVEL->magnetic_wy. If no connection is found. Both variables
+ *
+ *  The connection point is stored in GschemToplevel->magnetic_wx and
+ *  GschemToplevel->magnetic_wy. If no connection is found. Both variables
  *  are set to -1.
  */
-void o_net_find_magnetic(GSCHEM_TOPLEVEL *w_current,
+void o_net_find_magnetic(GschemToplevel *w_current,
 			 int w_x, int w_y)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int x1, x2, y1, y2, min_x, min_y, w_magnetic_reach;
+  int x1, x2, y1, y2, min_x, min_y;
   double mindist, minbest, dist1, dist2;
   double weight, min_weight;
   int magnetic_reach = 0;
   OBJECT *o_current;
   OBJECT *o_magnetic = NULL;
-  GList *objectlists, *iter1, *iter2;
+  GList *object_list, *iter1, *iter2;
+
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
+
+  PAGE *page = gschem_page_view_get_page (page_view);
+  g_return_if_fail (page != NULL);
 
   minbest = min_x = min_y = 0;
   min_weight = 0;
@@ -318,46 +222,38 @@ void o_net_find_magnetic(GSCHEM_TOPLEVEL *w_current,
   /* max distance of all the different reaches */
   magnetic_reach = max(MAGNETIC_PIN_REACH, MAGNETIC_NET_REACH);
   magnetic_reach = max(magnetic_reach, MAGNETIC_BUS_REACH);
-  w_magnetic_reach = WORLDabs (w_current, magnetic_reach);
 
-  /* get the objects of the tiles around the reach region */
-  x1 = w_x - w_magnetic_reach;
-  y1 = w_y - w_magnetic_reach;
-  x2 = w_x + w_magnetic_reach;
-  y2 = w_y + w_magnetic_reach;
-  objectlists = s_tile_get_objectlists(toplevel, toplevel->page_current,
-                                       x1, y1, x2, y2);
+  object_list = g_list_append (NULL, page->connectible_list);
 
-  for (iter1 = objectlists; iter1 != NULL; iter1 = g_list_next(iter1)) {
+  for (iter1 = object_list; iter1 != NULL; iter1 = g_list_next(iter1)) {
     for (iter2 = (GList*) iter1->data; iter2 != NULL; iter2 = g_list_next(iter2)) {
+      int left, top, right, bottom;
       o_current = (OBJECT*) iter2->data;
 
-      if (!visible (w_current,  o_current->w_left, o_current->w_top,
-		   o_current->w_right, o_current->w_bottom))
+      if (!world_get_single_object_bounds(page->toplevel, o_current,
+                                          &left, &top, &right, &bottom) ||
+          !visible (w_current, left, top, right, bottom))
 	continue; /* skip invisible objects */
 
       if (o_current->type == OBJ_PIN) {
 	min_x = o_current->line->x[o_current->whichend];
 	min_y = o_current->line->y[o_current->whichend];
 
-	mindist = sqrt((double) (w_x - min_x)*(w_x - min_x)
-		       + (double) (w_y - min_y)*(w_y - min_y));
+	mindist = hypot(w_x - min_x, w_y - min_y);
 	weight = mindist / MAGNETIC_PIN_WEIGHT;
       }
 
       else if (o_current->type == OBJ_NET
 	       || o_current->type == OBJ_BUS) {
-	/* we have 3 possible points to connect: 
+	/* we have 3 possible points to connect:
 	   2 endpoints and 1 midpoint point */
 	x1 = o_current->line->x[0];
 	y1 = o_current->line->y[0];
 	x2 = o_current->line->x[1];
 	y2 = o_current->line->y[1];
 	/* endpoint tests */
-	dist1 = sqrt((double) (w_x - x1)*(w_x - x1)
-		     + (double) (w_y - y1)*(w_y - y1));
-	dist2 = sqrt((double) (w_x - x2)*(w_x - x2)
-		     + (double) (w_y - y2)*(w_y - y2));
+	dist1 = hypot(w_x - x1, w_y - y1);
+	dist2 = hypot(w_x - x2, w_y - y2);
 	if (dist1 < dist2) {
 	  min_x = x1;
 	  min_y = y1;
@@ -368,7 +264,7 @@ void o_net_find_magnetic(GSCHEM_TOPLEVEL *w_current,
 	  min_y = y2;
 	  mindist = dist2;
 	}
-      
+
 	/* midpoint tests */
 	if ((x1 == x2)  /* vertical net */
 	    && ((y1 >= w_y && w_y >= y2)
@@ -378,10 +274,10 @@ void o_net_find_magnetic(GSCHEM_TOPLEVEL *w_current,
 	    min_x = x1;
 	    min_y = w_y;
 	  }
-	} 
+	}
 	if ((y1 == y2)  /* horitontal net */
 	    && ((x1 >= w_x && w_x >= x2)
-		|| (x2 >= w_x && w_x >= x1))) {  
+		|| (x2 >= w_x && w_x >= x1))) {
 	  if (abs(w_y - y1) < mindist) {
 	    mindist = abs(w_y - y1);
 	    min_x = w_x;
@@ -416,7 +312,7 @@ void o_net_find_magnetic(GSCHEM_TOPLEVEL *w_current,
     case (OBJ_NET): magnetic_reach = MAGNETIC_NET_REACH; break;
     case (OBJ_BUS): magnetic_reach = MAGNETIC_BUS_REACH; break;
     }
-    if (minbest > WORLDabs (w_current, magnetic_reach)) {
+    if (minbest > gschem_page_view_WORLDabs (page_view, magnetic_reach)) {
       w_current->magnetic_wx = -1;
       w_current->magnetic_wy = -1;
     }
@@ -426,7 +322,7 @@ void o_net_find_magnetic(GSCHEM_TOPLEVEL *w_current,
     w_current->magnetic_wy = -1;
   }
 
-  g_list_free(objectlists);
+  g_list_free (object_list);
 }
 
 /*! \brief calcutates the net route to the magnetic marker
@@ -435,14 +331,14 @@ void o_net_find_magnetic(GSCHEM_TOPLEVEL *w_current,
  *  last to second, the 3 coordinates are manipulated to find
  *  a way to the magnetic marker.
  */
-void o_net_finishmagnetic(GSCHEM_TOPLEVEL *w_current)
+void o_net_finishmagnetic(GschemToplevel *w_current)
 {
   int primary_zero_length, secondary_zero_length;
 
-  primary_zero_length = ((w_current->first_wx == w_current->second_wx) 
+  primary_zero_length = ((w_current->first_wx == w_current->second_wx)
 			 && (w_current->first_wy == w_current->second_wy));
- 
-  secondary_zero_length = ((w_current->second_wx == w_current->third_wx) 
+
+  secondary_zero_length = ((w_current->second_wx == w_current->third_wx)
 			   && (w_current->second_wy == w_current->third_wy));
 
   if (!primary_zero_length && secondary_zero_length) {
@@ -491,12 +387,16 @@ void o_net_finishmagnetic(GSCHEM_TOPLEVEL *w_current)
 
 /*! \brief callback function to draw a net marker in magnetic mode
  *  \par Function Description
- *  If the mouse is moved, this function is called to update the 
+ *  If the mouse is moved, this function is called to update the
  *  position of the magnetic marker.
  *  If the controllkey is pressed the magnetic marker follows the mouse.
  */
-void o_net_start_magnetic(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void o_net_start_magnetic(GschemToplevel *w_current, int w_x, int w_y)
 {
+  if (!(gschem_options_get_magnetic_net_mode (w_current->options))) {
+    return;
+  }
+
   o_net_invalidate_rubber (w_current);
 
   if (w_current->CONTROLKEY) {
@@ -509,17 +409,18 @@ void o_net_start_magnetic(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
 
   o_net_invalidate_rubber (w_current);
   w_current->rubber_visible = 1;
-  w_current->inside_action = 1;
 }
 
 /*! \brief set the start point of a new net
  *  \par Function Description
- *  This function sets the start point of a new net at the position of the 
- *  cursor. If we have a visible magnetic marker, we use that instead of 
+ *  This function sets the start point of a new net at the position of the
+ *  cursor. If we have a visible magnetic marker, we use that instead of
  *  the cursor position
  */
-void o_net_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void o_net_start(GschemToplevel *w_current, int w_x, int w_y)
 {
+  i_action_start (w_current);
+
   if (w_current->magnetic_wx != -1 && w_current->magnetic_wy != -1) {
     w_current->first_wx = w_current->magnetic_wx;
     w_current->first_wy = w_current->magnetic_wy;
@@ -540,21 +441,19 @@ void o_net_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
     o_net_guess_direction(w_current, w_current->first_wx, w_current->first_wy);
 }
 
-/*! \brief finish a net drawing action 
- * \par Function Description 
+/*! \brief finish a net drawing action
+ * \par Function Description
  * This function finishes the drawing of a net. If we have a visible
  * magnetic marker, we use that instead of the current cursor
  * position.
  *
  * The rubber nets are removed, the nets and cues are drawn and the
- * net is added to the TOPLEVEL structure.  
+ * net is added to the TOPLEVEL structure.
  *
  * The function returns TRUE if it has drawn a net, FALSE otherwise.
  */
-int o_net_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void o_net_end(GschemToplevel *w_current, int w_x, int w_y)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int color;
   int primary_zero_length, secondary_zero_length;
   int found_primary_connection = FALSE;
   int save_wx, save_wy;
@@ -567,6 +466,12 @@ int o_net_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
 
   g_assert( w_current->inside_action != 0 );
 
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
+
+  PAGE *page = gschem_page_view_get_page (page_view);
+  g_return_if_fail (page != NULL);
+
   o_net_invalidate_rubber (w_current);
 
   if (w_current->magnetic_wx != -1 && w_current->magnetic_wy != -1)
@@ -578,24 +483,19 @@ int o_net_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
   /* the non-zero ones */
   primary_zero_length = (w_current->first_wx == w_current->second_wx) &&
     (w_current->first_wy == w_current->second_wy);
- 
+
   secondary_zero_length = (w_current->second_wx == w_current->third_wx) &&
       (w_current->second_wy == w_current->third_wy);
 
   /* If both nets are zero length... */
   /* this ends the net drawing behavior */
   if ( primary_zero_length && secondary_zero_length ) {
-    return FALSE;
+    o_net_reset(w_current);
+    return;
   }
 
   save_wx = w_current->third_wx;
   save_wy = w_current->third_wy;
-
-  if (toplevel->override_net_color == -1) {
-    color = NET_COLOR;
-  } else {
-    color = toplevel->override_net_color;
-  }
 
   if (w_current->third_wx != snap_grid (w_current, w_current->third_wx)
       || w_current->third_wy != snap_grid (w_current, w_current->third_wy))
@@ -603,10 +503,10 @@ int o_net_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
 
   if (!primary_zero_length ) {
   /* create primary net */
-      new_net = o_net_new(toplevel, OBJ_NET, color,
+      new_net = o_net_new(page->toplevel, OBJ_NET, NET_COLOR,
                           w_current->first_wx, w_current->first_wy,
                           w_current->second_wx, w_current->second_wy);
-      s_page_append (toplevel, toplevel->page_current, new_net);
+      s_page_append (page->toplevel, page, new_net);
 
       added_objects = g_list_prepend (added_objects, new_net);
 
@@ -616,13 +516,13 @@ int o_net_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
       o_net_add_busrippers (w_current, new_net, prev_conn_objects);
       g_list_free (prev_conn_objects);
 
-#if DEBUG 
-      printf("primary:\n"); 
+#if DEBUG
+      printf("primary:\n");
       s_conn_print(new_net->conn_list);
 #endif
 
       /* Go off and search for valid connection on this newly created net */
-      found_primary_connection = s_conn_net_search(new_net, 1, 
+      found_primary_connection = s_conn_net_search(new_net, 1,
                                                    new_net->conn_list);
       if (found_primary_connection)
       {
@@ -636,12 +536,12 @@ int o_net_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
   /* If the second net is not zero length, add it as well */
   /* Also, a valid net connection from the primary net was not found */
   if (!secondary_zero_length && !found_primary_connection) {
-      
+
       /* Add secondary net */
-      new_net = o_net_new(toplevel, OBJ_NET, color,
+      new_net = o_net_new(page->toplevel, OBJ_NET, NET_COLOR,
                           w_current->second_wx, w_current->second_wy,
                           w_current->third_wx, w_current->third_wy);
-      s_page_append (toplevel, toplevel->page_current, new_net);
+      s_page_append (page->toplevel, page, new_net);
 
       added_objects = g_list_prepend (added_objects, new_net);
 
@@ -661,35 +561,41 @@ int o_net_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
     g_list_free (added_objects);
   }
 
-  toplevel->page_current->CHANGED = 1;
   w_current->first_wx = save_wx;
   w_current->first_wy = save_wy;
-  o_undo_savestate(w_current, UNDO_ALL);
 
-  return (TRUE);
+  gschem_toplevel_page_content_changed (w_current, page);
+  o_undo_savestate_old (w_current, UNDO_ALL, _("Net"));
+
+  /* Continue net drawing */
+  o_net_start(w_current, w_current->first_wx, w_current->first_wy);
 }
 
 /*! \brief erase and redraw the rubber lines when drawing a net
  *  \par Function Description
  *  This function draws the rubbernet lines when drawing a net.
  */
-void o_net_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void o_net_motion (GschemToplevel *w_current, int w_x, int w_y)
 {
   int ortho, horizontal, quadrant;
+  gboolean magnetic_net_mode;
 
+  g_return_if_fail (w_current != NULL);
   g_assert( w_current->inside_action != 0 );
+
+  magnetic_net_mode = gschem_options_get_magnetic_net_mode (w_current->options);
 
   /* Orthognal mode enabled when Control Key is NOT pressed or
      if we are using magnetic mode */
-  ortho = !w_current->CONTROLKEY || w_current->magneticnet_mode;
+  ortho = !w_current->CONTROLKEY || magnetic_net_mode;
 
   if (w_current->rubber_visible)
     o_net_invalidate_rubber (w_current);
 
-  if (w_current->magneticnet_mode) {
+  if (magnetic_net_mode) {
     if (w_current->CONTROLKEY) {
       /* set the magnetic marker position to current xy if the
-	 controlkey is pressed. Thus the net will not connect to 
+	 controlkey is pressed. Thus the net will not connect to
 	 the closest net if we finish the net drawing */
       w_current->magnetic_wx = w_x;
       w_current->magnetic_wy = w_y;
@@ -709,7 +615,7 @@ void o_net_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
   }
   /* If you press the control key then you can draw non-ortho nets */
   else {
-    if (w_current->second_wy > w_current->first_wy) 
+    if (w_current->second_wy > w_current->first_wy)
       quadrant = w_current->second_wx > w_current->first_wx ? QUADRANT1: QUADRANT2;
     else
       quadrant = w_current->second_wx > w_current->first_wx ? QUADRANT4: QUADRANT3;
@@ -740,37 +646,45 @@ void o_net_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
  *  \par Function Description
  *  This function draws the rubbernets to the graphic context
  */
-void o_net_draw_rubber(GSCHEM_TOPLEVEL *w_current)
+void
+o_net_draw_rubber(GschemToplevel *w_current, EdaRenderer *renderer)
 {
-  int size = 0, w_magnetic_halfsize;
+  int size = NET_WIDTH, w_magnetic_halfsize;
+  cairo_t *cr = eda_renderer_get_cairo_context (renderer);
+  GArray *color_map = eda_renderer_get_color_map (renderer);
+  int flags = eda_renderer_get_cairo_flags (renderer);
+  gboolean magnetic_net_mode;
 
-  if (w_current->toplevel->net_style == THICK)
-    size = NET_WIDTH;
+  g_return_if_fail (w_current != NULL);
 
-  gschem_cairo_set_source_color (w_current,
-                                 x_color_lookup_dark (SELECT_COLOR));
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
 
-  if (w_current->magneticnet_mode) {
+  eda_cairo_set_source_color (cr, SELECT_COLOR, color_map);
+
+  magnetic_net_mode = gschem_options_get_magnetic_net_mode (w_current->options);
+
+  if (magnetic_net_mode) {
     if (w_current->magnetic_wx != -1 && w_current->magnetic_wy != -1) {
       w_magnetic_halfsize = max (4 * size,
-                                 WORLDabs (w_current, MAGNETIC_HALFSIZE));
-      gschem_cairo_arc (w_current, size, w_current->magnetic_wx,
-                                         w_current->magnetic_wy,
-                                         w_magnetic_halfsize, 0, 360);
+                                 gschem_page_view_WORLDabs (page_view, MAGNETIC_HALFSIZE));
+      eda_cairo_arc (cr, flags, size,
+                     w_current->magnetic_wx, w_current->magnetic_wy,
+                     w_magnetic_halfsize, 0, 360);
     }
   }
 
   /* Primary line */
-  gschem_cairo_line (w_current, END_NONE, size,
-                     w_current->first_wx,  w_current->first_wy,
-                     w_current->second_wx, w_current->second_wy);
+  eda_cairo_line (cr, flags, END_NONE, size,
+                  w_current->first_wx,  w_current->first_wy,
+                  w_current->second_wx, w_current->second_wy);
 
   /* Secondary line */
-  gschem_cairo_line (w_current, END_NONE, size,
+  eda_cairo_line (cr, flags, END_NONE, size,
                      w_current->second_wx, w_current->second_wy,
                      w_current->third_wx,  w_current->third_wy);
 
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, size, -1, -1);
+  eda_cairo_stroke (cr, flags, TYPE_SOLID, END_NONE, size, -1, -1);
 }
 
 
@@ -779,31 +693,26 @@ void o_net_draw_rubber(GSCHEM_TOPLEVEL *w_current)
  *  \par Function Description
  *
  */
-void o_net_invalidate_rubber (GSCHEM_TOPLEVEL *w_current)
+void o_net_invalidate_rubber (GschemToplevel *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   int size = 0, magnetic_halfsize;
-  int bloat;
   int magnetic_x, magnetic_y;
-  int first_x, first_y, third_x, third_y, second_x, second_y;
-  int x1, y1, x2, y2;
+  gboolean magnetic_net_mode;
 
-  WORLDtoSCREEN (w_current, w_current->magnetic_wx, w_current->magnetic_wy,
-                 &magnetic_x, &magnetic_y);
-  WORLDtoSCREEN (w_current, w_current->first_wx, w_current->first_wy,
-                 &first_x, &first_y);
-  WORLDtoSCREEN (w_current, w_current->third_wx, w_current->third_wy,
-                 &third_x, &third_y);
-  WORLDtoSCREEN (w_current, w_current->second_wx, w_current->second_wy,
-                 &second_x, &second_y);
+  g_return_if_fail (w_current != NULL);
 
-  if (toplevel->net_style == THICK) {
-    size = SCREENabs (w_current, NET_WIDTH);
-  }
-  size = max (size, 0);
-  bloat = size / 2;
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
 
-  if (w_current->magneticnet_mode) {
+  gschem_page_view_WORLDtoSCREEN (page_view,
+                                  w_current->magnetic_wx, w_current->magnetic_wy,
+                                  &magnetic_x, &magnetic_y);
+
+  size = gschem_page_view_SCREENabs (page_view, NET_WIDTH);
+
+  magnetic_net_mode = gschem_options_get_magnetic_net_mode (w_current->options);
+
+  if (magnetic_net_mode) {
     if (w_current->magnetic_wx != -1 && w_current->magnetic_wy != -1) {
       magnetic_halfsize = max (4 * size, MAGNETIC_HALFSIZE);
 
@@ -814,17 +723,17 @@ void o_net_invalidate_rubber (GSCHEM_TOPLEVEL *w_current)
     }
   }
 
-  x1 = min (first_x, second_x) - bloat;
-  x2 = max (first_x, second_x) + bloat;
-  y1 = min (first_y, second_y) - bloat;
-  y2 = max (first_y, second_y) + bloat;
-  o_invalidate_rect (w_current, x1, y1, x2, y2);
+  gschem_page_view_invalidate_world_rect (page_view,
+                                          w_current->first_wx,
+                                          w_current->first_wy,
+                                          w_current->second_wx,
+                                          w_current->second_wy);
 
-  x1 = min (second_x, third_x) - bloat;
-  x2 = max (second_x, third_x) + bloat;
-  y1 = min (second_y, third_y) - bloat;
-  y2 = max (second_y, third_y) + bloat;
-  o_invalidate_rect (w_current, x1, y1, x2, y2);
+  gschem_page_view_invalidate_world_rect (page_view,
+                                          w_current->second_wx,
+                                          w_current->second_wy,
+                                          w_current->third_wx,
+                                          w_current->third_wy);
 }
 
 
@@ -833,13 +742,11 @@ void o_net_invalidate_rubber (GSCHEM_TOPLEVEL *w_current)
  *  \par Function Description
  *
  */
-int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
+int o_net_add_busrippers(GschemToplevel *w_current, OBJECT *net_obj,
                          GList *prev_conn_objects)
 
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   OBJECT *new_obj;
-  int color;
   GList *cl_current = NULL;
   OBJECT *bus_object = NULL;
   CONN *found_conn = NULL;
@@ -856,28 +763,27 @@ int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
   const int ripper_size = w_current->bus_ripper_size;
   int complex_angle = 0;
   const CLibSymbol *rippersym = NULL;
-  
+
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_val_if_fail (page_view != NULL, FALSE);
+
+  PAGE *page = gschem_page_view_get_page (page_view);
+  g_return_val_if_fail (page != NULL, FALSE);
+
   length = o_line_length(net_obj);
 
   if (!prev_conn_objects) {
     return(FALSE);
   }
-  
+
   if (length <= ripper_size) {
     return(FALSE);
   }
 
-  if (toplevel->override_net_color == -1) {
-    color = NET_COLOR;
-  } else {
-    color = toplevel->override_net_color;
-  }
-
-  
   /* check for a bus connection and draw rippers if so */
   cl_current = prev_conn_objects;
   while (cl_current != NULL) {
-    
+
     bus_object = (OBJECT *) cl_current->data;
     if (bus_object && bus_object->type == OBJ_BUS) {
       /* yes, using the net routine is okay */
@@ -903,12 +809,12 @@ int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
       if (!found_conn) {
         return(FALSE);
       }
-      
+
       otherone = !found_conn->whichone;
-      
+
       /* now deal with the found connection */
       if (bus_orientation == HORIZONTAL && net_orientation == VERTICAL) {
-	/* printf("found horiz bus %s %d!\n", bus_object->name, 
+	/* printf("found horiz bus %s %d!\n", bus_object->name,
            found_conn->whichone);*/
 
         sign = bus_object->bus_ripper_direction;
@@ -920,12 +826,12 @@ int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
             first = 1;
             second = 0;
           }
-              
+
           distance1 = abs(bus_object->line->x[first] -
                           net_obj->line->x[found_conn->whichone]);
           distance2 = abs(bus_object->line->x[second] -
                           net_obj->line->x[found_conn->whichone]);
-          
+
           if (distance1 <= distance2) {
             sign = 1;
           } else {
@@ -959,19 +865,19 @@ int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
           }
 
           net_obj->line->y[found_conn->whichone] -= ripper_size;
-          o_recalc_single_object(toplevel, net_obj);
-          rippers[ripper_count].x[0] = 
+          net_obj->w_bounds_valid_for = NULL;
+          rippers[ripper_count].x[0] =
             net_obj->line->x[found_conn->whichone];
           rippers[ripper_count].y[0] =
             net_obj->line->y[found_conn->whichone];
           rippers[ripper_count].x[1] =
-            net_obj->line->x[found_conn->whichone] + sign*ripper_size;       
+            net_obj->line->x[found_conn->whichone] + sign*ripper_size;
           rippers[ripper_count].y[1] =
             net_obj->line->y[found_conn->whichone] + ripper_size;
           ripper_count++;
           /* printf("done\n"); */
           made_changes++;
-          
+
         } else {
           /* new net is above bus */
           /* printf("above\n"); */
@@ -994,24 +900,24 @@ int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
             /* symmetric */
             complex_angle = 180;
           }
-          
+
           net_obj->line->y[found_conn->whichone] += ripper_size;
-          o_recalc_single_object(toplevel, net_obj);
-          rippers[ripper_count].x[0] = 
+          net_obj->w_bounds_valid_for = NULL;
+          rippers[ripper_count].x[0] =
             net_obj->line->x[found_conn->whichone];
           rippers[ripper_count].y[0] =
             net_obj->line->y[found_conn->whichone];
           rippers[ripper_count].x[1] =
-            net_obj->line->x[found_conn->whichone] + sign*ripper_size;      
+            net_obj->line->x[found_conn->whichone] + sign*ripper_size;
           rippers[ripper_count].y[1] =
             net_obj->line->y[found_conn->whichone] - ripper_size;
             ripper_count++;
-            
+
             /* printf("done\n"); */
           made_changes++;
         }
-        
-        
+
+
       } else if (bus_orientation == VERTICAL &&
 		 net_orientation == HORIZONTAL) {
 
@@ -1032,21 +938,21 @@ int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
                           net_obj->line->y[found_conn->whichone]);
           distance2 = abs(bus_object->line->y[second] -
                           net_obj->line->y[found_conn->whichone]);
-          
+
           if (distance1 <= distance2) {
             sign = 1;
           } else {
             sign = -1;
           }
           bus_object->bus_ripper_direction = sign;
-        } 
+        }
         /* printf("ver sign: %d\n", sign); */
 
-        
+
         if (net_obj->line->x[otherone] < bus_object->line->x[0]) {
           /* new net is to the left of the bus */
           /* printf("left\n"); */
-          
+
           if (ripper_count >= 2) {
             /* try to exit gracefully */
             fprintf(stderr, _("Tried to add more than two bus rippers. Internal gschem error.\n"));
@@ -1067,8 +973,8 @@ int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
           }
 
           net_obj->line->x[found_conn->whichone] -= ripper_size;
-          o_recalc_single_object(toplevel, net_obj);
-          rippers[ripper_count].x[0] = 
+          net_obj->w_bounds_valid_for = NULL;
+          rippers[ripper_count].x[0] =
             net_obj->line->x[found_conn->whichone];
           rippers[ripper_count].y[0] =
             net_obj->line->y[found_conn->whichone];
@@ -1077,7 +983,7 @@ int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
           rippers[ripper_count].y[1] =
             net_obj->line->y[found_conn->whichone] + sign*ripper_size;
           ripper_count++;
-                    
+
           made_changes++;
         } else {
           /* new net is to the right of the bus */
@@ -1103,8 +1009,8 @@ int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
           }
 
           net_obj->line->x[found_conn->whichone] += ripper_size;
-          o_recalc_single_object(toplevel, net_obj);
-          rippers[ripper_count].x[0] = 
+          net_obj->w_bounds_valid_for = NULL;
+          rippers[ripper_count].x[0] =
             net_obj->line->x[found_conn->whichone];
           rippers[ripper_count].y[0] =
             net_obj->line->y[found_conn->whichone];
@@ -1122,44 +1028,44 @@ int o_net_add_busrippers(GSCHEM_TOPLEVEL *w_current, OBJECT *net_obj,
 
     cl_current = g_list_next(cl_current);
   }
- 
+
   if (made_changes) {
-    s_conn_remove_object (toplevel, net_obj);
+    s_conn_remove_object_connections (page->toplevel, net_obj);
 
     if (w_current->bus_ripper_type == COMP_BUS_RIPPER) {
-      GList *symlist = 
-	s_clib_search (toplevel->bus_ripper_symname, CLIB_EXACT);
+      GList *symlist =
+	s_clib_search (page->toplevel->bus_ripper_symname, CLIB_EXACT);
       if (symlist != NULL) {
         rippersym = (CLibSymbol *) symlist->data;
       }
       g_list_free (symlist);
     }
-    
+
     for (i = 0; i < ripper_count; i++) {
       if (w_current->bus_ripper_type == NET_BUS_RIPPER) {
-        new_obj = o_net_new(toplevel, OBJ_NET, color,
+        new_obj = o_net_new(page->toplevel, OBJ_NET, NET_COLOR,
                   rippers[i].x[0], rippers[i].y[0],
                   rippers[i].x[1], rippers[i].y[1]);
-        s_page_append (toplevel, toplevel->page_current, new_obj);
+        s_page_append (page->toplevel, page, new_obj);
       } else {
 
         if (rippersym != NULL) {
-          new_obj = o_complex_new (toplevel, OBJ_COMPLEX, DEFAULT_COLOR,
+          new_obj = o_complex_new (page->toplevel, OBJ_COMPLEX, DEFAULT_COLOR,
                                    rippers[i].x[0], rippers[i].y[0],
                                    complex_angle, 0,
                                    rippersym,
-                                   toplevel->bus_ripper_symname, 1);
-          s_page_append_list (toplevel, toplevel->page_current,
-                              o_complex_promote_attribs (toplevel, new_obj));
-          s_page_append (toplevel, toplevel->page_current, new_obj);
+                                   page->toplevel->bus_ripper_symname, 1);
+          s_page_append_list (page->toplevel, page,
+                              o_complex_promote_attribs (page->toplevel, new_obj));
+          s_page_append (page->toplevel, page, new_obj);
         } else {
-          s_log_message(_("Bus ripper symbol [%s] was not found in any component library\n"),
-                        toplevel->bus_ripper_symname);
+          s_log_message(_("Bus ripper symbol [%s] was not found in any symbol library\n"),
+                        page->toplevel->bus_ripper_symname);
         }
       }
     }
-    
-    s_conn_update_object (toplevel, net_obj);
+
+    s_conn_update_object (page, net_obj);
     return(TRUE);
   }
 

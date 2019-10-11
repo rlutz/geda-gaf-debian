@@ -1,6 +1,6 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 2011-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,6 @@
 #endif
 
 #include "gschem.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
@@ -105,13 +101,13 @@ show_uri__win32 (const gchar *uri, GError **error)
  * -# Calling the ShellExecute() Windows API call (default on Windows)
  * -# Running an appropriate external tool.
  *
- * \param w_current  Current #GSCHEM_TOPLEVEL structure.
+ * \param w_current  Current #GschemToplevel structure.
  * \param uri        URI to launch viewer for.
  * \param error      Location to return error information.
  * \return TRUE on success, FALSE on failure.
  */
 gboolean
-x_show_uri (GSCHEM_TOPLEVEL *w_current, const gchar *uri,
+x_show_uri (GschemToplevel *w_current, const gchar *uri,
             GError **error)
 {
 # if defined (SHOW_URI_GIO)

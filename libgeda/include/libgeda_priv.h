@@ -8,17 +8,19 @@
 /* Public libgeda headers */
 #include "defines.h"
 #include "struct.h"
+#include "s_toplevel.h"
 #include "globals.h"
 #include "o_types.h"
 #include "colors.h"
-#include "papersizes.h"
 #include "prototype.h"
 #include "funcs.h"
+#include "edaconfig.h"
 #include "edaerrors.h"
 
 #include "geda_list.h"
 
 /* Private libgeda headers */
+#include "defines_priv.h"
 #include "struct_priv.h"
 #include "prototype_priv.h"
 #include "i_vars_priv.h"

@@ -11,6 +11,9 @@ BUILT_SOURCES = \
 	scheme_page.x \
 	scheme_attrib.x \
 	scheme_os.x \
+	scheme_config.x \
+	scheme_closure.x \
+	scheme_log.x \
 	scheme_deprecated.x
 
 scheme_api_sources = \
@@ -22,14 +25,19 @@ scheme_api_sources = \
 	scheme_os.c \
 	scheme_page.c \
 	scheme_attrib.c \
-	scheme_deprecated.c
+	scheme_config.c \
+	scheme_closure.c \
+	scheme_deprecated.c \
+	scheme_log.c \
+	edascmhookproxy.c \
+	edascmvaluetypes.c
 
 libgeda_la_SOURCES = \
 	$(scheme_api_sources) \
 	a_basic.c \
+	edaconfig.c \
 	edaerrors.c \
 	f_basic.c \
-	f_print.c \
 	g_basic.c \
 	geda_list.c \
 	g_rc.c \
@@ -65,18 +73,14 @@ libgeda_la_SOURCES = \
 	s_clib.c \
 	s_color.c \
 	s_conn.c \
-	s_cue.c \
 	s_encoding.c \
 	s_hierarchy.c \
 	s_log.c \
-	s_menu.c \
 	s_page.c \
-	s_papersizes.c \
 	s_path.c \
 	s_slib.c \
 	s_slot.c \
 	s_textbuffer.c \
-	s_tile.c \
 	s_toplevel.c \
 	s_undo.c \
 	s_weakref.c \
@@ -96,9 +100,13 @@ LIBTOOL=@LIBTOOL@ --silent
 # in C.
 SUFFIXES = .x
 snarf_cpp_opts = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(libgeda_la_CPPFLAGS) $(AM_CFLAGS) $(libgeda_la_CFLAGS)
+	$(libgeda_la_CPPFLAGS) $(AM_CFLAGS) $(libgeda_la_CFLAGS) $(CPPFLAGS)
+AM_V_SNARF = $(am__v_SNARF_@AM_V@)
+am__v_SNARF_ = $(am__v_SNARF_@AM_DEFAULT_V@)
+am__v_SNARF_0 = @echo "  SNARF   " $@;
+am__v_SNARF_1 =
 .c.x:
-	CPP="$(CPP)" $(GUILE_SNARF) -o $@ $< $(snarf_cpp_opts)
+	$(AM_V_SNARF)CPP="$(CPP)" $(GUILE_SNARF) -o $@ $< $(snarf_cpp_opts)
 
 MOSTLYCLEANFILES = *.log core FILE *~
 CLEANFILES = *.log core FILE *~ $(BUILT_SOURCES)

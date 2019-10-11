@@ -1,6 +1,6 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ init_module_geda_core_deprecated ()
  * \brief Initialise the basic gEDA page manipulation procedures.
  * \par Function Description
  * Registers some Scheme procedures for working with #PAGE
- * smobs. Should only be called by scheme_api_init().
+ * smobs. Should only be called by edascm_init().
  */
 void
 edascm_init_deprecated ()

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,6 @@
 #endif
 
 #include "libgeda_priv.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 /*! \todo Finish function documentation!!!
  *  \brief
@@ -85,10 +81,16 @@ UNDO *s_undo_new_head(void)
   u_new->type = -1;
   u_new->filename = NULL;
   u_new->object_list = NULL;
-  u_new->left = u_new->right = u_new->top = u_new->bottom = -1;
+  u_new->x = u_new->y = 0;
+  u_new->scale = 0;
 
   u_new->page_control = 0;
   u_new->up = -2;
+  u_new->CHANGED = 0;
+
+  u_new->desc = NULL;
+  u_new->tx = 0;
+  u_new->ty = 0;
 
   u_new->prev = NULL;
   u_new->next = NULL;
@@ -112,8 +114,8 @@ void s_undo_destroy_head(UNDO *u_head)
  *
  */
 UNDO *s_undo_add (UNDO *head, int type, char *filename, GList *object_list,
-		 int left, int top, int right, int bottom, int page_control,
-		 int up)
+                  int x, int y, double scale, int page_control, int up,
+                  int CHANGED, const char *desc)
 {
   UNDO *tail;
   UNDO *u_new;
@@ -126,13 +128,17 @@ UNDO *s_undo_add (UNDO *head, int type, char *filename, GList *object_list,
 
   u_new->type = type;
 
-  u_new->left = left;
-  u_new->top = top;
-  u_new->right = right;
-  u_new->bottom = bottom;
+  u_new->x = x;
+  u_new->y = y;
+  u_new->scale = scale;
 
   u_new->page_control = page_control;
   u_new->up = up;
+  u_new->CHANGED = CHANGED;
+
+  u_new->desc = desc;
+  u_new->tx = 0;
+  u_new->ty = 0;
 
   if (head == NULL) {
     u_new->prev = NULL; /* setup previous link */
@@ -168,8 +174,7 @@ void s_undo_print_all( UNDO *head )
       print_struct_forw (u_current->object_list);
     }
 		
-    printf("\t%d %d %d %d\n", u_current->left, u_current->top,
-           u_current->right, u_current->bottom);
+    printf("\t%d %d %f\n", u_current->x, u_current->y, u_current->scale);
     u_current = u_current->next;
   }
   printf("TOS\n");

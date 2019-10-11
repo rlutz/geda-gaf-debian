@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schematic xmlns="https://hedmen.org/xorn/schematic/" file-format-features="experimental">
+  <content>
+    <component x="6.2" y="6.2" symbol="plain_transform"/>
+    <component x="6.2" y="6.2" angle="90" symbol="plain_transform"/>
+    <component x="6.2" y="6.2" angle="180" symbol="plain_transform"/>
+    <component x="6.2" y="6.2" angle="270" symbol="plain_transform"/>
+    <component x="19.2" y="6.2" mirror="yes" symbol="plain_transform"/>
+    <component x="19.2" y="6.2" angle="90" mirror="yes" symbol="plain_transform"/>
+    <component x="19.2" y="6.2" angle="180" mirror="yes" symbol="plain_transform"/>
+    <component x="19.2" y="6.2" angle="270" mirror="yes" symbol="plain_transform"/>
+  </content>
+  <symbol id="plain_transform" name="plain_transform.sym" mode="embedded">
+    <content>
+      <box x="0" y="4.8" width="1.6" height="1.4" linewidth=".01" capstyle="square"/>
+      <circle x=".5" y="5.7" radius=".25" linewidth=".01" capstyle="square"/>
+      <line x0=".9" y0="6" x1=".7" y1="5.3" linewidth=".01" capstyle="square"/>
+      <arc x="1.1" y="5.6" radius=".25" startangle="30" sweepangle="15" linewidth=".01" capstyle="square"/>
+      <arc x="1.1" y="5.6" radius=".25" startangle="75" sweepangle="15" linewidth=".01" capstyle="square"/>
+      <arc x="1.1" y="5.6" radius=".25" startangle="120" sweepangle="15" linewidth=".01" capstyle="square"/>
+      <arc x="1.1" y="5.6" radius=".25" startangle="165" sweepangle="15" linewidth=".01" capstyle="square"/>
+      <arc x="1.1" y="5.6" radius=".25" startangle="210" sweepangle="15" linewidth=".01" capstyle="square"/>
+      <arc x="1.1" y="5.6" radius=".25" startangle="255" sweepangle="15" linewidth=".01" capstyle="square"/>
+      <arc x="1.1" y="5.6" radius=".25" startangle="300" sweepangle="15" linewidth=".01" capstyle="square"/>
+      <arc x="1.1" y="5.6" radius=".25" startangle="345" sweepangle="15" linewidth=".01" capstyle="square"/>
+      <pin x0=".9" y0="5" x1="1.4" y1="5">
+        <attribute name="pinnumber" x="1.408" y="5.042" size="10" visible="yes" show="name-value" alignment="lower-right">0</attribute>
+      </pin>
+      <box x="1.6" y="4.8" width="1.4" height="1.4" linewidth=".01" capstyle="square"/>
+      <picture x="2.3" y="5.5" width=".3" height=".578" pixmap="pinwheel-red"/>
+      <picture x="1.722" y="5.5" width=".578" height=".3" angle="90" pixmap="pinwheel-yellow"/>
+      <picture x="2" y="4.922" width=".3" height=".578" angle="180" pixmap="pinwheel-green"/>
+      <picture x="2.3" y="5.2" width=".578" height=".3" angle="270" pixmap="pinwheel-blue"/>
+      <box x="3" y="4.8" width="1.4" height="1.4" linewidth=".01" capstyle="square"/>
+      <picture x="3.4" y="5.5" width=".3" height=".578" mirrored="yes" pixmap="pinwheel-red"/>
+      <picture x="3.122" y="5.2" width=".578" height=".3" angle="90" mirrored="yes" pixmap="pinwheel-yellow"/>
+      <picture x="3.7" y="4.922" width=".3" height=".578" angle="180" mirrored="yes" pixmap="pinwheel-green"/>
+      <picture x="3.7" y="5.5" width=".578" height=".3" angle="270" mirrored="yes" pixmap="pinwheel-blue"/>
+      <box x="0" y="2.4" width="4.4" height="2.4" linewidth=".01" capstyle="square"/>
+      <box x="1.8" y="3.9" width=".8" height=".4" linewidth=".01" capstyle="square"/>
+      <text x="1.8" y="4.3" size="12" alignment="lower-right">Lorem</text>
+      <text x="2.2" y="4.3" size="12" alignment="lower-middle">ipsum</text>
+      <text x="2.6" y="4.3" size="12">quia</text>
+      <text x="1.8" y="4.1" size="12" alignment="middle-right">dolor</text>
+      <text x="2.2" y="4.1" size="12" alignment="middle-middle">sit</text>
+      <text x="2.6" y="4.1" size="12" alignment="middle-left">amet</text>
+      <text x="1.8" y="3.9" size="12" alignment="upper-right">con</text>
+      <text x="2.2" y="3.9" size="12" alignment="upper-middle">sec</text>
+      <text x="2.6" y="3.9" size="12" alignment="upper-left">tetur</text>
+      <box x=".4" y="3.2" width=".4" height=".8" linewidth=".01" capstyle="square"/>
+      <text x=".4" y="3.2" size="12" angle="90" alignment="lower-right">Lorem</text>
+      <text x=".4" y="3.6" size="12" angle="90" alignment="lower-middle">ipsum</text>
+      <text x=".4" y="4" size="12" angle="90">quia</text>
+      <text x=".6" y="3.2" size="12" angle="90" alignment="middle-right">dolor</text>
+      <text x=".6" y="3.6" size="12" angle="90" alignment="middle-middle">sit</text>
+      <text x=".6" y="4" size="12" angle="90" alignment="middle-left">amet</text>
+      <text x=".8" y="3.2" size="12" angle="90" alignment="upper-right">con</text>
+      <text x=".8" y="3.6" size="12" angle="90" alignment="upper-middle">sec</text>
+      <text x=".8" y="4" size="12" angle="90" alignment="upper-left">tetur</text>
+      <box x="1.8" y="2.9" width=".8" height=".4" linewidth=".01" capstyle="square"/>
+      <text x="1.8" y="3.3" size="12" angle="180" alignment="upper-left">Lorem</text>
+      <text x="2.2" y="3.3" size="12" angle="180" alignment="upper-middle">ipsum</text>
+      <text x="2.6" y="3.3" size="12" angle="180" alignment="upper-right">quia</text>
+      <text x="1.8" y="3.1" size="12" angle="180" alignment="middle-left">dolor</text>
+      <text x="2.2" y="3.1" size="12" angle="180" alignment="middle-middle">sit</text>
+      <text x="2.6" y="3.1" size="12" angle="180" alignment="middle-right">amet</text>
+      <text x="1.8" y="2.9" size="12" angle="180">con</text>
+      <text x="2.2" y="2.9" size="12" angle="180" alignment="lower-middle">sec</text>
+      <text x="2.6" y="2.9" size="12" angle="180" alignment="lower-right">tetur</text>
+      <box x="3.6" y="3.2" width=".4" height=".8" linewidth=".01" capstyle="square"/>
+      <text x="4" y="4" size="12" angle="270" alignment="lower-right">Lorem</text>
+      <text x="4" y="3.6" size="12" angle="270" alignment="lower-middle">ipsum</text>
+      <text x="4" y="3.2" size="12" angle="270">quia</text>
+      <text x="3.8" y="4" size="12" angle="270" alignment="middle-right">dolor</text>
+      <text x="3.8" y="3.6" size="12" angle="270" alignment="middle-middle">sit</text>
+      <text x="3.8" y="3.2" size="12" angle="270" alignment="middle-left">amet</text>
+      <text x="3.6" y="4" size="12" angle="270" alignment="upper-right">con</text>
+      <text x="3.6" y="3.6" size="12" angle="270" alignment="upper-middle">sec</text>
+      <text x="3.6" y="3.2" size="12" angle="270" alignment="upper-left">tetur</text>
+      <box x="0" y="0" width="4.4" height="2.4" linewidth=".01" capstyle="square"/>
+      <box x="1.8" y="1.5" width=".8" height=".4" linewidth=".01" capstyle="square"/>
+      <text x="1.8" y="1.9" size="12" alignment="lower-right">Lorem</text>
+      <text x="2.2" y="1.9" size="12" alignment="lower-middle">ipsum</text>
+      <text x="2.6" y="1.9" size="12">quia</text>
+      <text x="1.8" y="1.7" size="12" alignment="middle-right">dolor</text>
+      <text x="2.2" y="1.7" size="12" alignment="middle-middle">sit</text>
+      <text x="2.6" y="1.7" size="12" alignment="middle-left">amet</text>
+      <text x="1.8" y="1.5" size="12" alignment="upper-right">con</text>
+      <text x="2.2" y="1.5" size="12" alignment="upper-middle">sec</text>
+      <text x="2.6" y="1.5" size="12" alignment="upper-left">tetur</text>
+      <box x="3.6" y=".8" width=".4" height=".8" linewidth=".01" capstyle="square"/>
+      <text x="3.6" y=".8" size="12" angle="90" alignment="lower-right">Lorem</text>
+      <text x="3.6" y="1.2" size="12" angle="90" alignment="lower-middle">ipsum</text>
+      <text x="3.6" y="1.6" size="12" angle="90">quia</text>
+      <text x="3.8" y=".8" size="12" angle="90" alignment="middle-right">dolor</text>
+      <text x="3.8" y="1.2" size="12" angle="90" alignment="middle-middle">sit</text>
+      <text x="3.8" y="1.6" size="12" angle="90" alignment="middle-left">amet</text>
+      <text x="4" y=".8" size="12" angle="90" alignment="upper-right">con</text>
+      <text x="4" y="1.2" size="12" angle="90" alignment="upper-middle">sec</text>
+      <text x="4" y="1.6" size="12" angle="90" alignment="upper-left">tetur</text>
+      <box x="1.8" y=".5" width=".8" height=".4" linewidth=".01" capstyle="square"/>
+      <text x="1.8" y=".9" size="12" angle="180" alignment="upper-left">Lorem</text>
+      <text x="2.2" y=".9" size="12" angle="180" alignment="upper-middle">ipsum</text>
+      <text x="2.6" y=".9" size="12" angle="180" alignment="upper-right">quia</text>
+      <text x="1.8" y=".7" size="12" angle="180" alignment="middle-left">dolor</text>
+      <text x="2.2" y=".7" size="12" angle="180" alignment="middle-middle">sit</text>
+      <text x="2.6" y=".7" size="12" angle="180" alignment="middle-right">amet</text>
+      <text x="1.8" y=".5" size="12" angle="180">con</text>
+      <text x="2.2" y=".5" size="12" angle="180" alignment="lower-middle">sec</text>
+      <text x="2.6" y=".5" size="12" angle="180" alignment="lower-right">tetur</text>
+      <box x=".4" y=".8" width=".4" height=".8" linewidth=".01" capstyle="square"/>
+      <text x=".8" y="1.6" size="12" angle="270" alignment="lower-right">Lorem</text>
+      <text x=".8" y="1.2" size="12" angle="270" alignment="lower-middle">ipsum</text>
+      <text x=".8" y=".8" size="12" angle="270">quia</text>
+      <text x=".6" y="1.6" size="12" angle="270" alignment="middle-right">dolor</text>
+      <text x=".6" y="1.2" size="12" angle="270" alignment="middle-middle">sit</text>
+      <text x=".6" y=".8" size="12" angle="270" alignment="middle-left">amet</text>
+      <text x=".4" y="1.6" size="12" angle="270" alignment="upper-right">con</text>
+      <text x=".4" y="1.2" size="12" angle="270" alignment="upper-middle">sec</text>
+      <text x=".4" y=".8" size="12" angle="270" alignment="upper-left">tetur</text>
+    </content>
+  </symbol>
+  <pixmap id="pinwheel-red" name="pinwheel-red.png" mode="embedded">
+iVBORw0KGgoAAAANSUhEUgAAAA4AAAAbCAYAAABMU775AAAABmJLR0QA/wD/AP+gvaeTAAAA
+CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AkSDCEvA8SdmQAAABl0RVh0Q29tbWVudABD
+cmVhdGVkIHdpdGggR0lNUFeBDhcAAACKSURBVDjLndTZDcQgDEXRy2ssraW0UJnnKyNCWPyC
+hARGx2Kx4IKICNwugFpKYDYBHB+w7oGL1U4crD6QxRoFM1izhR3WKusKa3eWGVbmBkdY2Xfr
+sZxqabHcGr2xDeuXrVbgOE8PtigNe5SCI7SFM7SEKzSFOzSEGfSCWfSADvpDFwGUC+zPGOAH
+/TBbGhNY2fgAAAAASUVORK5CYII=
+  </pixmap>
+  <pixmap id="pinwheel-yellow" name="pinwheel-yellow.png" mode="embedded">
+iVBORw0KGgoAAAANSUhEUgAAAA4AAAAbCAYAAABMU775AAAABmJLR0QA/wD/AP+gvaeTAAAA
+CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AkSDCIZ51NbwwAAABl0RVh0Q29tbWVudABD
+cmVhdGVkIHdpdGggR0lNUFeBDhcAAACMSURBVDjLndTZDQMhDEXRO68xWpvScGXka0aEsPgF
+CQmMjsViQa201hpuF0DE1TCbAErxsZ6Bi9VPHKwxkMWaBTNYq4UT1i7rDut0lhVW5gZnWNl3
+G7Gcaumx3Bp9sA0j/thqBJRye7BHaTiiFJyhI1yhLdyhJTyhKcygH5hFX9BBL3QRwFUr9mcM
+8AGJH2+PRZvcsQAAAABJRU5ErkJggg==
+  </pixmap>
+  <pixmap id="pinwheel-green" name="pinwheel-green.png" mode="embedded">
+iVBORw0KGgoAAAANSUhEUgAAAA4AAAAbCAYAAABMU775AAAABmJLR0QA/wD/AP+gvaeTAAAA
+CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AkSDCI3O4VWDAAAABl0RVh0Q29tbWVudABD
+cmVhdGVkIHdpdGggR0lNUFeBDhcAAACISURBVDjLndRZCsAgDEXR69tYt9al1ZWlX50d8ioI
+JnIgxCBsRETgbgGUWgJzCYDFxzpPJtYjMrA+mSRWM5vA6t5MsIb1DLCmXehgpXrfwEq/+AvL
+mrMbljujB/Zh/VNqhXVZTXhDefhCOdhAc9hBYzhAfThBbZhAX5hET2igC5oIoLBhf8YAO+i7
+WxoyCQn0AAAAAElFTkSuQmCC
+  </pixmap>
+  <pixmap id="pinwheel-blue" name="pinwheel-blue.png" mode="embedded">
+iVBORw0KGgoAAAANSUhEUgAAAA4AAAAbCAYAAABMU775AAAABmJLR0QA/wD/AP+gvaeTAAAA
+CXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AkSDCMbEEYLrgAAABl0RVh0Q29tbWVudABD
+cmVhdGVkIHdpdGggR0lNUFeBDhcAAACGSURBVDjLndJLDsAgCEXR69uYW+vS6srooANr/YEk
+RsSchKDAbWZGdAkgpWIEQ++Ww1g1jWG1Rz9WX/Jhjct7rPnVGmvd0BxrP4Yxlm/4PZb/yVus
+2EerWITjxQewnLRauK4chRUFYIucsEcOOEYbOEcLuEYTuEcD6EM/6EcfGEMACW7jIB7URlsa
+o8XXpQAAAABJRU5ErkJggg==
+  </pixmap>
+</schematic>

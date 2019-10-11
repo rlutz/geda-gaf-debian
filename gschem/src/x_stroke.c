@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,7 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBSTROKE
 #include <stroke.h>
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 /*
  * <B>stroke_points</B> is an array of points for the stroke
@@ -86,13 +81,20 @@ x_stroke_free (void)
  *
  * The footprint is updated and the new point is drawn on the drawing area.
  *
- *  \param [in] w_current The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current The GschemToplevel object.
  *  \param [in] x        The X coord of the new point.
  *  \param [in] Y        The X coord of the new point.
  */
 void
-x_stroke_record (GSCHEM_TOPLEVEL *w_current, gint x, gint y)
+x_stroke_record (GschemToplevel *w_current, gint x, gint y)
 {
+  cairo_matrix_t user_to_device_matrix;
+  double x0, y0, x1, y1;
+  GschemPageView *view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (view != NULL);
+  GschemPageGeometry *geometry = gschem_page_view_get_page_geometry (view);
+  g_return_if_fail (geometry != NULL);
+
   g_assert (stroke_points != NULL);
 
   stroke_record (x, y);
@@ -102,8 +104,39 @@ x_stroke_record (GSCHEM_TOPLEVEL *w_current, gint x, gint y)
 
     g_array_append_val (stroke_points, point);
 
-    gdk_gc_set_foreground (w_current->gc, x_get_color (STROKE_COLOR));
-    gdk_draw_point (w_current->window, w_current->gc, x, y);
+    if (stroke_points->len == 1)
+      return;
+
+    StrokePoint *last_point = &g_array_index (stroke_points, StrokePoint,
+                                              stroke_points->len - 2);
+
+    cairo_t *cr = gdk_cairo_create (gtk_widget_get_window (GTK_WIDGET(view)));
+    COLOR *color = x_color_lookup (STROKE_COLOR);
+    cairo_set_source_rgba (cr,
+                           color->r / 255.0,
+                           color->g / 255.0,
+                           color->b / 255.0,
+                           color->a / 255.0);
+
+    cairo_set_matrix (cr, gschem_page_geometry_get_world_to_screen_matrix (geometry));
+    x0 = last_point->x;
+    y0 = last_point->y;
+    x1 = x;
+    y1 = y;
+    cairo_device_to_user (cr, &x0, &y0);
+    cairo_device_to_user (cr, &x1, &y1);
+    cairo_get_matrix (cr, &user_to_device_matrix);
+    cairo_save (cr);
+    cairo_identity_matrix (cr);
+
+    cairo_matrix_transform_point (&user_to_device_matrix, &x0, &y0);
+    cairo_matrix_transform_point (&user_to_device_matrix, &x1, &y1);
+
+    cairo_move_to (cr, x0, y0);
+    cairo_line_to (cr, x1, y1);
+    cairo_stroke (cr);
+    cairo_restore (cr);
+    cairo_destroy (cr);
   }
 
 }
@@ -120,11 +153,11 @@ x_stroke_record (GSCHEM_TOPLEVEL *w_current, gint x, gint y)
  *  action. It returns 0 if libstroke failed to transform the stroke
  *  or there is no action attached to the stroke.
  *
- *  \param [in] w_current The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current The GschemToplevel object.
  *  \returns 1 on success, 0 otherwise.
  */
 gint
-x_stroke_translate_and_execute (GSCHEM_TOPLEVEL *w_current)
+x_stroke_translate_and_execute (GschemToplevel *w_current)
 {
   gchar sequence[STROKE_MAX_SEQUENCE];
   StrokePoint *point;
@@ -169,5 +202,3 @@ x_stroke_translate_and_execute (GSCHEM_TOPLEVEL *w_current)
 
   return 0;
 }
-
-#endif /* HAVE_LIBSTROKE */

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <config.h>
-#include <missing.h>
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -35,206 +34,8 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 #include <gdk/gdkkeysyms.h>
 
-
-#define DEFINE_G_KEYS(name)				\
-SCM g_keys_ ## name(SCM rest)				\
-{							\
-   GSCHEM_TOPLEVEL *w_current = g_current_window ();	\
-   i_callback_ ## name(w_current, 0, NULL);                   \
-   return SCM_BOOL_T;				\
-}
-
-/*! \brief test-comment
- * test-comment
- */
-DEFINE_G_KEYS(file_new)
-
-DEFINE_G_KEYS(file_new_window)
-
-/* don't use the widget parameter on this function, or do some checking... */
-/* since there is a call: widget = NULL, data = 0 (will be w_current) */
-/* This should be renamed to page_open perhaps... */
-DEFINE_G_KEYS(file_open)
-
-/* don't use the widget parameter on this function, or do some checking... */
-/* since there is a call: widget = NULL, data = 0 (will be w_current) */
-DEFINE_G_KEYS(file_script)
-
-/* don't use the widget parameter on this function, or do some checking... */
-/* since there is a call: widget = NULL, data = 0 (will be w_current) */
-DEFINE_G_KEYS(file_save)
-DEFINE_G_KEYS(file_save_as)
-DEFINE_G_KEYS(file_save_all)
-DEFINE_G_KEYS(file_print)
-DEFINE_G_KEYS(file_write_png)
-
-/* don't use the widget parameter on this function, or do some checking... */
-/* since there is a call: widget = NULL, data = 0 (will be w_current) */
-/* this function closes a window */
-DEFINE_G_KEYS(file_close)
-DEFINE_G_KEYS(file_quit)
-
-/* Select also does not update the middle button shortcut */
-DEFINE_G_KEYS(edit_undo)
-DEFINE_G_KEYS(edit_redo)
-DEFINE_G_KEYS(edit_select)
-DEFINE_G_KEYS(edit_select_all)
-DEFINE_G_KEYS(edit_deselect)
-DEFINE_G_KEYS(edit_copy)
-DEFINE_G_KEYS(edit_copy_hotkey)
-DEFINE_G_KEYS(edit_mcopy)
-DEFINE_G_KEYS(edit_mcopy_hotkey)
-DEFINE_G_KEYS(edit_move)
-DEFINE_G_KEYS(edit_move_hotkey)
-DEFINE_G_KEYS(edit_delete)
-DEFINE_G_KEYS(edit_rotate_90)
-DEFINE_G_KEYS(edit_rotate_90_hotkey)
-DEFINE_G_KEYS(edit_mirror)
-DEFINE_G_KEYS(edit_mirror_hotkey)
-DEFINE_G_KEYS(edit_slot)
-DEFINE_G_KEYS(edit_color)
-DEFINE_G_KEYS(edit_edit)
-DEFINE_G_KEYS(edit_pin_type)
-DEFINE_G_KEYS(edit_text)
-DEFINE_G_KEYS(edit_lock)
-DEFINE_G_KEYS(edit_unlock)
-DEFINE_G_KEYS(edit_linetype)
-DEFINE_G_KEYS(edit_filltype)
-DEFINE_G_KEYS(edit_translate)
-DEFINE_G_KEYS(edit_invoke_macro)
-DEFINE_G_KEYS(edit_embed)
-DEFINE_G_KEYS(edit_unembed)
-DEFINE_G_KEYS(edit_update)
-DEFINE_G_KEYS(edit_show_hidden)
-DEFINE_G_KEYS(edit_find)
-DEFINE_G_KEYS(edit_show_text)
-DEFINE_G_KEYS(edit_hide_text)
-DEFINE_G_KEYS(edit_autonumber_text)
-
-DEFINE_G_KEYS(clipboard_copy)
-DEFINE_G_KEYS(clipboard_cut)
-DEFINE_G_KEYS(clipboard_paste)
-DEFINE_G_KEYS(clipboard_paste_hotkey)
-
-DEFINE_G_KEYS(buffer_copy1)
-DEFINE_G_KEYS(buffer_copy2)
-DEFINE_G_KEYS(buffer_copy3)
-DEFINE_G_KEYS(buffer_copy4)
-DEFINE_G_KEYS(buffer_copy5)
-DEFINE_G_KEYS(buffer_cut1)
-DEFINE_G_KEYS(buffer_cut2)
-DEFINE_G_KEYS(buffer_cut3)
-DEFINE_G_KEYS(buffer_cut4)
-DEFINE_G_KEYS(buffer_cut5)
-DEFINE_G_KEYS(buffer_paste1)
-DEFINE_G_KEYS(buffer_paste2)
-DEFINE_G_KEYS(buffer_paste3)
-DEFINE_G_KEYS(buffer_paste4)
-DEFINE_G_KEYS(buffer_paste5)
-DEFINE_G_KEYS(buffer_paste1_hotkey)
-DEFINE_G_KEYS(buffer_paste2_hotkey)
-DEFINE_G_KEYS(buffer_paste3_hotkey)
-DEFINE_G_KEYS(buffer_paste4_hotkey)
-DEFINE_G_KEYS(buffer_paste5_hotkey)
-
-/* repeat middle shortcut doesn't make sense on redraw, just hit right
- * button */
-DEFINE_G_KEYS(view_redraw)
-
-/* for these functions, repeat middle shortcut would get into the way
- * of what user is try to do */
-DEFINE_G_KEYS(view_zoom_full)
-DEFINE_G_KEYS(view_zoom_extents)
-DEFINE_G_KEYS(view_zoom_in)
-DEFINE_G_KEYS(view_zoom_out)
-DEFINE_G_KEYS(view_zoom_in_hotkey)
-DEFINE_G_KEYS(view_zoom_out_hotkey)
-
-DEFINE_G_KEYS(view_zoom_box)
-DEFINE_G_KEYS(view_zoom_box_hotkey)
-DEFINE_G_KEYS(view_pan)
-DEFINE_G_KEYS(view_pan_left)
-DEFINE_G_KEYS(view_pan_right)
-DEFINE_G_KEYS(view_pan_up)
-DEFINE_G_KEYS(view_pan_down)
-DEFINE_G_KEYS(view_pan_hotkey)
-DEFINE_G_KEYS(view_dark_colors)
-DEFINE_G_KEYS(view_light_colors)
-DEFINE_G_KEYS(view_bw_colors)
-DEFINE_G_KEYS(page_manager)
-DEFINE_G_KEYS(page_next)
-DEFINE_G_KEYS(page_prev)
-DEFINE_G_KEYS(page_new)
-DEFINE_G_KEYS(page_close)
-DEFINE_G_KEYS(page_revert)
-DEFINE_G_KEYS(page_discard)
-DEFINE_G_KEYS(page_print)
-DEFINE_G_KEYS(add_component)
-DEFINE_G_KEYS(add_attribute)
-DEFINE_G_KEYS(add_attribute_hotkey)
-DEFINE_G_KEYS(add_net)
-DEFINE_G_KEYS(add_net_hotkey)
-DEFINE_G_KEYS(add_bus)
-DEFINE_G_KEYS(add_bus_hotkey)
-DEFINE_G_KEYS(add_text)
-DEFINE_G_KEYS(add_line)
-DEFINE_G_KEYS(add_line_hotkey)
-DEFINE_G_KEYS(add_box)
-DEFINE_G_KEYS(add_box_hotkey)
-DEFINE_G_KEYS(add_picture)
-DEFINE_G_KEYS(add_picture_hotkey)
-DEFINE_G_KEYS(add_circle)
-DEFINE_G_KEYS(add_circle_hotkey)
-DEFINE_G_KEYS(add_arc)
-DEFINE_G_KEYS(add_arc_hotkey)
-DEFINE_G_KEYS(add_pin)
-DEFINE_G_KEYS(add_pin_hotkey)
-DEFINE_G_KEYS(hierarchy_down_schematic)
-DEFINE_G_KEYS(hierarchy_down_symbol)
-DEFINE_G_KEYS(hierarchy_up)
-DEFINE_G_KEYS(attributes_attach)
-DEFINE_G_KEYS(attributes_detach)
-DEFINE_G_KEYS(attributes_show_name)
-DEFINE_G_KEYS(attributes_show_value)
-DEFINE_G_KEYS(attributes_show_both)
-DEFINE_G_KEYS(attributes_visibility_toggle)
-
-/* i_callback_script_console is not currently implemented */
-DEFINE_G_KEYS(script_console)
-
-/* repeat last command doesn't make sense on options either??? (does
- * it?) */
-DEFINE_G_KEYS(options_text_size)
-
-/* repeat last command doesn't make sense on options either??? (does
- * it?) */
-DEFINE_G_KEYS(options_afeedback)
-DEFINE_G_KEYS(options_grid)
-DEFINE_G_KEYS(options_snap)
-DEFINE_G_KEYS(options_snap_size)
-DEFINE_G_KEYS(options_scale_up_snap_size)
-DEFINE_G_KEYS(options_scale_down_snap_size)
-DEFINE_G_KEYS(options_rubberband)
-DEFINE_G_KEYS(options_magneticnet)
-DEFINE_G_KEYS(options_show_log_window)
-DEFINE_G_KEYS(options_show_coord_window)
-DEFINE_G_KEYS(misc)
-DEFINE_G_KEYS(misc2)
-DEFINE_G_KEYS(misc3)
-
-DEFINE_G_KEYS(help_about)
-DEFINE_G_KEYS(help_hotkeys)
-
-/* be sure that you don't use the widget parameter in this one, since it is
-being called with a null, I suppose we should call it with the right param.
-hack */
-DEFINE_G_KEYS(cancel)
 
 /*! Contains the smob tag for key smobs */
 static scm_t_bits g_key_smob_tag;
@@ -469,12 +270,12 @@ SCM_SYMBOL (prefix_sym, "prefix");
  * keystroke is pressed.  If the current key sequence was a prefix,
  * let it persist.
  *
- * \param [in] data a pointer to the GSCHEM_TOPLEVEL to update.
+ * \param [in] data a pointer to the GschemToplevel to update.
  * \return FALSE (this is a one-shot timer).
  */
 static gboolean clear_keyaccel_string(gpointer data)
 {
-  GSCHEM_TOPLEVEL *w_current = data;
+  GschemToplevel *w_current = data;
 
   /* If the window context has disappeared, do nothing. */
   if (g_list_find(global_window_list, w_current) == NULL) {
@@ -493,10 +294,10 @@ static gboolean clear_keyaccel_string(gpointer data)
  * If any prefix keys are stored in the current key sequence, clears
  * them.
  *
- * \param w_current  The active #GSCHEM_TOPLEVEL context.
+ * \param w_current  The active #GschemToplevel context.
  */
 void
-g_keys_reset (GSCHEM_TOPLEVEL *w_current)
+g_keys_reset (GschemToplevel *w_current)
 {
   SCM s_expr = scm_list_1 (reset_keys_sym);
 
@@ -518,13 +319,13 @@ g_keys_reset (GSCHEM_TOPLEVEL *w_current)
  * current keymap.  Updates the gschem status bar with the current key
  * sequence.
  *
- * \param w_current  The active #GSCHEM_TOPLEVEL context.
+ * \param w_current  The active #GschemToplevel context.
  * \param event      A GdkEventKey structure.
  *
  * \return 1 if a binding was found for the keystroke, 0 otherwise.
  */
 int
-g_keys_execute(GSCHEM_TOPLEVEL *w_current, GdkEventKey *event)
+g_keys_execute(GschemToplevel *w_current, GdkEventKey *event)
 {
   SCM s_retval, s_key, s_expr;
   guint key, mods, upper, lower, caps;
@@ -596,80 +397,25 @@ g_keys_execute(GSCHEM_TOPLEVEL *w_current, GdkEventKey *event)
   s_retval = g_scm_eval_protected (s_expr, scm_interaction_environment ());
   scm_dynwind_end ();
 
-  /* If the keystroke was not part of a prefix, start a timer to clear
-   * the status bar display. */
-  if (w_current->keyaccel_string_source_id) {
-    /* Cancel any existing timers that haven't fired yet. */
-    GSource *timer =
-      g_main_context_find_source_by_id (NULL,
-                                        w_current->keyaccel_string_source_id);
-    g_source_destroy (timer);
-    w_current->keyaccel_string_source_id = 0;
-  }
-  if (!scm_is_eq (s_retval, prefix_sym)) {
-    w_current->keyaccel_string_source_id =
-      g_timeout_add(400, clear_keyaccel_string, w_current);
+  /* only start timer if window wasn't destroyed during the action */
+  if (g_list_find (global_window_list, w_current) != NULL) {
+    /* If the keystroke was not part of a prefix, start a timer to clear
+     * the status bar display. */
+    if (w_current->keyaccel_string_source_id) {
+      /* Cancel any existing timers that haven't fired yet. */
+      GSource *timer =
+        g_main_context_find_source_by_id (NULL,
+                                          w_current->keyaccel_string_source_id);
+      g_source_destroy (timer);
+      w_current->keyaccel_string_source_id = 0;
+    }
+    if (!scm_is_eq (s_retval, prefix_sym)) {
+      w_current->keyaccel_string_source_id =
+        g_timeout_add(400, clear_keyaccel_string, w_current);
+    }
   }
 
   return !scm_is_false (s_retval);
-}
-
-/*! \brief Exports the keymap in Scheme to a GtkListStore
- *  \par Function Description
- *  This function converts the list of key sequence/action pairs
- *  returned by the Scheme function \c dump-global-keymap into a
- *  GtkListStore with two columns.  The first column contains the name
- *  of the action executed by the keybinding as a string, and the
- *  second contains the keybinding itself as a string suitable for
- *  display.
- *
- *  The returned value must be freed by caller.
- *
- *  \return A GtkListStore containing keymap data.
-  */
-GtkListStore *
-g_keys_to_list_store (void)
-{
-  SCM s_expr;
-  SCM s_lst;
-  SCM s_iter;
-  GtkListStore *list_store;
-
-  /* Call Scheme procedure to dump global keymap into list */
-  s_expr = scm_list_1 (scm_from_utf8_symbol ("dump-global-keymap"));
-  s_lst = g_scm_eval_protected (s_expr, scm_interaction_environment ());
-
-  g_return_val_if_fail (scm_is_true (scm_list_p (s_lst)), NULL);
-
-  /* Convert to  */
-  scm_dynwind_begin (0);
-  list_store = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
-  scm_dynwind_unwind_handler (g_object_unref, list_store, 0);
-
-  for (s_iter = s_lst; !scm_is_null (s_iter); s_iter = scm_cdr (s_iter)) {
-    SCM s_binding = scm_caar (s_iter);
-    SCM s_keys = scm_cdar (s_iter);
-    char *binding, *keys;
-    GtkTreeIter iter;
-
-    scm_dynwind_begin (0);
-
-    binding = scm_to_utf8_string (s_binding);
-    scm_dynwind_free (binding);
-
-    keys = scm_to_utf8_string (s_keys);
-    scm_dynwind_free (keys);
-
-    gtk_list_store_insert_with_values (list_store, &iter, -1,
-                                       0, binding,
-                                       1, keys,
-                                       -1);
-
-    scm_dynwind_end ();
-  }
-
-  scm_dynwind_end ();
-  return list_store;
 }
 
 /*! \brief Create the (gschem core keymap) Scheme module

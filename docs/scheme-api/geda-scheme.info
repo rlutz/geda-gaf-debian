@@ -1,9 +1,9 @@
-This is geda-scheme.info, produced by makeinfo version 5.1 from
+This is geda-scheme.info, produced by makeinfo version 6.3 from
 geda-scheme.texi.
 
-This manual is for gEDA/gaf, version 1.8.2.
+This manual is for gEDA/gaf, version 1.10.0.
 
-   Copyright © 2011 Peter TB Brett
+   Copyright © 2011-2013 Peter TB Brett
 
    The text of and illustrations in this document are licensed under a
 Creative Commons Attribution–Share Alike 3.0 Unported license
@@ -24,9 +24,9 @@ File: geda-scheme.info,  Node: Top,  Next: Introduction,  Up: (dir)
 gEDA Scheme Reference Manual
 ****************************
 
-This manual is for gEDA/gaf, version 1.8.2.
+This manual is for gEDA/gaf, version 1.10.0.
 
-   Copyright © 2011 Peter TB Brett
+   Copyright © 2011-2013 Peter TB Brett
 
    The text of and illustrations in this document are licensed under a
 Creative Commons Attribution–Share Alike 3.0 Unported license
@@ -58,7 +58,7 @@ Introduction
 About gEDA
 ==========
 
-"gEDA", or _GPL Electronic Design Automation_, is a suite of free
+“gEDA”, or _GPL Electronic Design Automation_, is a suite of free
 software tools for designing electronics.  The gEDA project has produced
 and continues working on a full GPL’d suite and toolkit of Electronic
 Design Automation (EDA) tools.  These tools are used for electrical
@@ -78,7 +78,7 @@ into making sure the tools run on other platforms as well.
 About the gEDA Scheme API
 =========================
 
-The "gEDA Scheme API", documented in this manual, is a set of Scheme
+The “gEDA Scheme API”, documented in this manual, is a set of Scheme
 functions which can be used to enhance gEDA applications by adding new
 functionality or modify existing behaviour.
 
@@ -108,7 +108,7 @@ using Scheme, you may wish to send a message to one of the gEDA mailing
 lists.  You may also find additional information in the gEDA wiki.
 
    Both the mailing lists and wiki can be accessed from the main gEDA
-website: <http://gpleda.org/>.
+website: <http://www.geda-project.org/>.
 
 We Need Feedback!
 =================
@@ -181,7 +181,7 @@ File: geda-scheme.info,  Node: Objects,  Next: Component objects,  Prev: Pages, 
 1.2 Objects
 ===========
 
-Each ‘page’ contains some number of "schematic elements", represented by
+Each ‘page’ contains some number of “schematic elements”, represented by
 the ‘object’ type.  There are several sub-types of ‘object’, including:
 
    • graphical lines, circles, arcs, rectangles and paths;
@@ -212,7 +212,7 @@ File: geda-scheme.info,  Node: Component objects,  Next: Attributes,  Prev: Obje
 
 When a symbol is instantiated in a schematic (e.g.  by the user
 selecting it from the gschem component library and placing it on the
-page), a compound ‘object’ known as a "component" is created.
+page), a compound ‘object’ known as a “component” is created.
 
    Like a ‘page’, a component contains some number of ‘object’ elements.
 When a component is created from a symbol, the contents of the symbol’s
@@ -243,7 +243,7 @@ File: geda-scheme.info,  Node: Attributes,  Next: Coordinate system,  Prev: Comp
 
 A gEDA user is able to annotate schematic elements with additional data,
 such as footprints for components or net names for nets.  This is
-carried out using "attributes".
+carried out using “attributes”.
 
    An attribute is text ‘object’ which contains a text string in the
 form ‘NAME=VALUE’.  Currently, the restrictions on attribute format that
@@ -286,7 +286,7 @@ File: geda-scheme.info,  Node: Coordinate system,  Prev: Attributes,  Up: Schema
 1.5 Coordinate system
 =====================
 
-gEDA documents use a "coordinate system" (internally referred to as
+gEDA documents use a “coordinate system” (internally referred to as
 ‘world’ coordinates) with coordinates increasing upwards and to the
 right (i.e.  a conventional right-handed Cartesian coordinate system).
 
@@ -300,7 +300,7 @@ format:
 
      (x . y)
 
-   and a set of "bounds" (i.e.  a rectangular area in the document
+   and a set of “bounds” (i.e.  a rectangular area in the document
 plane) is expressed in the format:
 
      ((left . top) . (right . bottom))
@@ -324,6 +324,8 @@ be used in all gEDA applications.
 * Core page functions::
 * Core object functions::
 * Core attribute functions::
+* Configuration functions::
+* Logging functions::
 * System information::
 
 
@@ -362,7 +364,8 @@ filesystem.
      saving, and without asking the user.
 
  -- Function: page-filename page
-     Returns the filename associated with PAGE as a string.
+     Returns the filename associated with PAGE as a string, or ‘#f’ if
+     PAGE is untitled.
 
  -- Function: set-page-filename! page filename
      Sets the filename of PAGE to FILENAME.  Returns PAGE.
@@ -584,7 +587,7 @@ map.  This allows users to specify the color map that suits them when
 viewing schematics and symbols.
 
  -- Function: object-color object
-     Returns the integer color map index of the the color used to draw
+     Returns the integer color map index of the color used to draw
      OBJECT.
 
  -- Function: set-object-color! object color
@@ -651,10 +654,10 @@ interiors filled with a variety of patterns.
           ‘hatch’;
        2. up to five fill parameters, depending on fill style:
             1. none for ‘hollow’ or ‘solid’ fills;
-            2. line width, line angle (in degrees) and line spacing for
+            2. line width, line spacing and line angle (in degrees) for
                ‘hatch’ fills;
-            3. line width, first angle and spacing, and second angle and
-               spacing for ‘mesh’ fills.
+            3. line width, first spacing and angle, and second spacing
+               and angle for ‘mesh’ fills.
 
  -- Function: set-object-fill! object fill-type . fill-args
      Sets the fill settings of OBJECT, which must be a box, circle or
@@ -749,7 +752,7 @@ points in symbols or subcircuits, such as the pins of a semiconductor
 package.  Only one end of a pin can be connected to nets, buses or other
 pins; the rest of a pin is purely graphical.
 
-   Pins come in two varieties: "net pins" and "bus pins", which are used
+   Pins come in two varieties: “net pins” and “bus pins”, which are used
 for connections to nets and buses respectively (*note Nets and buses::).
 
    All of the functions that work on line ‘object’s also work with pins
@@ -791,7 +794,7 @@ and fill settings.
    *Note Object color::.  *Note Object fill and stroke::.
 
  -- Function: box? object
-     Returns ‘#t’ if and only of OBJECT is a box ‘object’.
+     Returns ‘#t’ if and only if OBJECT is a box ‘object’.
 
  -- Function: make-box top-left bottom-right [color]
      Creates and returns a new box ‘object’.  TOP-LEFT is the position
@@ -832,7 +835,7 @@ different colors, and with various stroke and fill settings.
    *Note Object color::.  *Note Object fill and stroke::.
 
  -- Function: circle? object
-     Returns ‘#t’ if and only of OBJECT is a circle ‘object’.
+     Returns ‘#t’ if and only if OBJECT is a circle ‘object’.
 
  -- Function: make-circle center radius [color]
      Creates and returns a new circle ‘object’.  CENTER is the position
@@ -929,6 +932,12 @@ supported by gEDA are:
  -- Function: path? object
      Returns ‘#t’ if and only if OBJECT is a path ‘object’.
 
+ -- Function: make-path [color]
+     Creates and returns a new path ‘object’.  If COLOR is specified, it
+     should be the integer color map index of the color with which to
+     draw the path.  If COLOR is not specified, the default path color
+     is used.
+
  -- Function: path-length path
      Returns the number of path elements in PATH.
 
@@ -955,7 +964,7 @@ supported by gEDA are:
      path.  For example, to append a straight line section to the
      current path:
 
-          (path-insert! path -1 'lineto '(500. 100))
+          (path-insert! path -1 'lineto '(500 . 100))
 
 
 File: geda-scheme.info,  Node: Pictures,  Next: Text,  Prev: Paths,  Up: Core object functions
@@ -998,7 +1007,7 @@ follows:
  -- Function: picture-info picture
      Returns the parameters of PICTURE as a list in the form:
 
-          ((top-left-x . top-left-y) (bottom-right-x . bottom-right-y) angle mirror)
+          (filename (top-left-x . top-left-y) (bottom-right-x . bottom-right-y) angle mirror)
 
  -- Function: picture-filename picture
      Returns the filename associated with PICTURE as a string.
@@ -1064,7 +1073,7 @@ display just the attribute name, just the attribute value, or both.
      ANGLE should be an integer multiple of 90 degrees, determining the
      angle which the text should be displayed at.  STRING is the string
      contents for the ‘text’ object, and must not contain any null
-     characters (‘#\0’ in Scheme, Unicode ‘U+0000’.  SIZE is the font
+     characters (‘#\0’ in Scheme, Unicode ‘U+0000’).  SIZE is the font
      size to use.  If VISIBLE is ‘#f’, the text will be invisible;
      otherwise, it will be visible.
 
@@ -1078,7 +1087,7 @@ display just the attribute name, just the attribute value, or both.
 
      If COLOR is specified, it should be the integer color map index of
      the color with which to draw the text.  If COLOR is not specified,
-     the default arc color is used.
+     the default text color is used.
 
  -- Function: set-text! text anchor align angle string size visible show
           [color]
@@ -1092,7 +1101,7 @@ display just the attribute name, just the attribute value, or both.
 
      See ‘make-text’ for a description of all of these parameters.
 
- -- Function: text-center text
+ -- Function: text-anchor text
      Returns the position of the anchor of TEXT in the form ‘(x . y)’.
 
  -- Function: text-align text
@@ -1206,6 +1215,13 @@ be done separately (e.g.  by reloading the symbol).
      *Note*: Remember that modifying the transformation parameters of a
      component does not update the component’s contents.
 
+ -- Function: set-component-with-transform! component position angle
+          mirror locked
+     Sets the parameters of COMPONENT.  Arguments are the same as to
+     ‘make-component’.  Returns COMPONENT.
+
+     *Note*: All transformations are applied immediately.
+
  -- Function: component-info component
      Returns the parameters of COMPONENT as a list of the form:
 
@@ -1253,7 +1269,7 @@ be done separately (e.g.  by reloading the symbol).
         • are attached as an attribute.
 
 
-File: geda-scheme.info,  Node: Core attribute functions,  Next: System information,  Prev: Core object functions,  Up: Core API Reference
+File: geda-scheme.info,  Node: Core attribute functions,  Next: Configuration functions,  Prev: Core object functions,  Up: Core API Reference
 
 2.3 Core attribute functions
 ============================
@@ -1321,7 +1337,7 @@ They can be floating, or they can be attached to another ‘object’.
 2.3.3 Inherited and promoted attributes
 ---------------------------------------
 
-"Inherited attributes" are unattached attributes inside a component
+“Inherited attributes” are unattached attributes inside a component
 ‘object’.
 
  -- Function: inherited-attribs object
@@ -1331,7 +1347,7 @@ They can be floating, or they can be attached to another ‘object’.
  -- Function: attrib-inherited? attrib
      Returns ‘#t’ if ATTRIB is an inherited attribute.
 
-   "promotable attributes" are inherited attributes that are both
+   “promotable attributes” are inherited attributes that are both
 visible and have names that are in the list of promotable attributes set
 with the ‘always-promote-attributes’ rc file parameter.
 
@@ -1351,9 +1367,412 @@ with the ‘always-promote-attributes’ rc file parameter.
      a component ‘object’, does nothing and returns the empty list.
 
 
-File: geda-scheme.info,  Node: System information,  Prev: Core attribute functions,  Up: Core API Reference
+File: geda-scheme.info,  Node: Configuration functions,  Next: Logging functions,  Prev: Core attribute functions,  Up: Core API Reference
 
-2.4 System information
+2.4 Configuration functions
+===========================
+
+To use the functions described in this section, you will need to load
+the ‘(geda config)’ module.
+
+   This section describes some functions for accessing, monitoring and
+modifying the configuration of gEDA libraries and applications.
+
+* Menu:
+
+* Configuration contexts::
+* Configuration parameters::
+* Configuration events::
+* Configuration errors::
+
+
+File: geda-scheme.info,  Node: Configuration contexts,  Next: Configuration parameters,  Up: Configuration functions
+
+2.4.1 Configuration contexts
+----------------------------
+
+A configuration parameter is always evaluated within a “configuration
+context”.  Each context is associated with a configuration file
+(although the file does not necessarily need to exist).
+
+   Each configuration context may have a “parent context”.  If, when
+looking up a parameter, it has no value set in the selected context, the
+parent context is checked, and so on.
+
+   Three special contexts are always automatically defined: the “default
+context”, the “system context” and the “user context”.  The user context
+is the default parent context for all other configuration contexts,
+including newly-created ones.
+
+2.4.1.1 Obtaining a context
+...........................
+
+ -- Function: path-config-context path
+     Normally, you shouldn’t create a configuration context directly;
+     you should obtain the configuration context associated with a PATH.
+
+     ‘path-config-context’ looks for a configuration file named
+     ‘geda.conf’.  If PATH is not a directory, it is truncated, and then
+     a file named ‘geda.conf’ is looked for in that directory.  If none
+     is found, the parent directory is checked, and so on until a
+     configuration file is found or the filesystem root is reached.  If
+     no configuration file was found, the returned context will be
+     associated with a ‘geda.conf’ in the same directory as PATH.
+
+     *Warning*: Do not assume that the configuration file associated
+     with the context returned by ‘path-config-context’ is located in
+     the directory specified by PATH.
+
+ -- Function: default_config_context
+     The default context is not associated with any physical path or
+     on-disk configuration file, and has no parent context.  It contains
+     the default configuration used when no configuration file can be
+     loaded.
+
+     *Note*: Normally, the default context should be populated with
+     built-in default configuration settings on start-up, before loading
+     any further configuration files.  This approach is strongly
+     recommended, because it means that configuration parameters can
+     then be safely read without having to use ‘config-has-group?’ and
+     ‘config-has-key?’ to check if they are set (*note Configuration
+     groups and keys: Configuration parameters.).
+
+     Since 1.10.
+
+ -- Function: system-config-context
+     The system context is used for system-wide configuration.  Its
+     parent context is the default context.  It is located:
+
+       1. By searching ‘XDG_CONFIG_DIRS’ for a ‘gEDA/geda-system.conf’
+          file.
+       2. By checking the system configuration directory specified at
+          compile-time for a ‘gEDA/geda-system.conf’ file.
+
+     Since 1.10.
+
+ -- Function: user-config-context
+     The user context is used for user-specific configuration, and is
+     loaded from ‘gEDA/geda-user.conf’ in ‘XDG_CONFIG_HOME’.  Its parent
+     context is the system context.
+
+     Since 1.10.
+
+2.4.1.2 Loading and saving configuration files
+..............................................
+
+Other than the default context, all configuration contexts are
+associated with an on-disk configuration file.
+
+ -- Function: config-filename cfg
+     Return the filename of the configuration file associated with the
+     context CFG.  For some contexts (including the default context),
+     this will return ‘#f’.
+
+     Since 1.10.
+
+ -- Function: config-load! cfg
+     Attempt to load configuration parameters for the context CFG from
+     its associated file.
+
+ -- Function: config-loaded? cfg
+     Determine whether the context CFG has been successfully loaded from
+     file.
+
+     Since 1.10.
+
+ -- Function: config-save! cfg
+     Attempt to save configuration parameters for the context CFG to its
+     associated file.
+
+     Since 1.10.
+
+ -- Function: config-changed? cfg
+     Determine whether the context CFG has been altered since it was
+     last synchronised with the on-disk version by loading or saving it.
+
+     Since 1.10.
+
+2.4.1.3 Context parents
+.......................
+
+A configuration context may have a “parent context”, from which it
+inherits configuration values.  Configuration inheritance loops are not
+permitted.
+
+   *Note Configuration inheritance: Configuration parameters.
+
+ -- Function: context-parent cfg
+     Return the parent context of the context CFG, if it has one.
+
+     Since 1.10.
+
+ -- Function: set-config-parent! cfg parent
+     Sets PARENT as the parent context of CFG.  If PARENT is ‘#f’, sets
+     CFG as having no parent context.
+
+     *Note*: Normally, application code should avoid using this
+     function; keeping to the default configuration inheritance
+     structure is recommended in order to ensure consistent behaviour of
+     all libgeda applications.
+
+     Since 1.10.
+
+2.4.1.4 Context trust
+.....................
+
+Some configuration parameters are dangerous; in particular, parameters
+that may lead to arbitrary code execution need to be handled carefully.
+Such settings might include:
+
+   • Preferred PDF reader
+   • Preferred web browser
+   • Search path for Scheme plugins
+
+   Configuration contexts can be flagged as being “trusted”.  This
+allows code that needs to access such dangerous parameters to determine
+whether the value has been obtained from a safe source.
+
+   By default, the default context, system context and user context are
+trusted, and all other contexts untrusted.
+
+ -- Function: config-trusted? cfg
+     Test whether CFG is a trusted configuration context.
+
+     Since 1.10.
+
+ -- Function: set-config-trusted! cfg trusted?
+     Set whether the configuration context CFG should be trusted as a
+     source for dangerous configuration parameters.
+
+     *Warning*: You should not set a configuration context as trusted
+     unless you are certain that it originated from a safe source (e.g.
+     by interacting with the user to verify it).
+
+     Since 1.10.
+
+ -- Function: config-trusted-context cfg
+     If CFG is trusted, returns CFG; otherwise, returns the first parent
+     context of CFG that is a trusted context.  If no trusted context
+     can be found, returns ‘#f’.
+
+     Since 1.10.
+
+
+File: geda-scheme.info,  Node: Configuration parameters,  Next: Configuration events,  Prev: Configuration contexts,  Up: Configuration functions
+
+2.4.2 Configuration parameters
+------------------------------
+
+A gEDA “configuration parameter” consists of three components:
+
+“Group”
+     A string which identifies the general category in which the
+     parameter lies (e.g.  which application and/or plugin).
+“Name”
+     A string which specifically identifies the parameter within the
+     group.
+“Value”
+     The value of the parameter.  This is stored as a string, but can be
+     converted to a number of possible scalar and list types.
+
+   Groups, names and values are all case-sensitive.
+
+2.4.2.1 Configuration groups and keys
+.....................................
+
+ -- Function: config-groups cfg
+     Returns a list of all groups available in CFG and its parent
+     contexts.
+
+     Since 1.10.
+
+ -- Function: config-has-group? cfg group
+     Determines whether CFG or its parent contexts contain the specified
+     GROUP
+
+     Since 1.10.
+
+ -- Function: config-keys cfg group
+     Returns a list of all keys available in the specified GROUP in CFG
+     and its parent contexts.
+
+     Since 1.10.
+
+ -- Function: config-has-key? cfg group key
+     Determines whether CFG or its parent contexts contains KEY in the
+     specified GROUP.
+
+     Since 1.10.
+
+2.4.2.2 Configuration inheritance
+.................................
+
+If a configuration context does not directly specify a value for a
+configuration parameter, it inherits the value from its parent context.
+
+   *Note Context parents: Configuration contexts.
+
+ -- Function: config-inherited? cfg group key
+     Returns ‘#f’ if value of the configuration parameter with the given
+     GROUP and KEY is specified in the context CFG, and ‘#t’ if it is
+     inherited from a parent context of CFG.
+
+     Since 1.10.
+
+ -- Function: config-source cfg group key
+     Returns the configuration context (either CFG or one of its parent
+     contexts) in which the configuration parameter with the given GROUP
+     and KEY has its value defined.
+
+     Since 1.10.
+
+2.4.2.3 Configuration values
+............................
+
+Each value is stored as a UTF-8 string in the configuration file.
+However, this string can be parsed a several different types.  All of
+the following types are supported:
+
+   • Strings
+   • Booleans
+   • Exact integers
+   • Inexact real numbers
+
+   In addition, lists of all the above are supported.
+
+ -- Function: config-string cfg group key
+     Retrieve configuration value as a string.
+
+     Since 1.10.
+
+ -- Function: config-boolean cfg group key
+     Retrieve configuration value as a boolean.
+
+     Since 1.10.
+
+ -- Function: config-int cfg group key
+     Retrieve configuration value as an exact integer.
+
+     Since 1.10.
+
+ -- Function: config-real cfg group key
+     Retrieve configuration value as an inexact real number.
+
+     Since 1.10.
+
+ -- Function: config-string-list cfg group key
+     Retrieve configuration value as a list of strings.
+
+     Since 1.10.
+
+ -- Function: config-boolean-list cfg group key
+     Retrieve configuration value as a list of booleans.
+
+     Since 1.10.
+ -- Function: config-int-list cfg group key
+     Retrieve configuration value as a list of exact integers.
+
+     Since 1.10.
+
+ -- Function: config-real-list cfg group key
+     Retrieve configuration value as a list of inexact real numbers.
+
+     Since 1.10.
+
+ -- Function: config-set! cfg group key value
+     Set the configuration parameter identified by the given GROUP and
+     KEY in the configuration context CFG.  The type of value to set is
+     inferred from VALUE.
+
+     Since 1.10.
+
+
+File: geda-scheme.info,  Node: Configuration events,  Next: Configuration errors,  Prev: Configuration parameters,  Up: Configuration functions
+
+2.4.3 Configuration events
+--------------------------
+
+When the value of a configuration parameter is altered, either directly
+or by loading a configuration file, a “configuration event” is
+generated.  Handlers can be registered to be notified when a
+configuration event occurs.  A configuration event is associated with
+the group and key that had its value modified.
+
+   If a configuration event is emitted by a configuration context, it
+propagates to all configuration contexts which inherit that group and
+key from it.
+
+   A configuration event handler must be a closure that accepts three
+arguments:
+
+     handler cfg group key
+
+   CFG is always the configuration context that received the event, and
+the GROUP and KEY identify the configuration parameter that changed.
+
+ -- Function: add-config-event! cfg handler
+     Registers HANDLER to be called when configuration changes in the
+     context CFG.
+
+     Since 1.10.
+
+ -- Function: remove-config-event! cfg handler
+     Stops HANDLER from being called when configuration changes in the
+     context CFG.
+
+     Since 1.10.
+
+
+File: geda-scheme.info,  Node: Configuration errors,  Prev: Configuration events,  Up: Configuration functions
+
+2.4.4 Configuration errors
+--------------------------
+
+All errors in functions in the ‘(geda config)’ are reported using one of
+two keys:
+
+  1. File errors (e.g.  “Access denied” or “File not found” are
+     indicated with the ‘system-error’ key.
+  2. All other errors are indicated using the ‘config-error’ key.
+
+   When a ‘config-error’ is signalled, ‘data’ part of the error
+arguments is a list containing one of the following symbols:
+
+‘unknown-encoding’
+     The text being parsed was in an unknown encoding.
+‘parse’
+     The configuration data wass ill-formed.
+‘key-not-found’
+     A requested configuration key was not found.
+‘group-not-found’
+     A requested configuration group was not found.
+‘invalid-value’
+     A configuration value could not be parsed into the requested
+     format.
+
+
+File: geda-scheme.info,  Node: Logging functions,  Next: System information,  Prev: Configuration functions,  Up: Core API Reference
+
+2.5 Logging functions
+=====================
+
+To use the functions described in this section, you will need to load
+the ‘(geda log)’ module.
+
+ -- Function: log! level message [format-args...]
+     Emit a log message with the specified LEVEL.  The MESSAGE is
+     interpreted as a format string, with FORMAT-ARGS as its parameters.
+
+     The LEVEL should be one of the symbols ‘error’, ‘critical’,
+     ‘warning’, ‘message’, ‘info’ or ‘debug’.
+
+     Generally, if the LEVEL is not ‘debug’, then the message should be
+     localised.
+
+
+File: geda-scheme.info,  Node: System information,  Prev: Logging functions,  Up: Core API Reference
+
+2.6 System information
 ======================
 
 To use the functions described in this section, you will need to load
@@ -1367,8 +1786,16 @@ operating system gEDA is running on.
      The directory separator character that should be used on the host
      platform.
 
+     The ‘separator-char’ function is deprecated and must not be used in
+     the newly written code.  It will be removed after version 1.10.
+     There is no replacement for it.
+
  -- Variable: separator
      A string containing ‘separator-char’.
+
+     The ‘separator’ function is deprecated and must not be used in the
+     newly written code.  It will be removed after version 1.10.  Use
+     the guile function ‘file-name-separator-string’ instead.
 
  -- Variable: path-separator-char
      The character used for separating the elements in ‘PATH’-like
@@ -1429,6 +1856,7 @@ enabling and responding to user editing operations.
 * Key mapping::
 * Selections::
 * Hooks::
+* Actions::
 * Miscellanous gschem functions::
 
 
@@ -1508,7 +1936,7 @@ key bindings.  For example:
      (string->keys ``F N'')
      => #(#<gschem-key "F"> #<gschem-key "N">)
 
-   In this case, <F> is a "prefix key", because pressing it does not
+   In this case, <F> is a “prefix key”, because pressing it does not
 cause an action to be carried out directly, but just changes the effect
 of pressing subsequent keys.
 
@@ -1531,7 +1959,8 @@ of pressing subsequent keys.
 3.2.3 Keymaps
 -------------
 
-A "keymap" maps key combinations to actions or other keymaps.
+A “keymap” maps key combinations to values (usually actions) or to other
+keymaps.  *Note Actions::.
 
  -- Function: keymap? obj
      Returns ‘#t’ if and only if OBJ is a keymap.
@@ -1595,7 +2024,7 @@ File: geda-scheme.info,  Node: Selections,  Next: Hooks,  Prev: Key mapping,  Up
 To use the functions described in this section, you will need to load
 the ‘(gschem selection)’ module.
 
-   Each ‘page’ in gschem has a "selection" associated with it, which is
+   Each ‘page’ in gschem has a “selection” associated with it, which is
 some subset of the ‘page’s contents.  Most actions in gschem operate on
 the currently selected objects.
 
@@ -1627,7 +2056,7 @@ the currently selected objects.
      *Note*: This function does not call ‘deselect-objects-hook’.
 
 
-File: geda-scheme.info,  Node: Hooks,  Next: Miscellanous gschem functions,  Prev: Selections,  Up: gschem API Reference
+File: geda-scheme.info,  Node: Hooks,  Next: Actions,  Prev: Selections,  Up: gschem API Reference
 
 3.4 Hooks
 =========
@@ -1648,9 +2077,14 @@ normally modify their arguments.
 
    For more information on hooks in Guile, *note Hooks: (guile)Hooks.
 
- -- Variable: add-object-hook
+ -- Variable: add-objects-hook
      Called after objects are added to the page, at their initial
      creation.  The argument is a list of the objects being added.
+
+ -- Variable: copy-objects-hook
+     Called after objects are copied, either via *Edit → Copy Mode* or
+     similar, or to buffers, or to the clipboard.  Argument is a list of
+     the objects that were copied.
 
  -- Variable: remove-objects-hook
      Called after objects are removed from the page.  Argument is a list
@@ -1658,7 +2092,7 @@ normally modify their arguments.
 
  -- Variable: move-objects-hook
      Called after objects are moved.  Argument is a list of the objects
-     that were mirrored.
+     that were moved.
 
  -- Variable: mirror-objects-hook
      Called after objects are mirrored.  Argument is a list of the
@@ -1692,13 +2126,158 @@ normally modify their arguments.
  -- Variable: new-page-hook
      Called when a new page is created.  The argument is the new page.
 
-
-File: geda-scheme.info,  Node: Miscellanous gschem functions,  Prev: Hooks,  Up: gschem API Reference
+ -- Variable: action-property-hook
+     Called when an action property is set.  The arguments are the
+     action, the property key and the property value.  *Note Actions::.
 
-3.5 Miscellaneous gschem functions
+     Since 1.10.
+
+ -- Variable: bind-keys-hook
+     Called when a key binding is set or modified.  The arguments are
+     the keymap, the key sequence and the binding’s target.
+
+     *Note*: ‘bind-keys-hook’ may be run multiple times for a single key
+     binding event if the target keymap is bound within a superior
+     keymap.
+
+     Since 1.10.
+
+
+File: geda-scheme.info,  Node: Actions,  Next: Miscellanous gschem functions,  Prev: Hooks,  Up: gschem API Reference
+
+3.5 Actions
+===========
+
+To use the functions described in this section, you will need to load
+the ‘(gschem action)’ module.
+
+3.5.1 Action objects
+--------------------
+
+Usually, it is sufficient to use normal Scheme functions when extending
+gschem.  However, when integrating an extension function with the gschem
+GUI (e.g.  via keybindings), it is often useful to couple a Scheme
+function with metadata such as the label and icon to show in menus, etc.
+
+   You can do this by creating a gschem action.  Actions can be called
+just like a normal Scheme function, but get executed via the gschem
+action dispatcher ‘eval-action!’ rather than being invoked directly.
+Normally, actions have names begining with an ‘&’ symbol.
+
+ -- Macro: define-action (name [keyword value ...]) body
+     Create a new action, bound to the given NAME in the current module.
+     The BODY is a sequence of Scheme expressions which are evaluated in
+     order when the action is invoked.  The following meta-information
+     can be specified for the action by providing pairs of KEYWORDs and
+     VALUEs:
+
+        • ‘#:icon’ sets the name of the icon to be used for the action.
+          This can be either a GTK stock identifier, in which case the
+          GTK stock icon is used, or an icon name in the current icon
+          theme.
+        • ‘#:name’ sets the generic name of the action.  This is
+          displayed as a tooltip for toolbar buttons, and in the hotkey
+          list.  It should be understandable without any context and not
+          contain a mnemonic or ellipsis.
+        • ‘#:label’ sets the generic label of the action.  This is
+          displayed in the context menu.  It should be suitable to be
+          used as a menu label but be understandable without any context
+          and not contain a mnemonic.
+        • ‘#:menu-label’ sets the label for the action when shown in the
+          main menu.  This should be identical to the generic label
+          except for the mnemonic (a character preceded by an underscore
+          for easier keyboard access) and omissions based on the menu
+          name.
+        • ‘#:tooltip’ sets a string explaining the action.  This is
+          displayed as an additional information when the user hovers
+          the mouse cursor over the action.  For tool buttons, it is
+          displayed in addition to the action name.  GTK tends to
+          display tooltips quite aggressively, so use with care.
+
+     Example:
+          (define-action (&report-bug
+                          #:icon       "web-browser"
+                          #:name       "Report Bug"
+                          #:label      "Report Bug..."
+                          #:menu-label "Report _Bug...")
+            (show-uri "http://bugs.launchpad.net/geda/+reportbug"))
+
+     Since 1.10.
+
+ -- Function: make-action thunk [keyword value ...]
+     Create and return a new action wrapping THUNK.  KEYWORD-VALUE pairs
+     specify the meta-information for the action as with
+     ‘define-action’.
+
+     Since 1.10.
+
+ -- Function: action? obj
+     Returns ‘#t’ iff OBJ is a gschem action, and ‘#f’ otherwise.
+
+     Since 1.10.
+
+3.5.2 Evaluating actions
+------------------------
+
+All of gschem’s built-in actions are callable just like normal Scheme
+functions.  However, it’s sometimes useful to explicitly evaluate an
+action in the same way that the gschem GUI (menus, toolbars or
+keybindings) would do so.
+
+ -- Function: eval-action! action
+     Invoke ACTION, returning ‘#t’ on success and raising an error on
+     failure.  There are a number of possible types for ACTION that
+     ‘eval-action!’ will accept:
+
+        • A thunk.
+        • A gschem action.
+        • A symbol naming an action or a thunk in the current module.
+
+     The special symbol ‘repeat-last-command’ is interpreted as a
+     request to repeat the last action evaluated via ‘eval-action!’.
+
+     *Note*: If you have an action object ‘&action’, then the following
+     to calls are equivalent and interchangeable:
+
+          (eval-action! &action)
+          (&action)
+
+     Since 1.10.
+
+3.5.3 Action positions
+----------------------
+
+Often in gschem actions it may be useful not to use the actual current
+mouse pointer position but to use the mouse pointer position that was
+current when the action was invoked.
+
+ -- Function: eval-action-at-point! action [point]
+     Evaluate ACTION at a particular point on the schematic plane.  If
+     POINT is omitted, the action is evaluated at the current mouse
+     pointer position.
+
+     Since 1.10.
+
+ -- Function: action-position
+     Return the current action pointer position, as set when the action
+     was invoked (via ‘eval-action-at-point!’).  This only makes sense
+     to call from inside an action.
+
+     Since 1.10.
+
+   *Note*: The pointer position can only be considered reliable when the
+user was actually clicking on or pointing at the schematic view area to
+invoke the action, rather than on a menu or toolbar button.  At the
+moment this means that an action position is only set when a command is
+invoked by hotkey.
+
+
+File: geda-scheme.info,  Node: Miscellanous gschem functions,  Prev: Actions,  Up: gschem API Reference
+
+3.6 Miscellaneous gschem functions
 ==================================
 
-3.5.1 gschem Attribute Helpers
+3.6.1 gschem Attribute Helpers
 ------------------------------
 
 To use the functions described in this section, you will need to load
@@ -1722,7 +2301,7 @@ the ‘(gschem attrib)’ module.
 
      *Note Text::, *note Attributes:: and *note Windows and views::.
 
-3.5.2 Miscellaneous utility functions
+3.6.2 Miscellaneous utility functions
 -------------------------------------
 
 To use the functions described in this section, you will need to load
@@ -1748,19 +2327,67 @@ Concept Index
  [index ]
 * Menu:
 
-* Attached attribute:                    Attributes.           (line 32)
-* Attribute:                             Attributes.           (line  6)
-* Attribute format:                      Attributes.           (line  6)
-* Component:                             Component objects.    (line  6)
-* Component library:                     Component objects.    (line  6)
-* Embedded component:                    Component objects.    (line  6)
-* Floating attribute:                    Attributes.           (line 39)
-* Objects:                               Objects.              (line  6)
-* Pages:                                 Pages.                (line  6)
-* Reporting bugs:                        Introduction.         (line 49)
-* Schematic elements:                    Objects.              (line  6)
-* Schematics:                            Pages.                (line  6)
-* Symbols:                               Pages.                (line  6)
+* Action evaluation:                     Actions.             (line  77)
+* Action objects:                        Actions.             (line  12)
+* Action positions:                      Actions.             (line 105)
+* Action properties:                     Actions.             (line  12)
+* Actions:                               Actions.             (line   6)
+* Attached attribute:                    Attributes.          (line  32)
+* Attribute:                             Attributes.          (line   6)
+* Attribute format:                      Attributes.          (line   6)
+* Component:                             Component objects.   (line   6)
+* Component library:                     Component objects.   (line   6)
+* Configuration:                         Configuration functions.
+                                                              (line   6)
+* Configuration context:                 Configuration contexts.
+                                                              (line   6)
+* Configuration errors:                  Configuration errors.
+                                                              (line   6)
+* Configuration events:                  Configuration events.
+                                                              (line   6)
+* Configuration group:                   Configuration parameters.
+                                                              (line   6)
+* Configuration key:                     Configuration parameters.
+                                                              (line   6)
+* Configuration notifications:           Configuration events.
+                                                              (line   6)
+* Configuration parameter:               Configuration parameters.
+                                                              (line   6)
+* Configuration trust:                   Configuration contexts.
+                                                              (line 135)
+* Configuration value:                   Configuration parameters.
+                                                              (line   6)
+* Context parent:                        Configuration contexts.
+                                                              (line 110)
+* Context trust:                         Configuration contexts.
+                                                              (line 135)
+* Default configuration contex:          Configuration contexts.
+                                                              (line  22)
+* Embedded component:                    Component objects.   (line   6)
+* Evaluating actions:                    Actions.             (line  77)
+* Floating attribute:                    Attributes.          (line  39)
+* Getting configuration parameters:      Configuration parameters.
+                                                              (line  72)
+* Loading configuration:                 Configuration contexts.
+                                                              (line  75)
+* Objects:                               Objects.             (line   6)
+* Pages:                                 Pages.               (line   6)
+* Parent configuration context:          Configuration contexts.
+                                                              (line 110)
+* Reporting bugs:                        Introduction.        (line  49)
+* Saving configuration:                  Configuration contexts.
+                                                              (line  75)
+* Schematic elements:                    Objects.             (line   6)
+* Schematics:                            Pages.               (line   6)
+* Setting configuration parameters:      Configuration parameters.
+                                                              (line  72)
+* Symbols:                               Pages.               (line   6)
+* System configuration context:          Configuration contexts.
+                                                              (line  22)
+* Trusted configuration context:         Configuration contexts.
+                                                              (line 135)
+* User configuration context:            Configuration contexts.
+                                                              (line  22)
 
 
 File: geda-scheme.info,  Node: Function Index,  Next: Variable Index,  Prev: Concept Index,  Up: Top
@@ -1771,10 +2398,14 @@ Function Index
  [index ]
 * Menu:
 
+* action-position:                       Actions.             (line 116)
+* action?:                               Actions.             (line  69)
 * active-page:                           Windows and views.   (line   9)
 * active-pages:                          Core page functions. (line  14)
 * add-attrib!:                           Miscellanous gschem functions.
                                                               (line  12)
+* add-config-event!:                     Configuration events.
+                                                              (line  24)
 * arc-center:                            Arcs.                (line  31)
 * arc-end-angle:                         Arcs.                (line  40)
 * arc-info:                              Arcs.                (line  26)
@@ -1793,7 +2424,7 @@ Function Index
                                                               (line  28)
 * attribute?:                            Core attribute functions.
                                                               (line  12)
-* bind-keys!:                            Key mapping.         (line 111)
+* bind-keys!:                            Key mapping.         (line 112)
 * box-bottom-right:                      Boxes.               (line  38)
 * box-info:                              Boxes.               (line  28)
 * box-top-left:                          Boxes.               (line  34)
@@ -1805,33 +2436,84 @@ Function Index
 * circle-radius:                         Circles.             (line  36)
 * circle?:                               Circles.             (line  12)
 * close-page!:                           Core page functions. (line  28)
-* component-angle:                       Components.          (line  80)
-* component-append!:                     Components.          (line  94)
-* component-basename:                    Components.          (line  73)
-* component-contents:                    Components.          (line  91)
-* component-info:                        Components.          (line  68)
-* component-locked?:                     Components.          (line  88)
-* component-mirror?:                     Components.          (line  84)
-* component-position:                    Components.          (line  76)
-* component-remove!:                     Components.          (line 101)
+* component-angle:                       Components.          (line  87)
+* component-append!:                     Components.          (line 101)
+* component-basename:                    Components.          (line  80)
+* component-contents:                    Components.          (line  98)
+* component-info:                        Components.          (line  75)
+* component-locked?:                     Components.          (line  95)
+* component-mirror?:                     Components.          (line  91)
+* component-position:                    Components.          (line  83)
+* component-remove!:                     Components.          (line 108)
 * component?:                            Components.          (line  38)
+* config-boolean:                        Configuration parameters.
+                                                              (line  88)
+* config-boolean-list:                   Configuration parameters.
+                                                              (line 108)
+* config-changed?:                       Configuration contexts.
+                                                              (line 101)
+* config-filename:                       Configuration contexts.
+                                                              (line  78)
+* config-groups:                         Configuration parameters.
+                                                              (line  23)
+* config-has-group?:                     Configuration parameters.
+                                                              (line  29)
+* config-has-key?:                       Configuration parameters.
+                                                              (line  41)
+* config-inherited?:                     Configuration parameters.
+                                                              (line  55)
+* config-int:                            Configuration parameters.
+                                                              (line  93)
+* config-int-list:                       Configuration parameters.
+                                                              (line 112)
+* config-keys:                           Configuration parameters.
+                                                              (line  35)
+* config-load!:                          Configuration contexts.
+                                                              (line  85)
+* config-loaded?:                        Configuration contexts.
+                                                              (line  89)
+* config-real:                           Configuration parameters.
+                                                              (line  98)
+* config-real-list:                      Configuration parameters.
+                                                              (line 117)
+* config-save!:                          Configuration contexts.
+                                                              (line  95)
+* config-set!:                           Configuration parameters.
+                                                              (line 122)
+* config-source:                         Configuration parameters.
+                                                              (line  62)
+* config-string:                         Configuration parameters.
+                                                              (line  83)
+* config-string-list:                    Configuration parameters.
+                                                              (line 103)
+* config-trusted-context:                Configuration contexts.
+                                                              (line 165)
+* config-trusted?:                       Configuration contexts.
+                                                              (line 150)
+* context-parent:                        Configuration contexts.
+                                                              (line 116)
 * copy-object:                           General object functions.
                                                               (line   9)
+* default_config_context:                Configuration contexts.
+                                                              (line  38)
+* define-action:                         Actions.             (line  22)
 * deselect-object!:                      Selections.          (line  32)
 * detach-attribs!:                       Core attribute functions.
                                                               (line  61)
-* expand-env-variables:                  System information.  (line  56)
+* eval-action!:                          Actions.             (line  82)
+* eval-action-at-point!:                 Actions.             (line 109)
+* expand-env-variables:                  System information.  (line  64)
 * fold-bounds:                           Object bounds.       (line  19)
 * inherited-attribs:                     Core attribute functions.
                                                               (line  72)
 * key->display-string:                   Key mapping.         (line  32)
 * key->string:                           Key mapping.         (line  28)
 * key?:                                  Key mapping.         (line  18)
-* keymap-bind-key!:                      Key mapping.         (line  83)
-* keymap-for-each:                       Key mapping.         (line  96)
-* keymap-lookup-binding:                 Key mapping.         (line  92)
-* keymap-lookup-key:                     Key mapping.         (line  88)
-* keymap?:                               Key mapping.         (line  77)
+* keymap-bind-key!:                      Key mapping.         (line  84)
+* keymap-for-each:                       Key mapping.         (line  97)
+* keymap-lookup-binding:                 Key mapping.         (line  93)
+* keymap-lookup-key:                     Key mapping.         (line  89)
+* keymap?:                               Key mapping.         (line  78)
 * keys->display-string:                  Key mapping.         (line  68)
 * keys->string:                          Key mapping.         (line  64)
 * keys?:                                 Key mapping.         (line  56)
@@ -1839,8 +2521,10 @@ Function Index
 * line-info:                             Lines.               (line  28)
 * line-start:                            Lines.               (line  37)
 * line?:                                 Lines.               (line  13)
-* lookup-binding:                        Key mapping.         (line 125)
-* lookup-keys:                           Key mapping.         (line 121)
+* log!:                                  Logging functions.   (line   9)
+* lookup-binding:                        Key mapping.         (line 126)
+* lookup-keys:                           Key mapping.         (line 122)
+* make-action:                           Actions.             (line  62)
 * make-arc:                              Arcs.                (line  13)
 * make-box:                              Boxes.               (line  16)
 * make-bus:                              Nets and buses.      (line  27)
@@ -1848,11 +2532,12 @@ Function Index
 * make-circle:                           Circles.             (line  15)
 * make-component:                        Components.          (line  41)
 * make-component/library:                Components.          (line  52)
-* make-keymap:                           Key mapping.         (line  80)
+* make-keymap:                           Key mapping.         (line  81)
 * make-line:                             Lines.               (line  16)
 * make-net:                              Nets and buses.      (line  17)
 * make-net-pin:                          Pins.                (line  24)
 * make-page:                             Core page functions. (line  24)
+* make-path:                             Paths.               (line  28)
 * make-picture/vector:                   Pictures.            (line  24)
 * make-text:                             Text.                (line  23)
 * mirror-objects!:                       Object transformations.
@@ -1869,7 +2554,7 @@ Function Index
                                                               (line  18)
 * object-fill:                           Object fill and stroke.
                                                               (line  51)
-* object-page:                           Core page functions. (line  90)
+* object-page:                           Core page functions. (line  91)
 * object-selected?:                      Selections.          (line  16)
 * object-stroke:                         Object fill and stroke.
                                                               (line   9)
@@ -1883,20 +2568,22 @@ Function Index
 * object-type?:                          Object sub-types.    (line  24)
 * object?:                               General object functions.
                                                               (line   6)
-* page->string:                          Core page functions. (line  54)
-* page-append!:                          Core page functions. (line  67)
-* page-contents:                         Core page functions. (line  63)
-* page-dirty?:                           Core page functions. (line 104)
+* page->string:                          Core page functions. (line  55)
+* page-append!:                          Core page functions. (line  68)
+* page-contents:                         Core page functions. (line  64)
+* page-dirty?:                           Core page functions. (line 105)
 * page-filename:                         Core page functions. (line  35)
-* page-remove!:                          Core page functions. (line  75)
+* page-remove!:                          Core page functions. (line  76)
 * page-selection:                        Selections.          (line  13)
 * page?:                                 Core page functions. (line  11)
 * parse-attrib:                          Core attribute functions.
                                                               (line  19)
-* path-insert!:                          Paths.               (line  46)
-* path-length:                           Paths.               (line  28)
-* path-ref:                              Paths.               (line  31)
-* path-remove!:                          Paths.               (line  42)
+* path-config-context:                   Configuration contexts.
+                                                              (line  22)
+* path-insert!:                          Paths.               (line  52)
+* path-length:                           Paths.               (line  34)
+* path-ref:                              Paths.               (line  37)
+* path-remove!:                          Paths.               (line  48)
 * path?:                                 Paths.               (line  25)
 * picture-angle:                         Pictures.            (line  54)
 * picture-bottom-right:                  Pictures.            (line  50)
@@ -1906,13 +2593,15 @@ Function Index
 * picture-top-left:                      Pictures.            (line  46)
 * picture?:                              Pictures.            (line  21)
 * pin?:                                  Pins.                (line  18)
-* platform:                              System information.  (line  27)
-* platform?:                             System information.  (line  37)
+* platform:                              System information.  (line  35)
+* platform?:                             System information.  (line  45)
 * pointer-position:                      Windows and views.   (line  15)
 * promotable-attribs:                    Core attribute functions.
                                                               (line  83)
 * promote-attribs!:                      Core attribute functions.
                                                               (line  86)
+* remove-config-event!:                  Configuration events.
+                                                              (line  30)
 * rotate-objects!:                       Object transformations.
                                                               (line  12)
 * select-object!:                        Selections.          (line  24)
@@ -1923,14 +2612,19 @@ Function Index
 * set-box!:                              Boxes.               (line  24)
 * set-circle!:                           Circles.             (line  23)
 * set-component!:                        Components.          (line  61)
+* set-component-with-transform!:         Components.          (line  68)
+* set-config-parent!:                    Configuration contexts.
+                                                              (line 121)
+* set-config-trusted!:                   Configuration contexts.
+                                                              (line 155)
 * set-line!:                             Lines.               (line  23)
 * set-object-color!:                     Object color.        (line  14)
 * set-object-fill!:                      Object fill and stroke.
                                                               (line  65)
 * set-object-stroke!:                    Object fill and stroke.
                                                               (line  23)
-* set-page-dirty!:                       Core page functions. (line 108)
-* set-page-filename!:                    Core page functions. (line  38)
+* set-page-dirty!:                       Core page functions. (line 109)
+* set-page-filename!:                    Core page functions. (line  39)
 * set-picture!:                          Pictures.            (line  35)
 * set-text!:                             Text.                (line  62)
 * set-text-string!:                      Text.                (line  97)
@@ -1942,13 +2636,15 @@ Function Index
 * snap-point:                            Windows and views.   (line  20)
 * string->key:                           Key mapping.         (line  21)
 * string->keys:                          Key mapping.         (line  59)
-* string->page:                          Core page functions. (line  47)
-* sys-config-dirs:                       System information.  (line  45)
-* sys-data-dirs:                         System information.  (line  41)
+* string->page:                          Core page functions. (line  48)
+* sys-config-dirs:                       System information.  (line  53)
+* sys-data-dirs:                         System information.  (line  49)
+* system-config-context:                 Configuration contexts.
+                                                              (line  54)
 * text-align:                            Text.                (line  77)
+* text-anchor:                           Text.                (line  74)
 * text-angle:                            Text.                (line  90)
 * text-attribute-mode:                   Text.                (line 111)
-* text-center:                           Text.                (line  74)
 * text-info:                             Text.                (line  67)
 * text-size:                             Text.                (line 101)
 * text-string:                           Text.                (line  94)
@@ -1956,8 +2652,10 @@ Function Index
 * text?:                                 Text.                (line  20)
 * translate-objects!:                    Object transformations.
                                                               (line   8)
-* user-config-dir:                       System information.  (line  52)
-* user-data-dir:                         System information.  (line  49)
+* user-config-context:                   Configuration contexts.
+                                                              (line  65)
+* user-config-dir:                       System information.  (line  60)
+* user-data-dir:                         System information.  (line  57)
 
 
 File: geda-scheme.info,  Node: Variable Index,  Prev: Function Index,  Up: Top
@@ -1968,63 +2666,73 @@ Variable Index
  [index ]
 * Menu:
 
-* add-object-hook:                       Hooks.                (line 22)
-* attach-attribs-hook:                   Hooks.                (line 47)
-* deselect-objects-hook:                 Hooks.                (line 59)
-* detach-attribs-hook:                   Hooks.                (line 51)
-* mirror-objects-hook:                   Hooks.                (line 34)
-* move-objects-hook:                     Hooks.                (line 30)
-* new-page-hook:                         Hooks.                (line 63)
-* paste-objects-hook:                    Hooks.                (line 42)
-* path-separator:                        System information.   (line 24)
-* path-separator-char:                   System information.   (line 20)
-* remove-objects-hook:                   Hooks.                (line 26)
-* rotate-objects-hook:                   Hooks.                (line 38)
-* select-objects-hook:                   Hooks.                (line 55)
-* separator:                             System information.   (line 17)
+* action-property-hook:                  Hooks.                (line 71)
+* add-objects-hook:                      Hooks.                (line 22)
+* attach-attribs-hook:                   Hooks.                (line 52)
+* bind-keys-hook:                        Hooks.                (line 77)
+* copy-objects-hook:                     Hooks.                (line 26)
+* deselect-objects-hook:                 Hooks.                (line 64)
+* detach-attribs-hook:                   Hooks.                (line 56)
+* mirror-objects-hook:                   Hooks.                (line 39)
+* move-objects-hook:                     Hooks.                (line 35)
+* new-page-hook:                         Hooks.                (line 68)
+* paste-objects-hook:                    Hooks.                (line 47)
+* path-separator:                        System information.   (line 32)
+* path-separator-char:                   System information.   (line 28)
+* remove-objects-hook:                   Hooks.                (line 31)
+* rotate-objects-hook:                   Hooks.                (line 43)
+* select-objects-hook:                   Hooks.                (line 60)
+* separator:                             System information.   (line 21)
 * separator-char:                        System information.   (line 13)
 
 
 
 Tag Table:
-Node: Top821
-Node: Introduction1693
-Node: Schematic Document Model4622
-Node: Pages5495
-Node: Objects6856
-Node: Component objects7739
-Node: Attributes9085
-Node: Coordinate system11016
-Node: Core API Reference12023
-Node: Core page functions12484
-Node: Core object functions16414
-Node: General object functions16867
-Node: Object sub-types18194
-Node: Object transformations19014
-Node: Object bounds19895
-Node: Object color20949
-Node: Object fill and stroke21542
-Node: Lines24764
-Node: Nets and buses26649
-Node: Pins27858
-Node: Boxes29412
-Node: Circles30964
-Node: Arcs32396
-Node: Paths34067
-Node: Pictures36492
-Node: Text38885
-Node: Components43287
-Node: Core attribute functions48034
-Node: System information51802
-Node: gschem API Reference53845
-Node: Windows and views54309
-Node: Key mapping55161
-Node: Selections60280
-Node: Hooks61836
-Node: Miscellanous gschem functions64201
-Node: Concept Index65974
-Node: Function Index67084
-Node: Variable Index80707
+Node: Top827
+Node: Introduction1705
+Node: Schematic Document Model4652
+Node: Pages5525
+Node: Objects6886
+Node: Component objects7773
+Node: Attributes9123
+Node: Coordinate system11058
+Node: Core API Reference12073
+Node: Core page functions12584
+Node: Core object functions16552
+Node: General object functions17005
+Node: Object sub-types18332
+Node: Object transformations19152
+Node: Object bounds20033
+Node: Object color21087
+Node: Object fill and stroke21676
+Node: Lines24898
+Node: Nets and buses26783
+Node: Pins27992
+Node: Boxes29554
+Node: Circles31106
+Node: Arcs32538
+Node: Paths34209
+Node: Pictures36900
+Node: Text39302
+Node: Components43706
+Node: Core attribute functions48722
+Node: Configuration functions52503
+Node: Configuration contexts53057
+Node: Configuration parameters59394
+Node: Configuration events63092
+Node: Configuration errors64324
+Node: Logging functions65285
+Node: System information65985
+Node: gschem API Reference68418
+Node: Windows and views68894
+Node: Key mapping69746
+Node: Selections74911
+Node: Hooks76471
+Node: Actions79557
+Node: Miscellanous gschem functions84832
+Node: Concept Index86607
+Node: Function Index91060
+Node: Variable Index109644
 
 End Tag Table
 

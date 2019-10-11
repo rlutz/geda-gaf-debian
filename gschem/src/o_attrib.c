@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,9 +27,11 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
+
+
+#define SPACING_FROM_END       100
+#define SPACING_PERPENDICULAR   50
+
 
 /* No special type for attributes */
 /* You can only edit text attributes */
@@ -49,7 +51,7 @@
  *
  *  \todo get a better name
  */
-void o_attrib_add_selected(GSCHEM_TOPLEVEL *w_current, SELECTION *selection,
+void o_attrib_add_selected(GschemToplevel *w_current, SELECTION *selection,
                            OBJECT *selected)
 {
   OBJECT *a_current;
@@ -84,11 +86,11 @@ void o_attrib_add_selected(GSCHEM_TOPLEVEL *w_current, SELECTION *selection,
  *  from the selection list. If hidden text is being shown, this
  *  function returns immediately.
  *
- *  \param [in]     w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in]     w_current  The GschemToplevel object.
  *  \param [in,out] selection  The SELECTION list to remove from.
  *  \param [in]     object     The OBJECT whose invisible attributes to remove.
  */
-void o_attrib_deselect_invisible (GSCHEM_TOPLEVEL *w_current,
+void o_attrib_deselect_invisible (GschemToplevel *w_current,
                                   SELECTION *selection,
                                   OBJECT *selected)
 {
@@ -105,7 +107,7 @@ void o_attrib_deselect_invisible (GSCHEM_TOPLEVEL *w_current,
        a_iter = g_list_next (a_iter)) {
     a_current = a_iter->data;
 
-    if (a_current->selected && !o_is_visible(w_current->toplevel, a_current)) {
+    if (a_current->selected && !o_is_visible(a_current)) {
       o_selection_remove (w_current->toplevel, selection, a_current);
     }
   }
@@ -118,11 +120,11 @@ void o_attrib_deselect_invisible (GSCHEM_TOPLEVEL *w_current,
  *  to the selection list. If hidden text is being shown, this
  *  function returns immediately.
  *
- *  \param [in]     w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in]     w_current  The GschemToplevel object.
  *  \param [in,out] selection  The SELECTION list to add to.
  *  \param [in]     object     The OBJECT whose invisible attributes to add.
  */
-void o_attrib_select_invisible (GSCHEM_TOPLEVEL *w_current,
+void o_attrib_select_invisible (GschemToplevel *w_current,
                                   SELECTION *selection,
                                   OBJECT *selected)
 {
@@ -139,7 +141,7 @@ void o_attrib_select_invisible (GSCHEM_TOPLEVEL *w_current,
        a_iter = g_list_next (a_iter)) {
     a_current = a_iter->data;
 
-    if (!a_current->selected && !o_is_visible(w_current->toplevel, a_current)) {
+    if (!a_current->selected && !o_is_visible(a_current)) {
       o_selection_add (w_current->toplevel, selection, a_current);
     }
   }
@@ -151,16 +153,16 @@ void o_attrib_select_invisible (GSCHEM_TOPLEVEL *w_current,
  *  object and updates it. The object is erased or redrawn if
  *  necessary.
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current  The GschemToplevel object.
  *  \param [in] object     The attribute object.
  */
-void o_attrib_toggle_visibility(GSCHEM_TOPLEVEL *w_current, OBJECT *object)
+void o_attrib_toggle_visibility(GschemToplevel *w_current, OBJECT *object)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
 
   g_return_if_fail (object != NULL && object->type == OBJ_TEXT);
 
-  if (o_is_visible (toplevel, object)) {
+  if (o_is_visible (object)) {
     /* only erase if we are not showing hidden text */
     if (!toplevel->show_hidden_text) {
       o_invalidate (w_current, object);
@@ -183,8 +185,6 @@ void o_attrib_toggle_visibility(GSCHEM_TOPLEVEL *w_current, OBJECT *object)
     o_set_visibility (toplevel, object, VISIBLE);
     o_text_recreate(toplevel, object);
   }
-
-  toplevel->page_current->CHANGED = 1;
 }
 
 /*! \brief Set what part of an attribute is shown.
@@ -193,22 +193,20 @@ void o_attrib_toggle_visibility(GSCHEM_TOPLEVEL *w_current, OBJECT *object)
  *  attribute is shown by its attribute object. The attribute object
  *  is erased, updated and finally redrawn.
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current  The GschemToplevel object.
  *  \param [in] object     The attribute object.
  *  \param [in] show_name_value  The new display flag for attribute.
  */
-void o_attrib_toggle_show_name_value(GSCHEM_TOPLEVEL *w_current,
+void o_attrib_toggle_show_name_value(GschemToplevel *w_current,
                                      OBJECT *object, int show_name_value)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
 
   g_return_if_fail (object != NULL && object->type == OBJ_TEXT);
 
   o_invalidate (w_current, object);
   object->show_name_value = show_name_value;
   o_text_recreate(toplevel, object);
-
-  toplevel->page_current->CHANGED = 1;
 }
 
 
@@ -219,14 +217,16 @@ void o_attrib_toggle_show_name_value(GSCHEM_TOPLEVEL *w_current,
  */
 /* This function no longer returns NULL, but will always return the new */
 /* text item */
-OBJECT *o_attrib_add_attrib(GSCHEM_TOPLEVEL *w_current,
+OBJECT *o_attrib_add_attrib(GschemToplevel *w_current,
 			    const char *text_string, int visibility, 
 			    int show_name_value, OBJECT *object)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   OBJECT *new_obj;
   int world_x = - 1, world_y = -1;
-  int color; 
+  int align = LOWER_LEFT;
+  int angle = 0;
+  int color;
   int left, right, top, bottom;
   OBJECT *o_current;
 
@@ -242,24 +242,32 @@ OBJECT *o_attrib_add_attrib(GSCHEM_TOPLEVEL *w_current,
       case(OBJ_PLACEHOLDER):
         world_x = o_current->complex->x;
         world_y = o_current->complex->y;
+        align = LOWER_LEFT;
+        angle = 0;
         color = ATTRIBUTE_COLOR;
         break;
 
       case(OBJ_ARC):
         world_x = o_current->arc->x;
         world_y = o_current->arc->y;
+        align = LOWER_LEFT;
+        angle = 0;
         color = ATTRIBUTE_COLOR;
         break;
 
       case(OBJ_CIRCLE):
         world_x = o_current->circle->center_x;
         world_y = o_current->circle->center_y;
+        align = LOWER_LEFT;
+        angle = 0;
         color = ATTRIBUTE_COLOR;
         break;
 
       case(OBJ_BOX):
         world_x = o_current->box->upper_x;
         world_y = o_current->box->upper_y;
+        align = LOWER_LEFT;
+        angle = 0;
         color = ATTRIBUTE_COLOR;
         break;
 
@@ -267,15 +275,60 @@ OBJECT *o_attrib_add_attrib(GSCHEM_TOPLEVEL *w_current,
       case(OBJ_NET):
       case(OBJ_PIN):
       case(OBJ_BUS):
-        world_x = o_current->line->x[0];
-        world_y = o_current->line->y[0];
-        color = ATTRIBUTE_COLOR;
+        {
+          int dx = o_current->line->x[1] - o_current->line->x[0];
+          int dy = o_current->line->y[1] - o_current->line->y[0];
+
+          if (dy == 0) {
+              if (dx > 0) {
+                  world_x = o_current->line->x[0] + SPACING_FROM_END;
+                  world_y = o_current->line->y[0] + SPACING_PERPENDICULAR;
+
+                  align = LOWER_LEFT;
+                  angle = 0;
+              }
+              else {
+                  world_x = o_current->line->x[0] - SPACING_FROM_END;
+                  world_y = o_current->line->y[0] + SPACING_PERPENDICULAR;
+
+                  align = LOWER_RIGHT;
+                  angle = 0;
+              }
+          }
+          else if (dx == 0) {
+              if (dy > 0) {
+                  world_x = o_current->line->x[0] - SPACING_PERPENDICULAR;
+                  world_y = o_current->line->y[0] + SPACING_FROM_END;
+
+                  align = LOWER_LEFT;
+                  angle = 90;
+              }
+              else {
+                  world_x = o_current->line->x[0] - SPACING_PERPENDICULAR;
+                  world_y = o_current->line->y[0] - SPACING_FROM_END;
+
+                  align = LOWER_RIGHT;
+                  angle = 90;
+              }
+          }
+          else {
+              world_x = o_current->line->x[0];
+              world_y = o_current->line->y[0];
+
+              align = LOWER_LEFT;
+              angle = 0;
+          }
+
+          color = ATTRIBUTE_COLOR;
+        }
         break;
 
       case(OBJ_TEXT):
         world_x = o_current->text->x;
         world_y = o_current->text->y;
         color = DETACHED_ATTRIBUTE_COLOR;
+        align = LOWER_LEFT;
+        angle = 0;
         o_current = NULL;
         break;
     }
@@ -289,12 +342,14 @@ OBJECT *o_attrib_add_attrib(GSCHEM_TOPLEVEL *w_current,
     world_y = top;  
 
     /* printf("%d %d\n", world_x, world_y); */
+    align = LOWER_LEFT;
+    angle = 0;
     color = DETACHED_ATTRIBUTE_COLOR;
   }
 
   /* first create text item */
-  new_obj = o_text_new(toplevel, OBJ_TEXT, color, world_x, world_y,
-                       LOWER_LEFT, 0, text_string, /* zero is angle */
+  new_obj = o_text_new(toplevel, color, world_x, world_y,
+                       align, angle, text_string,
                        w_current->text_size, /* current text size */
                        visibility, show_name_value);
   s_page_append (toplevel, toplevel->page_current, new_obj);
@@ -316,8 +371,6 @@ OBJECT *o_attrib_add_attrib(GSCHEM_TOPLEVEL *w_current,
   /* Call add-objects-hook. */
   g_run_hook_object (w_current, "%add-objects-hook", new_obj);
   g_run_hook_object (w_current, "%select-objects-hook", new_obj);
-
-  toplevel->page_current->CHANGED = 1;
 
   return new_obj;
 }

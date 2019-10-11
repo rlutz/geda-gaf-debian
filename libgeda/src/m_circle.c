@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,6 @@
 
 #include "libgeda_priv.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 
 /*! \brief Calculates the distance between the given point and the closest
  * point on the perimeter or interior of the circle.
@@ -57,7 +53,7 @@ double m_circle_shortest_distance (CIRCLE *circle, int x, int y, int solid)
   dx = ((double)x) - ((double)circle->center_x);
   dy = ((double)y) - ((double)circle->center_y);
 
-  distance_to_center = sqrt ((dx * dx) + (dy * dy));
+  distance_to_center = hypot (dx, dy);
 
   if (solid) {
     shortest_distance = max (distance_to_center - circle->radius, 0);

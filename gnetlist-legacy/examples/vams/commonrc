@@ -1,0 +1,6 @@
+(define examples-path (getenv "PWD"))
+
+(component-library (string-append examples-path "/sym"))
+(source-library (string-append examples-path "/sch"))
+
+(display "\nloaded local commonrc\n")

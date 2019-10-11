@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +31,6 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 /***************** Start of Attrib Edit dialog box ********************/
 /*! \section attrib-edit-dialog-box Atrib Edit Dialog Box */
 
@@ -63,9 +59,9 @@ gint option_menu_get_history (GtkOptionMenu *option_menu)
  *  \par Function Documentation
  *
  */
-void attrib_edit_dialog_ok(GtkWidget * w, GSCHEM_TOPLEVEL *w_current)
+void attrib_edit_dialog_ok(GtkWidget * w, GschemToplevel *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   const char *value, *label;
   char *newtext;
   GtkEntry *value_entry, *name_entry;
@@ -83,16 +79,14 @@ void attrib_edit_dialog_ok(GtkWidget * w, GSCHEM_TOPLEVEL *w_current)
   int option_index;
   gint wx, wy;
 
-  i_set_state(w_current, SELECT);
-
   value_entry =
-  gtk_object_get_data(GTK_OBJECT(w_current->aewindow), "value_entry");
+    g_object_get_data (G_OBJECT (w_current->aewindow), "value_entry");
   name_entry =
-  gtk_object_get_data(GTK_OBJECT(w_current->aewindow), "attrib_combo_entry");
+    g_object_get_data (G_OBJECT (w_current->aewindow), "attrib_combo_entry");
   visbutton =
-  gtk_object_get_data(GTK_OBJECT(w_current->aewindow), "visbutton");
+    g_object_get_data (G_OBJECT (w_current->aewindow), "visbutton");
   show_options =
-  gtk_object_get_data(GTK_OBJECT(w_current->aewindow), "show_options");
+    g_object_get_data (G_OBJECT (w_current->aewindow), "show_options");
 
   value = gtk_entry_get_text(value_entry);
   label = gtk_entry_get_text(name_entry);
@@ -130,7 +124,7 @@ void attrib_edit_dialog_ok(GtkWidget * w, GSCHEM_TOPLEVEL *w_current)
   }
 
   attribptr =
-  gtk_object_get_data(GTK_OBJECT(w_current->aewindow), "attrib");
+    g_object_get_data (G_OBJECT (w_current->aewindow), "attrib");
   if (!attribptr) {
     OBJECT *new = NULL;
 
@@ -148,22 +142,19 @@ void attrib_edit_dialog_ok(GtkWidget * w, GSCHEM_TOPLEVEL *w_current)
     }
     s_current = geda_list_get_glist( toplevel->page_current->selection_list );
     if (nsel > 1) {
+      gboolean changed = FALSE;
 
       addtoallbutton =
-        gtk_object_get_data(GTK_OBJECT(w_current->aewindow),
-                            "addtoallbutton");
+        g_object_get_data (G_OBJECT (w_current->aewindow), "addtoallbutton");
 
       addtocompsbutton =
-        gtk_object_get_data(GTK_OBJECT(w_current->aewindow),
-                            "addtocompsbutton");
+        g_object_get_data (G_OBJECT (w_current->aewindow), "addtocompsbutton");
 
       addtonetsbutton =
-        gtk_object_get_data(GTK_OBJECT(w_current->aewindow),
-                            "addtonetsbutton");
+        g_object_get_data (G_OBJECT (w_current->aewindow), "addtonetsbutton");
 
       overwritebutton =
-        gtk_object_get_data(GTK_OBJECT(w_current->aewindow),
-                            "overwritebutton");
+        g_object_get_data (G_OBJECT (w_current->aewindow), "overwritebutton");
 
       if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(overwritebutton))) {
 	replace = 1;
@@ -204,31 +195,39 @@ void attrib_edit_dialog_ok(GtkWidget * w, GSCHEM_TOPLEVEL *w_current)
                   if (!strncmp (str, newtext, strchr (newtext, '=') - newtext)) {
                     o_text_change(w_current, a_current, newtext, vis, show);
                     replaced = TRUE;
-                    toplevel->page_current->CHANGED = 1;
+                    changed = TRUE;
                   }
                 }
                 a_iter = g_list_next (a_iter);
               }
             }
             if (!replaced) {
-              (void) o_attrib_add_attrib(w_current, newtext, vis, show, object);
+              o_attrib_add_attrib(w_current, newtext, vis, show, object);
+              changed = TRUE;
             }
           }
         }
         s_current = g_list_next (s_current);
       }
-      o_undo_savestate(w_current, UNDO_ALL);
+      if (changed) {
+        gschem_toplevel_page_content_changed (w_current,
+                                              toplevel->page_current);
+        o_undo_savestate_old (w_current, UNDO_ALL, NULL);
+      }
+      /* shouldn't be reached */
     } else {
       object = o_select_return_first_object(w_current);
       new = o_attrib_add_attrib(w_current, newtext, vis, show, object);
 
       invocation_flag =
-	GPOINTER_TO_INT( gtk_object_get_data(GTK_OBJECT(w_current->aewindow),
-				  "invocation_flag") );
-      wx = GPOINTER_TO_INT( gtk_object_get_data(GTK_OBJECT(w_current->aewindow),
-						"position_wx"));
-      wy = GPOINTER_TO_INT( gtk_object_get_data(GTK_OBJECT(w_current->aewindow),
-						"position_wy"));
+        GPOINTER_TO_INT (g_object_get_data (G_OBJECT (w_current->aewindow),
+                                            "invocation_flag"));
+      wx =
+        GPOINTER_TO_INT (g_object_get_data (G_OBJECT (w_current->aewindow),
+                                            "position_wx"));
+      wy =
+        GPOINTER_TO_INT (g_object_get_data (G_OBJECT (w_current->aewindow),
+                                            "position_wy"));
       
 #if DEBUG
       printf("invocation flag: %d\n", invocation_flag);
@@ -239,14 +238,14 @@ void attrib_edit_dialog_ok(GtkWidget * w, GSCHEM_TOPLEVEL *w_current)
 	new->text->x = wx;
 	new->text->y = wy;
 	o_text_recreate(toplevel, new);
-	toplevel->page_current->CHANGED = 1;
-	o_undo_savestate(w_current, UNDO_ALL);
       }
+      gschem_toplevel_page_content_changed (w_current, toplevel->page_current);
+      o_undo_savestate_old (w_current, UNDO_ALL, _("Add Attribute"));
     }
   } else {
     o_text_change(w_current, attribptr, newtext, vis, show);
-    toplevel->page_current->CHANGED = 1;
-    o_undo_savestate(w_current, UNDO_ALL);
+    gschem_toplevel_page_content_changed (w_current, toplevel->page_current);
+    o_undo_savestate_old (w_current, UNDO_ALL, _("Edit Attribute"));
   }
   gtk_grab_remove(w_current->aewindow);
   gtk_widget_destroy(w_current->aewindow);
@@ -260,7 +259,7 @@ void attrib_edit_dialog_ok(GtkWidget * w, GSCHEM_TOPLEVEL *w_current)
  *  attribute dialog.
  */
 void attribute_edit_dialog_response(GtkWidget *w, gint response, 
-				 GSCHEM_TOPLEVEL *w_current)
+				 GschemToplevel *w_current)
 {
   switch(response) {
   case GTK_RESPONSE_APPLY:
@@ -268,7 +267,6 @@ void attribute_edit_dialog_response(GtkWidget *w, gint response,
     break;
   case GTK_RESPONSE_REJECT:
   case GTK_RESPONSE_DELETE_EVENT:
-    i_set_state(w_current, SELECT);
     gtk_grab_remove(w_current->aewindow);
     gtk_widget_destroy(w_current->aewindow);
     w_current->aewindow = NULL;
@@ -285,9 +283,9 @@ void attribute_edit_dialog_response(GtkWidget *w, gint response,
  *  \par Function Description
  *  This function creates the single attribute edit dialog.
  */
-void attrib_edit_dialog (GSCHEM_TOPLEVEL *w_current, OBJECT *attr_obj, int flag)
+void attrib_edit_dialog (GschemToplevel *w_current, OBJECT *attr_obj, int flag)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   GtkWidget *aewindow;
   GtkWidget *vbox, *label, *table, *alignment;
   GtkWidget *show_options;
@@ -388,7 +386,7 @@ void attrib_edit_dialog (GSCHEM_TOPLEVEL *w_current, OBJECT *attr_obj, int flag)
   g_object_ref (attrib_combo_entry);
   g_object_set_data_full (G_OBJECT (aewindow),
                          "attrib_combo_entry", attrib_combo_entry,
-                            (GtkDestroyNotify) gtk_widget_unref);
+                            (GtkDestroyNotify) g_object_unref);
 
   /* Value entry */
   label = gtk_label_new (_("Value:"));
@@ -398,9 +396,9 @@ void attrib_edit_dialog (GSCHEM_TOPLEVEL *w_current, OBJECT *attr_obj, int flag)
                     (GtkAttachOptions) (0), 0, 0);
 
   value_entry = gtk_entry_new ();
-  gtk_widget_ref (value_entry);
-  gtk_object_set_data_full (GTK_OBJECT (aewindow), "value_entry", value_entry,
-                            (GtkDestroyNotify) gtk_widget_unref);
+  g_object_ref (value_entry);
+  g_object_set_data_full (G_OBJECT (aewindow), "value_entry", value_entry,
+                          (GtkDestroyNotify) g_object_unref);
   gtk_table_attach (GTK_TABLE (table), value_entry, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
@@ -408,9 +406,9 @@ void attrib_edit_dialog (GSCHEM_TOPLEVEL *w_current, OBJECT *attr_obj, int flag)
 
   /* Visibility */
   visbutton = gtk_check_button_new_with_label (_("Visible"));
-  gtk_widget_ref (visbutton);
-  gtk_object_set_data_full (GTK_OBJECT (aewindow), "visbutton", visbutton,
-                            (GtkDestroyNotify) gtk_widget_unref);
+  g_object_ref (visbutton);
+  g_object_set_data_full (G_OBJECT (aewindow), "visbutton", visbutton,
+                          (GtkDestroyNotify) g_object_unref);
 
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (visbutton), TRUE);
   gtk_table_attach (GTK_TABLE (table), visbutton, 0, 1, 2, 3,
@@ -418,21 +416,20 @@ void attrib_edit_dialog (GSCHEM_TOPLEVEL *w_current, OBJECT *attr_obj, int flag)
                     (GtkAttachOptions) (0), 0, 0);
 
   show_options = gtk_option_menu_new ();
-  gtk_widget_ref (show_options);
-  gtk_object_set_data_full (GTK_OBJECT (aewindow), "show_options",
-                            show_options,
-                            (GtkDestroyNotify) gtk_widget_unref);
+  g_object_ref (show_options);
+  g_object_set_data_full (G_OBJECT (aewindow), "show_options", show_options,
+                          (GtkDestroyNotify) g_object_unref);
   gtk_widget_show (show_options);
   gtk_table_attach (GTK_TABLE (table), show_options, 1, 2, 2, 3,
                     (GtkAttachOptions) (GTK_FILL | GTK_EXPAND),
                     (GtkAttachOptions) (0), 0, 0);
   show_options_menu = gtk_menu_new ();
   glade_menuitem = gtk_menu_item_new_with_label (_("Show Value Only"));
-  gtk_menu_append (GTK_MENU (show_options_menu), glade_menuitem);
+  gtk_menu_shell_append (GTK_MENU_SHELL (show_options_menu), glade_menuitem);
   glade_menuitem = gtk_menu_item_new_with_label (_("Show Name Only"));
-  gtk_menu_append (GTK_MENU (show_options_menu), glade_menuitem);
+  gtk_menu_shell_append (GTK_MENU_SHELL (show_options_menu), glade_menuitem);
   glade_menuitem = gtk_menu_item_new_with_label (_("Show Name & Value"));
-  gtk_menu_append (GTK_MENU (show_options_menu), glade_menuitem);
+  gtk_menu_shell_append (GTK_MENU_SHELL (show_options_menu), glade_menuitem);
   gtk_option_menu_set_menu (GTK_OPTION_MENU (show_options), show_options_menu);
   gtk_option_menu_set_history (GTK_OPTION_MENU (show_options), 0);
   
@@ -454,34 +451,34 @@ void attrib_edit_dialog (GSCHEM_TOPLEVEL *w_current, OBJECT *attr_obj, int flag)
     gtk_container_add (GTK_CONTAINER (alignment), table);
 
     addtoallbutton = gtk_radio_button_new_with_label (hbox2_group, _("All"));
-    hbox2_group = gtk_radio_button_group (GTK_RADIO_BUTTON (addtoallbutton));
-    gtk_widget_ref (addtoallbutton);
-    gtk_object_set_data_full (GTK_OBJECT (aewindow), "addtoallbutton", addtoallbutton,
-                              (GtkDestroyNotify) gtk_widget_unref);
+    hbox2_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (addtoallbutton));
+    g_object_ref (addtoallbutton);
+    g_object_set_data_full (G_OBJECT (aewindow), "addtoallbutton", addtoallbutton,
+                            (GtkDestroyNotify) g_object_unref);
     gtk_table_attach(GTK_TABLE(table), addtoallbutton, 0, 1, 0, 1,
 		     (GtkAttachOptions) (GTK_FILL), 0, 0, 0);
 		     
     addtocompsbutton = gtk_radio_button_new_with_label (hbox2_group, _("Components"));
-    hbox2_group = gtk_radio_button_group (GTK_RADIO_BUTTON (addtocompsbutton));
-    gtk_widget_ref (addtocompsbutton);
-    gtk_object_set_data_full (GTK_OBJECT (aewindow), "addtocompsbutton", addtocompsbutton,
-                              (GtkDestroyNotify) gtk_widget_unref);
+    hbox2_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (addtocompsbutton));
+    g_object_ref (addtocompsbutton);
+    g_object_set_data_full (G_OBJECT (aewindow), "addtocompsbutton", addtocompsbutton,
+                            (GtkDestroyNotify) g_object_unref);
     gtk_table_attach(GTK_TABLE(table), addtocompsbutton, 1, 2, 0, 1,
 		     (GtkAttachOptions) (GTK_FILL), 0, 0, 0);
 
     addtonetsbutton = gtk_radio_button_new_with_label (hbox2_group, _("Nets"));
-    hbox2_group = gtk_radio_button_group (GTK_RADIO_BUTTON (addtonetsbutton));
-    gtk_widget_ref (addtonetsbutton);
-    gtk_object_set_data_full (GTK_OBJECT (aewindow), "addtonetsbutton", addtonetsbutton,
-                              (GtkDestroyNotify) gtk_widget_unref);
+    hbox2_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (addtonetsbutton));
+    g_object_ref (addtonetsbutton);
+    g_object_set_data_full (G_OBJECT (aewindow), "addtonetsbutton", addtonetsbutton,
+                            (GtkDestroyNotify) g_object_unref);
     gtk_table_attach(GTK_TABLE(table), addtonetsbutton, 2, 3, 0, 1,
 		     (GtkAttachOptions) (GTK_FILL), 0, 0, 0);
 
     overwritebutton = gtk_check_button_new_with_label (_("Replace existing attributes"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(overwritebutton), TRUE);
-    gtk_widget_ref (overwritebutton);
-    gtk_object_set_data_full (GTK_OBJECT (aewindow), "overwritebutton", overwritebutton,
-                              (GtkDestroyNotify) gtk_widget_unref);
+    g_object_ref (overwritebutton);
+    g_object_set_data_full (G_OBJECT (aewindow), "overwritebutton", overwritebutton,
+                            (GtkDestroyNotify) g_object_unref);
     gtk_table_attach(GTK_TABLE(table), overwritebutton, 0, 3, 1, 2,
 		     (GtkAttachOptions) (GTK_FILL), 0, 0, 0);
   }
@@ -490,7 +487,7 @@ void attrib_edit_dialog (GSCHEM_TOPLEVEL *w_current, OBJECT *attr_obj, int flag)
   if (attr_obj) {
     o_attrib_get_name_value (attr_obj, &name, &val);
     attrib = attr_obj;
-    if (o_is_visible (toplevel, attrib)) {
+    if (o_is_visible (attrib)) {
       gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(visbutton), TRUE);
     } else {
       gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(visbutton), FALSE);
@@ -517,25 +514,23 @@ void attrib_edit_dialog (GSCHEM_TOPLEVEL *w_current, OBJECT *attr_obj, int flag)
     /* show value only */
     gtk_option_menu_set_history (GTK_OPTION_MENU (show_options), 0);
   }
-  gtk_object_set_data(GTK_OBJECT(aewindow), "attrib", attrib);
+  g_object_set_data (G_OBJECT (aewindow), "attrib", attrib);
   if (name) {
     gtk_entry_set_text(GTK_ENTRY(attrib_combo_entry), name);
   }
   if (val) {
     gtk_entry_set_text(GTK_ENTRY(value_entry), val);
     len = strlen(val);
-    gtk_entry_select_region(GTK_ENTRY(value_entry), 0, len);
+    gtk_editable_select_region (GTK_EDITABLE (value_entry), 0, len);
   }
-  gtk_object_set_data(GTK_OBJECT(aewindow), "invocation_flag",
-                      GINT_TO_POINTER(flag));
+  g_object_set_data (G_OBJECT (aewindow), "invocation_flag",
+                     GINT_TO_POINTER(flag));
 
   if (!x_event_get_pointer_position(w_current, TRUE, &wx, &wy)) {
     wx = wy = -1;
   }
-  gtk_object_set_data(GTK_OBJECT(aewindow), "position_wx",
-                      GINT_TO_POINTER(wx));
-  gtk_object_set_data(GTK_OBJECT(aewindow), "position_wy",
-                      GINT_TO_POINTER(wy));
+  g_object_set_data (G_OBJECT (aewindow), "position_wx", GINT_TO_POINTER(wx));
+  g_object_set_data (G_OBJECT (aewindow), "position_wy", GINT_TO_POINTER(wy));
   
   /* gschem specific */
   i = 0;

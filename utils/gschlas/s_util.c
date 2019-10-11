@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschlas - gEDA Load and Save
  * Copyright (C) 2002-2010 Ales Hvezda
- * Copyright (C) 2002-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 2002-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,16 +30,12 @@
 #include <assert.h>
 #endif
 #ifdef HAVE_UNISTD_H
-#include <unistd.h> 
+#include <unistd.h>
 #endif
 
 #include <libgeda/libgeda.h>
 
 #include "../include/prototype.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 /* If embed_mode is true, then embed all components in all pages, */
 /* otherwise unembed all components in all pages */
@@ -63,14 +59,14 @@ s_util_embed(TOPLEVEL *pr_current, int embed_mode)
 
       if (o_current->type == OBJ_COMPLEX ||
                 o_current->type == OBJ_PICTURE) {
-        if (embed_mode == TRUE) {
-          o_embed(pr_current, o_current);
-        } else {
-          o_unembed(pr_current, o_current);
+        if (embed_mode ? o_embed(pr_current, o_current)
+                       : o_unembed(pr_current, o_current)) {
+          PAGE *page = o_get_page (pr_current, o_current);
+          if (page != NULL)
+            page->CHANGED = 1;
         }
       }
 
     }
   }
 }
-

@@ -1,0 +1,163 @@
+commit 0ab03654668ba723a287c97406e45329ff8e4e3d
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Oct 8 20:21:05 2019 +0200
+
+    Regenerate PO files
+
+commit e54df31f9f124dd4d813315eb2bdb6cc60729a22
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 17:51:35 2019 +0200
+
+    Add missing copyright notices in header files
+
+commit a1bebce61206600770771d451d68c12a735bbe22
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 17:50:47 2019 +0200
+
+    Update copyright years
+
+commit 71b21c6c721e7e730b0c5feb10ca866c19b18d82
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 15:08:35 2019 +0200
+
+    gnetlist-legacy: Update Doxygen main page
+
+commit 4839aad1a7611bdb0b2de77352bfd3e0d2ecd927
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 14:52:43 2019 +0200
+
+    Add `GEDALOG' to manpages
+
+commit 1e84095451714063aab4717001b4bcc93395fc8f
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 14:15:39 2019 +0200
+
+    Add silent rules for HTML generation
+
+commit 6e9c900c781bb24f5d5941bd21480ba13883bb49
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 14:00:50 2019 +0200
+
+    Add silent rules for manpage generation
+
+commit 3e300b07eeea69958233aab244012201efd6c822
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 26 23:33:58 2019 +0200
+
+    gnetlist-legacy: Remove test section "renamed-nets"
+    
+    The concept of "renaming" nets doesn't exist in the current version of
+    gnetlist any more.  The Python version of the `geda' backend doesn't
+    output a "renamed-nets" section, but the Guile version attempts to call
+    "geda:renamed-nets" which fails unless the backend is executed via the
+    gnetlist-legacy binary.
+    
+    Since users tend to use this backend for debugging and experimentation
+    purposes and it's unlikely that the net renaming mechanism will break
+    in an unmaintained codebase without causing other observable problems,
+    simply removing the tests appears to be the best option.
+
+commit e7b72fe4d9d7f3c7ce59922d230efb099c30a5e0
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Oct 8 18:13:57 2019 +0200
+
+    gnetlist-legacy: Fix line breaks in `bom' backend
+
+commit 502f962ab50e769f4485132d3043e7ff0f10d255
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Oct 3 10:59:16 2019 +0200
+
+    Don't use `==' and `!=' on SCM values
+
+commit 987736461bf11fba55b727716d5d4c55581954ba
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 19 15:31:46 2019 +0200
+
+    Redirect test logs so they won't clutter ~/.gEDA/logs/
+
+commit 43fa3b9fbc851d4d3517a6a46ce22c1007bbe698
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 19 12:43:56 2019 +0200
+
+    gnetlist-legacy: Move some options back to "gnetlistrc"
+    
+    Some gnetlist configuration options were previously moved to geda.conf
+    in preparation to a planned configuration system change:
+    
+      unnamed-netname -> default-net-name
+      unnamed-busname -> default-bus-name
+      hierarchy-traversal -> traverse-hierarchy
+      net-naming-priority -> net-naming-priority
+    
+    Move these options back to gnetlistrc in order to be consistent with
+    the remaining options and the current version of gnetlist.
+    
+    This reverts commit 18f64a9810ec99250b45c3a29edae04b080a8a8f.
+
+commit 45cd7d2d2f1c15ac710d4705dba03c310b5a4c74
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Sep 9 14:42:14 2019 +0200
+
+    API documentation: Disable include and call graphs
+    
+    These graphs aren't very helpful and increase both documentation size
+    and generation time.
+
+commit 26f7ea611b0bf8d6d00b588e3760be8b13e3da26
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Jul 18 21:47:23 2019 +0200
+
+    Handle chdir(2) errors appropriately
+    
+    This fixes the "FIXME: What do we do?" compilation warnings.
+
+commit 05bbb630d1da0224dfbb7ab5d55b3b3e9272d398
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@users.sourceforge.net>
+Date:   Sat Dec 6 15:19:56 2014 +0200
+
+    Fix bashisms in some example scripts
+    
+    Closes-bug: debian-772246
+
+commit b1da0804252f8215e020aa512282e86458391947
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Feb 13 20:37:09 2019 +0100
+
+    gschem: Add special actions in VAMS example to menu
+
+commit ad0ed70a7d28a4242f9a303f272eec5b92df0d07
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Feb 13 20:36:23 2019 +0100
+
+    gschem: Update keymap definitions in VAMS example
+
+commit b6f2e09289a3f5660e71350ea17843eb9e89c6b8
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Feb 12 14:37:36 2019 +0100
+
+    gschem: Fix gnetlist-legacy tests for non-VPATH builds
+
+commit c556378fba77644a4398bb06ff8b5e9764d22f57
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Jan 11 18:56:10 2019 +0100
+
+    Remove version control artifacts
+
+commit 3991fcc0fa68f092e40d72f8113650a811e6216e
+Merge: ccea85e64 53ec83330
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Jan 10 17:05:35 2019 +0100
+
+    Merge fixes from master into unstable-1.9
+
+commit e6d2b4c11e7c1fd7a64045ee7792dfb8271db2eb
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 13 15:59:28 2018 +0200
+
+    Fix `make doxygen' for VPATH builds
+
+commit cfc37ce2febcb9a4846d22b803135c07c91c856d
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Sep 11 15:00:14 2018 +0200
+
+    Rename `gnetlist' to `gnetlist-legacy'

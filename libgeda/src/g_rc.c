@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,14 +18,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 /*! \file g_rc.c
- *  \brief Parse configuration files.
+ *  \brief Execute Scheme initialisation files.
  *
- * Contains functions to open, parse and manage gEDA configuration
+ * Contains functions to open, parse and manage Scheme initialisation
  * (RC) files.
  */
 
 #include <config.h>
-#include <missing.h>
 
 #include <errno.h>
 #include <stdio.h>
@@ -42,10 +41,7 @@
 #endif
 
 #include "libgeda_priv.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
+#include "libgedaguile.h"
 
 /*! \todo Finish function documentation!!!
  *  \brief
@@ -99,7 +95,7 @@ SCM g_rc_mode_general(SCM scmmode,
   /* no match? */
   if(index == table_size) {
     fprintf(stderr,
-            "Invalid mode [%s] passed to %s\n",
+            _("Invalid mode [%s] passed to %s\n"),
             mode,
             rc_name);
     ret = SCM_BOOL_F;
@@ -113,14 +109,122 @@ SCM g_rc_mode_general(SCM scmmode,
   return ret;
 }
 
-/*! \brief Load a system configuration file.
+/*! \brief Mark an RC file as loaded.
  * \par Function Description
- * Attempts to load the system configuration file with basename \a
- * rcname.  The string "system-" is prefixed to \a rcname.  If \a
- * rcname is NULL, the default value of "gafrc" is used.
+ * If the Scheme initialisation file \a filename has not already been
+ * loaded, mark it as loaded and return TRUE, storing \a filename in
+ * \a toplevel (\a filename should not subsequently be freed).
+ * Otherwise, return FALSE, and set \a err appropriately.
+ *
+ * \note Should only be called by g_rc_parse_file().
  *
  * \param toplevel  The current #TOPLEVEL structure.
- * \param rcfile    The basename of the configuration file to load, or NULL.
+ * \param filename  The RC file name to test.
+ * \param err       Return location for errors, or NULL.
+ * \return TRUE if \a filename not already loaded, FALSE otherwise.
+ */
+static gboolean
+g_rc_try_mark_read (TOPLEVEL *toplevel, gchar *filename, GError **err)
+{
+  GList *found = NULL;
+  g_return_val_if_fail ((toplevel != NULL), FALSE);
+  g_return_val_if_fail ((filename != NULL), FALSE);
+
+  /* Test if marked read already */
+  found = g_list_find_custom (toplevel->RC_list, filename,
+                              (GCompareFunc) strcmp);
+  if (found != NULL) {
+    g_set_error (err, EDA_ERROR, EDA_ERROR_RC_TWICE,
+                 _("RC file already loaded"));
+    return FALSE;
+  }
+
+  toplevel->RC_list = g_list_append (toplevel->RC_list, filename);
+  /* N.b. don't free name_norm here; it's stored in the TOPLEVEL. */
+  return TRUE;
+}
+
+SCM scheme_rc_config_fluid = SCM_UNDEFINED;
+
+/*! \brief Load an RC file.
+ * \par Function Description
+ * Load and run the Scheme initialisation file \a rcfile, reporting
+ * errors via \a err.
+ *
+ * \param toplevel  The current #TOPLEVEL structure.
+ * \param rcfile    The filename of the RC file to load.
+ * \param cfg       The configuration context to use while loading.
+ * \param err       Return location for errors, or NULL;
+ * \return TRUE on success, FALSE on failure.
+ */
+static gboolean
+g_rc_parse_file (TOPLEVEL *toplevel, const gchar *rcfile,
+                 EdaConfig *cfg, GError **err)
+{
+  gchar *name_norm = NULL;
+  GError *tmp_err = NULL;
+  gboolean status = FALSE;
+  g_return_val_if_fail ((toplevel != NULL), FALSE);
+  g_return_val_if_fail ((rcfile != NULL), FALSE);
+
+  /* If no configuration file was specified, get the default
+   * configuration file for the rc file. */
+  if (cfg == NULL) {
+    cfg = eda_config_get_context_for_path (rcfile);
+  }
+  /* If the configuration wasn't loaded yet, attempt to load
+   * it. Config loading is on a best-effort basis; if we fail, just
+   * print a warning. */
+  if (!eda_config_is_loaded (cfg)) {
+    eda_config_load (cfg, &tmp_err);
+    if (tmp_err != NULL &&
+        !g_error_matches (tmp_err, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+      g_warning (_("Failed to load config from '%s': %s\n"),
+                 eda_config_get_filename (cfg), tmp_err->message);
+    g_clear_error (&tmp_err);
+  }
+
+  /* If the fluid for storing the relevant configuration context for
+   * RC file reading hasn't been created yet, create it. */
+  if (SCM_UNBNDP (scheme_rc_config_fluid))
+    scheme_rc_config_fluid = scm_permanent_object (scm_make_fluid ());
+
+  /* Normalise filename */
+  name_norm = f_normalize_filename (rcfile, err);
+  if (name_norm == NULL) return FALSE;
+
+  /* Attempt to load the RC file, if it hasn't been loaded already.
+   * If g_rc_try_mark_read() succeeds, it stores name_norm in
+   * toplevel, so we *don't* free it. */
+  scm_dynwind_begin (0);
+  scm_dynwind_fluid (scheme_rc_config_fluid, edascm_from_config (cfg));
+  status = (g_rc_try_mark_read (toplevel, name_norm, &tmp_err)
+            && g_read_file (toplevel, name_norm, &tmp_err));
+  scm_dynwind_end ();
+
+  /* refresh the component library in case the script changed it */
+  s_clib_end_update ();
+
+  if (status) {
+    s_log_message (_("Loaded RC file [%s]\n"), name_norm);
+  } else {
+    /* Copy tmp_err into err, with a prefixed message. */
+    g_propagate_prefixed_error (err, tmp_err,
+                                _("Failed to load RC file [%s]: "),
+                                name_norm);
+    g_free (name_norm);
+  }
+  return status;
+}
+
+/*! \brief Load a system RC file.
+ * \par Function Description
+ * Attempts to load and run the system Scheme initialisation file with
+ * basename \a rcname.  The string "system-" is prefixed to \a rcname.
+ * If \a rcname is NULL, the default value of "gafrc" is used.
+ *
+ * \param toplevel  The current #TOPLEVEL structure.
+ * \param rcname    The basename of the RC file to load, or NULL.
  * \param err       Return location for errors, or NULL.
  * \return TRUE on success, FALSE on failure.
  */
@@ -128,50 +232,61 @@ gboolean
 g_rc_parse_system (TOPLEVEL *toplevel, const gchar *rcname, GError **err)
 {
   gchar *sysname = NULL;
-  gboolean status;
+  gchar *rcfile = NULL;
+  gboolean status = TRUE;
 
   /* Default to gafrc */
   rcname = (rcname != NULL) ? rcname : "gafrc";
 
   sysname = g_strdup_printf ("system-%s", rcname);
-  status = g_rc_parse_local (toplevel, sysname, s_path_sys_config (), err);
+  rcfile = g_build_filename (s_path_sys_config (), sysname, NULL);
+  status = g_rc_parse_file (toplevel, rcfile,
+                            eda_config_get_system_context (), err);
+  g_free (rcfile);
   g_free (sysname);
   return status;
 }
 
-/*! \brief Load a user configuration file.
+/*! \brief Load a user RC file.
  * \par Function Description
- * Attempts to load the user configuration file with basename \a
- * rcname.  If \a rcname is NULL, the default value of "gafrc" is
+ * Attempts to load the user Scheme initialisation file with basename
+ * \a rcname.  If \a rcname is NULL, the default value of "gafrc" is
  * used.
  *
  * \param toplevel  The current #TOPLEVEL structure.
- * \param rcfile    The basename of the configuration file to load, or NULL.
+ * \param rcname    The basename of the RC file to load, or NULL.
  * \param err       Return location for errors, or NULL.
  * \return TRUE on success, FALSE on failure.
  */
 gboolean
 g_rc_parse_user (TOPLEVEL *toplevel, const gchar *rcname, GError **err)
 {
+  gchar *rcfile = NULL;
+  gboolean status;
+
   /* Default to gafrc */
   rcname = (rcname != NULL) ? rcname : "gafrc";
 
-  return g_rc_parse_local (toplevel, rcname, s_path_user_config (), err);
+  rcfile = g_build_filename (s_path_user_config (), rcname, NULL);
+  status = g_rc_parse_file (toplevel, rcfile,
+                            eda_config_get_user_context (), err);
+  g_free (rcfile);
+  return status;
 }
 
-/*! \brief Load a local configuration file.
+/*! \brief Load a local RC file.
  * \par Function Description
- * Attempts to load the configuration file with basename \a rcname
- * corresponding to \a path, reporting errors via \a err.  If \a path
- * is a directory, looks for a file named \a rcname in that
+ * Attempts to load the Scheme initialisation file with basename \a
+ * rcname corresponding to \a path, reporting errors via \a err.  If
+ * \a path is a directory, looks for a file named \a rcname in that
  * directory. Otherwise, looks for a file named \a rcname in the same
  * directory as \a path. If \a path is NULL, looks in the current
  * directory. If \a rcname is NULL, the default value of "gafrc" is
  * used.
  *
  * \param toplevel  The current #TOPLEVEL structure.
- * \param rcname    The basename of the configuration file to load, or NULL.
- * \param path      The path to load a configuration file for, or NULL.
+ * \param rcname    The basename of the RC file to load, or NULL.
+ * \param path      The path to load a RC file for, or NULL.
  * \param err       Return location for errors, or NULL.
  * \return TRUE on success, FALSE on failure.
  */
@@ -197,94 +312,11 @@ g_rc_parse_local (TOPLEVEL *toplevel, const gchar *rcname, const gchar *path,
   }
 
   rcfile = g_build_filename (dir, rcname, NULL);
-  status = g_rc_parse_file (toplevel, rcfile, err);
+  status = g_rc_parse_file (toplevel, rcfile, NULL, err);
 
   g_free (dir);
   g_free (rcfile);
   return status;
-}
-
-/*! \brief Mark a configuration file as read.
- * \par Function Description
- * If the config file \a filename has not already been loaded, mark it
- * as loaded and return TRUE, storing \a filename in \a toplevel (\a
- * filename should not subsequently be freed).  Otherwise, return
- * FALSE, and set \a err appropriately.
- *
- * \note Should only be called by g_rc_parse_file().
- *
- * \param toplevel  The current #TOPLEVEL structure.
- * \param filename  The config file name to test.
- * \param err       Return location for errors, or NULL.
- * \return TRUE if \a filename not already loaded, FALSE otherwise.
- */
-static gboolean
-g_rc_try_mark_read (TOPLEVEL *toplevel, gchar *filename, GError **err)
-{
-  GList *found = NULL;
-  g_return_val_if_fail ((toplevel != NULL), FALSE);
-  g_return_val_if_fail ((filename != NULL), FALSE);
-
-  /* Test if marked read already */
-  found = g_list_find_custom (toplevel->RC_list, filename,
-                              (GCompareFunc) strcmp);
-  if (found != NULL) {
-    g_set_error (err, EDA_ERROR, EDA_ERROR_RC_TWICE,
-                 _("Config file already loaded"));
-    return FALSE;
-  }
-
-  toplevel->RC_list = g_list_append (toplevel->RC_list, filename);
-  /* N.b. don't free name_norm here; it's stored in the TOPLEVEL. */
-  return TRUE;
-}
-
-/*! \brief Load a configuration file.
- * \par Function Description
- * Load the configuration file \a rcfile, reporting errors via \a err.
- *
- * \param toplevel  The current #TOPLEVEL structure.
- * \param rcfile    The filename of the configuration file to load.
- * \param err       Return location for errors, or NULL;
- * \return TRUE on success, FALSE on failure.
- */
-gboolean
-g_rc_parse_file (TOPLEVEL *toplevel, const gchar *rcfile, GError **err)
-{
-  gchar *name_norm = NULL;
-  GError *tmp_err = NULL;
-  g_return_val_if_fail ((toplevel != NULL), FALSE);
-  g_return_val_if_fail ((rcfile != NULL), FALSE);
-
-  /* Normalise filename */
-  name_norm = f_normalize_filename (rcfile, &tmp_err);
-  if (name_norm == NULL) goto parse_file_error;
-
-  /* Attempt to load the rc file, if it hasn't been loaded already.
-   * If g_rc_try_mark_read() succeeds, it stores name_norm in
-   * toplevel, so we *don't* free it. */
-  if (g_rc_try_mark_read (toplevel, name_norm, &tmp_err)
-      && g_read_file (toplevel, name_norm, &tmp_err)) {
-    s_log_message (_("Parsed config from [%s]\n"), name_norm);
-    return TRUE;
-  }
-
- parse_file_error:
-  /* Copy tmp_err into err, with a prefixed message. */
-  /*! \todo We should upgrade to GLib >= 2.16 and use
-   * g_propagate_prefixed_error(). */
-  if (err == NULL) {
-    g_error_free (tmp_err);
-  } else {
-    gchar *orig_msg = tmp_err->message;
-    tmp_err->message =
-      g_strdup_printf (_("Unable to parse config from [%s]: %s"),
-                       (name_norm != NULL) ? name_norm : rcfile, orig_msg);
-    g_free (orig_msg);
-    *err = tmp_err;
-  }
-  g_free (name_norm);
-  return FALSE;
 }
 
 static void
@@ -300,7 +332,7 @@ g_rc_parse__process_error (GError **err, const gchar *pname)
     fprintf(stderr, "%s\n", msgl);
 
   } else {
-    /* Config files are allowed to be missing or skipped; check for
+    /* RC files are allowed to be missing or skipped; check for
      * this. */
     if (g_error_matches (*err, G_FILE_ERROR, G_FILE_ERROR_NOENT) ||
         g_error_matches (*err, EDA_ERROR, EDA_ERROR_RC_TWICE)) {
@@ -322,8 +354,9 @@ g_rc_parse__process_error (GError **err, const gchar *pname)
 /*! \brief General RC file parsing function.
  * \par Function Description
  * Calls g_rc_parse_handler() with the default error handler. If any
- * error other than ENOENT occurs while parsing a configuration file,
- * prints an informative message and calls exit(1).
+ * error other than ENOENT occurs while loading or running a Scheme
+ * initialisation file, prints an informative message and calls
+ * exit(1).
  *
  * \bug libgeda shouldn't call exit() - this function calls
  *      g_rc_parse__process_error(), which does.
@@ -334,8 +367,8 @@ g_rc_parse__process_error (GError **err, const gchar *pname)
  *
  * \param [in] toplevel  The current #TOPLEVEL structure.
  * \param [in] pname     The name of the application (usually argv[0]).
- * \param [in] rcname    Config file basename, or NULL.
- * \param [in] rcfile    Specific config file path, or NULL.
+ * \param [in] rcname    RC file basename, or NULL.
+ * \param [in] rcfile    Specific RC file path, or NULL.
  */
 void
 g_rc_parse (TOPLEVEL *toplevel, const gchar *pname,
@@ -348,11 +381,11 @@ g_rc_parse (TOPLEVEL *toplevel, const gchar *pname,
 
 /*! \brief General RC file parsing function.
  * \par Function Description
- * Attempt to load system, user and local (current working directory)
- * configuration files, first with the default "gafrc" basename and
- * then with the basename \a rcname, if \a rcname is not NULL.
- * Additionally, attempt to load configuration from \a rcfile if \a
- * rcfile is not NULL.
+ * Attempt to load and run system, user and local (current working directory)
+ * Scheme initialisation files, first with the default "gafrc"
+ * basename and then with the basename \a rcname, if \a rcname is not
+ * NULL.  Additionally, attempt to load and run \a rcfile
+ * if \a rcfile is not NULL.
  *
  * If an error occurs, calls \a handler with the provided \a user_data
  * and a GError.
@@ -360,9 +393,9 @@ g_rc_parse (TOPLEVEL *toplevel, const gchar *pname,
  * \see g_rc_parse().
  *
  * \param toplevel  The current #TOPLEVEL structure.
- * \param rcname    Config file basename, or NULL.
- * \param rcfile    Specific config file path, or NULL.
- * \param handler   Handler function for config parse errors.
+ * \param rcname    RC file basename, or NULL.
+ * \param rcfile    Specific RC file path, or NULL.
+ * \param handler   Handler function for RC errors.
  * \param user_data Data to be passed to \a handler.
  */
 void
@@ -377,9 +410,9 @@ g_rc_parse_handler (TOPLEVEL *toplevel,
 #endif
 #define HANDLER_DISPATCH \
   do { if (err == NULL) break;  handler (&err, user_data);        \
-       g_error_free (err); err = NULL; } while (0)
+       g_clear_error (&err); } while (0)
 
-  /* Load configuration files in order. */
+  /* Load RC files in order. */
   /* First gafrc files. */
   g_rc_parse_system (toplevel, NULL, &err); HANDLER_DISPATCH;
   g_rc_parse_user (toplevel, NULL, &err); HANDLER_DISPATCH;
@@ -390,9 +423,12 @@ g_rc_parse_handler (TOPLEVEL *toplevel,
     g_rc_parse_user (toplevel, rcname, &err); HANDLER_DISPATCH;
     g_rc_parse_local (toplevel, rcname, NULL, &err); HANDLER_DISPATCH;
   }
-  /* Finally, optional additional config file. */
+  /* Finally, optional additional RC file.  Specifically use the
+   * current working directory's configuration context here, no matter
+   * where the rc file is located on disk. */
   if (rcfile != NULL) {
-    g_rc_parse_file (toplevel, rcfile, &err); HANDLER_DISPATCH;
+    EdaConfig *cwd_cfg = eda_config_get_context_for_file (NULL);
+    g_rc_parse_file (toplevel, rcfile, cwd_cfg, &err); HANDLER_DISPATCH;
   }
 
 #undef HANDLER_DISPATCH
@@ -415,7 +451,7 @@ SCM g_rc_component_library(SCM path, SCM name)
               SCM_ARG1, "component-library");
 
   scm_dynwind_begin (0);
-  if (name != SCM_UNDEFINED) {
+  if (!SCM_UNBNDP (name)) {
     SCM_ASSERT (scm_is_string (name), name,
 		SCM_ARG2, "component-library");
     namestr = scm_to_utf8_string (name);
@@ -431,7 +467,7 @@ SCM g_rc_component_library(SCM path, SCM name)
   /* invalid path? */
   if (!g_file_test (string, G_FILE_TEST_IS_DIR)) {
     fprintf(stderr,
-            "Invalid path [%s] passed to component-library\n",
+            _("Invalid path [%s] passed to component-library\n"),
             string);
     scm_dynwind_end();
     return SCM_BOOL_F;
@@ -463,8 +499,9 @@ SCM g_rc_component_library(SCM path, SCM name)
  *  \param [in] name    Optional descriptive name for component source.
  *  \return SCM_BOOL_T on success, SCM_BOOL_F otherwise.
  */
-SCM g_rc_component_library_command (SCM listcmd, SCM getcmd, 
-                                    SCM name)
+SCM
+g_rc_component_library_command (SCM listcmd, SCM getcmd,
+                                SCM name)
 {
   const CLibSource *src;
   gchar *lcmdstr, *gcmdstr;
@@ -501,7 +538,9 @@ SCM g_rc_component_library_command (SCM listcmd, SCM getcmd,
 
   scm_dynwind_end();
 
-  if (src != NULL) return SCM_BOOL_T;
+  if (src != NULL) {
+    return SCM_BOOL_T;
+  }
 
   return SCM_BOOL_F;
 }
@@ -567,7 +606,7 @@ SCM g_rc_source_library(SCM path)
   /* invalid path? */
   if (!g_file_test (string, G_FILE_TEST_IS_DIR)) {
     fprintf (stderr,
-             "Invalid path [%s] passed to source-library\n",
+             _("Invalid path [%s] passed to source-library\n"),
              string);
     g_free(string);
     return SCM_BOOL_F;
@@ -614,7 +653,7 @@ SCM g_rc_source_library_search(SCM path)
   /* invalid path? */
   if (!g_file_test (string, G_FILE_TEST_IS_DIR)) {
     fprintf (stderr,
-             "Invalid path [%s] passed to source-library-search\n",
+             _("Invalid path [%s] passed to source-library-search\n"),
              string);
     g_free(string);
     return SCM_BOOL_F;
@@ -623,17 +662,26 @@ SCM g_rc_source_library_search(SCM path)
   dir = g_dir_open (string, 0, NULL);
   if (dir == NULL) {
     fprintf (stderr,
-             "Invalid path [%s] passed to source-library-search\n",
+             _("Invalid path [%s] passed to source-library-search\n"),
              string);
     g_free(string);
     return SCM_BOOL_F;
   }
 
   while ((entry = g_dir_read_name (dir))) {
+    /* entry is in the on-disk-encoding; convert to utf8 for testing */
+    gchar *entry_utf8 = g_filename_to_utf8 (entry, -1, NULL, NULL, NULL);
+    if (entry_utf8 == NULL) {
+      fprintf (stderr,
+	       "Failed to convert filename \"%s\" to UTF-8\n",
+	       entry);
+      return SCM_BOOL_F;
+    }
     /* don't do . and .. and special case font */
-    if ((g_strcasecmp (entry, ".")    != 0) && 
-        (g_strcasecmp (entry, "..")   != 0) &&
-        (g_strcasecmp (entry, "font") != 0))
+    if ((strcmp (entry_utf8, ".")  != 0) &&
+        (strcmp (entry_utf8, "..") != 0) &&
+        (g_utf8_collate (g_utf8_casefold (entry_utf8, -1),
+			 g_utf8_casefold ("font", -1)) != 0))
     {
       gchar *fullpath = g_build_filename (string, entry, NULL);
 
@@ -653,6 +701,7 @@ SCM g_rc_source_library_search(SCM path)
       }
       g_free(fullpath);
     }
+    g_free (entry_utf8);
   }
 
   g_free(string);
@@ -692,6 +741,25 @@ g_rc_rc_filename()
   }
 
   return scm_source_property (source, scm_sym_filename);
+}
+
+/*!
+ * \brief Get a configuration context for the current RC file.
+ * \par Function Description
+ * Returns the configuration context applicable to the RC file being
+ * evaluated.  This function is intended to support gEDA transition
+ * from functions in RC files to static configuration files.
+ *
+ * \returns An EdaConfig smob.
+ */
+SCM
+g_rc_rc_config()
+{
+  SCM cfg_s = scm_fluid_ref (scheme_rc_config_fluid);
+  if (!scm_is_false (cfg_s)) return cfg_s;
+
+  EdaConfig *cfg = eda_config_get_context_for_file (NULL);
+  return edascm_from_config (cfg);
 }
 
 /*! \todo Finish function description!!!
@@ -735,29 +803,6 @@ SCM g_rc_world_size(SCM width, SCM height, SCM border)
   return SCM_BOOL_T;
 }
 #undef FUNC_NAME
-
-/*! \todo Finish function description!!!
- *  \brief
- *  \par Function Description
- *
- *  \param [in] name  
- *  \return SCM_BOOL_T always.
- */
-SCM g_rc_untitled_name(SCM name)
-{
-  char *temp;
-  SCM_ASSERT (scm_is_string (name), name,
-              SCM_ARG1, "untitled-name");
-
-  g_free(default_untitled_name);
-
-  temp = scm_to_utf8_string (name);
-  default_untitled_name = g_strdup (temp);
-  free (temp);
-
-  return SCM_BOOL_T;
-}
-
 
 /*! \brief Add a directory to the Guile load path.
  * \par Function Description
@@ -817,7 +862,7 @@ SCM g_rc_bitmap_directory(SCM path)
   /* invalid path? */
   if (!g_file_test (string, G_FILE_TEST_IS_DIR)) {
     fprintf (stderr,
-             "Invalid path [%s] passed to bitmap-directory\n",
+             _("Invalid path [%s] passed to bitmap-directory\n"),
              string);
     g_free(string);
     return SCM_BOOL_F;
@@ -847,31 +892,6 @@ SCM g_rc_bus_ripper_symname(SCM scmsymname)
 
   temp = scm_to_utf8_string (scmsymname);
   default_bus_ripper_symname = g_strdup (temp);
-  free (temp);
-
-  return SCM_BOOL_T;
-}
-
-/*! \todo Finish function description!!!
- *  \brief
- *  \par Function Description
- *
- *  \param [in] scmsymname  
- *  \return SCM_BOOL_T always.
- */
-SCM g_rc_postscript_prolog(SCM scmsymname)
-{
-  char *temp;
-
-  SCM_ASSERT (scm_is_string (scmsymname), scmsymname,
-              SCM_ARG1, "postsript-prolog");
-
-  g_free(default_postscript_prolog);
-
-  /* take care of any shell variables */
-  temp = scm_to_utf8_string (scmsymname);
-  default_postscript_prolog =
-    s_expand_env_variables (temp);
   free (temp);
 
   return SCM_BOOL_T;
@@ -990,14 +1010,14 @@ SCM g_rc_always_promote_attributes(SCM attrlist)
     }
     g_strfreev(attr2);
   } else {
-    SCM_ASSERT(scm_list_p(attrlist), attrlist, SCM_ARG1, "always-promote-attributes");
+    SCM_ASSERT(scm_is_true(scm_list_p(attrlist)), attrlist, SCM_ARG1, "always-promote-attributes");
     length = scm_ilength(attrlist);
     /* convert the scm list into a GList */
     for (i=0; i < length; i++) {
       char *temp;
       SCM_ASSERT(scm_is_string(scm_list_ref(attrlist, scm_from_int(i))), 
 		 scm_list_ref(attrlist, scm_from_int(i)), SCM_ARG1, 
-		 "always-promote-attribute: list element is not a string");
+		 _("always-promote-attribute: list element is not a string"));
       temp = scm_to_utf8_string (scm_list_ref (attrlist, scm_from_int (i)));
       attr = g_strdup(temp);
       free (temp);
@@ -1031,11 +1051,9 @@ SCM g_rc_make_backup_files(SCM mode)
                   2);
 }
 
-extern COLOR print_colors[MAX_COLORS];
-
 SCM g_rc_print_color_map (SCM scm_map)
 {
-  if (scm_map == SCM_UNDEFINED) {
+  if (SCM_UNBNDP (scm_map)) {
     return s_color_map_to_scm (print_colors);
   }
 

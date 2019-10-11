@@ -1,5 +1,5 @@
-<!-- Creator     : groff version 1.22.2 -->
-<!-- CreationDate: Wed Sep 25 22:55:57 2013 -->
+<!-- Creator     : groff version 1.22.3 -->
+<!-- CreationDate: Tue Oct  8 18:33:57 2019 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -48,7 +48,8 @@ gEDA/gaf Symbol Checker</p>
 
 
 <p style="margin-left:11%; margin-top: 1em"><b>gsymcheck</b>
-[&minus;h] [&minus;v] [&minus;q] symbol1 [... symbolN]</p>
+[<b>-h</b>] [<b>-v</b>] [<b>-q</b>] <i>symbol1</i>
+[...<i>symbolN</i>]</p>
 
 <h2>DESCRIPTION
 <a name="DESCRIPTION"></a>
@@ -56,9 +57,9 @@ gEDA/gaf Symbol Checker</p>
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><i>gsymcheck</i>
+<p style="margin-left:11%; margin-top: 1em"><b>gsymcheck</b>
 is a symbol checker for gEDA/gaf. Here is a list of checks
-that <i>gsymcheck</i> performs:</p>
+that <b>gsymcheck</b> performs:</p>
 
 <table width="100%" border="0" rules="none" frame="void"
        cellspacing="0" cellpadding="0">
@@ -174,35 +175,20 @@ number</p> </td></tr>
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><i>gsymcheck</i>
-accepts the following options:</p>
+<p style="margin-left:11%; margin-top: 1em"><b>gsymcheck</b>
+accepts the following options: <b><br>
+-q</b>, <b>--quiet</b></p>
+
+<p style="margin-left:23%;">Quiet mode on. This mode turns
+off all warnings/notes/messages. (optional)</p>
+
+<p style="margin-left:11%;"><b>-v</b>, <b>--verbose</b></p>
+
+<p style="margin-left:23%;">Verbose mode 1. This mode will
+show all error messages (optional)</p>
 
 <table width="100%" border="0" rules="none" frame="void"
        cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="11%"></td>
-<td width="6%">
-
-
-<p style="margin-top: 1em"><b>-q</b></p></td>
-<td width="6%"></td>
-<td width="77%">
-
-
-<p style="margin-top: 1em">Quiet mode on. This mode turns
-off all warnings/notes/messages. (optional)</p></td></tr>
-<tr valign="top" align="left">
-<td width="11%"></td>
-<td width="6%">
-
-
-<p><b>-v</b></p></td>
-<td width="6%"></td>
-<td width="77%">
-
-
-<p>Verbose mode 1. This mode will show all error messages
-(optional)</p> </td></tr>
 <tr valign="top" align="left">
 <td width="11%"></td>
 <td width="6%">
@@ -227,25 +213,20 @@ warning messages (optional)</p></td></tr>
 
 <p>Verbose mode 2. This mode will show all error, warning,
 and info messages (optional)</p></td></tr>
-<tr valign="top" align="left">
-<td width="11%"></td>
-<td width="6%">
-
-
-<p><b>-h</b></p></td>
-<td width="6%"></td>
-<td width="77%">
-
-
-<p>Usage summary / gsymcheck help</p></td></tr>
 </table>
 
-<p style="margin-left:11%;">symbol1 [... symbolN]</p>
+<p style="margin-left:11%;"><b>-h</b>, <b>--help</b></p>
+
+<p style="margin-left:23%;">Usage summary /
+<b>gsymcheck</b> help</p>
+
+<p style="margin-left:11%;"><i>symbol1</i>
+[...<i>symbolN</i>]</p>
 
 <p style="margin-left:23%;">At least one symbol file must
 be specified. If multiple symbols are specified then they
 are sequentially read in and checked. It is important that
-the schematic(s) follow all the options (ie last).</p>
+the schematic(s) follow all the options (i.e. last).</p>
 
 <h2>EXAMPLES
 <a name="EXAMPLES"></a>
@@ -253,7 +234,7 @@ the schematic(s) follow all the options (ie last).</p>
 
 
 <p style="margin-left:11%; margin-top: 1em">Here are some
-examples on how to run <i>gsymcheck</i>:</p>
+examples on how to run <b>gsymcheck</b>:</p>
 
 <p style="margin-left:11%; margin-top: 1em">To get usage
 information just run:</p>
@@ -269,20 +250,20 @@ symbolfilename.sym</p>
 <p style="margin-left:11%; margin-top: 1em">To get the
 actuall error messages, run:</p>
 
-<p style="margin-left:11%; margin-top: 1em">gsymcheck
-&minus;v symbolfilename.sym</p>
+<p style="margin-left:11%; margin-top: 1em">gsymcheck -v
+symbolfilename.sym</p>
 
 <p style="margin-left:11%; margin-top: 1em">To see all the
 error messages and warnings, run:</p>
 
-<p style="margin-left:11%; margin-top: 1em">gsymcheck
-&minus;vv symbolfilename.sym</p>
+<p style="margin-left:11%; margin-top: 1em">gsymcheck -vv
+symbolfilename.sym</p>
 
 <p style="margin-left:11%; margin-top: 1em">To see all the
 error messages, warnings, and parse info, run:</p>
 
-<p style="margin-left:11%; margin-top: 1em">gsymcheck
-&minus;vvv symbolfilename.sym</p>
+<p style="margin-left:11%; margin-top: 1em">gsymcheck -vvv
+symbolfilename.sym</p>
 
 <h2>ENVIRONMENT
 <a name="ENVIRONMENT"></a>
@@ -290,7 +271,7 @@ error messages, warnings, and parse info, run:</p>
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><i>gsymcheck</i>
+<p style="margin-left:11%; margin-top: 1em"><b>gsymcheck</b>
 respects the following environment variable: <b><br>
 GEDADATA</b></p>
 
@@ -299,6 +280,22 @@ required scheme and rc files are located (the default is
 ${prefix}/share/gEDA). This environment variables does not
 need to be set by the end user unless they are moving the
 executables to a new install ${prefix}.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="11%">
+
+
+<p><b>GEDALOG</b></p></td>
+<td width="1%"></td>
+<td width="77%">
+
+
+<p>specifies the directory to which to write log files. The
+default is &rsquo;~/.gEDA/logs&rsquo;.</p></td></tr>
+</table>
 
 <h2>AUTHOR
 <a name="AUTHOR"></a>
@@ -323,10 +320,10 @@ many others</p>
 
 
 <p style="margin-left:11%; margin-top: 1em">Copyright
-&copy; 1999-2008 Ales Hvezda</p>
-
-<p style="margin-left:11%; margin-top: 1em">This document
-can be freely redistributed according to the terms of the
+&copy; 1999-2008 Ales Hvezda <br>
+Copyright &copy; 1999-2019 gEDA Contributors. <br>
+This document can be freely redistributed according to the
+terms of the <br>
 GNU General Public License version 2.0</p>
 <hr>
 </body>

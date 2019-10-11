@@ -1,0 +1,37 @@
+(load "./commonrc")
+(load (string-append examples-path "/../../../gschem/scheme/generate_netlist.scm"))
+
+(define-action (&generate-netlist
+                #:name       "Generate Netlist"
+                #:label      "Generate Netlist"
+                #:menu-label "Generate _Netlist")
+  (generate-netlist))
+
+(define-action (&generate-entity
+                #:name       "Generate Entity"
+                #:label      "Generate Entity"
+                #:menu-label "Generate Entit_y")
+  (generate-entity))
+
+(set! tools-menu
+      (append! tools-menu
+               `((,&generate-netlist
+                  ,&generate-entity))))
+
+(global-set-key "G N" &generate-netlist)
+(global-set-key "G E" &generate-entity)
+
+(attribute-promotion "enabled")
+(promote-invisible "enabled")
+(keep-invisible "enabled")
+(enforce-hierarchy "disabled")
+
+(attribute-name "port_object")
+(attribute-name "port_type")
+(attribute-name "port_mode")
+(attribute-name "entity")
+(attribute-name "architecture")
+
+(define vhdl-path (string-append examples-path "/vhdl/new-vhdl"))
+
+(display "loaded local gschemrc\n")

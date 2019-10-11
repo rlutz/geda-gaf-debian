@@ -1,5 +1,5 @@
-<!-- Creator     : groff version 1.22.2 -->
-<!-- CreationDate: Wed Sep 25 22:56:02 2013 -->
+<!-- Creator     : groff version 1.22.3 -->
+<!-- CreationDate: Tue Oct  8 18:33:59 2019 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -37,17 +37,18 @@
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em">garchive
-&minus; create and extract gEDA design archives</p>
+<p style="margin-left:11%; margin-top: 1em">garchive -
+create and extract gEDA design archives</p>
 
 <h2>SYNOPSIS
 <a name="SYNOPSIS"></a>
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em"><b>garchive
-[</b> <i>options</i> <b>] [-o</b> <i>output_file</i>
-<b>]</b> <i>file</i> <b>...</b></p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>garchive</b>
+[<i>options</i>] [<b>-o</b> <i>output_file</i>] <i>file</i>
+...</p>
 
 <h2>DESCRIPTION
 <a name="DESCRIPTION"></a>
@@ -71,8 +72,8 @@ the default.</p>
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em">&minus;f
-filename</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>-f&nbsp;</b><i>filename</i></p>
 
 <p style="margin-left:22%;">Optional. Used in archive mode.
 Read files to archive from &lt;filename&gt; instead of
@@ -85,7 +86,7 @@ garchiverc.</p>
 <td width="3%">
 
 
-<p>&minus;v</p></td>
+<p><b>-v</b></p></td>
 <td width="8%"></td>
 <td width="76%">
 
@@ -98,7 +99,7 @@ garchiverc.</p>
 <td width="3%">
 
 
-<p>&minus;e</p></td>
+<p><b>-e</b></p></td>
 <td width="8%"></td>
 <td width="76%">
 
@@ -111,7 +112,7 @@ garchiverc.</p>
 <td width="3%">
 
 
-<p>&minus;a</p></td>
+<p><b>-a</b></p></td>
 <td width="8%"></td>
 <td width="76%">
 
@@ -121,13 +122,18 @@ garchiverc.</p>
 </td></tr>
 </table>
 
-<p style="margin-left:11%;">&minus;o outfile</p>
+
+<p style="margin-left:11%;"><b>-o&nbsp;</b><i>outfile</i></p>
 
 <p style="margin-left:22%;">Optional. Used in archive mode.
 Specifies the name of the output archive file. The output
 file extension should be &quot;.tar.gz&quot;. If this flag
 is not specified, the output file name is
 &quot;ProjectArchive.tar.gz&quot;.</p>
+
+<p style="margin-left:11%;"><b>-h</b>, <b>--help</b></p>
+
+<p style="margin-left:22%;">Print usage information.</p>
 
 <h2>EXAMPLES
 <a name="EXAMPLES"></a>
@@ -138,22 +144,22 @@ is not specified, the output file name is
 archive named MyArchive.tar.gz (the files to store listed in
 garchiverc):</p>
 
-<p style="margin-left:22%; margin-top: 1em">garchive
-&minus;o MyArchive.tar.gz</p>
+<p style="margin-left:22%; margin-top: 1em">garchive -o
+MyArchive.tar.gz</p>
 
 <p style="margin-left:11%; margin-top: 1em">Verbosely
 create an archive (archives files listed on cmd line as well
 as those listed in garchiverc):</p>
 
-<p style="margin-left:22%; margin-top: 1em">garchive
-&minus;v &minus;o MyArchive.tar.gz README Schematic1.sch
-Schematic2.sch Schematic3.sch</p>
+<p style="margin-left:22%; margin-top: 1em">garchive -v -o
+MyArchive.tar.gz README Schematic1.sch Schematic2.sch
+Schematic3.sch</p>
 
 <p style="margin-left:11%; margin-top: 1em">Extract an
 archive:</p>
 
-<p style="margin-left:22%; margin-top: 1em">garchive
-&minus;e ProjectArchive.tar.gz</p>
+<p style="margin-left:22%; margin-top: 1em">garchive -e
+ProjectArchive.tar.gz</p>
 
 <h2>AUTHOR
 <a name="AUTHOR"></a>
@@ -177,9 +183,9 @@ archive:</p>
 
 
 <p style="margin-left:11%; margin-top: 1em">Copyright
-&copy; 1999-2011 gEDA Contributors. License GPLv2+: GNU GPL
+&copy; 1999-2019 gEDA Contributors. License GPLv2+: GNU GPL
 <br>
-version 2 or later. Please see the &lsquo;COPYING&rsquo;
+version 2 or later. Please see the &rsquo;COPYING&rsquo;
 file included with this <br>
 program for full details.</p>
 

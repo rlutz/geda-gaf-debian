@@ -1,3 +1,89 @@
+commit 2006f2e8030bdd35fa8c4ad8f401c73db265ee1f
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Sep 25 14:11:10 2019 +0200
+
+    gTAG example: Move netlist/ps regeneration to separate scripts
+
+commit cae3ef0d436285c24baf5aee2e6c96c7281b287c
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Feb 27 17:14:45 2019 +0100
+
+    gTAG example: Fix building un-installed tree
+
+commit 2f4380a2c3534b1a967e6183d8cdcbe3f1e397ef
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Aug 12 17:57:36 2018 +0200
+
+    gTAG example: Regenerate PostScript output
+
+commit e59fd3c067c520355c4e95cb9b20a215bae6b136
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Jan 10 17:26:02 2019 +0100
+
+    gTAG example: Regenerate PCB netlist
+
+commit e703c14ee9522664fe5d2e6c7457c0739f55a540
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Aug 12 17:25:15 2018 +0200
+
+    gTAG example: Re-write Makefile.am
+
+commit b0ac187bc1e66e678288a2219046de0ea4019c19
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Aug 12 16:40:25 2018 +0200
+
+    gTAG example: Fix README file
+
+commit 3b5da1f4e0efe2e51753c6a8bcce8a2f51125474
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Aug 12 17:49:28 2018 +0200
+
+    gTAG example: Fix footprint= attribute conflict
+
+commit bb8cac578b5230558f42537d10824510b8c578eb
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Sep 2 16:18:02 2016 +0300
+
+    gTAG example: Removed duplicated column in BOM netlist.
+
+commit a42b9c40d8059b756e5871a3498a121d83cbf3fb
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Sep 2 16:14:58 2016 +0300
+
+    gTAG example: Fixed attribute promotion.
+    
+    gnetlist doesn't promote attributes attached in symbols these days.
+
+commit 4f876740599210bc8c1b5dfced28f240741963ec
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Sep 2 16:09:21 2016 +0300
+
+    gTAG example: Updated BOM netlist.
+    
+    The netlist has been changed due to changes introduced in commit 1314f9a.
+
+commit fc6533ec1915a8c1a22c230c5e3bacffc0301086
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Aug 12 17:42:58 2018 +0200
+
+    gTAG example: Update BOM netlist (backend change)
+
+commit 57afc7921a9aba3810d56d1760d8e1cd9dbc034b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 23 21:09:11 2016 +0000
+
+    build: Generate an empty ChangeLog when git history unavailable
+    
+    When no git history is available -- for example, when the git
+    repository was cloned using the `--depth` option to limit the amount
+    of git history downloaded -- the changelog-generation rule can fail
+    because the changelog's base git commit (i.e. the 1.0 release tag)
+    isn't available in the repository.
+    
+    This patch makes generation of `ChangeLog` succeed in that situation,
+    by creating an empty log and printing a warning to stderr.  It allows
+    `make dist` and `make distcheck` to pass on shallow clones.
+
 commit f7fab3715f984c374f41d7c2d74fc2802bbb4e7a
 Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
 Date:   Wed Nov 14 22:58:12 2012 +0000
@@ -29,19 +115,19 @@ Date:   Mon Dec 12 14:13:22 2011 +0000
     automake.
 
 commit 502ab80495c45e092eca6052edd6cf8e7ff55429
-Merge: 27f7a52 e1c3ba4
+Merge: 27f7a522a e1c3ba4c4
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Thu Jan 13 19:59:35 2011 +0000
 
     Merge branch 'stable-1.6'
     
     Conflicts:
-    	NEWS
-    	libgeda/include/prototype_priv.h
-    	libgeda/src/gdk-pixbuf-hacks.c
-    	libgeda/src/o_basic.c
-    	libgeda/src/o_complex_basic.c
-    	utils/src/gsch2pcb.c
+            NEWS
+            libgeda/include/prototype_priv.h
+            libgeda/src/gdk-pixbuf-hacks.c
+            libgeda/src/o_basic.c
+            libgeda/src/o_complex_basic.c
+            utils/src/gsch2pcb.c
 
 commit 8a3a0bb070d1b288fceac2fcdd7b317a8f77a464
 Author: Peter TB Brett <peter@peter-b.co.uk>
@@ -206,7 +292,7 @@ Date:   Sat Mar 28 15:22:19 2009 -0400
     Updated all ChangeLogs
     
     Updated the ChangeLogs by running:
-    	./update-changelogs.sh 1.0-20070526..master
+            ./update-changelogs.sh 1.0-20070526..master
     in the toplevel directory
 
 commit 859abe69912ba99ca27bb58c378284e9eec56259

@@ -1,5 +1,5 @@
-<!-- Creator     : groff version 1.22.2 -->
-<!-- CreationDate: Wed Sep 25 22:56:01 2013 -->
+<!-- Creator     : groff version 1.22.3 -->
+<!-- CreationDate: Tue Oct  8 18:33:59 2019 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -37,7 +37,7 @@
 
 
 <p style="margin-left:11%; margin-top: 1em"><b>schdiff</b>
-&minus; Graphical diff tool for schematics</p>
+- Graphical diff tool for schematics</p>
 
 <h2>SYNOPSIS
 <a name="SYNOPSIS"></a>
@@ -66,8 +66,7 @@ are instructions for three:</p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>git:</b> Use
 the <b>difftool</b> command exactly as you would use
-<b>diff</b> , but supply the <b>&minus;x schdiff</b>
-option.</p>
+<b>diff</b> , but supply the <b>-x schdiff</b> option.</p>
 
 
 <p style="margin-left:11%; margin-top: 1em"><b>mercurial:</b>
@@ -93,21 +92,21 @@ Use the <b>diff</b> command like normal, but supply the
 <p style="margin-left:11%; margin-top: 1em">Use git to view
 the changes to a file between two revisions</p>
 
-<p style="margin-left:22%;">git difftool &minus;x schdiff
+<p style="margin-left:22%;">git difftool -x schdiff
 182110f690c51eb53ea1799fd022e87322d742e3
 039e012397f2638d1577dd7c80fb862a5503dbfd cpu.sch</p>
 
 <p style="margin-left:11%;">Use mercurial to see all the
 changes since a specific revision</p>
 
-<p style="margin-left:22%;">hg schdiff &minus;r
-8442880f9835 cpld.sch</p>
+<p style="margin-left:22%;">hg schdiff -r 8442880f9835
+cpld.sch</p>
 
 <p style="margin-left:11%;">Use subversion to review a
 specific revision</p>
 
-<p style="margin-left:22%;">svn diff &minus;&minus;diff-cmd
-schdiff &minus;c 49 power.sch</p>
+<p style="margin-left:22%;">svn diff --diff-cmd schdiff -c
+49 power.sch</p>
 
 <h2>BUGS
 <a name="BUGS"></a>

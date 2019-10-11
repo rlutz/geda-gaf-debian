@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,6 @@
 #endif
 
 #include "libgeda_priv.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 #define MAX_ATTRIBS	128
 
@@ -119,9 +115,10 @@ void s_attrib_free()
   attrib_index=0;
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
+/*! \brief Perform initialization of array of attributes.
  *  \par Function Description
+ *  This function performs initialization of the \a attrib array
+ *  by setting all its members to NULL.
  *
  */
 void s_attrib_init()

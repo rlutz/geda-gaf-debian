@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,6 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 
 /*! \brief Tests a if a given OBJECT was hit at a given set of coordinates
  *
@@ -36,7 +32,7 @@
  *  object is not selectable (e.g. it is locked), or it is invisible and
  *  not being rendered, this function will return FALSE.
  *
- *  \param [in] w_current         The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current         The GschemToplevel object.
  *  \param [in] object            The OBJECT being hit-tested.
  *  \param [in] w_x               The X coordinate to test (in world coords).
  *  \param [in] w_y               The Y coordinate to test (in world coords).
@@ -45,27 +41,30 @@
  *  \returns TRUE if the OBJECT was hit, otherwise FALSE.
  */
 static gboolean
-is_object_hit (GSCHEM_TOPLEVEL *w_current, OBJECT *object,
+is_object_hit (GschemToplevel *w_current, OBJECT *object,
                int w_x, int w_y, int w_slack)
 {
+  int left, top, right, bottom;
+
   if (!object->selectable)
     return FALSE;
 
   /* We can't hit invisible (text) objects unless show_hidden_text is active.
    */
-  if (!o_is_visible (w_current->toplevel, object) &&
-      !w_current->toplevel->show_hidden_text)
+  if (!o_is_visible (object) && !w_current->toplevel->show_hidden_text)
     return FALSE;
 
   /* Do a coarse test first to avoid computing distances for objects ouside
    * of the hit range.
    */
-  if (!inside_region (object->w_left  - w_slack, object->w_top    - w_slack,
-                      object->w_right + w_slack, object->w_bottom + w_slack,
+  if (!world_get_single_object_bounds(w_current->toplevel, object,
+                                      &left, &top, &right, &bottom) ||
+      !inside_region (left  - w_slack, top    - w_slack,
+                      right + w_slack, bottom + w_slack,
                       w_x, w_y))
     return FALSE;
 
-  return (o_shortest_distance (object, w_x, w_y) < w_slack);
+  return (o_shortest_distance (w_current->toplevel, object, w_x, w_y) < w_slack);
 }
 
 
@@ -77,7 +76,7 @@ is_object_hit (GSCHEM_TOPLEVEL *w_current, OBJECT *object,
  *  flag. Saves a pointer to the found object so future find operations
  *  resume after this object.
  *
- *  \param [in] w_current         The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current         The GschemToplevel object.
  *  \param [in] object            The OBJECT being hit-tested.
  *  \param [in] w_x               The X coordinate to test (in world coords).
  *  \param [in] w_y               The Y coordinate to test (in world coords).
@@ -86,7 +85,7 @@ is_object_hit (GSCHEM_TOPLEVEL *w_current, OBJECT *object,
  *  \returns TRUE if the OBJECT was hit, otherwise FALSE.
  */
 static gboolean
-find_single_object (GSCHEM_TOPLEVEL *w_current, OBJECT *object,
+find_single_object (GschemToplevel *w_current, OBJECT *object,
                     int w_x, int w_y, int w_slack,
                     int change_selection)
 {
@@ -117,21 +116,26 @@ find_single_object (GSCHEM_TOPLEVEL *w_current, OBJECT *object,
  *  found, so multiple find operations at the same point will cycle
  *  through any objects on top of each other at this location.
  *
- *  \param [in] w_current         The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current         The GschemToplevel object.
  *  \param [in] w_x               The X coordinate to test (in world coords).
  *  \param [in] w_y               The Y coordinate to test (in world coords).
  *  \param [in] change_selection  Whether to select the found object or not.
  *  \returns TRUE if the object was hit at the given coordinates,
  *           otherwise FALSE.
  */
-gboolean o_find_object (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y,
+gboolean o_find_object (GschemToplevel *w_current, int w_x, int w_y,
                         gboolean change_selection)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_val_if_fail (page_view != NULL, FALSE);
+
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
+  g_return_val_if_fail (toplevel != NULL, FALSE);
+
   int w_slack;
   const GList *iter = NULL;
 
-  w_slack = WORLDabs (w_current, w_current->select_slack_pixels);
+  w_slack = gschem_page_view_WORLDabs (page_view, w_current->select_slack_pixels);
 
   /* Decide whether to iterate over all object or start at the last
      found object. If there is more than one object below the
@@ -171,8 +175,8 @@ gboolean o_find_object (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y,
   /* didn't find anything.... reset lastplace */
   toplevel->page_current->object_lastplace = NULL;
 
-  /* deselect everything only if shift key isn't pressed and 
-     the caller allows it */	
+  /* deselect everything only if shift key isn't pressed and
+     the caller allows it */
   if (change_selection && (!w_current->SHIFTKEY)) {
     o_select_unselect_all (w_current);
   }
@@ -187,10 +191,15 @@ gboolean o_find_object (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y,
  *
  */
 gboolean
-o_find_selected_object (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+o_find_selected_object (GschemToplevel *w_current, int w_x, int w_y)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int w_slack = WORLDabs (w_current, w_current->select_slack_pixels);
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_val_if_fail (page_view != NULL, FALSE);
+
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
+  g_return_val_if_fail (toplevel != NULL, FALSE);
+
+  int w_slack = gschem_page_view_WORLDabs (page_view, w_current->select_slack_pixels);
   GList *s_current;
 
   for (s_current = geda_list_get_glist (toplevel->page_current->selection_list);

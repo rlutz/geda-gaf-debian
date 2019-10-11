@@ -1,0 +1,497 @@
+commit 0ab03654668ba723a287c97406e45329ff8e4e3d
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Oct 8 20:21:05 2019 +0200
+
+    Regenerate PO files
+
+commit a1bebce61206600770771d451d68c12a735bbe22
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 17:50:47 2019 +0200
+
+    Update copyright years
+
+commit 4839aad1a7611bdb0b2de77352bfd3e0d2ecd927
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 14:52:43 2019 +0200
+
+    Add `GEDALOG' to manpages
+
+commit 1e84095451714063aab4717001b4bcc93395fc8f
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 14:15:39 2019 +0200
+
+    Add silent rules for HTML generation
+
+commit 6e9c900c781bb24f5d5941bd21480ba13883bb49
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 14:00:50 2019 +0200
+
+    Add silent rules for manpage generation
+
+commit 5cdd84c91b2a7db0d241e55ce67edf865f5c1806
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Oct 3 00:28:53 2019 +0200
+
+    Add silent rules for `guile-snarf'
+
+commit d7fc8d933c41324d0309a3e9abf36b13347b5fbe
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Oct 3 00:23:56 2019 +0200
+
+    Pass CPPFLAGS to `guile-snarf'
+    
+    This allows running
+      make clean
+      make CPPFLAGS=-DSCM_DEBUG_TYPING_STRICTNESS=2
+      # ...fix errors...
+      make clean
+      make
+    in order to detect SCM typing errors.
+
+commit 9733a8c790ad0cec890ab488a14e74f86bbf6bd5
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Jan 22 15:38:27 2019 +0100
+
+    Remove unnecessary dependencies on version.h
+
+commit 7c6e500fb572da4a753a95150813049cdd664b49
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 23 21:26:11 2016 +0000
+
+    build: Require an external libintl.
+    
+    The version of intl installed in the source tree by autopoint is
+    incompatible with bison 3.0 (which is the most common bison installed
+    on development systems these days).  It's not unreasonable to require
+    either GNU gettext or a GNU gettext internationalization library
+    to be available.
+
+commit 57afc7921a9aba3810d56d1760d8e1cd9dbc034b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 23 21:09:11 2016 +0000
+
+    build: Generate an empty ChangeLog when git history unavailable
+    
+    When no git history is available -- for example, when the git
+    repository was cloned using the `--depth` option to limit the amount
+    of git history downloaded -- the changelog-generation rule can fail
+    because the changelog's base git commit (i.e. the 1.0 release tag)
+    isn't available in the repository.
+    
+    This patch makes generation of `ChangeLog` succeed in that situation,
+    by creating an empty log and printing a warning to stderr.  It allows
+    `make dist` and `make distcheck` to pass on shallow clones.
+
+commit cf60e1d772c2d2b1dc820748b5048cf8381fa289
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Sep 27 15:47:36 2015 +0300
+
+    Automatically update Copyright in man pages.
+
+commit faf4911952a331d647b68a351ea9452d9a9a1caf
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Sep 27 13:34:24 2015 +0300
+
+    Update translation files.
+
+commit f896bc2026d58179813a603509bd93a718e369cb
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Thu Jun 18 09:49:08 2015 +0300
+
+    gaf: More portable invoking the export and config functions.
+    
+    This fix targets MinGW port issues, that is, fixes commands 'gaf export'
+    and 'gaf config' which do not work in the MinGW environment due to
+    non-portable invoking of guile via scm_init_guile().
+
+commit 24fdc58906bba7c51e25f3398a3f14bce964d30f
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Thu Apr 30 15:44:23 2015 +0300
+
+    gaf: Build without readline support under MinGW.
+    
+    Prohibit activating the readline library as it is not supported for
+    MinGW build yet, so invoking 'gaf shell' yields the following error:
+      [scm-error misc-error #f "~A ~S" ("no code for module" (ice-9 readline))
+
+commit fda37d67334d41abdd9988053b11930ea4f30ffe
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Jul 14 22:54:34 2015 +0300
+
+    Replaced non-portable 'date -d' with a portable guile script.
+    
+    Closes-bug: lp-1473456
+
+commit c3b32b8cc9ccc89b2cc2181bb88696d69f539656
+Author: Marco Ciampa <ciampix@libero.it>
+Date:   Sun Dec 28 22:10:46 2014 +0100
+
+    gaf: Added Italian translation
+
+commit aea330a649859b9cf7dc2fcfc18196fcd15e1f4d
+Merge: bf2216272 361fcbd98
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 13 19:11:33 2014 +0000
+
+    Merge branch 'dutch' of https://github.com/bert/geda-gaf.
+
+commit c92a29885637b7230a125adce0ca9721461e1698
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Sat Sep 13 10:19:25 2014 -0700
+
+    Add include directives for locale.h
+
+commit 5ba6269ca2fbf66bfb7cffad9b4f98663c29574c
+Author: bert <bert.timmerman@xs4all.nl>
+Date:   Sun Aug 31 20:26:02 2014 +0200
+
+    Updated the Dutch translation of gaf.
+    
+    Signed-off-by: bert <bert.timmerman@xs4all.nl>
+
+commit 7c7d23ef43ac2ee2221de1ffbabe7fa4f10094c5
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Thu Aug 7 12:37:51 2014 +0400
+
+    gaf: get rid of some unnecessary variables
+
+commit 2fdf87279c15ea3d2d47618e98fb219c321f652e
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Aug 6 23:02:41 2014 +0400
+
+    gaf export: fix cairo svg output
+
+commit 80555db052628b0369fb1c1bcce2087b4fda6d49
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Jun 25 10:57:36 2014 +0400
+
+    gaf shell: output gEDA version to stderr instead of stdout
+    
+    This prevents getting the version info into the data output by user
+    scripts, since the user may afterwards want, for example, to redirect
+    the data to a file.
+
+commit 23ba1b01a598b585b6deae82993aa8f83eb39a4d
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Mar 9 15:45:45 2014 +0400
+
+    gaf: fix formatting of an option in the man page
+
+commit 587592b8fa62553431cfd9f5d37d3eea82a97270
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Mar 8 22:38:00 2014 +0000
+
+    Update translation files.
+
+commit 6c97b1957c127ba086f5ce393834aa1af558e9a8
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sat Mar 8 20:54:27 2014 +0400
+
+    Updated Russian translation
+    
+    The translation has been updated for all tools including changes as
+    follows:
+    - full (new) translation for gattrib
+    - consistent quotes everywhere
+    - changes in copyright headers
+    - notes for translators into Russian
+    - consistent usage output
+    - spelling, rephrasing, formatting, etc.
+
+commit c09583437ec723b7ed1a02451c8a327da483e528
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Jan 26 14:38:47 2014 +0400
+
+    gaf: fix bind_textdomain_codeset
+
+commit 8e09b54ad22c8a76a977bc7ba4aeda7bb9f0f2f7
+Author: Antony Pavlov <antonynpavlov@gmail.com>
+Date:   Wed Nov 20 21:19:04 2013 +0400
+
+    gaf: add missed ChangeLog generation
+    
+    Signed-off-by: Antony Pavlov <antonynpavlov@gmail.com>
+    Signed-off-by: Edward Hennessy <ehennes@sbcglobal.net>
+
+commit 4e2417d23eec6837b71ccca6c46835efdd51020c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Sep 3 21:52:17 2013 +0100
+
+    gschem: Page->Discard considered harmful
+    
+    Page->Discard closes the current page and throws away any unsaved
+    changes without prompting the user.  Get rid of this command entirely
+    -- there is no situation in which you shouldn't use Page->Close
+    instead.
+
+commit 1814f28ac246582fc5f41dc969f5006fcf87683d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Feb 23 18:51:45 2013 +0000
+
+    gaf: Use g_setenv() instead of setenv().
+    
+    Using bare setenv() was causing problems with Windows builds.
+    
+    Reported-by: DJ Delorie <dj@delorie.com>
+
+commit 1abc805a38277e78f918f636e8a6093b795887db
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 15 09:31:09 2012 +0000
+
+    gaf-config: Use new GFile config sys APIs where appropriate.
+
+commit 90657bc3fd95f24e50e53ec8634f038ab3c6ebb5
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Dec 14 15:55:31 2012 +0000
+
+    gaf-config: Handle -p option properly.
+
+commit adfcde051935230593135375da750d1a0cce9691
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 8 09:12:54 2012 +0000
+
+    libgeda: Use GFile to load/save configuration.
+
+commit 3a0fb13c04019f39e8668d5b580a972fc82d77f1
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sat Dec 8 20:55:24 2012 +0000
+
+    gaf: remove null dereference in command line parser.
+    
+    The variable err was dereferenced in one of the error handlers even though
+    it was never set. Remove the dereference, the variable itself and the
+    variant error message that was used in the faulty fprint() command.
+    
+    Coverity-ID: 746988
+
+commit d1777b845a542ea44ad9bfeab881f120f68f4837
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sat Dec 8 20:28:18 2012 +0000
+
+    gaf: parse margins from config into correct settings field
+    
+    Margins in the configuration were being copied into the size field of
+    the settings variable. Put it into the right place.
+    
+    Coverity-ID: 746986
+    Coverity-ID: 746989
+    
+    Closes-bug: lp-1088041
+
+commit 56a8978816550272ed37cbddc03e3e63a205b408
+Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
+Date:   Sat Dec 8 20:17:55 2012 +0000
+
+    gaf: remove redundant call to s_page_objects()
+    
+    In export_draw_page, s_page_objects() is called twice unnecessarily. Remove
+    one of the calls.
+    
+    Coverity-ID: 746990
+
+commit 574e50602151f2584487c535d857e94a1ccb6e1e
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Thu Dec 6 18:58:24 2012 +0000
+
+    gaf: add ":" to the list of option arguments separator
+    
+    The reason for such a change is the fact that the separator ";"
+    is used by shell and should always be quoted for proper operation.
+    
+    Affects-bug: lp-1086522
+
+commit 345f64cfbc30caf29a812954928311daac3a0646
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Thu Dec 6 18:58:23 2012 +0000
+
+    gaf: added the --scale option
+    
+    This option lets users to set a known scale for their titles and symbols
+    when they have to. It can be used, for instance, to keep the same known
+    scale for several schematics or ensure the conformity with standards
+    requiring using definite sizes for titles (e.g. Russian GOST).
+    The argument of the --scale option should be given as the output size
+    corresponding to 100 points in gschem (one default grid spacing), i.e.
+    100 mils by default.
+    
+    Closes-bug: lp-1086522
+
+commit f74515efcd70f0669b5ada908e62b9ef36a29fc7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Dec 4 10:25:23 2012 +0000
+
+    Add built manpages to .gitignore files.
+
+commit 06d228d70301d8a5178b9b979e5e8268b9821f34
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 20:12:32 2012 +0000
+
+    Automatically update man page version/date info.
+
+commit 3aa60eccc95205ee11032978fda8ad8c09d6a12e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Dec 4 00:16:31 2012 +0000
+
+    gaf-export: Make sure messages are translated.
+
+commit 65e52d753f50711152df3b367a89e52313b662ef
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Dec 4 01:58:34 2012 +0400
+
+    Minor fixes for the Russian translation
+
+commit 7852fd6b224e27702167cfd59c339a81bb080f68
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Dec 4 00:59:28 2012 +0400
+
+    Updated the Russian translation
+
+commit 82fd666750511e7a23562aff297625e5546e4e8c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 20:10:39 2012 +0000
+
+    gaf: Update .gitignore file.
+
+commit 222ae70f66062549e2c664be85895dc9a76bc2ff
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 17:57:18 2012 +0000
+
+    Update translation files.
+
+commit 6243f3b4586b7ce0a2d17539444083eed97287e9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 17:45:36 2012 +0000
+
+    Update version numbers for 1.9.0.
+
+commit 88162395541c555467722c95bdbd88ef986b57c9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 16:53:00 2012 +0000
+
+    gaf-export: Add --align option.
+    
+    Add an option to adjust how the drawing is aligned within the page (by
+    default, it's centred vertically and horizontally).
+
+commit 1efce90acb2764b89adf41f110b764147ddf6d86
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 16:29:13 2012 +0000
+
+    gaf-export: Add --font option.
+    
+    Add an option for setting the font family to be used when drawing
+    text.  Suggested by Ed Hennessy.
+
+commit ba22912365a24b12b275fcc4a3476b2937f4cf8b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 11:59:29 2012 +0000
+
+    Update message bugs report address.
+    
+    Closes-bug: lp-1085611
+
+commit 872019e7e969e4387b1d0e6d9ea689c79adb8863
+Author: Sergey Alyoshin <alyoshin.s@gmail.com>
+Date:   Mon Dec 3 11:42:54 2012 +0000
+
+    gaf: Add Russian translation.
+    
+    Closes-bug: lp-1085854
+
+commit 13c7702ea87bb070556620276adfae2299654736
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 11:04:22 2012 +0000
+
+    gaf-export: Correct parsing of distance units.
+
+commit 3e8008a30d545e421a1109dfe7c19baf46892d4e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 10:00:01 2012 +0000
+
+    gaf-export: Correct PNG output.
+
+commit eae1551c0dead14dfc12d5fedd2565c523832dee
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 09:11:25 2012 +0000
+
+    gaf: Properly install manpage.
+
+commit a7650ba7f1abf92564467ea0681c9757a4fd9c5b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 01:07:10 2012 +0000
+
+    gaf: Add manpage.
+
+commit 4c24bc13d2943f3c1466e299594629c82d59aefc
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 00:27:31 2012 +0000
+
+    gaf: Add `gaf export' command.
+
+commit 918f38c0a0799dc9bff5b1f715cb896f7e56ceac
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 1 21:32:40 2012 +0000
+
+    gaf-config: Don't warn if config file doesn't exist.
+    
+    It's valid for config files to not exist (ideally the defaults should
+    be good enough for everybody).
+
+commit 98f4463305061f6f10140446a9c22e2acf73f859
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 1 21:32:54 2012 +0000
+
+    libgeda: eda_config_get_context_for_path() should always succeed.
+    
+    If it's possible for the configuration system to fail to return a
+    context for a path then using the API can be hasslesome.  We maybe
+    should change how the configuration filename for bogus paths is
+    chosen, and probably add some warning messages, but it makes sense for
+    eda_config_get_context_for_path() to always return a configuration
+    context of some description.
+
+commit ab1efdb1488b9a61afeb894bdceef73e4a6a71bd
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 1 21:32:26 2012 +0000
+
+    gaf: Add `gaf config' command.
+
+commit ed66b132d5e443e02d0da0e91370370ef13a3b18
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Dec 1 17:02:38 2012 +0100
+
+    gaf: starting the Dutch translation.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit e5c37d05553e7fa2126ea6e6cea645e8aa8d57cf
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 26 17:16:33 2012 +0000
+
+    gaf: Correct subcommand argument processing.
+    
+    The main wrapper program needs to reset optind before invoking the
+    subcommand, so that subcommands can correctly process subcommand
+    arguments with getopt.
+
+commit 9d7f9101831f135121a9744bcb2f3931f386e91d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 26 17:04:45 2012 +0000
+
+    gaf: Fix gettext build rules.
+
+commit 7ee47a3854d2a8831d3827f669a73bea72634939
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 26 14:06:29 2012 +0000
+
+    gaf: Add translations.
+
+commit 4ac55147880a8d49b19dca2b472ff392d0067b02
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 26 14:06:29 2012 +0000
+
+    Add `gaf' program.
+    
+    Add a utility program to wrap various command-line tools, called
+    `gaf'.  At the moment, it supports exactly one sub-command, `gaf
+    shell'.

@@ -2,7 +2,6 @@
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-  <title></title>
   <link rel="stylesheet" media="screen" type="text/css" href="./style.css" />
   <link rel="stylesheet" media="screen" type="text/css" href="./design.css" />
   <link rel="stylesheet" media="print" type="text/css" href="./print.css" />
@@ -11,23 +10,28 @@
 </head>
 <body>
 
+<p>
+<em>Autres langues: <a href="geda-pcb-quick_reference.html" class="wikilink1" title="geda-pcb-quick_reference.html">English</a> <a href="geda-pcb-quick_reference.ru.html" class="wikilink1" title="geda-pcb-quick_reference.ru.html">Русский</a></em>
+</p>
 
-<h1 class="sectionedit830"><a name="pcbreference_rapide" id="pcbreference_rapide">PCB: Référence Rapide</a></h1>
+<h1 id="pcbréférencerapide">PCB: Référence Rapide</h1>
 <div class="level1">
 
 </div>
-<!-- EDIT830 SECTION "PCB: Référence Rapide" [1-39] -->
-<h2 class="sectionedit831"><a name="disposition_des_touches" id="disposition_des_touches">Disposition des Touches</a></h2>
+
+<h2 id="dispositiondestouches">Disposition des Touches</h2>
 <div class="level2">
 
 </div>
-<!-- EDIT831 SECTION "Disposition des Touches" [40-76] -->
-<h3 class="sectionedit832"><a name="table_des_touches_pcb" id="table_des_touches_pcb">Table des Touches PCB</a></h3>
+
+<h3 id="tabledestouchespcb">Table des Touches PCB</h3>
 <div class="level3">
-<div class="table sectionedit833"><table class="inline">
+<div class="table sectionedit1"><table class="inline">
+	<thead>
 	<tr class="row0">
 		<th class="col0 centeralign">  TOUCHE	</th><th class="col1 leftalign"> MNEMONIQUE	</th><th class="col2 centeralign">  DESCRIPTION  </th>
 	</tr>
+	</thead>
 	<tr class="row1">
 		<td class="col0 centeralign">  esc		</td><td class="col1 leftalign"> panner	</td><td class="col2"> enter panning mode </td>
 	</tr>
@@ -197,15 +201,17 @@
 		<td class="col0 centeralign">  F12		</td><td class="col1 leftalign"> lock		</td><td class="col2"> entrer dans le mode lock </td>
 	</tr>
 </table></div>
-<!-- EDIT833 TABLE [110-3776] -->
+<!-- EDIT1 TABLE [204-3867] -->
 </div>
-<!-- EDIT832 SECTION "Table des Touches PCB" [77-3777] -->
-<h2 class="sectionedit834"><a name="touches_de_visualisation" id="touches_de_visualisation">Touches de Visualisation</a></h2>
+
+<h2 id="touchesdevisualisation">Touches de Visualisation</h2>
 <div class="level2">
-<div class="table sectionedit835"><table class="inline">
+<div class="table sectionedit2"><table class="inline">
+	<thead>
 	<tr class="row0">
 		<th class="col0 centeralign">  TOUCHE  </th><th class="col1 centeralign">  MNEMONIC  </th><th class="col2 centeralign">  DESCRIPTION  </th>
 	</tr>
+	</thead>
 	<tr class="row1">
 		<td class="col0 centeralign">  esc  </td><td class="col1 centeralign">  panner  </td><td class="col2 leftalign">  </td>
 	</tr>
@@ -231,19 +237,19 @@
 		<td class="col0 centeralign">  shift-b  </td><td class="col1 centeralign">  flip view  </td><td class="col2">retournement carte</td>
 	</tr>
 </table></div>
-<!-- EDIT835 TABLE [3816-4193] -->
+<!-- EDIT2 TABLE [3907-4282] -->
 </div>
-<!-- EDIT834 SECTION "Touches de Visualisation" [3778-4194] -->
-<h1 class="sectionedit836"><a name="reference_d_empreintes" id="reference_d_empreintes">Référence d&#039;Empreintes</a></h1>
+
+<h1 id="référencedempreintes">Référence d&#039;Empreintes</h1>
 <div class="level1">
 
 <p>
-Le document maître pour la création d&#039;empreintes est le <a href="http://pcb.geda-project.org/index.html#dir" class="urlextern" title="http://pcb.geda-project.org/index.html#dir"  rel="nofollow">PCB Manual</a>. Il y a aussi le <a href="http://www.brorson.com/gEDA/land_patterns_20050129.pdf" class="urlextern" title="http://www.brorson.com/gEDA/land_patterns_20050129.pdf"  rel="nofollow">Footprint Creation for the Open-Source Layout Program PCB</a> de Stuart Brorson.
+Le document maître pour la création d&#039;empreintes est le PCB Manual. Il y a aussi le Footprint Creation for the Open-Source Layout Program PCB de Stuart Brorson.
 </p>
 
 </div>
-<!-- EDIT836 SECTION "Référence d'Empreintes" [4195-4504] -->
-<h2 class="sectionedit837"><a name="syntaxe_generale" id="syntaxe_generale">Syntaxe Générale</a></h2>
+
+<h2 id="syntaxegénérale">Syntaxe Générale</h2>
 <div class="level2">
 
 <p>
@@ -265,17 +271,19 @@ Un fichier d&#039;empreinte pcb peut contenir une des commandes suivantes:
 </ul>
 
 </div>
-<!-- EDIT837 SECTION "Syntaxe Générale" [4505-5145] -->
-<h2 class="sectionedit838"><a name="elements" id="elements">Éléments</a></h2>
+
+<h2 id="éléments">Éléments</h2>
 <div class="level2">
 
 <p>
 <strong><code>Element [element_flags, description, pcb-name, value, mark_x, mark_y, text_x, text_y, text_direction, text_scale, text_flags]</code></strong>
 </p>
-<div class="table sectionedit839"><table class="inline">
+<div class="table sectionedit3"><table class="inline">
+	<thead>
 	<tr class="row0">
 		<th class="col0 centeralign">  item  </th><th class="col1 centeralign">  allowed value  </th><th class="col2 centeralign">  explanation  </th><th class="col3 centeralign">  comment  </th>
 	</tr>
+	</thead>
 	<tr class="row1">
 		<td class="col0 centeralign">  element_flags  </td><td class="col1 centeralign">  unsigned hex value  </td><td class="col2 leftalign">  </td><td class="col3 leftalign">  </td>
 	</tr>
@@ -310,19 +318,21 @@ Un fichier d&#039;empreinte pcb peut contenir une des commandes suivantes:
 		<td class="col0 centeralign">  text_flags  </td><td class="col1 centeralign">  unsigned hex  </td><td class="col2 leftalign">  </td><td class="col3 leftalign">  </td>
 	</tr>
 </table></div>
-<!-- EDIT839 TABLE [5304-5981] -->
+<!-- EDIT3 TABLE [5393-6070] -->
 </div>
-<!-- EDIT838 SECTION "Éléments" [5146-5982] -->
-<h2 class="sectionedit840"><a name="pastilles" id="pastilles">Pastilles</a></h2>
+
+<h2 id="pastilles">Pastilles</h2>
 <div class="level2">
 
 <p>
 <strong><code>Pad[x1 y1 x2 y2 thickness clearance mask name pad_number flags]</code></strong>
 </p>
-<div class="table sectionedit841"><table class="inline">
+<div class="table sectionedit4"><table class="inline">
+	<thead>
 	<tr class="row0">
 		<th class="col0 centeralign">  Item  </th><th class="col1 centeralign">  Allowed Value  </th><th class="col2 centeralign">  Explanation  </th><th class="col3 centeralign">  Comment  </th>
 	</tr>
+	</thead>
 	<tr class="row1">
 		<td class="col0 centeralign">  x1  </td><td class="col1 centeralign">  1/100th mils  </td><td class="col2 centeralign">  x(1st point)  </td><td class="col3 leftalign">  </td>
 	</tr>
@@ -354,19 +364,21 @@ Un fichier d&#039;empreinte pcb peut contenir une des commandes suivantes:
 		<td class="col0 centeralign">  flags  </td><td class="col1 centeralign">  hex value  </td><td class="col2 centeralign">  xxx  </td><td class="col3 leftalign">  </td>
 	</tr>
 </table></div>
-<!-- EDIT841 TABLE [6078-6937] -->
+<!-- EDIT4 TABLE [6167-7026] -->
 </div>
-<!-- EDIT840 SECTION "Pastilles" [5983-6938] -->
-<h2 class="sectionedit842"><a name="broches" id="broches">Broches</a></h2>
+
+<h2 id="broches">Broches</h2>
 <div class="level2">
 
 <p>
 <strong><code>Pin[x y thickness clearance mask drillholedia name number flags]</code></strong>
 </p>
-<div class="table sectionedit843"><table class="inline">
+<div class="table sectionedit5"><table class="inline">
+	<thead>
 	<tr class="row0">
 		<th class="col0 centeralign">  Item  </th><th class="col1 leftalign"> Allowed Value  </th><th class="col2 centeralign">  Explanation  </th><th class="col3 centeralign">  Comment  </th>
 	</tr>
+	</thead>
 	<tr class="row1">
 		<td class="col0 centeralign">  x  </td><td class="col1 centeralign">  1/100th mils  </td><td class="col2 centeralign">  pin x coord.  </td><td class="col3 leftalign">  </td>
 	</tr>
@@ -395,10 +407,10 @@ Un fichier d&#039;empreinte pcb peut contenir une des commandes suivantes:
 		<td class="col0 centeralign">  flags  </td><td class="col1 centeralign">  hex  </td><td class="col2 centeralign">  xxx  </td><td class="col3 leftalign">  </td>
 	</tr>
 </table></div>
-<!-- EDIT843 TABLE [7033-7639] -->
+<!-- EDIT5 TABLE [7122-7728] -->
 </div>
-<!-- EDIT842 SECTION "Broches" [6939-7640] -->
-<h2 class="sectionedit844"><a name="exemples" id="exemples">Exemples</a></h2>
+
+<h2 id="exemples">Exemples</h2>
 <div class="level2">
 <ul>
 <li class="level1"><div class="li"> <strong><code>Pad[-24606 14760 -19538 14760 1181 2000 3181 “” “16” “square”]</code></strong></div>
@@ -416,5 +428,5 @@ Un fichier d&#039;empreinte pcb peut contenir une des commandes suivantes:
 </ul>
 
 </div>
-<!-- EDIT844 SECTION "Exemples" [7641-] --></body>
+</body>
 </html>

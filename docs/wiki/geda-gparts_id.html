@@ -2,7 +2,6 @@
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-  <title></title>
   <link rel="stylesheet" media="screen" type="text/css" href="./style.css" />
   <link rel="stylesheet" media="screen" type="text/css" href="./design.css" />
   <link rel="stylesheet" media="print" type="text/css" href="./print.css" />
@@ -11,6 +10,9 @@
 </head>
 <body>
 
+<p>
+<a href="start.html" class="wikilink1" title="start.html">gEDA</a> &gt;&gt; <a href="geda-developer.html" class="wikilink1" title="geda-developer.html">Development</a> &gt;&gt; <a href="geda-gparts_tc.html" class="wikilink1" title="geda-gparts_tc.html">Parts Manager</a> &gt;&gt; <a href="geda-gparts_id.html" class="wikilink1" title="geda-gparts_id.html">Implementation Details</a>
+</p>
 
 <p>
 This page covers the implementation details of a parts manager for gEDA. Please submit feedback to the geda-dev or geda-user mailing lists.
@@ -20,45 +22,45 @@ This page covers the implementation details of a parts manager for gEDA. Please 
 For design details, see <a href="geda-gparts_dd.html" class="wikilink1" title="geda-gparts_dd.html">gparts_dd</a>.
 </p>
 
-<h1 class="sectionedit2135"><a name="packages" id="packages">Packages</a></h1>
+<h1 id="packages">Packages</h1>
 <div class="level1">
 
 <p>
-The following diagram shows the package dependencies – cycles removed – within the part manager.
+The following diagram shows the package dependencies -- cycles removed -- within the part manager.
 </p>
 
 <p>
-<a href="media/geda/gparts_pkg_2.png" class="media" target="_blank" title="geda:gparts_pkg_2.png"><img src="media/geda/gparts_pkg_2.png" class="media" title="" alt="" /></a>
+<a href="media/geda/gparts_pkg_2.png" class="media" target="_blank" title="geda:gparts_pkg_2.png"></a>
 </p>
 
 </div>
-<!-- EDIT2135 SECTION "Packages" [182-332] -->
-<h2 class="sectionedit2136"><a name="geometry_package" id="geometry_package">Geometry Package</a></h2>
+
+<h2 id="geometrypackage">Geometry Package</h2>
 <div class="level2">
 
 <p>
-<a href="media/geda/gparts_pkg_geom.png" class="media" target="_blank" title="geda:gparts_pkg_geom.png"><img src="media/geda/gparts_pkg_geom.png" class="media" title="" alt="" /></a>
+<a href="media/geda/gparts_pkg_geom.png" class="media" target="_blank" title="geda:gparts_pkg_geom.png"></a>
 </p>
 
 </div>
-<!-- EDIT2136 SECTION "Geometry Package" [333-393] -->
-<h2 class="sectionedit2137"><a name="schematic_package" id="schematic_package">Schematic Package</a></h2>
+
+<h2 id="schematicpackage">Schematic Package</h2>
 <div class="level2">
 
 <p>
-<a href="media/geda/gparts_pkg_sch.png" class="media" target="_blank" title="geda:gparts_pkg_sch.png"><img src="media/geda/gparts_pkg_sch.png" class="media" title="" alt="" /></a>
+<a href="media/geda/gparts_pkg_sch.png" class="media" target="_blank" title="geda:gparts_pkg_sch.png"></a>
 </p>
 
 </div>
-<!-- EDIT2137 SECTION "Schematic Package" [394-454] -->
-<h2 class="sectionedit2138"><a name="schematic_gui_package" id="schematic_gui_package">Schematic GUI Package</a></h2>
+
+<h2 id="schematicguipackage">Schematic GUI Package</h2>
 <div class="level2">
 
 </div>
-<!-- EDIT2138 SECTION "Schematic GUI Package" [455-489] -->
-<h2 class="sectionedit2139"><a name="scheme_configuration_package" id="scheme_configuration_package">Scheme Configuration Package</a></h2>
+
+<h2 id="schemeconfigurationpackage">Scheme Configuration Package</h2>
 <div class="level2">
 
 </div>
-<!-- EDIT2139 SECTION "Scheme Configuration Package" [490-] --></body>
+</body>
 </html>

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
  */
 
 #include <config.h>
-#include <missing.h>
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -31,10 +30,6 @@
 #endif
 
 #include "libgeda_priv.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 /*! \brief */
 struct gsubr_t {
@@ -61,11 +56,9 @@ static struct gsubr_t libgeda_funcs[] = {
   { "reset-component-library",  0, 0, 0, g_rc_reset_component_library },
   { "reset-source-library",     0, 0, 0, g_rc_reset_source_library },
   
-  { "untitled-name",            1, 0, 0, g_rc_untitled_name },
   { "scheme-directory",         1, 0, 0, g_rc_scheme_directory },
   { "bitmap-directory",         1, 0, 0, g_rc_bitmap_directory },
   { "bus-ripper-symname",       1, 0, 0, g_rc_bus_ripper_symname },
-  { "postscript-prolog",        1, 0, 0, g_rc_postscript_prolog },
   { "attribute-promotion",       1, 0, 0, g_rc_attribute_promotion },
   { "promote-invisible",         1, 0, 0, g_rc_promote_invisible },
   { "keep-invisible",            1, 0, 0, g_rc_keep_invisible },
@@ -73,6 +66,7 @@ static struct gsubr_t libgeda_funcs[] = {
   { "make-backup-files",        1, 0, 0, g_rc_make_backup_files },
   { "print-color-map", 0, 1, 0, g_rc_print_color_map },
   { "rc-filename",              0, 0, 0, g_rc_rc_filename },
+  { "rc-config",                0, 0, 0, g_rc_rc_config },
   { NULL,                       0, 0, 0, NULL } };
 
 /*! \brief Register all libgeda functions with scheme.

@@ -44,10 +44,7 @@
 #include "../include/struct.h"     /* typdef and struct declarations */
 #include "../include/prototype.h"  /* function prototypes */
 #include "../include/globals.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
+#include "../include/gettext.h"
 
 /* ===================  Public Functions  ====================== */
 
@@ -242,7 +239,7 @@ STRING_LIST *s_table_create_attrib_pair(gchar *row_name,
   if (row == -1) {
     /* we didn't find the item in the list */
     fprintf (stderr,
-             "In s_table_create_attrib_pair, we didn't find the row name in the row list!\n");
+             _("In s_table_create_attrib_pair, we didn't find the row name in the row list!\n"));
     return attrib_pair_list;
   }
 
@@ -285,7 +282,7 @@ void s_table_add_toplevel_comp_items_to_comp_table (const GList *obj_list) {
 
 
   if (verbose_mode) {
-    printf("- Starting internal component TABLE creation\n");
+    printf(_("- Starting internal component TABLE creation\n"));
   }
 
 #ifdef DEBUG
@@ -327,8 +324,7 @@ void s_table_add_toplevel_comp_items_to_comp_table (const GList *obj_list) {
             attrib_text = g_strdup(a_current->text->string);
             attrib_name = u_basic_breakup_string(attrib_text, '=', 0);
             attrib_value = s_misc_remaining_string(attrib_text, '=', 1);
-            old_visibility = o_is_visible (pr_current, a_current)
-              ? VISIBLE : INVISIBLE;
+            old_visibility = o_is_visible (a_current) ? VISIBLE : INVISIBLE;
 	    old_show_name_value = a_current->show_name_value;
 
 	    /* Don't include "refdes" or "slot" because they form the row name. */
@@ -344,7 +340,7 @@ void s_table_add_toplevel_comp_items_to_comp_table (const GList *obj_list) {
               if (row == -1 || col == -1) {
                 /* we didn't find the item in the table */
                 fprintf (stderr,
-                         "In s_table_add_toplevel_comp_items_to_comp_table, we didn't find either row or col in the lists!\n");
+                         _("In s_table_add_toplevel_comp_items_to_comp_table, we didn't find either row or col in the lists!\n"));
               } else {
 
 #if DEBUG
@@ -493,7 +489,7 @@ void s_table_add_toplevel_pin_items_to_pin_table (const GList *obj_list) {
   OBJECT *pin_attrib;
 
   if (verbose_mode) {
-    printf("- Starting internal pin TABLE creation\n");
+    printf(_("- Starting internal pin TABLE creation\n"));
   }
 
 #ifdef DEBUG
@@ -553,7 +549,7 @@ void s_table_add_toplevel_pin_items_to_pin_table (const GList *obj_list) {
                   if (row == -1 || col == -1) {
                     /* we didn't find the item in the table */
                     fprintf (stderr,
-                             "In s_table_add_toplevel_pin_items_to_pin_table, we didn't find either row or col in the lists!\n");
+                             _("In s_table_add_toplevel_pin_items_to_pin_table, we didn't find either row or col in the lists!\n"));
                   } else {
 
 #if DEBUG

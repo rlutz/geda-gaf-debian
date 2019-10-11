@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,16 +49,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "libgeda_priv.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 static gint global_pid = 0;
 
-/* Called just before removing an OBJECT from a PAGE. */
+/* Called just before removing an OBJECT from a PAGE
+ * or after appending an OBJECT to a PAGE. */
 static void
 object_added (TOPLEVEL *toplevel, PAGE *page, OBJECT *object)
 {
@@ -70,11 +68,8 @@ object_added (TOPLEVEL *toplevel, PAGE *page, OBJECT *object)
 #endif
   object->page = page;
 
-  /* Add object to tile system. */
-  s_tile_add_object (toplevel, object);
-
   /* Update object connection tracking */
-  s_conn_update_object (toplevel, object);
+  s_conn_update_object (page, object);
 
   o_emit_change_notify (toplevel, object);
 }
@@ -84,6 +79,9 @@ static void
 pre_object_removed (TOPLEVEL *toplevel, PAGE *page, OBJECT *object)
 {
   o_emit_pre_change_notify (toplevel, object);
+
+  /* Remove object from the list of connectible objects */
+  s_conn_remove_object (page, object);
 
   /* Clear object parent pointer */
 #ifndef NDEBUG
@@ -99,10 +97,7 @@ pre_object_removed (TOPLEVEL *toplevel, PAGE *page, OBJECT *object)
   }
 
   /* Remove object from connection system */
-  s_conn_remove_object (toplevel, object);
-
-  /* Remove object from tile system */
-  s_tile_remove_object (object);
+  s_conn_remove_object_connections (toplevel, object);
 }
 
 /*! \brief create a new page object
@@ -116,13 +111,23 @@ pre_object_removed (TOPLEVEL *toplevel, PAGE *page, OBJECT *object)
 PAGE *s_page_new (TOPLEVEL *toplevel, const gchar *filename)
 {
   PAGE *page;
+  struct stat buf;
 
   /* Now create a blank page */
   page = (PAGE*)g_new0 (PAGE, 1);
 
   page->pid = global_pid++;
 
+  page->is_untitled = FALSE;
   page->CHANGED = 0;
+
+  if (stat (filename, &buf) == -1) {
+    page->exists_on_disk = FALSE;
+    memset (&page->last_modified, 0, sizeof page->last_modified);
+  } else {
+    page->exists_on_disk = TRUE;
+    page->last_modified = buf.st_mtim;
+  }
 
   /* big assumption here that page_filename isn't null */
   if (g_path_is_absolute (filename)) {
@@ -132,16 +137,18 @@ PAGE *s_page_new (TOPLEVEL *toplevel, const gchar *filename)
     page->page_filename = g_build_filename (pwd, filename, NULL);
     g_free (pwd);
   }
+
+  page->patch_filename = NULL;
+  page->patch_descend = FALSE;
+  page->patch_seen_on_disk = FALSE;
 	
   g_assert (toplevel->init_bottom != 0);
-  page->coord_aspectratio = (
-    ((float) toplevel->init_right) / ((float) toplevel->init_bottom));
 
   page->up = -2;
   page->page_control = 0;
 
-  /* Init tile array */
-  s_tile_init (toplevel, page);
+  /* Init connectible objects array */
+  page->connectible_list = NULL;
 
   /* Init the object list */
   page->_object_list = NULL;
@@ -158,10 +165,6 @@ PAGE *s_page_new (TOPLEVEL *toplevel, const gchar *filename)
 
   page->weak_refs = NULL;
   
-  set_window (toplevel, page,
-              toplevel->init_left, toplevel->init_right,
-              toplevel->init_top,  toplevel->init_bottom);
-
   /* Backup variables */
   g_get_current_time (&page->last_load_or_save_time);
   page->ops_since_last_backup = 0;
@@ -170,6 +173,7 @@ PAGE *s_page_new (TOPLEVEL *toplevel, const gchar *filename)
 
   /* now append page to page list of toplevel */
   geda_list_add( toplevel->pages, page );
+  page->toplevel = toplevel;
 
   return page;
 }
@@ -239,11 +243,16 @@ void s_page_delete (TOPLEVEL *toplevel, PAGE *page)
   s_delete_object_glist (toplevel, page->place_list);
   page->place_list = NULL;
 
-#if DEBUG
-  printf("Freeing page: %s\n", page->page_filename);
-  s_tile_print(toplevel, page);
-#endif
-  s_tile_free_all (page);
+  /*  This removes all objects from the list of connectible objects
+   *  of the given \a page. */
+  if (g_list_length (page->connectible_list) != 0) {
+    fprintf (stderr,
+            "OOPS! page->connectible_list had something in it when it was freed!\n");
+    fprintf (stderr, "Length: %d\n", g_list_length (page->connectible_list));
+  }
+
+  g_list_free (page->connectible_list);
+  page->connectible_list = NULL;
 
   /* free current page undo structs */
   s_undo_free_all (toplevel, page); 
@@ -251,12 +260,9 @@ void s_page_delete (TOPLEVEL *toplevel, PAGE *page)
   /* ouch, deal with parents going away and the children still around */
   page->up = -2;
   g_free (page->page_filename);
+  g_free (page->patch_filename);
 
   geda_list_remove( toplevel->pages, page );
-
-#if DEBUG
-  s_tile_print (toplevel, page);
-#endif
 
   s_weakref_notify (page, page->weak_refs);
 
@@ -267,7 +273,7 @@ void s_page_delete (TOPLEVEL *toplevel, PAGE *page)
     s_page_goto (toplevel, tmp);
   } else {
     /* page was page_current */
-    toplevel->page_current = NULL;
+    s_toplevel_set_page_current (toplevel, NULL);
     /* page_current must be updated by calling function */
   }
 
@@ -298,7 +304,7 @@ void s_page_delete_list(TOPLEVEL *toplevel)
   g_list_free (list_copy);
 
   /* reset toplevel fields */
-  toplevel->page_current = NULL;
+  s_toplevel_set_page_current (toplevel, NULL);
 }
 
 /*! \brief Add a weak reference watcher to an PAGE.
@@ -390,13 +396,12 @@ void s_page_goto (TOPLEVEL *toplevel, PAGE *p_new)
 {
   gchar *dirname;
 
-  toplevel->page_current = p_new;
+  s_toplevel_set_page_current (toplevel, p_new);
 
-  dirname = g_dirname (p_new->page_filename);
-  if (chdir (dirname)) {
-    /* An error occured with chdir */
-#warning FIXME: What do we do?
-  }
+  dirname = g_path_get_dirname (p_new->page_filename);
+  if (chdir (dirname) == -1)
+    g_warning (_("Failed to change working directory to [%s]: %s\n"),
+               dirname, g_strerror (errno));
   g_free (dirname);
 
 }
@@ -421,7 +426,9 @@ PAGE *s_page_search (TOPLEVEL *toplevel, const gchar *filename)
         iter = g_list_next( iter ) ) {
 
     page = (PAGE *)iter->data;
-    if ( g_strcasecmp( page->page_filename, filename ) == 0 )
+    /* FIXME this may not be correct on platforms with
+     * case-insensitive filesystems. */
+    if (!page->is_untitled && strcmp (page->page_filename, filename) == 0)
       return page;
   }
   return NULL;

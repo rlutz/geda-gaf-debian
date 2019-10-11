@@ -1,22 +1,21 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02111-1301 USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #ifndef _GSCHEM_DEFINES_H_INCL
@@ -26,13 +25,10 @@
 #define ZOOM_IN 1
 #define ZOOM_FULL 2
 
-/* For grip size */
-#define GRIP_SIZE1		25
-#define GRIP_SIZE2		50
-#define GRIP_SIZE3		80
-#define SMALL_ZOOMFACTOR1	150
-#define SMALL_ZOOMFACTOR2	30
-#define MAXIMUM_GRIP_PIXELS     30
+#define ZOOM_EXTENTS_PADDING_PX 5
+
+/* For grip size in pixels (i.e. device units) */
+#define GRIP_SIZE		10.0
 
 /* for bus_ripper_type */
 #define COMP_BUS_RIPPER         0
@@ -54,17 +50,6 @@
 #define UPPER 1
 #define BOTH  2
 
-/* These modes are for net_endpoint_mode */
-#define NONE		0
-#define FILLEDBOX	1
-#define EMPTYBOX	2
-#define X		3
-
-/* These modes are for net_midpoint_mode */
-/* NONE also applies here */
-#define FILLED	3
-#define EMPTY 	4
-
 /* These modes are for actionfeedback_mode */
 /* there's a hack in i_keypress.c dealing with the 0 and 1 (has to be these */
 /* values */
@@ -75,10 +60,6 @@
  * last bounding box drawn. last_drawb_mode also takes actionfeedback_mode
  * constants, so be sure not to clash with those */
 #define LAST_DRAWB_MODE_NONE -1
-
-/* there are modes for text-feedback */
-#define ONLY_WHEN_READABLE	0
-#define ALWAYS			1
 
 /* used in o_undo_callback */
 #define UNDO_ACTION		0
@@ -94,9 +75,13 @@
 #define MULTIPLE                1
 
 /* for grid */
-#define GRID_NONE               0
-#define GRID_DOTS               1
-#define GRID_MESH               2
+typedef enum
+{
+  GRID_MODE_NONE,
+  GRID_MODE_DOTS,
+  GRID_MODE_MESH,
+  GRID_MODE_COUNT
+} GRID_MODE;
 
 /* for dots_grid_mode */
 #define DOTS_GRID_VARIABLE_MODE 0
@@ -128,9 +113,5 @@
 #define DONTCARE		0
 #define MENU			1
 #define HOTKEY			2
-
-/* for a_pan_general and a_zoom */
-#define A_PAN_IGNORE_BORDERS 	1
-#define A_PAN_DONT_REDRAW 	2
 
 #endif /* !_GSCHEM_DEFINES_H_INCL */

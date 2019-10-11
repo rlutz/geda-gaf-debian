@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,83 +25,13 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 #define NUM_BEZIER_SEGMENTS 100
 
 
-typedef void (*FILL_FUNC) (GSCHEM_TOPLEVEL *w_current,
+typedef void (*FILL_FUNC) (GschemToplevel *w_current,
                            COLOR *color, PATH *path,
                            gint fill_width,
                            gint angle1, gint pitch1, gint angle2, gint pitch2);
-
-
-static void hint_coordinates (int x, int y, double *fx, double *fy, int width)
-{
-  double offset = ((width % 2) == 0) ? 0 : 0.5;
-  *fx = (double)x + offset;
-  *fy = (double)y + offset;
-}
-
-
-static void path_path (GSCHEM_TOPLEVEL *w_current, OBJECT *object)
-{
-  PATH *path = object->path;
-  int line_width;
-  int i;
-  int x1, y1, x2, y2, x3, y3;
-  double fx1 = 0.0, fy1 = 0.0;
-  double fx2 = 0.0, fy2 = 0.0;
-  double fx3 = 0.0, fy3 = 0.0;
-
-  line_width = SCREENabs (w_current, object->line_width);
-  if (line_width <= 0) {
-    line_width = 1;
-  }
-
-  for (i = 0; i <  path->num_sections; i++) {
-    PATH_SECTION *section = &path->sections[i];
-
-    switch (section->code) {
-      case PATH_CURVETO:
-        /* Two control point grips */
-        WORLDtoSCREEN (w_current, section->x1, section->y1, &x1, &y1);
-        WORLDtoSCREEN (w_current, section->x2, section->y2, &x2, &y2);
-        hint_coordinates (x1, y1, &fx1, &fy1, line_width);
-        hint_coordinates (x2, y2, &fx2, &fy2, line_width);
-        /* Fall through */
-      case PATH_MOVETO:
-      case PATH_MOVETO_OPEN:
-      case PATH_LINETO:
-        /* Destination point grip */
-        WORLDtoSCREEN (w_current, section->x3, section->y3, &x3, &y3);
-        hint_coordinates (x3, y3, &fx3, &fy3, line_width);
-      case PATH_END:
-        break;
-    }
-
-    switch (section->code) {
-      case PATH_MOVETO:
-        cairo_close_path (w_current->cr);
-        /* fall-through */
-      case PATH_MOVETO_OPEN:
-        cairo_move_to (w_current->cr, fx3, fy3);
-        break;
-      case PATH_CURVETO:
-        cairo_curve_to (w_current->cr, fx1, fy1, fx2, fy2, fx3, fy3);
-        break;
-      case PATH_LINETO:
-        cairo_line_to (w_current->cr, fx3, fy3);
-        break;
-      case PATH_END:
-        cairo_close_path (w_current->cr);
-        break;
-    }
-  }
-}
-
 
 static PATH *path_copy_modify (PATH *path, int dx, int dy,
                                int new_x, int new_y, int whichone)
@@ -153,235 +83,29 @@ static PATH *path_copy_modify (PATH *path, int dx, int dy,
   return new_path;
 }
 
-
-/*! \brief Placeholder filling function.
+/*! \brief Calculate path bounding box for rubber purposes
  *  \par Function Description
- *  This function does nothing. It has the same prototype as all the
- *  filling functions. It prevent from making a difference between filling
- *  in function #o_path_draw().
- *
- *  \param [in] w_current   Schematic top level
- *  \param [in] color       Box fill color.
- *  \param [in] path        The PATH object to draw
- *  \param [in] fill_width  PATH pattern fill width.
- *  \param [in] angle1      1st angle for pattern.
- *  \param [in] pitch1      1st pitch for pattern.
- *  \param [in] angle2      2nd angle for pattern.
- *  \param [in] pitch2      2nd pitch for pattern.
+ * Calculate the bounding box of \a path, returning its bounds in \a
+ * min_x, \a max_y, \a max_x and \a min_y.  If \a path is NULL, the
+ * PATH object currently being edited is used, with any required
+ * control point changes applied.
  */
-static void o_path_fill_hollow (GSCHEM_TOPLEVEL *w_current,
-                                COLOR *color, PATH *path,
-                                gint fill_width,
-                                gint angle1, gint pitch1,
-                                gint angle2, gint pitch2)
+static void
+path_rubber_bbox (GschemToplevel *w_current, PATH *path,
+                  int *min_x, int *max_y, int *max_x, int *min_y)
 {
-  /* NOP */
-}
-
-/*! \brief Fill inside of path with a solid pattern.
- *  \par Function Description
- *  This function fills the inside of the path with a solid pattern.
- *  Parameters <B>angle1</B>, <B>pitch1</B> and <B>angle2</B>,
- *  <B>pitch2</B> and <B>fill_width</B> are unused here but kept for compatibility
- *  with other path filling functions.
- *
- *  \param [in] w_current   Schematic top level
- *  \param [in] color       Box fill color.
- *  \param [in] path        The PATH object to draw
- *  \param [in] fill_width  PATH pattern fill width.
- *  \param [in] angle1      (unused)
- *  \param [in] pitch1      (unused)
- *  \param [in] angle2      (unused)
- *  \param [in] pitch2      (unused)
- */
-static void o_path_fill_fill (GSCHEM_TOPLEVEL *w_current,
-                              COLOR *color, PATH *path,
-                              gint fill_width,
-                              gint angle1, gint pitch1,
-                              gint angle2, gint pitch2)
-{
-  /* NOP: We'll fill it when we do the stroking */
-}
-
-/*! \brief Fill inside of path with single line pattern.
- *  \par Function Description
- *  This function fills the inside of the path with a pattern made of lines.
- *  The lines are drawn inside the path with an angle <B>angle1</B> from the
- *  horizontal. The distance between two of these lines is given by
- *  <B>pitch1</B> and their width by <B>fill_width</B>.
- *  Parameters <B>angle2</B> and <B>pitch2</B> are unused here but kept for
- *  compatbility with other path filling functions.
- *
- *  \param [in] w_current   Schematic top level
- *  \param [in] color       Box fill color.
- *  \param [in] path        The PATH object to draw
- *  \param [in] fill_width  PATH pattern fill width.
- *  \param [in] angle1      1st angle for pattern.
- *  \param [in] pitch1      1st pitch for pattern.
- *  \param [in] angle2      (unused)
- *  \param [in] pitch2      (unused)
- */
-static void o_path_fill_hatch (GSCHEM_TOPLEVEL *w_current,
-                               COLOR *color, PATH *path,
-                               gint fill_width,
-                               gint angle1, gint pitch1,
-                               gint angle2, gint pitch2)
-{
-  int i;
-  GArray *lines;
-
-  gschem_cairo_set_source_color (w_current, color);
-
-  lines = g_array_new (FALSE, FALSE, sizeof (LINE));
-  m_hatch_path (path, angle1, pitch1, lines);
-
-  for (i=0; i < lines->len; i++) {
-    LINE *line = &g_array_index (lines, LINE, i);
-
-    gschem_cairo_line (w_current, END_NONE, fill_width, line->x[0], line->y[0],
-                                                        line->x[1], line->y[1]);
-  }
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, fill_width, -1, -1);
-
-  g_array_free (lines, TRUE);
-}
-
-
-/*! \brief Fill inside of path with mesh pattern.
- *  \par Function Description
- *  This function fills the inside of the path with a pattern made of two
- *  sets of parallel lines in two directions. The first set is drawn inside
- *  the path with an angle <B>angle1</B> from the horizontal. The distance
- *  between two of these lines is given by <B>pitch1</B>.
- *  The second set is drawn inside the path with an angle <B>angle2</B> from
- *  the horizontal. The distance between two of these lines is given
- *  by <B>pitch2</B>.
- *
- *  \param [in] w_current   Schematic top level
- *  \param [in] color       Box fill color.
- *  \param [in] path        The PATH object to draw
- *  \param [in] fill_width  PATH pattern fill width.
- *  \param [in] angle1      1st angle for pattern.
- *  \param [in] pitch1      1st pitch for pattern.
- *  \param [in] angle2      2nd angle for pattern.
- *  \param [in] pitch2      2nd pitch for pattern.
- */
-static void o_path_fill_mesh (GSCHEM_TOPLEVEL *w_current,
-                              COLOR *color, PATH *path,
-                              gint fill_width,
-                              gint angle1, gint pitch1,
-                              gint angle2, gint pitch2)
-{
-  o_path_fill_hatch (w_current, color, path,
-                     fill_width, angle1, pitch1, -1, -1);
-  o_path_fill_hatch (w_current, color, path,
-                     fill_width, angle2, pitch2, -1, -1);
-}
-
-
-/*! \brief Draw a path on screen.
- *  \par Function Description
- *  This function is used to draw a path on screen. The path is described
- *  in the object which is referred by <B>o_current</B>. The path is displayed
- *  according to the current state, described in the GSCHEM_TOPLEVEL object pointed
- *  by <B>w_current</B>.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  The path OBJECT to draw.
- */
-void o_path_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
-{
-  PATH *path = o_current->path;
-  int angle1, pitch1, angle2, pitch2;
-  FILL_FUNC fill_func;
-
-  if (path == NULL) {
-    return;
-  }
-
-  angle1 = o_current->fill_angle1;
-  pitch1 = o_current->fill_pitch1;
-  angle2 = o_current->fill_angle2;
-  pitch2 = o_current->fill_pitch2;
-
-  switch(o_current->fill_type) {
-    case FILLING_HOLLOW:
-      angle1 = -1; angle2 = -1;
-      pitch1 = 1; pitch2 = 1;
-      /* this function is empty ! however if it do not use it we have to add
-       * a test before the call. Simply putting a return here instead is not
-       * possible as it would prevent any hollow path from having its grips
-       * drawn
-       */
-      fill_func = o_path_fill_hollow;
-      break;
-
-    case FILLING_FILL:
-      angle1 = -1; angle2 = -1;
-      pitch1 = 1; pitch2 = 1;
-      fill_func = o_path_fill_fill;
-      break;
-
-    case FILLING_MESH:
-      fill_func = o_path_fill_mesh;
-      break;
-
-    case FILLING_HATCH:
-      angle2 = -1;
-      pitch2 = 1;
-      fill_func = o_path_fill_hatch;
-      break;
-
-    case FILLING_VOID:
-    default:
-      angle1 = -1; angle2 = -1;
-      pitch1 = 1; pitch2 = 1;
-      fill_func = o_path_fill_hollow;
-      fprintf(stderr, _("Unknown type for path (fill)!\n"));
-  }
-
-  if((pitch1 <= 0) || (pitch2 <= 0)) {
-    fill_func = o_path_fill_fill;
-  }
-
-  (*fill_func) (w_current, o_drawing_color (w_current, o_current),
-                path, o_current->fill_width, angle1, pitch1, angle2, pitch2);
-
-  path_path (w_current, o_current);
-
-  gschem_cairo_set_source_color (w_current,
-                                 o_drawing_color (w_current, o_current));
-
-  if (o_current->fill_type == FILLING_FILL)
-    cairo_fill_preserve (w_current->cr);
-
-  gschem_cairo_stroke (w_current, o_current->line_type,
-                                  o_current->line_end,
-                                  o_current->line_width,
-                                  o_current->line_length,
-                                  o_current->line_space);
-
-  if (o_current->selected && w_current->draw_grips) {
-    o_path_draw_grips (w_current, o_current);
-  }
-}
-
-
-/*! \todo Finish function documentation
- *  \brief
- *  \par Function Description
- */
-void o_path_invalidate_rubber (GSCHEM_TOPLEVEL *w_current)
-{
-  PATH *path = w_current->which_object->path;
-  int min_x, min_y, max_x, max_y;
   int x1, y1, x2, y2, x3, y3;
   int new_x, new_y, whichone;
   int grip_no = 0;
   int i;
 
-  min_x = G_MAXINT;  max_x = G_MININT;
-  min_y = G_MAXINT;  max_y = G_MININT;
+  g_assert (w_current);
+
+  if (path == NULL)
+    path = w_current->which_object->path;
+
+  *min_x = G_MAXINT;  *max_x = G_MININT;
+  *min_y = G_MAXINT;  *max_y = G_MININT;
 
   new_x = w_current->second_wx;
   new_y = w_current->second_wy;
@@ -403,10 +127,10 @@ void o_path_invalidate_rubber (GSCHEM_TOPLEVEL *w_current)
         if (whichone == grip_no++) {
           x2 = new_x; y2 = new_y;
         }
-        min_x = MIN (min_x, x1);  min_y = MIN (min_y, y1);
-        max_x = MAX (max_x, x1);  max_y = MAX (max_y, y1);
-        min_x = MIN (min_x, x2);  min_y = MIN (min_y, y2);
-        max_x = MAX (max_x, x2);  max_y = MAX (max_y, y2);
+        *min_x = MIN (*min_x, x1);  *min_y = MIN (*min_y, y1);
+        *max_x = MAX (*max_x, x1);  *max_y = MAX (*max_y, y1);
+        *min_x = MIN (*min_x, x2);  *min_y = MIN (*min_y, y2);
+        *max_x = MAX (*max_x, x2);  *max_y = MAX (*max_y, y2);
         /* Fall through */
       case PATH_MOVETO:
       case PATH_MOVETO_OPEN:
@@ -415,67 +139,292 @@ void o_path_invalidate_rubber (GSCHEM_TOPLEVEL *w_current)
         if (whichone == grip_no++) {
           x3 = new_x; y3 = new_y;
         }
-        min_x = MIN (min_x, x3);  min_y = MIN (min_y, y3);
-        max_x = MAX (max_x, x3);  max_y = MAX (max_y, y3);
+        *min_x = MIN (*min_x, x3);  *min_y = MIN (*min_y, y3);
+        *max_x = MAX (*max_x, x3);  *max_y = MAX (*max_y, y3);
       case PATH_END:
         break;
     }
   }
-
-  WORLDtoSCREEN (w_current, min_x, max_y, &x1, &y1);
-  WORLDtoSCREEN (w_current, max_x, min_y, &x2, &y2);
-  o_invalidate_rect (w_current, x1, y1, x2, y2);
 }
 
+/*! Default capacity of newly created path objects, in path
+ * sections. */
+#define TEMP_PATH_DEFAULT_SIZE 8
 
-/*! \brief Draw a path object after applying translation.
- *  \par Function Description
- *  This function is used to draw the path object described by
- *  <B>*o_current</B> after applying a translation on the two directions of
- *  <B>dx</B> and <B>dy</B> in world units.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] dx         Delta x coordinate for path.
- *  \param [in] dy         Delta y coordinate for path.
- *  \param [in] o_current  Line OBJECT to draw.
+/*! \brief Add elements to the temporary PATH.
+ * \par Function Description
+ * Check if the temporary #PATH object used when interactively
+ * creating paths has room for additional sections.  If not, doubles
+ * its capacity.
  */
-void o_path_draw_place (GSCHEM_TOPLEVEL *w_current, int dx, int dy, OBJECT *o_current)
+static void
+path_expand (GschemToplevel *w_current)
 {
-  OBJECT object;
+  PATH *p = w_current->temp_path;
+  if (p->num_sections == p->num_sections_max) {
+    p->num_sections_max *= 2;
+    p->sections = g_renew (PATH_SECTION, p->sections,
+                           p->num_sections_max);
+  }
+}
 
-  g_return_if_fail (o_current->path != NULL);
+/*! \brief Add new sections to the temporary path while drawing.
+ * \par Function Description
+ * Calculates the next section to be added to a path while drawing.
+ * The temporary slots in the #GschemToplevel structure are used as
+ * follows:
+ *   - first_wx and first_wy contain the location of the next point
+ *     that will lie on the path
+ *   - second_wx and second_wy contain the location of the next
+ *     point's control point.
+ *   - third_wx and third_wy contain the location of the previous
+ *     point's control point.
+ *   - temp_path is the new #PATH object (i.e. sequence of path
+ *     sections that comprise the path drawn so far).
+ *
+ * path_next_sections() adds up to two additional sections to the
+ * temporary path, and returns the number of sections added, on the
+ * basis that: a path starts with a MOVETO the first point; two cusp
+ * nodes (control points coincident with the node position) generate a
+ * LINETO section; and a path ends either whenever the user clicks on
+ * either the first or the current node.
+ *
+ * \return the number of path sections added.
+ */
+static int
+path_next_sections (GschemToplevel *w_current)
+{
+  gboolean cusp_point, cusp_prev, close_path, end_path, start_path;
+  PATH *p;
+  PATH_SECTION *section, *prev_section;
+  int x1, y1, x2, y2, x3, y3;
+  int save_num_sections;
 
-  /* Setup a fake object to pass the drawing routine */
-  object.line_width = 0; /* clamped to 1 pixel in circle_path */
-  object.path = path_copy_modify (o_current->path, dx, dy, 0, 0, -1);
+  g_assert (w_current);
+  g_assert (w_current->temp_path != NULL);
+  g_assert (w_current->temp_path->sections != NULL);
 
-  path_path (w_current, &object);
-  g_free (object.path->sections);
-  g_free (object.path);
+  x1 = w_current->first_wx;
+  y1 = w_current->first_wy;
+  x2 = w_current->second_wx;
+  y2 = w_current->second_wy;
+  x3 = w_current->third_wx;
+  y3 = w_current->third_wy;
+  p = w_current->temp_path;
 
-  gschem_cairo_set_source_color (w_current,
-                                 x_color_lookup_dark (o_current->color));
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, 0, -1, -1);
+  save_num_sections = p->num_sections;
+
+  /* Check whether the section that's being added is the initial
+   * MOVETO.  This is detected if the path is currently empty. */
+  start_path = (p->num_sections == 0);
+
+  prev_section = start_path ? NULL : &p->sections[p->num_sections - 1];
+
+  /* Check whether the point that's being added has a handle offset. */
+  cusp_point = (w_current->first_wx == w_current->second_wx
+                && w_current->first_wy == w_current->second_wy);
+
+  /* Check whether there's a leftover control handle from the previous
+   * point. */
+  cusp_prev = (!start_path
+               && prev_section->x3 == x3
+               && prev_section->y3 == y3);
+
+  /* Check whether the section that's being added closes the path.
+   * This is detected if the location of the node is the same as the
+   * location of the starting node, and there is at least one section
+   * in the path in addition to the initial MOVETO section. */
+  section = &p->sections[0];
+  close_path = (!start_path
+                && x1 == section->x3
+                && y1 == section->y3);
+
+  /* Check whether the section that's being added ends the path. This
+   * is detected if the location of the node is the same as the
+   * location of the previous node. */
+  end_path = (!start_path
+              && x1 == prev_section->x3
+              && y1 == prev_section->y3);
+
+  /* Create section */
+  if (start_path) {
+    /* At the start of the path, just create the initial MOVETO. */
+    path_expand (w_current);
+    section = &p->sections[p->num_sections++];
+    section->code = PATH_MOVETO;
+    section->x3 = x1;
+    section->y3 = y1;
+
+  } else if (!end_path) {
+    path_expand (w_current);
+    section = &p->sections[p->num_sections++];
+
+    /* If there are two cusp points, then add a line segment. If the
+     * path is being closed, closing the path adds an implicit line
+     * segment. */
+    if (cusp_prev && cusp_point && close_path) {
+      section->code = PATH_END;
+
+    } else if (cusp_prev && cusp_point) {
+      section->code = PATH_LINETO;
+      section->x3 = x1;
+      section->y3 = y1;
+
+    } else {
+      /* If there are one or more Bezier control points, the section
+       * needs to be a CURVETO.  The control point of the current
+       * point is mirrored about the point (i.e. the line is kept
+       * continuous through the point). */
+      section->code = PATH_CURVETO;
+      section->x1 = x3;
+      section->y1 = y3;
+      section->x2 = x1 + (x1 - x2);
+      section->y2 = y1 + (y1 - y2);
+      section->x3 = x1;
+      section->y3 = y1;
+
+      if (close_path) {
+        path_expand (w_current);
+        section = &p->sections[p->num_sections++];
+        section->code = PATH_END;
+      }
+    }
+  }
+  /* Return the number of sections added */
+  return p->num_sections - save_num_sections;
+}
+
+/*! \brief Invalidate current path creation screen region.
+ * \par Function Description
+ * Invalidates the screen region occupied by the current path creation
+ * preview and control handle helpers.
+ */
+void
+o_path_invalidate_rubber (GschemToplevel *w_current)
+{
+  int added_sections;
+  int min_x, min_y, max_x, max_y;
+
+  g_return_if_fail (w_current != NULL);
+
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
+
+  /* Calculate any new sections */
+  added_sections = path_next_sections (w_current);
+
+  path_rubber_bbox (w_current, w_current->temp_path,
+                    &min_x, &max_y, &max_x, &min_y);
+
+  /* Expand the bounding box to include any control handles
+   * that are currently being drawn. */
+  min_x = MIN (min_x, w_current->second_wx);
+  max_x = MAX (max_x, w_current->second_wx);
+  min_y = MIN (min_y, w_current->second_wy);
+  max_y = MAX (max_y, w_current->second_wy);
+
+  gschem_page_view_invalidate_world_rect (page_view,
+                                          min_x,
+                                          min_y,
+                                          max_x,
+                                          max_y);
+
+  w_current->temp_path->num_sections -= added_sections;
 }
 
 /*! \brief Start process to input a new path.
  *  \par Function Description
  *  This function starts the process of interactively adding a path to
- *  the current sheet.
+ *  the current sheet by resetting the path creation state and
+ *  enabling preview ("rubber") drawing.
  *
- *  During all the process, the path is internally represented by the two
- *  ends of the path as (<B>w_current->first_wx</B>,<B>w_current->first_wy</B>) and
- *  (<B>w_current->second_wx</B>,<B>w_current->second_wy</B>).
+ *  For details of how #GschemToplevel fields are used during the
+ *  path creation process, see path_next_sections().
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current  The GschemToplevel object.
  *  \param [in] w_x        Current x coordinate of pointer in world units.
  *  \param [in] w_y        Current y coordinate of pointer in world units.
  */
-void o_path_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void
+o_path_start(GschemToplevel *w_current, int w_x, int w_y)
 {
-  /* TODO: Implement support for drawing paths from within gschem */
+  g_assert (w_current);
+
+  w_current->pathcontrol = TRUE;
+  i_action_start (w_current);
+
+  /* Reset path creation state */
+  if (w_current->temp_path != NULL) {
+    w_current->temp_path->num_sections = 0;
+  } else {
+    PATH *p = g_new0 (PATH, 1);
+    p->sections = g_new0 (PATH_SECTION, TEMP_PATH_DEFAULT_SIZE);
+    p->num_sections = 0;
+    p->num_sections_max = TEMP_PATH_DEFAULT_SIZE;
+    w_current->temp_path = p;
+  }
+
+  w_current->which_grip = -1;
+  w_current->first_wx = w_x;
+  w_current->first_wy = w_y;
+  w_current->second_wx = w_x;
+  w_current->second_wy = w_y;
+  w_current->third_wx = w_x;
+  w_current->third_wy = w_y;
+
+  /* Enable preview drawing */
+  w_current->rubber_visible = TRUE;
 }
 
+/* \brief Begin inputting a new path node.
+ * \par Function Description
+ * Re-enters path creation mode, saving the current pointer location
+ * as the location of the next path control point.
+ */
+void
+o_path_continue (GschemToplevel *w_current, int w_x, int w_y)
+{
+  g_assert (w_current);
+  g_assert (w_current->inside_action != 0);
+
+  w_current->pathcontrol = TRUE;
+
+  o_path_invalidate_rubber (w_current);
+
+  w_current->first_wx = w_x;
+  w_current->first_wy = w_y;
+  w_current->second_wx = w_x;
+  w_current->second_wy = w_y;
+
+  o_path_invalidate_rubber (w_current);
+}
+
+/* \brief Give feedback on path creation during mouse movement.
+ * \par Function Description
+ * If the user is currently in the process of creating a path node
+ * (i.e. has mouse button pressed), moves the next node's control
+ * point.  If the user has not yet pressed the mouse button to start
+ * defining a path node, moves the next node's location and control
+ * point together.
+ */
+void
+o_path_motion (GschemToplevel *w_current, int w_x, int w_y)
+{
+  g_assert (w_current);
+  g_assert (w_current->inside_action != 0);
+
+  o_path_invalidate_rubber (w_current);
+
+  w_current->second_wx = w_x;
+  w_current->second_wy = w_y;
+
+  if (!w_current->pathcontrol) {
+    w_current->first_wx = w_x;
+    w_current->first_wy = w_y;
+  }
+
+  o_path_invalidate_rubber (w_current);
+}
 
 /*! \brief End the input of a path.
  *  \par Function Description
@@ -487,13 +436,183 @@ void o_path_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
  *  adds a new initialized path object to the list of object of the current
  *  sheet.
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current  The GschemToplevel object.
  *  \param [in] w_x        (unused)
  *  \param [in] w_y        (unused)
  */
-void o_path_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void
+o_path_end(GschemToplevel *w_current, int w_x, int w_y)
 {
-  /* TODO: Implement support for drawing paths from within gschem */
+  gboolean close_path, end_path, start_path;
+  PATH *p;
+  PATH_SECTION *section, *prev_section;
+  int x1, y1, x2, y2;
+
+  g_assert (w_current);
+  g_assert (w_current->inside_action != 0);
+  g_assert (w_current->toplevel);
+  g_assert (w_current->temp_path != NULL);
+  g_assert (w_current->temp_path->sections != NULL);
+
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
+
+  PAGE *page = gschem_page_view_get_page (page_view);
+  g_return_if_fail (page != NULL);
+
+  TOPLEVEL *toplevel = page->toplevel;
+  g_return_if_fail (toplevel != NULL);
+
+  o_path_invalidate_rubber (w_current);
+
+  x1 = w_current->first_wx;
+  y1 = w_current->first_wy;
+  x2 = w_current->second_wx;
+  y2 = w_current->second_wy;
+  p = w_current->temp_path;
+
+  /* Check whether the section that's being added is the initial
+   * MOVETO.  This is detected if the path is currently empty. */
+  start_path = (p->num_sections == 0);
+
+  prev_section = start_path ? NULL : &p->sections[p->num_sections - 1];
+
+  /* Check whether the section that's being added closes the path.
+   * This is detected if the location of the node is the same as the
+   * location of the starting node, and there is at least one section
+   * in the path in addition to the initial MOVETO section. */
+  section = &p->sections[0];
+  close_path = (!start_path
+                && x1 == section->x3
+                && y1 == section->y3);
+
+  /* Check whether the section that's being added ends the path. This
+   * is detected if the location of the node is the same as the
+   * location of the previous node. */
+  end_path = (!start_path
+              && x1 == prev_section->x3
+              && y1 == prev_section->y3);
+
+  /* Add predicted next sections */
+  path_next_sections (w_current);
+
+  if (end_path || close_path) {
+    /* Add object to page and clean up path drawing state */
+    OBJECT *obj = o_path_new_take_path (toplevel, OBJ_PATH,
+                                        GRAPHIC_COLOR, p);
+    w_current->temp_path = NULL;
+    w_current->first_wx = -1;
+    w_current->first_wy = -1;
+    w_current->second_wx = -1;
+    w_current->second_wy = -1;
+    w_current->third_wx = -1;
+    w_current->third_wy = -1;
+
+    s_page_append (toplevel, page, obj);
+    g_run_hook_object (w_current, "%add-objects-hook", obj);
+    gschem_toplevel_page_content_changed (w_current, page);
+    o_undo_savestate (w_current, page, UNDO_ALL, _("Path"));
+
+    w_current->rubber_visible = FALSE;
+
+    i_action_stop (w_current);
+  } else {
+    /* Leave state as it is and continue path drawing... */
+
+    /* Save the control point coordinates for the next section */
+    w_current->third_wx = x2;
+    w_current->third_wy = y2;
+
+    w_current->pathcontrol = FALSE;
+  }
+}
+
+/*! \brief End the input of a path.
+ *
+ * Called on right-click.  Confirms all path segments except for the
+ * current one.  If there is only one path segment, cancels the path.
+ *
+ * \param [in] w_current  The GschemToplevel object.
+ */
+void
+o_path_end_path (GschemToplevel *w_current)
+{
+  PATH *p = w_current->temp_path;
+  PATH_SECTION *prev_section;
+
+  if (p->num_sections < 2) {
+    o_path_invalidate_rubber (w_current);
+    i_action_stop (w_current);
+    return;
+  }
+
+  prev_section = &p->sections[p->num_sections - 1];
+  w_current->first_wx = prev_section->x3;
+  w_current->first_wy = prev_section->y3;
+  o_path_end (w_current, 0, 0);
+}
+
+/*! \brief Draw path creation preview.
+ * \par Function Description
+ * Draw a preview of the path currently being drawn, including a
+ * helper line showing the control point of the node being drawn (if
+ * applicable).
+ */
+void
+o_path_draw_rubber (GschemToplevel *w_current, EdaRenderer *renderer)
+{
+  OBJECT object;
+  int added_sections = 0;
+
+  /* Draw a helper for when we're dragging a control point */
+  if (w_current->first_wx != w_current->second_wx
+      || w_current->first_wy != w_current->second_wy) {
+    double wwidth = 0;
+    cairo_t *cr = eda_renderer_get_cairo_context (renderer);
+    GArray *color_map = eda_renderer_get_color_map (renderer);
+    int flags = eda_renderer_get_cairo_flags (renderer);
+
+    eda_cairo_line (cr, flags, END_NONE, wwidth,
+                    w_current->first_wx, w_current->first_wy,
+                    w_current->second_wx, w_current->second_wy);
+
+    eda_cairo_set_source_color (cr, SELECT_COLOR, color_map);
+    eda_cairo_stroke (cr, flags, TYPE_SOLID, END_NONE, wwidth, -1, -1);
+  }
+  /* Now draw the rest of the path */
+
+  /* Calculate any new sections */
+  added_sections = path_next_sections (w_current);
+
+  /* Setup a fake object to pass the drawing routine */
+  memset (&object, 0, sizeof (OBJECT));
+  object.type = OBJ_PATH;
+  object.color = SELECT_COLOR;
+  object.line_width = 0; /* clamped to 1 pixel in circle_path */
+  object.path = w_current->temp_path;
+
+  eda_renderer_draw (renderer, &object);
+
+  /* Throw away the added sections again */
+  w_current->temp_path->num_sections -= added_sections;
+}
+
+void
+o_path_invalidate_rubber_grips (GschemToplevel *w_current)
+{
+  int min_x, min_y, max_x, max_y;
+
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
+
+  path_rubber_bbox (w_current, NULL,
+                    &min_x, &max_y, &max_x, &min_y);
+
+  gschem_page_view_invalidate_world_rect (page_view,
+                                          min_x,
+                                          min_y,
+                                          max_x,
+                                          max_y);
 }
 
 
@@ -506,150 +625,49 @@ void o_path_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
  *  (<B>second_wx</B>,<B>second_wy</B>).
  *  The first end is constant. The second end is updated to the (<B>w_x</B>,<B>w_y</B>).
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current  The GschemToplevel object.
  *  \param [in] w_x        Current x coordinate of pointer in world units.
  *  \param [in] w_y        Current y coordinate of pointer in world units.
  */
-void o_path_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void o_path_motion_grips (GschemToplevel *w_current, int w_x, int w_y)
 {
+  g_assert (w_current->inside_action != 0);
+
   if (w_current->rubber_visible)
-    o_path_invalidate_rubber (w_current);
+    o_path_invalidate_rubber_grips (w_current);
 
   w_current->second_wx = w_x;
   w_current->second_wy = w_y;
 
-  o_path_invalidate_rubber (w_current);
+  o_path_invalidate_rubber_grips (w_current);
   w_current->rubber_visible = 1;
 }
 
 
-/*! \brief Draw path from GSCHEM_TOPLEVEL object.
+/*! \brief Draw path from GschemToplevel object.
  *  \par Function Description
  *  This function draws a path with an exclusive or function over the sheet.
  *  The color of the box is <B>SELECT_COLOR</B>. The path is
  *  described by the two points (<B>w_current->first_wx</B>,
  *  <B>w_current->first_wy</B>) and (<B>w_current->second_wx</B>,<B>w_current->second_wy</B>).
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current  The GschemToplevel object.
  */
-void o_path_draw_rubber (GSCHEM_TOPLEVEL *w_current)
+void
+o_path_draw_rubber_grips (GschemToplevel *w_current, EdaRenderer *renderer)
 {
   OBJECT object;
 
   /* Setup a fake object to pass the drawing routine */
+  memset (&object, 0, sizeof (OBJECT));
+  object.type = OBJ_PATH;
+  object.color = SELECT_COLOR;
   object.line_width = 0; /* clamped to 1 pixel in circle_path */
   object.path = path_copy_modify (w_current->which_object->path, 0, 0,
                                   w_current->second_wx,
                                   w_current->second_wy, w_current->which_grip);
 
-  path_path (w_current, &object);
+  eda_renderer_draw (renderer, &object);
   g_free (object.path->sections);
   g_free (object.path);
-
-  gschem_cairo_set_source_color (w_current, x_color_lookup (SELECT_COLOR));
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_SQUARE, 0, -1, -1);
-}
-
-
-/*! \brief Draw lines between curve segment end-point and their control point.
- *
- *  \par Function Description
- *  This function Draws lines between the end-points and respective
- *  control-points of curve segments in the path.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  The path OBJECT.
- */
-static void draw_control_lines (GSCHEM_TOPLEVEL *w_current,
-                                OBJECT *o_current)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int i;
-  int next_x, next_y;
-  int last_x = 0, last_y = 0;
-  PATH_SECTION *section;
-  COLOR *color;
-
-  if (toplevel->override_color != -1 ) {
-    /* override : use the override_color instead */
-    color = x_color_lookup (toplevel->override_color);
-  } else {
-    /* use the normal selection color */
-    color = x_color_lookup_dark (SELECT_COLOR);
-  }
-
-  /* set the color for the grip */
-  gschem_cairo_set_source_color (w_current, color);
-
-  for (i = 0; i <  o_current->path->num_sections; i++) {
-    section = &o_current->path->sections[i];
-
-    if (section->code != PATH_END) {
-      next_x = section->x3;
-      next_y = section->y3;
-    }
-
-    switch (section->code) {
-    case PATH_CURVETO:
-      /* Two control point grips */
-      gschem_cairo_line (w_current, END_NONE, 0,
-                         last_x, last_y, section->x1, section->y1);
-      gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, 0, -1, -1);
-
-      gschem_cairo_line (w_current, END_NONE, 0,
-                         next_x, next_y, section->x2, section->y2);
-      gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, 0, -1, -1);
-
-      /* Fall through */
-    case PATH_MOVETO:
-    case PATH_MOVETO_OPEN:
-    case PATH_LINETO:
-      last_x = next_x;
-      last_y = next_y;
-      break;
-    case PATH_END:
-      break;
-    }
-  }
-}
-
-
-/*! \brief Draw grip marks on path.
- *  \par Function Description
- *  This function draws the grips on the path object <B>o_current</B>.
- *
- *  A path has a grip at each end.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  Line OBJECT to draw grip points on.
- */
-void o_path_draw_grips(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
-{
-  PATH_SECTION *section;
-  int i;
-
-  if (w_current->draw_grips == FALSE)
-    return;
-
-  draw_control_lines (w_current, o_current);
-
-  for (i = 0; i <  o_current->path->num_sections; i++) {
-    section = &o_current->path->sections[i];
-
-    switch (section->code) {
-    case PATH_CURVETO:
-      /* Two control point grips */
-      o_grips_draw (w_current, section->x1, section->y1);
-      o_grips_draw (w_current, section->x2, section->y2);
-      /* Fall through */
-    case PATH_MOVETO:
-    case PATH_MOVETO_OPEN:
-    case PATH_LINETO:
-      /* Destination point grip */
-      o_grips_draw (w_current, section->x3, section->y3);
-      break;
-    case PATH_END:
-      break;
-    }
-  }
 }

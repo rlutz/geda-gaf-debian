@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschlas - gEDA Load and Save
  * Copyright (C) 2002-2010 Ales Hvezda
- * Copyright (C) 2002-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 2002-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,17 +30,21 @@
 #include <assert.h>
 #endif
 #ifdef HAVE_UNISTD_H
-#include <unistd.h> 
+#include <unistd.h>
 #endif
 
 #include <libgeda/libgeda.h>
 
 #include "../include/prototype.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
+
+/*! \brief Register Scheme functions
+ *
+ * This function registers the Scheme functions required to use
+ * gschlas.  They are mostly unnecessary, except for reading in the gschlasrc
+ * file at the beginning of the prog which gives the library search paths.
+ */
 void
 g_register_funcs(void)
 {
@@ -48,15 +52,18 @@ g_register_funcs(void)
   scm_c_define_gsubr ("quit", 0, 0, 0, g_quit);
   scm_c_define_gsubr ("exit", 0, 0, 0, g_quit);
 
-  /* gsymcheckrc functions */
+  /* gschlas functions */
   scm_c_define_gsubr ("gschlas-version", 1, 0, 0, g_rc_gschlas_version);
-  scm_c_define_gsubr ("force-boundingbox", 1, 0, 0, g_rc_force_boundingbox);
+
 }
 
+/*! \brief Scheme function to quit the application
+ *
+ * Quit the application from within Scheme.
+ */
 SCM
 g_quit(void)
 {
   gschlas_quit();
   exit(0);
 }
-

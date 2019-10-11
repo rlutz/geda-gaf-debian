@@ -8,7 +8,7 @@ dnl directory.
 # Set up configuration system
 #####################################################################
 
-AC_INIT([gEDA/gaf], [1.8.2], [https://bugs.launchpad.net/geda], [geda-gaf])
+AC_INIT([gEDA/gaf], [1.10.0], [https://bugs.launchpad.net/geda], [geda-gaf])
 AC_PREREQ([2.60])
 
 AC_CONFIG_SRCDIR([libgeda/src/libgeda.c])
@@ -16,7 +16,8 @@ AC_CONFIG_AUX_DIR([build-tools])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADER([config.h])
 
-AM_INIT_AUTOMAKE([parallel-tests color-tests])
+AM_INIT_AUTOMAKE([parallel-tests color-tests tar-ustar])
+AM_SILENT_RULES
 
 AC_GNU_SOURCE # FIXME for some reason this is needed?
 
@@ -24,7 +25,7 @@ AC_GNU_SOURCE # FIXME for some reason this is needed?
 # Do version number magic
 #####################################################################
 
-AX_GIT_VERSION([20130925])
+AX_GIT_VERSION([20191008])
 
 # This is used for keeping the ChangeLog files up-to-date
 AC_SUBST([CHANGELOG_BASE], [1.0-20070526])
@@ -41,13 +42,18 @@ AX_WINDOWS_FLAGS
 
 AC_PROG_CC
 AC_PROG_CPP
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR]) dnl Workaround for Automake 1.11
 
 AC_LIBTOOL_WIN32_DLL
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 
 AM_PROG_CC_C_O
-AX_GCC_FLAGS([-Wall])
+
+AX_PROG_CC_WARNING([maybe_uninitialized], [maybe-uninitialized])
+AX_PROG_CC_WARNING([misleading_indentation], [misleading-indentation])
+
+AX_GCC_FLAGS([-Wall $Werror_maybe_uninitialized_IF_SUPPORTED])
 
 AC_PROG_MKDIR_P
 AM_PROG_LEX
@@ -60,8 +66,8 @@ AC_PATH_PROGS([M4], [gm4 m4], [m4])
 #####################################################################
 
 AM_NLS
-AM_GNU_GETTEXT
-AM_GNU_GETTEXT_VERSION([0.16])
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.18])
 AX_DESKTOP_I18N
 
 #####################################################################
@@ -70,19 +76,30 @@ AX_DESKTOP_I18N
 
 PKG_PROG_PKG_CONFIG
 
-AX_CHECK_GUILE([1.8.0])
+AX_CHECK_GUILE([2.0.0])
 
 PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.20.0], ,
   AC_MSG_ERROR([GLib 2.20.0 or later is required.]))
 
-PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.16.0], ,
-  AC_MSG_ERROR([GTK+ 2.16.0 or later is required.]))
+PKG_CHECK_MODULES(GIO, [gio-2.0 >= 2.20.0], ,
+  AC_MSG_ERROR([GIO 2.20.0 or later is required.]))
 
-PKG_CHECK_MODULES(GDK_PIXBUF, [gdk-pixbuf-2.0 >= 2.16.0], ,
-  AC_MSG_ERROR([GDK_PIXBUF 2.16.0 or later is required.]))
+PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.18.0], ,
+  AC_MSG_ERROR([GTK+ 2.18.0 or later is required.]))
 
-PKG_CHECK_MODULES(CAIRO, [cairo >= 1.8.0], ,
-  AC_MSG_ERROR([CAIRO 1.8.0 or later is required.]))
+PKG_CHECK_MODULES(GDK, [gdk-2.0 >= 2.18.0], ,
+  AC_MSG_ERROR([GDK 2.18.0 or later is required.]))
+
+PKG_CHECK_MODULES(GDK_PIXBUF, [gdk-pixbuf-2.0 >= 2.18.0], ,
+  AC_MSG_ERROR([GDK_PIXBUF 2.18.0 or later is required.]))
+
+AX_CHECK_CAIRO
+
+PKG_CHECK_MODULES(PANGOCAIRO, [pangocairo >= 0.26], ,
+  AC_MSG_ERROR([PANGOCAIRO 0.26 or later is required.]))
+
+PKG_CHECK_MODULES(PANGO, [pango >= 1.23.0], ,
+  AC_MSG_ERROR([PANGO 1.23.0 or later is required.]))
 
 #####################################################################
 # Header files & particular functions
@@ -148,8 +165,8 @@ AX_OPTION_XDG_DATA
 AX_OPTION_KDE3_DATA
 # XDG database updates
 AX_OPTION_XDG_DB
-# libstroke support
-AX_OPTION_STROKE
+# libfam support
+AX_OPTION_FAM
 # gattrib
 AX_OPTION_GATTRIB
 
@@ -162,28 +179,42 @@ AX_DATA_DIRS
 # Where should PCB footprints be searched for?
 AX_PCB_DIRS
 # Set up libgeda with the correct ld version number
-AX_LIBGEDA([42:1:0])
+AX_LIBGEDA([46:0:0])
+# Set up libgedacairo with the correct ld version number
+AX_LIBGEDACAIRO([1:2:0])
+
+#####################################################################
+# Recurse into Xorn configuration
+#####################################################################
+
+export GEDADATADIR
+export GEDARCDIR
+
+AC_CONFIG_SUBDIRS([xorn])
 
 #####################################################################
 # Generate output
 #####################################################################
 
 AC_CONFIG_FILES([Makefile
-                 intl/Makefile
 
                  libgeda/Makefile
                  libgeda/libgeda.pc
                  libgeda/po/domain.mak
                  libgeda/po/Makefile.in
-                 libgeda/shell/Makefile
                  libgeda/data/Makefile
                  libgeda/docs/Makefile
                  libgeda/docs/images/Makefile
                  libgeda/include/Makefile
                  libgeda/lib/Makefile
                  libgeda/scheme/Makefile
-                 libgeda/share/Makefile
                  libgeda/src/Makefile
+
+                 libgedacairo/Makefile
+                 libgedacairo/libgedacairo.pc
+
+                 gaf/Makefile
+                 gaf/po/Makefile.in
 
                  gschem/Makefile
                  gschem/po/Makefile.in
@@ -212,34 +243,32 @@ AC_CONFIG_FILES([Makefile
                  gsymcheck/include/Makefile
                  gsymcheck/lib/Makefile
                  gsymcheck/lib/system-gsymcheckrc
+                 gsymcheck/po/Makefile.in
                  gsymcheck/src/Makefile
                  gsymcheck/tests/Makefile
                  gsymcheck/Makefile
 
-                 gnetlist/Makefile
-                 gnetlist/src/Makefile
-                 gnetlist/include/Makefile
-                 gnetlist/scheme/Makefile
-                 gnetlist/examples/Makefile
-                 gnetlist/tests/Makefile
-                 gnetlist/tests/hierarchy/Makefile
-                 gnetlist/tests/hierarchy2/Makefile
-                 gnetlist/tests/drc2/Makefile
-                 gnetlist/tests/common/Makefile
-                 gnetlist/docs/Makefile
-                 gnetlist/docs/vams/Makefile
-                 gnetlist/examples/vams/Makefile
-                 gnetlist/examples/vams/vhdl/Makefile
-                 gnetlist/examples/vams/vhdl/basic-vhdl/Makefile
-                 gnetlist/examples/vams/vhdl/new-vhdl/Makefile
-                 gnetlist/examples/switcap/Makefile
-                 gnetlist/lib/Makefile
-                 gnetlist/utils/Makefile
-                 gnetlist/scripts/Makefile
-                 gnetlist/scripts/annotate.sh
-                 gnetlist/scripts/bom_xref.sh
-                 gnetlist/scripts/bompp.sh
-                 gnetlist/lib/system-gnetlistrc
+                 gnetlist-legacy/Makefile
+                 gnetlist-legacy/po/Makefile.in
+                 gnetlist-legacy/src/Makefile
+                 gnetlist-legacy/include/Makefile
+                 gnetlist-legacy/scheme/Makefile
+                 gnetlist-legacy/examples/Makefile
+                 gnetlist-legacy/tests/Makefile
+                 gnetlist-legacy/docs/Makefile
+                 gnetlist-legacy/docs/vams/Makefile
+                 gnetlist-legacy/examples/vams/Makefile
+                 gnetlist-legacy/examples/vams/vhdl/Makefile
+                 gnetlist-legacy/examples/vams/vhdl/basic-vhdl/Makefile
+                 gnetlist-legacy/examples/vams/vhdl/new-vhdl/Makefile
+                 gnetlist-legacy/examples/switcap/Makefile
+                 gnetlist-legacy/lib/Makefile
+                 gnetlist-legacy/utils/Makefile
+                 gnetlist-legacy/scripts/Makefile
+                 gnetlist-legacy/scripts/annotate.sh
+                 gnetlist-legacy/scripts/bom_xref.sh
+                 gnetlist-legacy/scripts/bompp.sh
+                 gnetlist-legacy/lib/system-gnetlistrc
 
                  utils/Makefile
                  utils/docs/Makefile
@@ -253,15 +282,9 @@ AC_CONFIG_FILES([Makefile
                  utils/lib/Makefile
                  utils/lib/system-gschlasrc
                  utils/scripts/Makefile
-                 utils/scripts/sw2asc
                  utils/src/Makefile
-                 utils/tests/Makefile
                  utils/tests/gxyrs/Makefile
-                 utils/tests/gxyrs/inputs/Makefile
-                 utils/tests/gxyrs/outputs/Makefile
                  utils/tests/refdes_renum/Makefile
-                 utils/tests/refdes_renum/inputs/Makefile
-                 utils/tests/refdes_renum/outputs/Makefile
 
                  symbols/Makefile
                  symbols/documentation/Makefile
@@ -279,5 +302,13 @@ AC_CONFIG_FILES([Makefile
                  examples/TwoStageAmp/Makefile
                  examples/gTAG/Makefile
                  examples/lightning_detector/Makefile
+
+                 contrib/Makefile
+                 contrib/smash_megafile/Makefile
+                 contrib/olib/Makefile
+                 contrib/gmk_sym/Makefile
+                 contrib/sarlacc_schem/Makefile
+                 contrib/scripts/Makefile
+                 contrib/scripts/sw2asc
 ])
 AC_OUTPUT

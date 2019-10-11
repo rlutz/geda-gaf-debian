@@ -1,5 +1,5 @@
 ;                                                         -*-Scheme-*-
-; 
+;
 ; Init file for gschem
 ;
 
@@ -8,19 +8,21 @@
 ;  ;'s are comments
 ;  keywords are case sensitive (guile feature)
 ;  mode strings are case sensitive
-;  colors are not case sensitive 
-;  
+;  colors are not case sensitive
+;
 
 ; gschem-version string
 ;
-; Specifies the version of this file.  This number is used to make sure 
-; that the rc file is compatible with the version of gschem that is 
+; Specifies the version of this file.  This number is used to make sure
+; that the rc file is compatible with the version of gschem that is
 ; being run. The end user should *not* change this value.
 ;
 (gschem-version "@DATE_VERSION@")
 
+(load-from-path "gschem-deprecated-config.scm")
+
 ;
-; Start of color section 
+; Start of color section
 ;
 
 ;; Make the gschem color maps more user-friendly
@@ -32,9 +34,11 @@
 ; light (almost white) background.  The dark background is the
 ; original look.
 ;
-(load (build-path geda-rc-path "gschem-colormap-darkbg")) ; dark background
-;(load (build-path geda-rc-path "gschem-colormap-lightbg")) ; light background
-;(load (build-path geda-rc-path "gschem-colormap-bw")) ; light background, bw
+(primitive-load (build-path geda-rc-path "gschem-colormap-darkbg")) ; dark background
+;(load (build-path geda-rc-path "gschem-colormap-whitebg")) ; light background
+;(load (build-path geda-rc-path "gschem-colormap-whitebg-bw")) ; light background, bw
+;(load (build-path geda-rc-path "gschem-colormap-lightbg")) ; shaded background
+;(load (build-path geda-rc-path "gschem-colormap-bw")) ; shaded background, bw
 
 ;
 ; End of color section
@@ -53,7 +57,7 @@
 
 ; handleboxes string
 ;
-; Controls if the handleboxes (which contain the menu and toolbar) are 
+; Controls if the handleboxes (which contain the menu and toolbar) are
 ; visible or not.
 ;
 (handleboxes "enabled")
@@ -68,14 +72,14 @@
 
 ; undo-levels number
 ;
-; Determines the number of levels of undo.  Basically this number decides 
+; Determines the number of levels of undo.  Basically this number decides
 ; how many backup schematics are saved on disk.
 ;
 (undo-levels 10)
 
 ; undo-type string
 ;
-; Controls which kind of undo is used.  The default is to use the disk as 
+; Controls which kind of undo is used.  The default is to use the disk as
 ; the storing medium (ie after every action the undo information is stored
 ; to disk).  The other mechanism uses only memory.  The disk mechanism is
 ; nice because you get undo-level number of backups of the schematic written
@@ -86,10 +90,10 @@
 
 ; undo-panzoom string
 ;
-; Controls if pan or zoom commands are saved in the undo list.  If this 
+; Controls if pan or zoom commands are saved in the undo list.  If this
 ; is enabled then a pan or zoom command will be considered a command and
 ; can be undone.  If this is false, then panning and zooming is not saved
-; in the undo list and cannot be undone.  Note, the current viewport 
+; in the undo list and cannot be undone.  Note, the current viewport
 ; information is saved for every command, so the display will change to the
 ; viewport before a command is executed.
 ;
@@ -112,16 +116,6 @@
 (draw-grips "enabled")
 ;(draw-grips "disabled")
 
-; net-endpoint-mode string
-;
-; Not user changable.
-(net-endpoint-mode "filledbox")
-
-;  net-midpoint-mode string
-;
-; Not user changable.
-(net-midpoint-mode "filled")
-
 ;  net-direction-mode string
 ;
 ;  Controlls if the net direction mode is used. This mode tries to guess
@@ -133,7 +127,7 @@
 ;  net-selection-mode string
 ;
 ; Controls how many net segments are selected when you click at a net
-; If one of the enabled items is used, the selection state will toggle 
+; If one of the enabled items is used, the selection state will toggle
 ; through all selection states. The mode defines the maximum search depth
 ; for the net selection mode
 ;
@@ -145,26 +139,17 @@
 ;
 ;  Controls if the net consolidation code is used when schematics are read
 ;  in, written to disk, and when nets are being drawn (does not consolidate
-;  when things are being copied or moved yet).  Net consolidation is the 
+;  when things are being copied or moved yet).  Net consolidation is the
 ;  connection of nets which can be combined into one.
-;  Comment out if you want the default mode 
+;  Comment out if you want the default mode
 ;
 (net-consolidate "enabled")
 ;(net-consolidate "disabled")
 
-;  net-style string
-;
-;  Set to thin if you want thin nets.
-;  Set to thick if you want thick nets.
-;  This mode also determines what net style gets printed
-;
-;(net-style "thin")
-(net-style "thick")
-
 ; netconn-rubberband string
 ;
-; Controls if net connections are maintained when you move a connecting 
-; component or net.   
+; Controls if net connections are maintained when you move a connecting
+; component or net.
 ;
 (netconn-rubberband "enabled")
 ;(netconn-rubberband "disabled")
@@ -176,33 +161,6 @@
 ; cursor position
 (magnetic-net-mode "enabled")
 ;(magnetic-net-mode "disabled")
-
-;  bus-style string
-;
-;  Set to thin if you want thin buses.
-;  Set to thick if you want thick buses.
-;  This mode also determines what bus style gets printed
-;
-;(bus-style "thin")
-(bus-style "thick")
-
-; pin-style string
-;
-; Set to thin if you want thin pins
-; Set to thick if you want thick pins.
-; This mode also determines what pin style gets printed
-;
-;(pin-style "thin")
-(pin-style "thick")
-
-; line-style string
-;
-; Set to thin if you want thin lines
-; Set to thick if you want thick lines.
-; This mode also determines what line style gets printed
-;
-;(line-style "thin")
-(line-style "thick")
 
 ; zoom-with-pan string
 ;
@@ -244,9 +202,9 @@
 
 ; keyboardpan-gain integer
 ;
-; Controls how much the display pans when using the keyboard cursor keys.  
-; A larger value provides greater pan distance when pressing the cursor 
-; keys, while a smaller value provides a smoother, but smaller pan 
+; Controls how much the display pans when using the keyboard cursor keys.
+; A larger value provides greater pan distance when pressing the cursor
+; keys, while a smaller value provides a smoother, but smaller pan
 ; distance when moving the cursor keys.
 (keyboardpan-gain 20)
 ;(keyboardpan-gain 10)
@@ -267,8 +225,8 @@
 ; action-feedback-mode string
 ;
 ; Set the default action feedback mode (for copy/move/component place).
-; Set to outline to get an outline of the selection. 
-; Set to boundingbox to get a bounding box of the selection. 
+; Set to outline to get an outline of the selection.
+; Set to boundingbox to get a bounding box of the selection.
 ; For a fast machines with fast video use outline (it looks good).
 ; For a slow machine use boundingbox; it is much faster.
 ; Comment out if you want the default mode.
@@ -287,60 +245,15 @@
 (continue-component-place "enabled")
 ;(continue-component-place "disabled")
 
-; sort-components-library string
-;
-; If this is enabled, then the component library will be sorted in
-; alphanumeric order.  Bear in mind that this option is totally
-; cosmetic, and will not alter the component search order (latest
-; added gets scanned first).
-;
-(sort-component-library "disabled")
-;(sort-component-library "enabled")
-
-; text-feedback string
-;
-; Controls if text is drawn when doing an xor action (like copy/move)
-; Comment out if you want the default mode.
-; Not in production yet.
-;
-(text-feedback "only-when-readable")
-;(text-feedback "always")
-
-; text-display-zoomfactor number
-;
-; Sets the zoomfactor number (~150 being the most zoomed out factor) 
-; (zoom factors get smaller as you zoom in) at which text is displayed
-; completely (not a line).  This is only valid if above is set to
-; "only-when-readable" 
-;
-(text-display-zoomfactor 30)
-
-; text-origin-marker string
-;
-; Controls if the text origin markers are displayed (or not)
-;
-(text-origin-marker "enabled")
-;(text-origin-marker "disabled")
-
 ; scrollbars string
 ;
 ; Controls if the scrollbars are displayed (enabled) or not (disabled)
-; If you disable the scrollbars, you will not be able to use the scroll 
+; If you disable the scrollbars, you will not be able to use the scroll
 ; wheel on your mouse.  This is an unfortunate side effect of how the
 ; code is implemented.
 ;
 (scrollbars "enabled")
 ;(scrollbars "disabled")
-
-; scrollbar-update string
-;
-; Specifies the behavior of the scrollbars in the main window.
-;    continuous - display is redrawn as you move the scrollbar
-;    delayed - display is redrawn once you stop moving the scrollbar
-; Default is continuous
-;
-(scrollbar-update "continuous")
-;(scrollbar-update "delayed")
 
 ; raise-dialog-boxes-on-expose string
 ;
@@ -351,44 +264,17 @@
 ;(raise-dialog-boxes-on-expose "enabled")
 (raise-dialog-boxes-on-expose "disabled")
 
-; object-clipping string
-;
-; Determines if the object clipping code is executed or not
-; This code does speed up redraws a bit.
-;   Possible options: enabled or disabled
-; Default is enabled, I do not recommend turning this off, since some X
-; servers don't handle clipping correctly.
-;
-(object-clipping "enabled")
-;(object-clipping "disabled")
-
 ; embed-components string
 ;
-; Determines if the newly placed components are embedded in the schematic 
-; or if only the filename is specified and the component is searched for 
-; instead.  If it is enabled, then all new components will be embedded 
-; othewise they are not embedded.  This can be controlled on the fly during
+; Determines if the newly placed components are embedded in the schematic
+; or if only the filename is specified and the component is searched for
+; instead.  If it is enabled, then all new components will be embedded
+; otherwise they are not embedded.  This can be controlled on the fly during
 ; runtime with the "Embed Component" checkbox on the select component dialog
 ; box
 ;
 ;(embed-components "enabled")
 (embed-components "disabled")
-
-; component-dialog-attributes stringlist
-;
-; Sets a list of attributs that are visible in the component select dialog.
-; The attributes are sorted in the same order as they appear in the list.
-; If the first list element is an asterisk "*", all attributes will be 
-; displayed in alphabetical order.
-; An empty list will disable the attribute view in the dialog.
-;
-;(component-dialog-attributes '("device" "description" "footprint" "comment"
-;			       "net" "model" "model-name" "file" "value"
-;			       "numslots" "slotdef" "slot"
-;			       "documentation" "symversion" "author"
-;			       "use-license=" "dist-license="))
-(component-dialog-attributes '("*"))
-;(component-dialog-attributes '())
 
 ; logging string
 ;
@@ -410,13 +296,13 @@
 ;       later   - NOT opened up when gschem starts
 ;                 (can be opened by Options/Show Log Window)
 ;
-(log-window "startup")
-;(log-window "later")
+;(log-window "startup")
+(log-window "later")
 
 
 ; log-window-type string
 ;
-; Controls if the log message window is a transient or if it is decorated 
+; Controls if the log message window is a transient or if it is decorated
 ; as a normal window (this is dependant on the window manager doing decoration
 ; right)
 ;
@@ -454,7 +340,7 @@
 ; snap-size number
 ;
 ; Sets the default grid spacing at start-up of gschem.
-; 
+;
 (snap-size 100)
 
 ; text-caps-style string
@@ -470,7 +356,7 @@
 
 ;  file-preview string
 ;
-;  Controls if the preview area in the File Open/Save As and Component 
+;  Controls if the preview area in the File Open/Save As and Component
 ;  dialog boxes is enabled by default or not
 ;
 (file-preview "enabled")
@@ -487,26 +373,6 @@
 (enforce-hierarchy "enabled")
 ;(enforce-hierarchy "disabled")
 
-; untitled-name string
-;
-; Specify the default untitled basename (usually only used a startup time)
-; And typically not changed at runtime
-;
-(untitled-name "untitled")
-
-; window-size width height 
-;
-; Specifies the size of the drawing area window.  The width and height
-; are specified in pixels and do not include the three menu bars and 
-; scrollbars (so the window will be larger than the specified 
-; measurements). Try to keep an aspect ratio of 1.333333 if at all possible. 
-; These numbers are NOT the true size of the window, but of the drawing area.
-;
-;(window-size 650 487)  ; Good size for 800x600
-(window-size 900 650)   ; Good size for 1024x768
-;(window-size 950 712)  ; Good size for 1152x864
-;(window-size 1100 825) ; Good size for 1280x1024
-
 ; world-size width height border
 ;
 ; Specifies the size of the world and a border (in world space units)
@@ -520,145 +386,6 @@
 (world-size 120.0 90.0 1.0)
 ;(world-size 60.0 45.0 1.0)
 
-; page-size width height 
-;
-; Specifies the size of the default paper size
-; Be sure all inputs are reals (floats/doubles) and don't try to reverse
-; the values: to get a portrait mode.  Code to support that needs to be added
-; The code that implements this automatically transforms the dimensions into
-; the proper aspect ratio.  All units are in inches. (use output-orientation
-; to get portrait mode)
-;
-(paper-size 11.0 8.5) ; letter
-;(paper-size 14.0 8.5) ; legal 
-;(paper-size 8.5 5.5) ; statement
-;(paper-size 17.0 11.0) ; tabloid
-;(paper-size 11.0 17.0) ; ledger
-;(paper-size 13.0 8.5) ; folio
-;(paper-size 10.833 8.472) ; quarto 
-;(paper-size 14 10) ; 10x14
-;(paper-size 10.0 7.5) ; executive
-;(paper-size 11.0 8.5) ; A
-;(paper-size 17.0 11.0) ; B 
-;(paper-size 22.0 17.0) ; C 
-;(paper-size 34.0 22.0) ; D 
-;(paper-size 44.0 34.0) ; E 
-;(paper-size 46.81 33.11) ; A0 
-;(paper-size 33.11 23.39) ; A1
-;(paper-size 23.39 16.54) ; A2
-;(paper-size 16.54 11.69) ; A3
-;(paper-size 11.69 8.27) ; A4
-;(paper-size 8.27 5.83) ; A5
-;(paper-size 5.83 4.13) ; A6
-;(paper-size 4.13 2.91) ; A7 
-;(paper-size 2.91 2.05) ; A8
-;(paper-size 2.05 1.46) ; A9 
-;(paper-size 1.46 1.02) ; A10
-;(paper-size 1.02 0.71) ; A11
-;(paper-size 0.71 0.51) ; A12
-
-; paper-sizes string width height
-;
-; Specifies which paper sizes are available for printing.
-; The width and height parameters are in the order for landscape printing,
-; so reversing them for portrait won't work just yet. (and that will be 
-; implemented differently. 
-; The default paper size is set above.  All units are in inches (forgiveness
-; please).
-;
-; You MUST change this list in this file (gschem-systemrc) if you want
-; any reordering changes to take effect.
-;
-(paper-sizes "Letter : 8.5 in x 11 in" 11.0 8.5)
-(paper-sizes "Legal : 8.5 in x 14 in" 14.0 8.5)
-(paper-sizes "Statement : 5.5 in x 8.5 in" 8.5 5.5)
-(paper-sizes "Tabloid : 11 in x 17 in" 17.0 11.0) 
-(paper-sizes "Ledger : 17 in x 11 in" 11.0 17.0) 
-(paper-sizes "Folio : 8.5 in x 13 in" 13.0 8.5) 
-(paper-sizes "Quarto : 8.472 in x 10.833 in" 10.833 8.472) 
-(paper-sizes "10x14 : 10 in x 14 in " 14.0 10.0) 
-(paper-sizes "Executive : 7.5 x 10" 10.0 7.5) 
-(paper-sizes "A : 8.5 in x 11 in" 11.0 8.5)
-(paper-sizes "B : 11 in x 17 in" 17.0 11.0)
-(paper-sizes "C : 17 in x 22 in" 22.0 17.0)
-(paper-sizes "D : 22 in x 34 in" 34.0 22.0)
-(paper-sizes "E : 34 in x 44 in" 44.0 34.0)
-(paper-sizes "A0  84.10 cm x 118.90 cm" 46.81 33.11)
-(paper-sizes "A1  59.40 cm x 84.10 cm" 33.11 23.39)
-(paper-sizes "A2  42.00 cm x 59.40 cm" 23.39 16.54)
-(paper-sizes "A3  29.70 cm x 42.00 cm" 16.54 11.69)
-(paper-sizes "A4  21.00 cm x 29.70 cm" 11.69 8.27)
-(paper-sizes "A5  14.80 cm x 21.00 cm" 8.27 5.83)
-(paper-sizes "A6  10.50 cm x 14.80 cm" 5.83 4.13)
-(paper-sizes "A7  7.40 cm x 10.50 cm" 4.13 2.91)
-(paper-sizes "A8  5.20 cm x 7.40 cm" 2.91 2.05)
-(paper-sizes "A9  3.70 cm x 5.20 cm" 2.05 1.46)
-(paper-sizes "A10 2.60 cm x 3.70 cm" 1.46 1.02)
-(paper-sizes "A11 1.80 cm x 2.60 cm" 1.02 0.71)
-(paper-sizes "A12 1.30 cm x 1.80 cm" 0.71 0.51)
-
-; print-command string 
-;
-; The command to send data to in order to print to a printer.  On most
-; systems, this will be "lpr".
-;
-(print-command "lpr")
-
-
-; output-type string
-;
-; Controls what is actually printed
-;	string is either "extents" or "extents no margins" or 
-;       "current window"
-;
-(output-type "extents")
-;(output-type "extents no margins")
-;(output-type "current window")
-;;; (output-type "limits")  "limits" is considered deprecated and should 
-;;;                         not be used.
-
-; output-orientation string
-;
-; Controls which way the output page is layed out (landscape or portrait)
-;
-;(output-orientation "portrait")
-(output-orientation "landscape")
-
-; output-color string
-;
-; Controls if output (postscript) is color (enabled) or black/white (disabled)
-;
-(output-color "disabled")
-;(output-color "enabled")
-
-
-; output-capstyle string
-;
-; Controls the capstyle at the end of lines in the postscript output
-;
-(output-capstyle "square")
-;(output-capstyle "round")
-;(output-capstyle "butt")
-
-
-; setpagedevice-orientation string
-;
-; If enabled, puts a << /Orientation x >> setpagedevice into the postscript
-; output.  x is either 1 for landscape or 0 for portrait.
-;
-(setpagedevice-orientation "disabled")
-;(setpagedevice-orientation "enabled")
-
-
-; setpagedevice-pagesize string
-;
-; If enabled, puts a << /PageSize XxY >> setpagedevice into the postscript
-; output.  XxY is the size of the paper in points.
-;
-(setpagedevice-pagesize "disabled")
-;(setpagedevice-pagesize "enabled")
-
-
 ; image-color string
 ;
 ; Controls if image (png) is color (enabled) or black/white (disabled)
@@ -668,8 +395,8 @@
 
 ; middle-button string
 ;
-; Controls if the middle mouse button draws strokes, repeats the last 
-; command, does an action (move and copy (holding down the ALT key) 
+; Controls if the middle mouse button draws strokes, repeats the last
+; command, does an action (move and copy (holding down the ALT key)
 ; are supported) on a single objects, or if it does the mouse panning.
 ;
 (middle-button "mousepan")
@@ -679,18 +406,26 @@
 
 ; third-button string
 ;
-; Controls if the third mouse button performs the popup ("popup") or 
+; Controls if the third mouse button performs the popup ("popup") or
 ; if it does the mouse panning ("mousepan")
 ;
 (third-button "popup")
 ;(third-button "mousepan")
+
+; third-button-cancel string
+;
+; Controls if the third mouse in mousepan mode cancels draw actions such as
+; placing of a component or drawing of a primitive
+;
+(third-button-cancel "enabled")
+;(third-button-cancel "disabled")
 
 ; scroll-wheel string
 ;
 ; Controls the binding of the mouse scroll wheel.
 ; "classic" style is the gschem default, where scrolling with no modifier
 ; key is mapped to zoom, + CTRL -> x-axis pan, + SHIFT -> y-axis pan.
-; "gtk" style changes the behaviour to be more like other GTK appliactions,
+; "gtk" style changes the behaviour to be more like other GTK applications,
 ; no modifier -> y-axis pan, + CTRL -> zoom, + SHIFT -> x-axis pan.
 (scroll-wheel "classic")
 ;(scroll-wheel "gtk")
@@ -716,15 +451,15 @@
 ; Bus ripper controls
 ; The following keywords control the auto bus ripper addition code
 ;
-; bus-ripper-size  : Sets the size of the auto bus rippers.  
-; bus-ripper-type  : Sets the bus ripper type either a "component" or 
+; bus-ripper-size  : Sets the size of the auto bus rippers.
+; bus-ripper-type  : Sets the bus ripper type either a "component" or
 ;                    plain "net"
-; bus-ripper-syname  : If above is set to component, specify the symbol name.
-;                      The symbol must exist in a component library
-; bus-ripper-rotation  : Either "symmetric" or "non-symmetric".  This deals 
-;                        with how the bus ripper symbol is rotated when it 
+; bus-ripper-symname  : If above is set to component, specify the symbol name.
+;                       The symbol must exist in a component library
+; bus-ripper-rotation  : Either "symmetric" or "non-symmetric".  This deals
+;                        with how the bus ripper symbol is rotated when it
 ;                        is auto added to a schematic.
-;   
+;
 
 ; The default bus ripper
 (bus-ripper-size 200)
@@ -732,15 +467,23 @@
 (bus-ripper-symname "busripper-1.sym")
 (bus-ripper-rotation "non-symmetric")
 
-; A symmetric alternative 
+; A symmetric alternative
 ;(bus-ripper-size 200)
 ;(bus-ripper-type "component")
 ;(bus-ripper-symname "busripper-2.sym")
 ;(bus-ripper-rotation "symmetric")
 
-; A simple net 
+; A simple net
 ;(bus-ripper-size 200)
 ;(bus-ripper-type "net")
+
+; Grid mode
+;
+; The grid-mode keyword controls which mode of grid is used by default in
+; gschem.
+;(grid-mode "none")
+;(grid-mode "dots")
+(grid-mode "mesh")
 
 ; Dots grid dot size
 ;
@@ -784,7 +527,7 @@
 ; force-boundingbox string
 ;
 ; Controls if the entire bounding box of a symbol is used when figuring out
-; whichend of the pin is considered the active port.  Enable this when 
+; whichend of the pin is considered the active port.  Enable this when
 ; gschem is guessing incorrectly.
 ;
 (force-boundingbox "disabled")
@@ -793,25 +536,25 @@
 
 ; add-attribute-offset integer
 ;
-; This has not been implemented/debugged yet.  
-; This has not been implemented/debugged yet.  
-; This has not been implemented/debugged yet.  
+; This has not been implemented/debugged yet.
+; This has not been implemented/debugged yet.
+; This has not been implemented/debugged yet.
 ;
 ; Controls a offset which is added to the location of text items that are
 ; added to an object as an attribute.  This offset is added when the following
 ; conditions occur:
 ;
 ;  1) Add/Attribute... has been invoked via the hotkey
-;  2) It is the the "netname" attribute being added
+;  2) It is the "netname" attribute being added
 ;  3) It is being attached to a horizontal or vertical net segment
 ;  4) The initial mouse position is at or near the actual net (with one
 ;     grid unit).
 ;
-; If these four conditions are not met, then this offset is not added. 
+; If these four conditions are not met, then this offset is not added.
 ;(add-attribute-offset 50)
 
 
-; reset-componet-library
+; reset-component-library
 ;
 ; When reset-component-library is executed, then all known component library
 ; paths are erased.  This is useful if the user wants to override all the
@@ -858,27 +601,27 @@
 
 
 ; Define default pin attributes
-; Attributes: 
+; Attributes:
 ;   - Attribute name.
 ;   - Value of the attribute.
 ;   - Visibility: #t (visible) or #f (hidden).
-;   - Show_list:  a list containing what to show, using 
+;   - Show_list:  a list containing what to show, using
 ;                 elements like "name" or "value", or an empty list.
-(define default-pin-attributes 
+(define default-pin-attributes
        '(("pintype"   "unknown" #f ())
 	 ("pinlabel"  "unknown" #t ("value"))
 	 ("pinnumber" "0"       #t ("value"))
 	 ("pinseq"    "0"       #f ())))
 
 ; Convert a character into a string
-(define char2str 
+(define char2str
   (lambda (char)
     (list->string (list char))))
 
-; Attribute autoplacement grid 
+; Attribute autoplacement grid
 (define autoplace-attributes-grid 50)
 
-; Load the default position of attributes, for attribute autoplacing 
+; Load the default position of attributes, for attribute autoplacing
 ; functions.
 (load-from-path "default-attrib-positions.scm")
 
@@ -896,20 +639,20 @@
 ; Comment in this to load the functions to place the attributes automatically.
 (load-from-path "auto-place-attribs.scm")
 
-; Autoplace pin text attributes hook. 
+; Autoplace pin text attributes hook.
 ; Comment in these if you want the pin attributes to be automatically placed.
 ; There are different hooks for situations like adding a new pin and rotating
-; or mirroring an existing one. 
+; or mirroring an existing one.
 ; The #t at the end means that function is appended to the end of the hook.
 (add-hook! add-pin-hook (lambda (pin)
 	(autoplace-pin-attributes pin )) #t)
-(add-hook! rotate-pin-hook (lambda (pin)
-	(autoplace-pin-attributes pin )) #t)
-(add-hook! mirror-pin-hook (lambda (pin)
-	(autoplace-pin-attributes pin )) #t)
+;(add-hook! rotate-pin-hook (lambda (pin)
+;	(autoplace-pin-attributes pin )) #t)
+;(add-hook! mirror-pin-hook (lambda (pin)
+;	(autoplace-pin-attributes pin )) #t)
 
-; Autoplace component/net/buses text attributes hook. 
-; Comment in these if you want the component attributes to be 
+; Autoplace component/net/buses text attributes hook.
+; Comment in these if you want the component attributes to be
 ; automatically placed.
 ; There are different hooks for situations like adding a new pin, rotating
 ; or mirroring an existing one, adding a new attribute or a new component.
@@ -925,6 +668,11 @@
 ;(add-hook! complex-place-list-changed-hook (lambda (object)
 ;         (autoplace-object-attributes object)) #t)
 
+; Autoplace netname= attribute hook.  This autoplaces netname
+; attribute at the time that it's added.
+(load-from-path "auto-place-netname.scm")
+(add-hook! add-objects-hook place-netname-attribute-handler)
+
 ; Automatically place a titleblock (or other components) when creating
 ; a new page.
 ; Comment in these lines if you want gschem to automatically place a titleblock
@@ -932,9 +680,9 @@
 ; Users can customize the default titleblock by adding the following line
 ; (without the semi-colons at the beginning) to the gschemrc file:
 ;; (define default-titleblock "title-A4.sym")
-;; Change "title-A4.sym" by the name of your prefered titleblock!
+;; Change "title-A4.sym" by the name of your preferred titleblock!
 ;
-; If you don't want a titleblock to be added automatically, then add one of 
+; If you don't want a titleblock to be added automatically, then add one of
 ; the following lines to your gschemrc file (without the semicolon).
 ; There are several ways, so just choose one:
 ;   (define default-titleblock "")
@@ -955,8 +703,8 @@
 	    ; If the guile installation doesn't provide the regex module,
 	    ; don't care about the page filename.
 	    (if (provided? 'regex)
-		(not (string-match ".*\\.[sS][yY][mM]" 
-				   (get-page-filename page)))
+		(not (string-match ".*\\.[sS][yY][mM]"
+				   (or (get-page-filename page) "")))
 		#t))
 ;      Syntax             Symbol name        X   Y    angle selectable mirrored
        (add-component-at-xy page default-titleblock 40000 40000   0       #f       #f))
@@ -990,15 +738,17 @@
 ; The order of the attribute-name keywords determines the order they
 ; are displayed.
 ;
-(attribute-name "netname")
-(attribute-name "footprint")
-(attribute-name "value")
 (attribute-name "refdes")
+(attribute-name "value")
+(attribute-name "footprint")
+(attribute-name "device")
 (attribute-name "source")
+(attribute-name "param")
 (attribute-name "model-name")
 (attribute-name "model")
+(attribute-name "netname")
 (attribute-name "net")
-(attribute-name "device")
+(attribute-name "portname")
 (attribute-name "pinnumber")
 (attribute-name "pinseq")
 (attribute-name "pintype")
@@ -1009,8 +759,8 @@
 (attribute-name "graphical")
 (attribute-name "description")
 (attribute-name "documentation")
-(attribute-name "symversion")
 (attribute-name "comment")
+(attribute-name "symversion")
 (attribute-name "author")
 (attribute-name "dist-license")
 (attribute-name "use-license")
@@ -1025,11 +775,11 @@
 ;
 
 ;
-; This section defines associations between a stroke sequence and a 
+; This section defines associations between a stroke sequence and a
 ; guile function which is executed when the stroke is drawn in the
 ; gschem window
 ;
-; Strokes are defined as follows: 
+; Strokes are defined as follows:
 ;
 ; 1  2  3
 ;
@@ -1038,111 +788,128 @@
 ; 7  8  9
 ;
 ; The sequence of number such as "852" specify how the stroke is drawn.
-; Sequence "852" happens to be a vertical line drawn from the bottom going 
+; Sequence "852" happens to be a vertical line drawn from the bottom going
 ; up.
 ;
-; Please see the libstroke documentation for further information on the 
-; stroke description.  
+; Please see the libstroke documentation for further information on the
+; stroke description.
 ;
-; For the most part I went a little overboard on the stroke defs, you 
-; probably can get away with many less stroke defs, but I'm a very 
-; sloppy stroke drawing person. :-)  Guess my teachers were always 
+; For the most part I went a little overboard on the stroke defs, you
+; probably can get away with many less stroke defs, but I'm a very
+; sloppy stroke drawing person. :-)  Guess my teachers were always
 ; right-- my handwritting was/is awful.
 ;
 ; Be careful here, strokes is a rather large list, and make sure you maintain
 ; proper ( and )'s.
-; 
+;
 
 (define strokes
-; Letter L for line
-  '(("14789" . add-line)
+  `(;; Letter L for line
+    ("14789" . ,&add-line)
 
-; Letter Z for zoom window
-("125789" . view-zoom-box)
-("1254789" . view-zoom-box)
-("1235789" . view-zoom-box)
-("2354789" . view-zoom-box)
-("2324789" . view-zoom-box)
-("12354789" . view-zoom-box)
-("12324789" . view-zoom-box)
-("12365789" . view-zoom-box)
-("1232789" . view-zoom-box)
+    ;; Letter Z for zoom window
+    ("125789"   . ,&view-zoom-box)
+    ("1254789"  . ,&view-zoom-box)
+    ("1235789"  . ,&view-zoom-box)
+    ("2354789"  . ,&view-zoom-box)
+    ("2324789"  . ,&view-zoom-box)
+    ("12354789" . ,&view-zoom-box)
+    ("12324789" . ,&view-zoom-box)
+    ("12365789" . ,&view-zoom-box)
+    ("1232789"  . ,&view-zoom-box)
 
-; line up for zoom out
-("852" . view-zoom-out)
-; line down for zoom in
-("258" . view-zoom-in)
+    ;; line up for zoom out
+    ("852" . ,&view-zoom-out)
+    ;; line down for zoom in
+    ("258" . ,&view-zoom-in)
 
-; Letter C for copy
-("3214789" . edit-copy)
-("214789" . edit-copy)
-("21489" . edit-copy)
-("32478" . edit-copy)
+    ;; Letter C for copy
+    ("3214789" . ,&edit-copy)
+    ("214789"  . ,&edit-copy)
+    ("21489"   . ,&edit-copy)
+    ("32478"   . ,&edit-copy)
 
-; Letter E for edit
-("563214789" . edit-edit)
-("53214789" . edit-edit)
-("5321478" . edit-edit)
-("5214789" . edit-edit)
-("521478" . edit-edit)
-("453214789" . edit-edit)
-("45321478" . edit-edit)
-("456321478" . edit-edit)
-("456214789" . edit-edit)
-("45621478" . edit-edit)
+    ;; Letter E for edit
+    ("563214789" . ,&edit-edit)
+    ("53214789"  . ,&edit-edit)
+    ("5321478"   . ,&edit-edit)
+    ("5214789"   . ,&edit-edit)
+    ("521478"    . ,&edit-edit)
+    ("453214789" . ,&edit-edit)
+    ("45321478"  . ,&edit-edit)
+    ("456321478" . ,&edit-edit)
+    ("456214789" . ,&edit-edit)
+    ("45621478"  . ,&edit-edit)
 
-; Letter N for net
-("415963" . add-net)
-("7414863" . add-net)
-("74148963" . add-net)
-("74158963" . add-net)
-("7415963" .  add-net)
+    ;; Letter N for net
+    ("415963"   . ,&add-net)
+    ("7414863"  . ,&add-net)
+    ("74148963" . ,&add-net)
+    ("74158963" . ,&add-net)
+    ("7415963"  . ,&add-net)
 
+    ;; Letter M for move
+    ("741236963"   . ,&edit-move)
+    ("7412572369"  . ,&edit-move)
+    ("7412575369"  . ,&edit-move)
+    ("741258369"   . ,&edit-move)
+    ("74125852369" . ,&edit-move)
+    ("7412585369"  . ,&edit-move)
+    ("74125863"    . ,&edit-move)
+    ("74126963"    . ,&edit-move)
+    ("741475369"   . ,&edit-move)
+    ("7414785369"  . ,&edit-move)
+    ("74148369"    . ,&edit-move)
+    ("7414852369"  . ,&edit-move)
+    ("741485369"   . ,&edit-move)
+    ("74148669"    . ,&edit-move)
+    ("741552369"   . ,&edit-move)
+    ("741575369"   . ,&edit-move)
+    ("7415852369"  . ,&edit-move)
+    ("741585369"   . ,&edit-move)
+    ("74185369"    . ,&edit-move)
+    ("74255369"    . ,&edit-move)
+    ("7425852369"  . ,&edit-move)
+    ("742585369"   . ,&edit-move)
+    ("7426963"     . ,&edit-move)
+    ("74585369"    . ,&edit-move)
 
-; Letter M for move
-("741236963" . edit-move)
-("7412572369" . edit-move)
-("7412575369" . edit-move)
-("741258369" . edit-move)
-("74125852369" . edit-move)
-("7412585369" . edit-move)
-("74125863" . edit-move)
-("74126963" . edit-move)
-("741475369" . edit-move)
-("7414785369" . edit-move)
-("74148369" . edit-move)
-("7414852369" . edit-move)
-("741485369" . edit-move)
-("74148669" . edit-move)
-("741552369" . edit-move)
-("741575369" . edit-move)
-("7415852369" . edit-move)
-("741585369" . edit-move)
-("74185369" . edit-move)
-("74255369" . edit-move)
-("7425852369" . edit-move)
-("742585369" . edit-move)
-("7426963" . edit-move)
-("74585369" . edit-move)
+    ;; Letter D for delete
+    ("14786321"  . ,&edit-delete)
+    ("14789621"  . ,&edit-delete)
+    ("147896321" . ,&edit-delete)
+    ("15896321"  . ,&edit-delete)
+    ("257896321" . ,&edit-delete)
+    ("25896321"  . ,&edit-delete)
+    ("4789621"   . ,&edit-delete)
 
-; Letter D for delete
-("14786321" . edit-delete)
-("14789621" . edit-delete)
-("147896321" . edit-delete)
-("15896321" . edit-delete)
-("257896321" . edit-delete)
-("25896321" . edit-delete)
-("4789621" . edit-delete)
+    ;; Letter S for select
+    ("2145987"  . ,&edit-select)
+    ("215987"   . ,&edit-select)
+    ("2156987"  . ,&edit-select)
+    ("21256987" . ,&edit-select)
+    ("3215987"  . ,&edit-select)
+    ("32156987" . ,&edit-select)
+    ("32148987" . ,&edit-select)
+    ("32145987" . ,&edit-select)
 
-; Letter S for select
-("2145987" . edit-select )
-("215987" . edit-select )
-("2156987" . edit-select )
-("21256987" . edit-select )
-("3215987" . edit-select )
-("32156987" . edit-select )
-("32148987" . edit-select )
-("32145987" . edit-select )))
+    ;; Left for previous page
+    ("654" . ,&page-prev)
+
+    ;; Right for next page
+    ("456" . ,&page-next)
+
+    ;; Right and down to edit subschematic
+    ("12369" . ,&hierarchy-down-schematic)
+
+    ;; Left and down to edit symbol
+    ("32147" . ,&hierarchy-down-symbol)
+
+    ;; Up and sideways (any order) to go up
+    ("96321" . ,&hierarchy-up)
+    ("98741" . ,&hierarchy-up)
+    ("74123" . ,&hierarchy-up)
+    ("78963" . ,&hierarchy-up)))
 
 ;
 ; End of stroke related keywords
@@ -1152,26 +919,45 @@
 ; Start of keymapping related keywords
 ;
 
+;;;; Custom actions
+;;
+;; Actions defined here are available for key bindings and/or menu
+;; items.  Example:
+;;
+;; (define-action (&hello-world
+;;                 #:name       "Hello World"
+;;                 #:label      "Hello World"
+;;                 #:menu-label "_Hello World")
+;;   (display "Hello world!")
+;;   (newline))
+;;
+;; #:name is the general name of the action, e.g. shown in the hotkey
+;; list.  #:label is the label associated with the action, e.g. shown
+;; in the popup menu.  #:menu-label is the label of the item as it
+;; will appear in the main menu.  Only #:menu-label should contain an
+;; underscored letter.
+
+
 ;;;; Keymapping
 ;;
 ;; Everything is case-sensitive.  Any number of keys may be bound in
 ;; sequence, and each keystroke consists of a non-modifier key with
 ;; some number of modifiers applied.  Examples:
 ;;
-;;  * (global-set-key "F N" 'file-new-window)
+;;  * (global-set-key "F N" &file-new-window)
 ;;
 ;;    The "New Window" command will be run when an <F> is typed,
 ;;    followed by an <A>.
 ;;
-;;  * (global-set-key "<Control><Shift>A" 'edit-deselect)
+;;  * (global-set-key "<Control><Shift>A" &edit-deselect)
 ;;
 ;;    The "Deselect All" command will be run when the <Ctrl> and
 ;;    <Shift> keys are held down, and the <A> key is pressed.
 ;;
-;;  * (global-set-key "O <Shift>S" 'options-snapsize)
+;;  * (global-set-key "E <Shift>B" &edit-unembed)
 ;;
-;;    The "Snap Size" dialog box will be shown when an <O> is typed,
-;;    followed by an <S> typed with the <Shift> key held down.
+;;    The "Unembed" command will be run when an <E> is typed,
+;;    followed by an <B> typed with the <Shift> key held down.
 ;;
 ;; Key names can be found in /usr/include/gtk-2.0/gdk/gdkkeysyms.h on
 ;; most Linux systems.  For other systems, please see your platform
@@ -1179,388 +965,421 @@
 ;;
 ;; Later keybindings override earlier ones.
 
-(global-set-key "A C" 'add-component)
-(global-set-key "A A" 'add-attribute-hotkey)
-(global-set-key "A N" 'add-net-hotkey)
-(global-set-key "A U" 'add-bus-hotkey)
-(global-set-key "A T" 'add-text)
-(global-set-key "A L" 'add-line-hotkey)
-(global-set-key "A B" 'add-box-hotkey)
-(global-set-key "A I" 'add-circle-hotkey)
-(global-set-key "A R" 'add-arc-hotkey)
-(global-set-key "A P" 'add-pin-hotkey)
-(global-set-key "A G" 'add-picture-hotkey)
+(global-set-key "A C" &add-last-component)
+(global-set-key "A A" &add-attribute)
+(global-set-key "A N" &add-net)
+(global-set-key "A U" &add-bus)
+(global-set-key "A T" &add-text)
+(global-set-key "A L" &add-line)
+(global-set-key "A H" &add-path)
+(global-set-key "A B" &add-box)
+(global-set-key "A V" &add-circle)
+(global-set-key "A I" &add-circle)
+(global-set-key "A R" &add-arc)
+(global-set-key "A P" &add-pin)
+(global-set-key "A G" &add-picture)
 
-(global-set-key "<Control>A" 'edit-select-all)
-(global-set-key "<Control><Shift>A" 'edit-deselect)
+(global-set-key "B" &add-box)
+(global-set-key "<Shift>B" &add-bus)
+(global-set-key "C" &edit-copy)
+(global-set-key "D" &edit-delete)
 
-(global-set-key "B" 'add-box-hotkey)
-(global-set-key "<Shift>B" 'add-bus-hotkey)
-(global-set-key "C" 'edit-copy-hotkey)
-(global-set-key "<Control>C" 'clipboard-copy)
-(global-set-key "D" 'edit-delete)
+(global-set-key "E S" &edit-select)
+(global-set-key "E C" &edit-copy)
+(global-set-key "E E" &edit-edit)
+(global-set-key "E Y" &edit-mcopy)
+(global-set-key "E X" &edit-text)
+(global-set-key "E M" &edit-move)
+(global-set-key "E D" &edit-delete)
+(global-set-key "E R" &edit-rotate-90)
+(global-set-key "E I" &edit-mirror)
+(global-set-key "E <Shift>S" &edit-slot)
+(global-set-key "E O" &edit-properties)    ; merged with "E P"
+(global-set-key "E L" &edit-lock)
+(global-set-key "E <Shift>L" &edit-unlock)
+(global-set-key "E W" &edit-properties)    ; merged with "E P"
+(global-set-key "E F" &edit-properties)    ; merged with "E P"
+(global-set-key "E P" &edit-properties)
+(global-set-key "E T" &edit-translate)
+(global-set-key "E <Shift>colon" &edit-invoke-macro)
+(global-set-key "E B" &edit-embed)
+(global-set-key "E <Shift>B" &edit-unembed)
+(global-set-key "E U" &edit-update)
+(global-set-key "E N" &edit-show-hidden)
 
-(global-set-key "E <Shift>U" 'edit-undo)
-(global-set-key "E <Shift>R" 'edit-redo)
-(global-set-key "E S" 'edit-select)
-(global-set-key "E C" 'edit-copy-hotkey)
-(global-set-key "E E" 'edit-edit)
-(global-set-key "E Y" 'edit-mcopy-hotkey)
-(global-set-key "E X" 'edit-text)
-(global-set-key "E M" 'edit-move-hotkey)
-(global-set-key "E D" 'edit-delete)
-(global-set-key "E R" 'edit-rotate-90-hotkey)
-(global-set-key "E I" 'edit-mirror-hotkey)
-(global-set-key "E <Shift>S" 'edit-slot)
-(global-set-key "E O" 'edit-color)
-(global-set-key "E L" 'edit-lock)
-(global-set-key "E <Shift>L" 'edit-unlock)
-(global-set-key "E W" 'edit-linetype)
-(global-set-key "E F" 'edit-filltype)
-(global-set-key "E T" 'edit-translate)
-(global-set-key "E <Shift>colon" 'edit-invoke-macro)
-(global-set-key "E B" 'edit-embed)
-(global-set-key "E U" 'edit-unembed)
-(global-set-key "E P" 'edit-update)
-(global-set-key "E N" 'edit-show-hidden)
+(global-set-key "F W" &file-new-window)
+(global-set-key "F N" &file-new)
+(global-set-key "F O" &file-open)
+(global-set-key "F S" &file-save)
+(global-set-key "F E" &page-close)
+(global-set-key "F C" &page-close)
+(global-set-key "F A" &file-save-as)
+(global-set-key "F L" &file-save-all)
+(global-set-key "F P" &file-print)
+(global-set-key "F R" &page-revert)
+(global-set-key "F I" &file-image)
+(global-set-key "F T" &file-script)
+(global-set-key "F <Shift>R" &file-repl)
+;(global-set-key "F C" &file-close-window)
+(global-set-key "F Q" &file-quit)
 
-(global-set-key "F W" 'file-new-window)
-(global-set-key "F N" 'file-new)
-(global-set-key "F O" 'file-open)
-(global-set-key "F S" 'file-save)
-(global-set-key "F E" 'page-close)
-(global-set-key "F A" 'file-save-as)
-(global-set-key "F L" 'file-save-all)
-(global-set-key "F P" 'file-print)
-(global-set-key "F R" 'page-revert)
-(global-set-key "F I" 'file-image)
-(global-set-key "F T" 'file-script)
-(global-set-key "F C" 'file-close-window)
-(global-set-key "F Q" 'file-quit)
+(global-set-key "G colon" &edit-invoke-macro)
+(global-set-key "G S" &file-script)
+(global-set-key "G R" &file-repl)
 
-(global-set-key "H A" 'help-about)
-(global-set-key "H M" 'help-manual)
-(global-set-key "H F" 'help-faq)
-(global-set-key "H W" 'help-wiki)
-(global-set-key "H H" 'help-hotkeys)
-(global-set-key "H C" 'hierarchy-documentation)
+(global-set-key "F1" &help-manual)
+(global-set-key "H A" &help-about)
+(global-set-key "H M" &help-manual)
+(global-set-key "H F" &help-faq)
+(global-set-key "H G" &help-guide)
+(global-set-key "H W" &help-wiki)
+(global-set-key "H H" &help-hotkeys)
+(global-set-key "H C" &hierarchy-documentation)
 
-(global-set-key "<Shift>H D" 'hierarchy-down-schematic)
-(global-set-key "<Shift>H S" 'hierarchy-down-symbol)
-(global-set-key "<Shift>H U" 'hierarchy-up)
-(global-set-key "<Shift>H O" 'hierarchy-documentation)
+;(global-set-key "<Shift>H D" &hierarchy-down-schematic)
+;(global-set-key "<Shift>H S" &hierarchy-down-symbol)
+;(global-set-key "<Shift>H U" &hierarchy-up)
+;(global-set-key "<Shift>H O" &hierarchy-documentation)
 
-(global-set-key "I" 'add-component)
-(global-set-key "L" 'add-line-hotkey)
-(global-set-key "M" 'edit-move-hotkey)
-(global-set-key "N" 'add-net-hotkey)
+(global-set-key "I" &add-component)
+(global-set-key "L" &add-line)
+(global-set-key "M" &edit-move)
+(global-set-key "N" &add-net)
 
-(global-set-key "O T" 'options-text-size)
-(global-set-key "O A" 'options-action-feedback)
-(global-set-key "O G" 'options-grid)
-(global-set-key "O S" 'options-snap)
-(global-set-key "O R" 'options-rubberband)
-(global-set-key "O M" 'options-magneticnet)
-(global-set-key "O <Shift>S" 'options-snap-size)
-(global-set-key "O L" 'options-show-log-window)
-(global-set-key "O C" 'options-show-coord-window)
+(global-set-key "O O" &options-options)
+(global-set-key "O A" &options-action-feedback)
+(global-set-key "O G" &options-grid)
+(global-set-key "O S" &options-snap)
+(global-set-key "O R" &options-rubberband)
+(global-set-key "O M" &options-magneticnet)
+(global-set-key "O L" &options-show-log-window)
+(global-set-key "O C" &options-show-coordinates)
 
-(global-set-key "P M" 'page-manager)
-(global-set-key "P N" 'page-next)
-(global-set-key "P P" 'page-prev)
-(global-set-key "P E" 'page-new)
-(global-set-key "P R" 'page-revert)
-(global-set-key "P C" 'page-close)
-(global-set-key "P D" 'page-discard)
-(global-set-key "P <Shift>P" 'page-print)
+(global-set-key "P M" &page-manager)
+;(global-set-key "P N" &page-next)
+;(global-set-key "P P" &page-prev)
+;(global-set-key "P R" &page-revert)
+;(global-set-key "P C" &page-close)
+;(global-set-key "P <Shift>P" &page-print)
 
-(global-set-key "<Alt>Q" 'file-quit)
-(global-set-key "R" 'view-redraw)
-(global-set-key "<Shift>R" 'edit-redo)
-(global-set-key "S" 'edit-select)
+(global-set-key "Q" &hierarchy-up)
+(global-set-key "<Alt>Q" &file-quit)
+(global-set-key "R" &view-redraw)
+(global-set-key "<Shift>R" &edit-redo)
+;(global-set-key "S" &edit-select)
+(global-set-key "S" &hierarchy-down-schematic)
+(global-set-key "<Shift>S" &hierarchy-down-symbol)
 
-(global-set-key "T A" 'attributes-attach)
-(global-set-key "T D" 'attributes-detach)
-(global-set-key "T N" 'attributes-show-name)
-(global-set-key "T V" 'attributes-show-value)
-(global-set-key "T B" 'attributes-show-both)
-(global-set-key "T T" 'attributes-visibility-toggle)
-(global-set-key "T <Shift>F" 'edit-find-text)
-(global-set-key "T H" 'edit-hide-text)
-(global-set-key "T <Shift>H" 'edit-show-text)
-(global-set-key "T U" 'edit-autonumber)
+(global-set-key "T A" &attributes-attach)
+(global-set-key "T D" &attributes-detach)
+(global-set-key "T N" &attributes-show-name)
+(global-set-key "T V" &attributes-show-value)
+(global-set-key "T B" &attributes-show-both)
+(global-set-key "T T" &attributes-visibility-toggle)
+(global-set-key "T O" &attributes-overbar-toggle)
+(global-set-key "T <Shift>F" &edit-find-text)
+(global-set-key "T <Shift>P" &edit-find-patch)
+(global-set-key "T H" &edit-hide-text)
+(global-set-key "T <Shift>H" &edit-show-text)
+(global-set-key "T L" &edit-select-locked)
+(global-set-key "T U" &edit-autonumber)
 
-(global-set-key "U" 'edit-undo)
-(global-set-key "<Shift>U" 'edit-undo)
+(global-set-key "U" &edit-undo)
+(global-set-key "<Shift>U" &edit-redo)
 
-(global-set-key "V R" 'view-redraw)
-(global-set-key "V B" 'view-zoom-box-hotkey)
-(global-set-key "V F" 'view-zoom-full)
-(global-set-key "V E" 'view-zoom-extents)
-(global-set-key "V P" 'view-pan-hotkey)
-(global-set-key "V O" 'view-zoom-out-hotkey)
-(global-set-key "V I" 'view-zoom-in-hotkey)
-(global-set-key "V D" 'view-dark-colors)
-(global-set-key "V L" 'view-light-colors)
-(global-set-key "V W" 'view-bw-colors)
+(global-set-key "V M" &view-menubar)
+(global-set-key "V T" &view-toolbar)
+(global-set-key "V S" &view-scrollbars)
+(global-set-key "V G" &view-show-origin)
+(global-set-key "V R" &view-redraw)
+(global-set-key "V B" &view-zoom-box)
+(global-set-key "V F" &view-zoom-full)
+(global-set-key "V E" &view-zoom-extents)
+(global-set-key "V P" &view-pan)
+(global-set-key "V O" &view-zoom-out)
+(global-set-key "V I" &view-zoom-in)
+(global-set-key "V D" &view-dark-colors)
+(global-set-key "V L" &view-light-colors)
+(global-set-key "V W" &view-light-bw-colors)
 
-(global-set-key "<Control>V" 'clipboard-paste-hotkey)
-(global-set-key "W" 'view-zoom-box-hotkey)
-(global-set-key "X" 'view-pan-hotkey)
-(global-set-key "<Control>X" 'clipboard-cut)
+(global-set-key "W" &view-zoom-box)
+(global-set-key "X" &view-pan)
 
-(global-set-key "Y C" 'buffer-copy1)
-(global-set-key "Y U" 'buffer-cut1)
-(global-set-key "Y P" 'buffer-paste1-hotkey)
+;(global-set-key "Y C" &buffer-copy1)
+;(global-set-key "Y U" &buffer-cut1)
+;(global-set-key "Y P" &buffer-paste1)
 
-(global-set-key "<Control>Y" 'edit-redo)
-(global-set-key "Z" 'view-zoom-in-hotkey)
-(global-set-key "<Shift>Z" 'view-zoom-out-hotkey)
-(global-set-key "<Control>Z" 'edit-undo)
+(global-set-key "Z" &view-zoom-in)
+(global-set-key "<Shift>Z" &view-zoom-out)
 
-(global-set-key "Escape" 'cancel)
-(global-set-key "bracketright" 'options-scale-up-snap-size)
-(global-set-key "bracketleft" 'options-scale-down-snap-size)
-(global-set-key "Left" 'view-pan-left)
-(global-set-key "Right" 'view-pan-right)
-(global-set-key "Up" 'view-pan-up)
-(global-set-key "Down" 'view-pan-down)
-(global-set-key "period" 'repeat-last-command)
-(global-set-key "colon" 'edit-invoke-macro)
-(global-set-key "comma" 'misc-misc)
-(global-set-key "equal" 'misc-misc2)
-(global-set-key "plus" 'misc-misc3)
-(global-set-key "Delete" 'edit-delete)
-(global-set-key "greater" 'page-next)
-(global-set-key "Page_Down" 'page-next)
-(global-set-key "less" 'page-prev)
-(global-set-key "Page_Up" 'page-prev)
+(global-set-key "<Control>N" &file-new)
+(global-set-key "<Control>O" &file-open)
+(global-set-key "<Control>S" &file-save)
+(global-set-key "<Control><Shift>S" &file-save-as)
+(global-set-key "<Control>P" &file-print)
+(global-set-key "<Control>W" &file-close-window)
+(global-set-key "<Control>Q" &file-quit)
 
-;
-; Here are the definitions for the top pull down menu bar
-;
-; The "menu item name" is the name of the item as it will appear in the menu
-; The "menu action" is the scheme function which is executed when the item
-; is selected off of the menu.  And "menu hotkey function" is the scheme
-; function which is executed when the hotkey is pressed.  
-; "menu hotkey function" has no real functionality in the menuing scheme other
-; than providing the information as to what hotkey to display in the menu.
-; "menu hotkey function" is not executed when you select an item off of the
-; list.  The hotkeys which are displayed are defined by the global-keymap.
-; Actions can have several hotkeys, but the displayed keys are the last
-; ones found.
-;
-; The SEPARATOR keyword is case sensitive and puts a seperator into the menu.
-;
+(global-set-key "<Control>Z" &edit-undo)
+(global-set-key "<Control>Y" &edit-redo)
+(global-set-key "<Control><Shift>Z" &edit-redo)
+(global-set-key "<Control>X" &clipboard-cut)
+(global-set-key "<Control>C" &clipboard-copy)
+(global-set-key "<Control>V" &clipboard-paste)
+(global-set-key "<Control>A" &edit-select-all)
+(global-set-key "<Control><Shift>A" &edit-deselect)
+(global-set-key "<Control>F" &edit-find-text)
 
-(or (defined? 'define-syntax)
-    (use-modules (ice-9 syncase)))
+(global-set-key "Escape" &cancel)
+(global-set-key "bracketright" &options-scale-up-snap-size)
+(global-set-key "bracketleft" &options-scale-down-snap-size)
+(global-set-key "Left" &view-pan-left)
+(global-set-key "Right" &view-pan-right)
+(global-set-key "Up" &view-pan-up)
+(global-set-key "Down" &view-pan-down)
+(global-set-key "period" &repeat-last-action)
+(global-set-key "Delete" &edit-delete)
+(global-set-key "Page_Down" &page-next)
+(global-set-key "Page_Up" &page-prev)
+(global-set-key "<Control>Page_Down" &page-next)
+(global-set-key "<Control>Page_Up" &page-prev)
+(global-set-key "greater" &page-next)
+(global-set-key "less" &page-prev)
 
-;; Define a no-op macro for flagging strings as translatable.
-(define-syntax N_
-  (syntax-rules ()
-    ((N_ expr) expr)))
 
-(define file-menu-items
+;;;; Definitions for the main menu bar, context menu, and toolbar
 ;;
-;;          menu item name      menu action             menu hotkey function    menu stock icon
+;; The main menu definition is split into individual variables in order
+;; to allow for easier modification of the menus.  Each menu definition
+;; is a list of sections; each section is a list of action objects.
+;; Separators are automatically inserted between adjacent sections.
 ;;
-        `( (,(N_ "_New")              file-new                file-new                "gtk-new")
-           (,(N_ "_Open...")          file-open               file-open               "gtk-open")
-;; The entry below will be removed from the menu if glib < 2.6 is detected
-           (,(N_ "Open Recen_t")      #f                      #f                      #f)
-           ("SEPARATOR"              #f                      #f                      #f)
-           (,(N_ "_Save")             file-save               file-save               "gtk-save")
-           (,(N_ "Save _As...")       file-save-as            file-save-as            "gtk-save-as")
-           (,(N_ "Save All")          file-save-all           file-save-all           "gtk-save")
-           (,(N_ "_Revert")           page-revert             page-revert             "gtk-revert-to-saved")
-           ("SEPARATOR"              #f                      #f                      #f)
-           (,(N_ "_Print...")         file-print              file-print              "gtk-print")
-           (,(N_ "Write _image...")   file-image              file-image              #f)
-           ("SEPARATOR"              #f                      #f                      #f)
-           (,(N_ "Execute Script...") file-script             file-script             "gtk-execute")
-           ("SEPARATOR"              #f                      #f                      #f)
-           (,(N_ "New Window")        file-new-window         file-new-window         #f)
-           (,(N_ "_Close Window")     file-close-window       file-close-window       "gtk-close")
-           (,(N_ "_Quit")             file-quit               file-quit               "gtk-quit")))
+;; The labels and icons which are displayed in the menu are determined
+;; by the individual action objects.  The hotkeys are defined by the
+;; global keymap.  Actions can have several hotkeys, but only the
+;; hotkey defined last will be displayed.
+;;
+;; When adding actions to the menu e.g. from your "gschemrc" file, you
+;; don't have to copy and paste the menu definition but can alter the
+;; existing definition.  This has the advantage that you won't get out
+;; of sync with changes in newer versions of gschem.  Examples:
+;;
+;; * Adding a section to a menu
+;;
+;;   (set! tools-menu
+;;         (append! tools-menu
+;;                  `((,&do-something
+;;                     ,&do-something-else))))
+;;
+;; * Adding a menu to the menubar
+;;
+;;   (define my-menu
+;;           `((,&do-something
+;;              ,&do-something-else)))
+;;
+;;   (let ((t (list-tail menubar (- (length menubar) 2))))
+;;     (set-cdr! t (cons (cons "My Menu" my-menu) (cdr t))))
+;;
+;; * Replacing a whole menu
+;;
+;;   (define my-help-menu
+;;           `((,&do-something
+;;              ,&do-something-else)
+;;             (,&help-about)))
+;;
+;;   (assoc-set! menubar (_ "_Help") my-help-menu)
+;;
+;; * Replacing the context menu
+;;
+;;   (set! context-menu
+;;         `((,&edit-select)
+;;           (,&do-something
+;;            ,&do-something-else)))
+;;
+;; * Adding a section to the toolbar
+;;
+;;   (let ((buttons `((,&do-something
+;;                     ,&do-something-else)))
+;;         (t (list-tail toolbar (- (length toolbar) 2))))
+;;     (set-cdr! t (append! buttons (cdr t))))
 
-(define edit-menu-items 
-;;
-;;          menu item name      menu action             menu hotkey action      menu stock icon
-;;
-        `( (,(N_ "_Undo")              edit-undo              edit-undo               "gtk-undo")
-           (,(N_ "_Redo")              edit-redo              edit-redo               "gtk-redo")
-           ("SEPARATOR"               #f                     #f                      #f)
-           (,(N_ "Cu_t")               clipboard-cut          clipboard-cut           "gtk-cut")
-           (,(N_ "_Copy")              clipboard-copy         clipboard-copy          "gtk-copy")
-           (,(N_ "_Paste")             clipboard-paste-hotkey clipboard-paste-hotkey  "gtk-paste")
-           (,(N_ "_Delete")            edit-delete            edit-delete             "gtk-delete"  )
-           ("SEPARATOR"               #f                     #f                      #f)
-           (,(N_ "Select Mode")        edit-select            edit-select             #f)
-           (,(N_ "Select All")         edit-select-all        edit-select-all         "gtk-select-all")
-           (,(N_ "Deselect")           edit-deselect          edit-deselect           #f)
-           (,(N_ "Copy Mode")          edit-copy              edit-copy-hotkey        #f)
-           (,(N_ "Multiple Copy Mode") edit-mcopy             edit-mcopy-hotkey       #f)
-           (,(N_ "Move Mode")          edit-move              edit-move-hotkey        #f)
-           (,(N_ "Rotate 90 Mode")     edit-rotate-90         edit-rotate-90-hotkey   #f)
-           (,(N_ "Mirror Mode")        edit-mirror            edit-mirror-hotkey      #f)
-           ("SEPARATOR"               #f                     #f                      #f)
-           (,(N_ "Edit...")            edit-edit              edit-edit               #f)
-           (,(N_ "Edit Text...")       edit-text              edit-text               "gtk-edit")
-           (,(N_ "Slot...")            edit-slot              edit-slot               #f)
-           (,(N_ "Color...")           edit-color             edit-color              "gtk-select-color")
-           (,(N_ "Line Width & Type...") edit-linetype        edit-linetype           #f)
-           (,(N_ "Fill Type...")         edit-filltype        edit-filltype           #f)
-           (,(N_ "Symbol Translate...")  edit-translate       edit-translate          #f)
-           (,(N_ "Lock")               edit-lock              edit-lock               #f)
-           (,(N_ "Unlock")             edit-unlock            edit-unlock             #f)
-           ("SEPARATOR"               #f                     #f                      #f)
-           (,(N_ "Invoke Macro")         edit-invoke-macro    edit-invoke-macro       #f)
-           (,(N_ "Embed Component/Picture")    edit-embed     edit-embed              #f)
-           (,(N_ "Unembed Component/Picture")  edit-unembed   edit-unembed            #f)
-           (,(N_ "Update Component")   edit-update            edit-update             "gtk-refresh")
-           (,(N_ "Show/Hide Inv Text") edit-show-hidden       edit-show-hidden        #f)))
+(define file-menu
+        `((,&file-new
+           ,&file-open
+           ,&file-open-recent)
+          (,&file-save
+           ,&file-save-as
+           ,&file-save-all
+           ,&page-revert
+           ,&page-close)
+          (,&file-print
+           ,&file-image)
+          (,&file-new-window
+           ,&file-close-window
+           ,&file-quit)))
 
-(define buffer-menu-items 
-;;
-;;          menu item name      menu action             menu hotkey action      menu stock icon
-;;
-	`( (,(N_ "Copy into 1")	buffer-copy1       	buffer-copy1)
-	   (,(N_ "Copy into 2")	buffer-copy2       	buffer-copy2)
-	   (,(N_ "Copy into 3")	buffer-copy3       	buffer-copy3)
-	   (,(N_ "Copy into 4")	buffer-copy4       	buffer-copy4)
-	   (,(N_ "Copy into 5")	buffer-copy5       	buffer-copy5)
-	   (,(N_ "Cut into 1")	buffer-cut1       	buffer-cut1)
-	   (,(N_ "Cut into 2")	buffer-cut2       	buffer-cut2)
-	   (,(N_ "Cut into 3")	buffer-cut3       	buffer-cut3)
-	   (,(N_ "Cut into 4")	buffer-cut4       	buffer-cut4)
-	   (,(N_ "Cut into 5")	buffer-cut5       	buffer-cut5)
-	   (,(N_ "Paste from 1")	buffer-paste1-hotkey    buffer-paste1-hotkey)
-	   (,(N_ "Paste from 2")	buffer-paste2-hotkey    buffer-paste2-hotkey)
-	   (,(N_ "Paste from 3")	buffer-paste3-hotkey    buffer-paste3-hotkey)
-	   (,(N_ "Paste from 4")	buffer-paste4-hotkey    buffer-paste4-hotkey)
-	   (,(N_ "Paste from 5")	buffer-paste5-hotkey    buffer-paste5-hotkey)))
+(define edit-menu
+        `((,&edit-undo
+           ,&edit-redo)
+          (,&clipboard-cut
+           ,&clipboard-copy
+           ,&clipboard-paste
+           ,&edit-delete
+           ,&edit-select-all
+           ,&edit-deselect)
+          (,&edit-find-text)))
 
-(define view-menu-items 
-;;
-;;          menu item name        menu action             menu hotkey action      menu stock icon
-;;
-        `( (,(N_ "_Redraw")             view-redraw             view-redraw             "gtk-refresh")
-           (,(N_ "_Pan")                view-pan                view-pan-hotkey         #f)
-           (,(N_ "Zoom _Box")           view-zoom-box           view-zoom-box-hotkey    #f)
-           (,(N_ "Zoom _Extents")       view-zoom-extents       view-zoom-extents       "gtk-zoom-fit")
-           (,(N_ "Zoom _In")            view-zoom-in            view-zoom-in-hotkey     "gtk-zoom-in")
-           (,(N_ "Zoom _Out")           view-zoom-out           view-zoom-out-hotkey    "gtk-zoom-out")
-           (,(N_ "Zoom _Full")          view-zoom-full          view-zoom-full          #f)
-           ("SEPARATOR"                #f                      #f                      #f)
-           (,(N_ "_Dark color scheme")  view-dark-colors        view-dark-colors        #f)
-           (,(N_ "_Light color scheme") view-light-colors       view-light-colors       #f)
-           (,(N_ "B_W color scheme")    view-bw-colors          view-bw-colors          #f)
-         ))
+(define add-menu
+        `((,&add-component
+           ,&add-last-component
+           ,&add-net
+           ,&add-bus
+           ,&add-attribute
+           ,&add-text)
+          (,&add-line
+           ,&add-path
+           ,&add-box
+           ,&add-circle
+           ,&add-arc
+           ,&add-pin
+           ,&add-picture)))
 
-(define page-menu-items 
-;;
-;;          menu item name      menu action             menu hotkey action      menu stock icon
-;;
-        `( (,(N_ "_Manager...")       page-manager            page-manager            #f)
-           (,(N_ "_Previous")         page-prev               page-prev               "gtk-go-back")
-           (,(N_ "_Next")             page-next               page-next               "gtk-go-forward")
-           (,(N_ "Ne_w")              page-new                page-new                "gtk-new")
-           (,(N_ "_Revert")           page-revert             page-revert             "gtk-revert-to-saved")
-           (,(N_ "_Close")            page-close              page-close              "gtk-close")
-           ("SEPARATOR"              #f                      #f                      #f)
-           (,(N_ "_Discard")          page-discard            page-discard            "gtk-discard")))
+(define object-menu
+        `((,&edit-edit
+           ,&edit-properties
+           ,&edit-copy
+           ,&edit-mcopy
+           ,&edit-move
+           ,&edit-rotate-90
+           ,&edit-mirror)
+          (,&edit-text
+           ,&attributes-attach
+           ,&attributes-detach
+           ,&attributes-show-value
+           ,&attributes-show-name
+           ,&attributes-show-both
+           ,&attributes-visibility-toggle
+           ,&attributes-overbar-toggle)
+          (,&edit-embed
+           ,&edit-unembed
+           ,&edit-update
+           ,&edit-lock
+           ,&edit-unlock
+           ,&edit-slot
+           ,&hierarchy-documentation)))
 
-(define add-menu-items 
-;;
-;;          menu item name      menu action             menu hotkey action      menu stock icon
-;;
-	`( (,(N_ "_Component...")     add-component       	add-component)
-	   (,(N_ "_Net")              add-net	  	     	add-net-hotkey)
-	   (,(N_ "B_us")              add-bus	  	     	add-bus-hotkey)
-	   (,(N_ "_Attribute...")     add-attribute  	     	add-attribute-hotkey)
-	   (,(N_ "_Text...")          add-text  	     	add-text)
-	   ("SEPARATOR"              #f                      #f)
-	   (,(N_ "_Line")             add-line  	     	add-line-hotkey)
-	   (,(N_ "_Box")              add-box  	     	add-box-hotkey)
-	   (,(N_ "C_ircle")           add-circle  	     	add-circle-hotkey)
-	   (,(N_ "A_rc")              add-arc  	     	add-arc-hotkey)
-	   (,(N_ "_Pin")              add-pin  	     	add-pin-hotkey)
-	   (,(N_ "Pictu_re...")       add-picture  	     	add-picture-hotkey)))
+(define view-menu
+        `((,&edit-show-hidden
+           ,&view-show-origin)
+          (,&view-zoom-in
+           ,&view-zoom-out
+           ,&view-zoom-extents
+           ,&view-zoom-full
+           ,&view-zoom-box
+           ,&view-pan
+           ,&view-redraw)
+          (,&view-menubar
+           ,&view-toolbar
+           ,&view-scrollbars)
+          (,&docking-area-left
+           ,&docking-area-bottom
+           ,&docking-area-right)))
 
-(define hierarchy-menu-items 
-;;
-;;          menu item name      menu action               menu hotkey action        menu stock icon
-;;
-        `( (,(N_ "_Down Schematic")   hierarchy-down-schematic  hierarchy-down-schematic  "gtk-go-down")
-           (,(N_ "Down _Symbol")      hierarchy-down-symbol     hierarchy-down-symbol     "gtk-goto-bottom")
-           (,(N_ "_Up")               hierarchy-up              hierarchy-up              "gtk-go-up")
-           (,(N_ "D_ocumentation...") hierarchy-documentation   hierarchy-documentation   #f)))
+(define pages-menu
+        `((,&hierarchy-down-schematic
+           ,&hierarchy-down-symbol
+           ,&hierarchy-up)
+          (,&page-prev
+           ,&page-next)
+          (,&page-manager)))
 
-(define attributes-menu-items 
-;;
-;;          menu item name      menu action             menu hotkey action      menu stock icon
-;;
-        `( (,(N_ "_Attach")           attributes-attach       attributes-attach       #f)
-           (,(N_ "_Detach")           attributes-detach       attributes-detach       #f)
-           (,(N_ "Show _Value")       attributes-show-value   attributes-show-value   #f)
-           (,(N_ "Show _Name")        attributes-show-name    attributes-show-name    #f)
-           (,(N_ "Show _Both")        attributes-show-both    attributes-show-both    #f)
-           (,(N_ "_Toggle Visibility")  attributes-visibility-toggle
-                                  attributes-visibility-toggle                  #f)
-           (,(N_ "_Find Specific Text...")  edit-find-text    edit-find-text          "gtk-find")
-           (,(N_ "_Hide Specific Text...")  edit-hide-text    edit-hide-text          #f)
-           (,(N_ "_Show Specific Text...")  edit-show-text    edit-show-text          #f)
-           (,(N_ "A_utonumber Text...")     edit-autonumber   edit-autonumber         #f)))
+(define tools-menu
+        `((,&edit-autonumber
+           ,&edit-translate
+           ,&edit-find-patch
+           ,&edit-hide-text
+           ,&edit-show-text
+           ,&edit-select-locked)
+          (,&options-show-log-window
+           ,&options-show-coordinates)
+          (,&edit-invoke-macro
+           ,&file-script
+           ,&file-repl)))
 
-(define options-menu-items 
-;;
-;;          menu item name      menu action             menu hotkey action      menu stock icon
-;;
-	`( (,(N_ "_Text Size...")	options-text-size       options-text-size)
-	   (,(N_ "Cycle _grid styles")  options-grid           options-grid)
-	   (,(N_ "Toggle _Snap On/Off") options-snap       	options-snap)
-	   (,(N_ "Snap Grid S_pacing...") options-snap-size   	options-snap-size)
-    	   (,(N_ "Scale _up Grid Spacing") options-scale-up-snap-size 
-						    options-scale-up-snap-size)
-    	   (,(N_ "Scale _down Grid Spacing") options-scale-down-snap-size
-						  options-scale-down-snap-size)
-	   (,(N_ "Toggle _Outline/Box")   options-action-feedback   	
-				   options-action-feedback)
-	   (,(N_ "Toggle Net _Rubberband") options-rubberband   options-rubberband)
-	   (,(N_ "Toggle _Magnetic Net") options-magneticnet options-magneticnet)
-	   (,(N_ "Show _Log Window...")    options-show-log-window   
-	 			    options-show-log-window)
-	   (,(N_ "Show _Coord Window...")   options-show-coord-window   
-				     options-show-coord-window)))
+(define options-menu
+        `((,&options-options)
+          (,&options-rubberband
+           ,&options-magneticnet
+           ,&options-action-feedback)
+          (,&options-snap-off
+           ,&options-snap-grid
+           ,&options-snap-resnap
+           ,&options-scale-up-snap-size
+           ,&options-scale-down-snap-size)
+          (,&view-dark-colors
+           ,&view-light-colors
+           ,&view-light-bw-colors
+           ,&view-shaded-colors
+           ,&view-shaded-bw-colors)))
 
-(define help-menu-items 
-;;
-;;          menu item name                menu action               menu hotkey action        menu stock icon
-;;
-        `(
-           (,(N_ "gEDA Docu_mentation...") help-manual               help-manual               "gtk-help")
-           (,(N_ "gschem _FAQ...")         help-faq                  help-faq                  #f)
-           (,(N_ "gEDA _Wiki...")          help-wiki                 help-wiki                 #f)
-           (,(N_ "Component D_ocumentation...") hierarchy-documentation   hierarchy-documentation   #f)
-           ("SEPARATOR"                   #f                        #f                        #f)
-           (,(N_ "_Hotkeys...")            help-hotkeys              help-hotkeys              #f)
-           (,(N_ "_About...")              help-about                help-about                "gtk-about")))
+(define help-menu
+        `((,&help-manual
+           ,&help-guide
+           ,&help-faq
+           ,&help-wiki)
+          (,&help-hotkeys
+           ,&help-about)))
 
-;
-; Now actually add the menus.  The order here defines the order in which
-; the menus appear in the top menu bar.
-;
-(add-menu (N_ "_File") file-menu-items)
-(add-menu (N_ "_Edit") edit-menu-items)
-(add-menu (N_ "_Buffer") buffer-menu-items)
-(add-menu (N_ "_View") view-menu-items)
-(add-menu (N_ "_Page") page-menu-items)
-(add-menu (N_ "_Add") add-menu-items)
-(add-menu (N_ "Hie_rarchy") hierarchy-menu-items)
-(add-menu (N_ "A_ttributes") attributes-menu-items)
-(add-menu (N_ "_Options") options-menu-items)
-(add-menu (N_ "_Help") help-menu-items)
+(define menubar
+        `((,(_ "_File")    . ,file-menu)
+          (,(_ "_Edit")    . ,edit-menu)
+          (,(_ "_Add")     . ,add-menu)
+          (,(_ "O_bject")  . ,object-menu)
+          (,(_ "_View")    . ,view-menu)
+          (,(_ "_Pages")   . ,pages-menu)
+          (,(_ "_Tools")   . ,tools-menu)
+          (,(_ "_Options") . ,options-menu)
+          (,(_ "_Help")    . ,help-menu)))
+
+(define context-menu
+        `((,&edit-select
+           ,&add-net
+           ,&add-last-component
+           ,&add-component
+           ,&add-attribute
+           ,&add-text)
+          (,&view-zoom-in
+           ,&view-zoom-out
+           ,&view-zoom-box
+           ,&view-zoom-extents)
+          (,&edit-edit
+           ,&edit-properties
+           ,&edit-rotate-90
+           ,&edit-mirror
+           ,&edit-delete)
+          (,&hierarchy-down-schematic
+           ,&hierarchy-down-symbol
+           ,&hierarchy-up)))
+
+(define toolbar
+        `((,&file-new
+           ,&file-open
+           ,&file-save)
+          (,&edit-undo
+           ,&edit-redo)
+          (,&add-component
+           ,&add-net
+           ,&add-text
+           ,&edit-select)
+          (,&edit-edit
+           ,&edit-properties
+           ,&edit-update)
+          (,&hierarchy-down-schematic
+           ,&hierarchy-down-symbol
+           ,&hierarchy-up)
+          (,&options-grid-size)
+          (,&options-options
+           ,&help-manual)))
 
 ;
 ; End of keymapping related keywords
@@ -1578,4 +1397,3 @@
 ;; The short answer is neither program likes a pipe to break.
 ;;
 ; (load-from-path "pcb.scm")
-

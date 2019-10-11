@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,31 +23,10 @@
  */
 
 #include <config.h>
-#include <stdio.h>
 #include <math.h>
 
 #include "libgeda_priv.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
-/*! \brief calculate the distance between two points
- *  \par Function Description
- *  This function calculates the distance between two points.
- *  The two points are defined by the (\a x1, \a y1) and (\a x2, \a y2)
- *  parameters.
- *  \param [in]  x1  x-value of the first point
- *  \param [in]  y1  y-value of the first point
- *  \param [in]  x2  x-value of the second point
- *  \param [in]  y2  y-value of the second point
- *  \return the distance
- *  \todo Move this function to a different place
- */
-int dist(int x1, int y1, int x2, int y2)
-{
-  return sqrt(pow(x1-x2,2)+pow(y1-y2,2));
-}
 
 /*! \brief Create and add circle OBJECT to list.
  *  \par Function Description
@@ -67,7 +46,6 @@ int dist(int x1, int y1, int x2, int y2)
  *  with #o_set_line_options() and #o_set_fill_options().
  *
  *  \param [in]     toplevel     The TOPLEVEL object.
- *  \param [in]     type         Must be OBJ_CIRCLE.
  *  \param [in]     color        Circle line color.
  *  \param [in]     x            Center x coordinate.
  *  \param [in]     y            Center y coordinate.
@@ -75,13 +53,12 @@ int dist(int x1, int y1, int x2, int y2)
  *  \return A pointer to the new end of the object list.
  */
 OBJECT *o_circle_new(TOPLEVEL *toplevel,
-		     char type, int color,
-		     int x, int y, int radius)
+		     int color, int x, int y, int radius)
 {
   OBJECT *new_node;	
 
   /* create the object */
-  new_node = s_basic_new_object(type, "circle");
+  new_node = s_basic_new_object(OBJ_CIRCLE, "circle");
   new_node->color  = color;
   
   new_node->circle = (CIRCLE *) g_malloc(sizeof(CIRCLE));
@@ -93,12 +70,12 @@ OBJECT *o_circle_new(TOPLEVEL *toplevel,
   
   /* line type and filling initialized to default */
   o_set_line_options(toplevel, new_node,
-		     END_NONE, TYPE_SOLID, 0, -1, -1);
+		     DEFAULT_OBJECT_END, TYPE_SOLID, 0, -1, -1);
   o_set_fill_options(toplevel, new_node,
 		     FILLING_HOLLOW, -1, -1, -1, -1, -1);
 
   /* compute the bounding box coords */
-  o_circle_recalc(toplevel, new_node);
+  new_node->w_bounds_valid_for = NULL;
 
   return new_node;
 }
@@ -112,36 +89,28 @@ OBJECT *o_circle_new(TOPLEVEL *toplevel,
  *  \param [in]  o_current  Circle OBJECT to copy.
  *  \return The new OBJECT
  */
-OBJECT *o_circle_copy(TOPLEVEL *toplevel, OBJECT *o_current)
+OBJECT *o_circle_copy(TOPLEVEL *toplevel, OBJECT *object)
 {
   OBJECT *new_obj;
 
-  /* A new circle object is created with #o_circle_new().
-   * Values for its fields are default and need to be modified. */
-  new_obj = o_circle_new (toplevel, OBJ_CIRCLE, o_current->color, 0, 0, 0);
+  g_return_val_if_fail (object != NULL, NULL);
+  g_return_val_if_fail (object->circle != NULL, NULL);
+  g_return_val_if_fail (object->type == OBJ_CIRCLE, NULL);
 
-  /*
-   * The parameters of the new circle are set with the ones of the original
-   * circle. The two circle have the same line type and the same filling
-   * options.
-   *
-   * The bounding box coordinates are computed with
-   * #o_circle_recalc().
-   */
-  /* modify */
-  new_obj->circle->center_x = o_current->circle->center_x;
-  new_obj->circle->center_y = o_current->circle->center_y;
-  new_obj->circle->radius   = o_current->circle->radius;
+  new_obj = o_circle_new (toplevel, object->color,
+                                    object->circle->center_x,
+                                    object->circle->center_y,
+                                    object->circle->radius);
   
-  o_set_line_options(toplevel, new_obj, o_current->line_end,
-		     o_current->line_type, o_current->line_width,
-		     o_current->line_length, o_current->line_space);
+  o_set_line_options(toplevel, new_obj, object->line_end,
+		     object->line_type, object->line_width,
+		     object->line_length, object->line_space);
   o_set_fill_options(toplevel, new_obj,
-		     o_current->fill_type, o_current->fill_width,
-		     o_current->fill_pitch1, o_current->fill_angle1,
-		     o_current->fill_pitch2, o_current->fill_angle2);
+		     object->fill_type, object->fill_width,
+		     object->fill_pitch1, object->fill_angle1,
+		     object->fill_pitch2, object->fill_angle2);
   
-  o_circle_recalc(toplevel, new_obj);
+  new_obj->w_bounds_valid_for = NULL;
 
   /*	new_obj->attribute = 0;*/
 
@@ -200,7 +169,7 @@ void o_circle_modify(TOPLEVEL *toplevel, OBJECT *object,
   }
 
   /* recalculate the boundings */
-  o_circle_recalc(toplevel, object);
+  object->w_bounds_valid_for = NULL;
   o_emit_change_notify (toplevel, object);
 }
 
@@ -285,7 +254,7 @@ OBJECT *o_circle_read (TOPLEVEL *toplevel, const char buf[],
     radius = 0;
   }
   
-  if (color < 0 || color > MAX_COLORS) {
+  if (color < 0 || color >= MAX_OBJECT_COLORS) {
     s_log_message(_("Found an invalid color [ %s ]\n"), buf);
     s_log_message(_("Setting color to default color\n"));
     color = DEFAULT_COLOR;
@@ -298,7 +267,7 @@ OBJECT *o_circle_read (TOPLEVEL *toplevel, const char buf[],
    * Its filling and line type are set according to the values of the field
    * on the line.
    */
-  new_obj = o_circle_new(toplevel, type, color, x1, y1, radius);
+  new_obj = o_circle_new(toplevel, color, x1, y1, radius);
   o_set_line_options(toplevel, new_obj,
 		     circle_end, circle_type, circle_width, 
 		     circle_length, circle_space);
@@ -315,7 +284,6 @@ OBJECT *o_circle_read (TOPLEVEL *toplevel, const char buf[],
  *  It follows the post-20000704 release file format that handle the line
  *  type and fill options.
  *
- *  \param [in] toplevel  a TOPLEVEL structure.
  *  \param [in] object  Circle OBJECT to create string from.
  *  \return A pointer to the circle OBJECT character string.
  *
@@ -323,43 +291,29 @@ OBJECT *o_circle_read (TOPLEVEL *toplevel, const char buf[],
  *  Caller must g_free returned character string.
  *
  */
-char *o_circle_save(TOPLEVEL *toplevel, OBJECT *object)
+char *o_circle_save(OBJECT *object)
 {
-  int x,y;
-  int radius;
-  int circle_width, circle_space, circle_length;
-  int fill_width, angle1, pitch1, angle2, pitch2;
-  char *buf;
-  OBJECT_END circle_end;
-  OBJECT_TYPE circle_type;
-  OBJECT_FILLING circle_fill;
+  g_return_val_if_fail (object != NULL, NULL);
+  g_return_val_if_fail (object->circle != NULL, NULL);
+  g_return_val_if_fail (object->type == OBJ_CIRCLE, NULL);
 
-  /* circle center and radius */
-  x = object->circle->center_x;
-  y = object->circle->center_y;
-  radius = object->circle->radius;
-  
-  /* line type parameters */
-  circle_width = object->line_width;
-  circle_end   = object->line_end;
-  circle_type  = object->line_type;
-  circle_length= object->line_length;
-  circle_space = object->line_space;
-  
-  /* filling parameters */
-  circle_fill  = object->fill_type;
-  fill_width   = object->fill_width;
-  angle1       = object->fill_angle1;
-  pitch1       = object->fill_pitch1;
-  angle2       = object->fill_angle2;
-  pitch2       = object->fill_pitch2;
-  
-  buf = g_strdup_printf("%c %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
-			object->type, x, y, radius, object->color,
-			circle_width, circle_end, circle_type, circle_length, 
-			circle_space, circle_fill,
-			fill_width, angle1, pitch1, angle2, pitch2);
-  return(buf);
+  return g_strdup_printf ("%c %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+                          OBJ_CIRCLE,
+                          object->circle->center_x,
+                          object->circle->center_y,
+                          object->circle->radius,
+                          object->color,
+                          object->line_width,
+                          object->line_end,
+                          object->line_type,
+                          object->line_length,
+                          object->line_space,
+                          object->fill_type,
+                          object->fill_width,
+                          object->fill_angle1,
+                          object->fill_pitch1,
+                          object->fill_angle2,
+                          object->fill_pitch2);
 }
            
 /*! \brief Translate a circle position in WORLD coordinates by a delta.
@@ -367,20 +321,22 @@ char *o_circle_save(TOPLEVEL *toplevel, OBJECT *object)
  *  This function applies a translation of (<B>x1</B>,<B>y1</B>) to the circle
  *  described by <B>*object</B>. <B>x1</B> and <B>y1</B> are in world unit. 
  *
- *  \param [in]     toplevel  The TOPLEVEL object.
+ *  \param [in,out] object     Circle OBJECT to translate.
  *  \param [in]     dx         x distance to move.
  *  \param [in]     dy         y distance to move.
- *  \param [in,out] object     Circle OBJECT to translate.
  */
-void o_circle_translate_world(TOPLEVEL *toplevel,
-			      int dx, int dy, OBJECT *object)
+void o_circle_translate_world(OBJECT *object, int dx, int dy)
 {
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->circle != NULL);
+  g_return_if_fail (object->type == OBJ_CIRCLE);
+
   /* Do world coords */
   object->circle->center_x = object->circle->center_x + dx;
   object->circle->center_y = object->circle->center_y + dy;
   
   /* recalc the screen coords and the bounding box */
-  o_circle_recalc(toplevel, object);
+  object->w_bounds_valid_for = NULL;
   
 }
 
@@ -403,6 +359,10 @@ void o_circle_rotate_world(TOPLEVEL *toplevel,
 {
   int newx, newy;
   int x, y;
+
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->circle != NULL);
+  g_return_if_fail (object->type == OBJ_CIRCLE);
 
   /* Only 90 degree multiple and positive angles are allowed. */
   /* angle must be positive */
@@ -432,7 +392,7 @@ void o_circle_rotate_world(TOPLEVEL *toplevel,
   object->circle->center_x += world_centerx;
   object->circle->center_y += world_centery;
 
-  o_circle_recalc(toplevel, object);
+  object->w_bounds_valid_for = NULL;
   
 }
 
@@ -453,50 +413,22 @@ void o_circle_mirror_world(TOPLEVEL *toplevel,
 			   int world_centerx, int world_centery,
 			   OBJECT *object)
 {
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->circle != NULL);
+  g_return_if_fail (object->type == OBJ_CIRCLE);
+
   /* translate object to origin */
   object->circle->center_x -= world_centerx;
-  object->circle->center_y -= world_centery;
 
   /* mirror the center of the circle */
   object->circle->center_x = -object->circle->center_x;
-  object->circle->center_y =  object->circle->center_y;
 
   /* translate back in position */
   object->circle->center_x += world_centerx;
-  object->circle->center_y += world_centery;
 
   /* recalc boundings and screen coords */
-  o_circle_recalc(toplevel, object);
+  object->w_bounds_valid_for = NULL;
   
-}
-
-/*! \brief Recalculate circle coordinates in SCREEN units.
- *  \par Function Description
- *  This function recalculates the screen coords of the <B>o_current</B> pointed
- *  circle object from its world coords.
- *
- *  The circle coordinates and its bounding are recalculated as well as the
- *  OBJECT specific (line width, filling ...).
- *
- *  \param [in] toplevel      The TOPLEVEL object.
- *  \param [in,out] o_current  Circle OBJECT to be recalculated.
- */
-void o_circle_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
-{
-  int left, right, top, bottom;
-
-  if (o_current->circle == NULL) {
-    return;
-  }
-  
-  /* update the bounding box - world unit */
-  world_get_circle_bounds(toplevel, o_current,
-		    &left, &top, &right, &bottom);
-  o_current->w_left   = left;
-  o_current->w_top    = top;
-  o_current->w_right  = right;
-  o_current->w_bottom = bottom;
-  o_current->w_bounds_valid = TRUE;
 }
 
 /*! \brief Get circle bounding rectangle in WORLD coordinates.
@@ -536,576 +468,32 @@ void world_get_circle_bounds(TOPLEVEL *toplevel, OBJECT *object, int *left,
  *  \par Function Description
  *  This function gets the position of the center point of a circle object.
  *
- *  \param [in] toplevel The toplevel environment.
+ *  \param [in] object   The object to get the position.
  *  \param [out] x       pointer to the x-position
  *  \param [out] y       pointer to the y-position
- *  \param [in] object   The object to get the position.
  *  \return TRUE if successfully determined the position, FALSE otherwise
  */
-gboolean o_circle_get_position (TOPLEVEL *toplevel, gint *x, gint *y,
-                              OBJECT *object)
+gboolean o_circle_get_position (OBJECT *object, gint *x, gint *y)
 {
-  *x = object->circle->center_x;
-  *y = object->circle->center_y;
+  g_return_val_if_fail (object != NULL, FALSE);
+  g_return_val_if_fail (object->type == OBJ_CIRCLE, FALSE);
+  g_return_val_if_fail (object->circle != NULL, FALSE);
+
+  if (x != NULL) {
+    *x = object->circle->center_x;
+  }
+
+  if (y != NULL) {
+    *y = object->circle->center_y;
+  }
+
   return TRUE;
-}
-
-/*! \brief Print circle to Postscript document.
- *  \par Function Description
- *  This function prints the circle described by the <B>o_current</B>
- *  parameter to a Postscript document. It takes into account its line type
- *  and fill type.
- *  The Postscript document is descibed by the file pointer <B>fp</B>.
- *
- *  The validity of the <B>o_current</B> pointer is checked :
- *  a null pointer causes an error message and a return.
- *
- *  The description of the circle is extracted from the <B>o_current</B>
- *  parameter : the coordinates of the center of the circle, its radius,
- *  its line type, its fill type.
- *
- *  The outline and the inside of the circle are successively handled by
- *  two differend sets of functions.
- *  
- *  \param [in] toplevel  The TOPLEVEL object.
- *  \param [in] fp         FILE pointer to Postscript document.
- *  \param [in] o_current  Circle OBJECT to write to document.
- *  \param [in] origin_x   Page x coordinate to place circle OBJECT.
- *  \param [in] origin_y   Page y coordinate to place circle OBJECT.
- */
-void o_circle_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
-		    int origin_x, int origin_y)
-{
-  int x, y, radius;
-  int color;
-  int circle_width, length, space;
-  int fill_width, angle1, pitch1, angle2, pitch2;
-  void (*outl_func)() = NULL;
-  void (*fill_func)() = NULL;
-
-  if (o_current == NULL) {
-    printf("got null in o_circle_print\n");
-    return;
-  }
-
-  x      = o_current->circle->center_x; 
-  y      = o_current->circle->center_y;
-  radius = o_current->circle->radius;
-
-  color  = o_current->color;
-
-  /*
-   * Depending on the type of the line for this particular circle, the
-   * appropriate function is chosen among #o_circle_print_solid(),
-   * #o_circle_print_dotted(), #o_circle_print_dashed(),
-   * #o_circle_print_center() and #o_circle_print_phantom().
-   *
-   * The needed parameters for each of these type is extracted from the
-   * <B>o_current</B> object. Depending on the type, unused parameters are
-   * set to -1.
-   *
-   * In the eventuality of a length and/or space null, the line is
-   * printed solid to avoid and endless loop produced by other functions
-   * in such a case.
-   */
-  circle_width = o_current->line_width;
-  if(circle_width <=2) {
-    if(toplevel->line_style == THICK) {
-      circle_width=LINE_WIDTH;
-    } else {
-      circle_width=2;
-    }
-  }
-  length       = o_current->line_length;
-  space        = o_current->line_space;
-
-  switch(o_current->line_type) {
-    case(TYPE_SOLID):
-      length = -1; space  = -1;
-      outl_func = o_circle_print_solid;
-      break;
-
-    case(TYPE_DOTTED):
-      length = -1;
-      outl_func = o_circle_print_dotted;
-      break;
-
-    case(TYPE_DASHED):
-      outl_func = o_circle_print_dashed;
-      break;
-
-    case(TYPE_CENTER):
-      outl_func = o_circle_print_center;
-      break;
-
-    case(TYPE_PHANTOM):
-      outl_func = o_circle_print_phantom;
-      break;
-
-    case(TYPE_ERASE):
-      /* Unused for now print it solid */
-      length = -1; space  = -1;
-      outl_func = o_circle_print_solid;
-      break;
-  }
-
-  if((length == 0) || (space == 0)) {
-    length = -1; space  = -1;
-    outl_func = o_circle_print_solid;
-  }
-
-  (*outl_func)(toplevel, fp,
-               x - origin_x, y - origin_y,
-               radius,
-               color,
-               circle_width, length, space,
-               origin_x, origin_y);
-
-  /*
-   * If the filling type of the circle is not <B>HOLLOW</B>, the appropriate
-   * function is chosen among #o_circle_print_filled(), #o_circle_print_mesh()
-   * and #o_circle_print_hatch(). The corresponding parameters are extracted
-   * from the <B>o_current</B> object and corrected afterward.
-   *
-   * The case where <B>pitch1</B> and <B>pitch2</B> are null or negative is
-   * avoided as it leads to an endless loop in most of the called functions.
-   * In such a case, the circle is printed filled. Unused parameters for
-   * each of these functions are set to -1 or any passive value.
-   */
-  if(o_current->fill_type != FILLING_HOLLOW) {
-    fill_width = o_current->fill_width;
-    angle1     = o_current->fill_angle1;
-    pitch1     = o_current->fill_pitch1;
-    angle2     = o_current->fill_angle2;
-    pitch2     = o_current->fill_pitch2;
-		
-    switch(o_current->fill_type) {
-      case(FILLING_FILL):
-        angle1 = -1; pitch1 = 1;
-        angle2 = -1; pitch2 = 1;
-        fill_width = -1;
-        fill_func = o_circle_print_filled;
-        break;
-			
-      case(FILLING_MESH):
-        fill_func = o_circle_print_mesh;
-        break;
-				
-      case(FILLING_HATCH):
-        angle2 = -1; pitch2 = 1;
-        fill_func = o_circle_print_hatch;
-        break;
-				
-      case(FILLING_VOID):
-				/* Unused for now, print it filled */
-        angle1 = -1; pitch1 = 1;
-        angle2 = -1; pitch2 = 1;
-        fill_width = -1;
-        fill_func = o_circle_print_filled;
-        break;
-        
-      case(FILLING_HOLLOW):
-        /* nop */
-        break;
-    }
-
-    if((pitch1 <= 0) || (pitch2 <= 0)) {
-      angle1 = -1; pitch1 = 1;
-      angle2 = -1; pitch2 = 1;
-      fill_func = o_circle_print_filled;
-    }
-		
-    (*fill_func)(toplevel, fp,
-                 x, y, radius,
-                 color,
-                 fill_width,
-                 angle1, pitch1, angle2, pitch2,
-                 origin_x, origin_y);
-  }
-}
-
-/*! \brief Print a solid circle to Postscript document.
- *  \par Function Description
- *  This function prints the outline of a circle when a solid line type
- *  is required. The circle is defined by its center in (<B>x</B>, <B>y</B>)
- *  and its radius in <B>radius</B>. It is printed with the color given
- *  in <B>color</B>.
- *  The parameters <B>length</B> and <B>space</B> are ignored.
- *
- *  It uses the function #o_arc_print_solid() to print the outline.
- *  Therefore it acts as an interface between the way a circle is defined
- *  and the way an arc is defined.
- *
- *  All dimensions are in mils.
- *
- *  \param [in] toplevel     The TOPLEVEL object.
- *  \param [in] fp            FILE pointer to Postscript document.
- *  \param [in] x             Center x coordinate of circle.
- *  \param [in] y             Center y coordinate of circle.
- *  \param [in] radius        Circle radius.
- *  \param [in] color         Circle color.
- *  \param [in] circle_width  Width of circle.
- *  \param [in] length        (unused).
- *  \param [in] space         (unused).
- *  \param [in] origin_x      Page x coordinate to place circle OBJECT.
- *  \param [in] origin_y      Page y coordinate to place circle OBJECT.
- */
-void o_circle_print_solid(TOPLEVEL *toplevel, FILE *fp,
-			  int x, int y, int radius,
-			  int color,
-			  int circle_width, int length, int space,
-			  int origin_x, int origin_y)
-{
-
-  o_arc_print_solid(toplevel, fp,
-                    x, y, radius,
-                    0, FULL_CIRCLE / 64,
-                    color,
-                    circle_width, -1, -1,
-                    origin_x, origin_y);
-
-}
-
-
-/*! \brief Print a dotted circle to Postscript document.
- *  \par Function Description
- *  This function prints the outline of a circle when a dotted line
- *  type is required. The circle is defined by its center
- *  in (<B>x</B>, <B>y</B>) and its radius in <B>radius</B>. It is printed
- *  with the color given in <B>color</B>.
- *  The parameter <B>length</B> is ignored.
- *
- *  It uses the function #o_arc_print_dotted() to print the outline.
- *  Therefore it acts as an interface between the way a circle is
- *  defined and the way an arc is defined.
- *
- *  All dimensions are in mils.
- *
- *  \param [in] toplevel     The TOPLEVEL object.
- *  \param [in] fp            FILE pointer to Postscript document.
- *  \param [in] x             Center x coordinate of circle.
- *  \param [in] y             Center y coordinate of circle.
- *  \param [in] radius        Circle radius.
- *  \param [in] color         Circle color.
- *  \param [in] circle_width  Width of circle.
- *  \param [in] length        (unused).
- *  \param [in] space         Space between dots.
- *  \param [in] origin_x      Page x coordinate to place circle OBJECT.
- *  \param [in] origin_y      Page y coordinate to place circle OBJECT.
- */
-void o_circle_print_dotted(TOPLEVEL *toplevel, FILE *fp,
-			   int x, int y, int radius,
-			   int color,
-			   int circle_width, int length, int space,
-			   int origin_x, int origin_y)
-{
-
-  o_arc_print_dotted(toplevel, fp,
-                     x, y, radius,
-                     0, FULL_CIRCLE / 64,
-                     color,
-                     circle_width, -1, space,
-                     origin_x, origin_y);
-
-}
-
-/*! \brief Print a dashed circle to Postscript document.
- *  \par Function Description
- *  This function prints the outline of a circle when a dashed line type
- *  is required. The circle is defined by its center in
- *  (<B>x</B>, <B>y</B>) and its radius in <B>radius</B>. It is printed with the
- *  color given in <B>color</B>.
- *
- *  It uses the function #o_arc_print_dashed() to print the outline.
- *  Therefore it acts as an interface between the way a circle is
- *  defined and the way an arc is defined.
- *
- *  All dimensions are in mils.
- *
- *  \param [in] toplevel     The TOPLEVEL object.
- *  \param [in] fp            FILE pointer to Postscript document.
- *  \param [in] x             Center x coordinate of circle.
- *  \param [in] y             Center y coordinate of circle.
- *  \param [in] radius        Circle radius.
- *  \param [in] color         Circle color.
- *  \param [in] circle_width  Width of circle.
- *  \param [in] length        Length of dashed lines.
- *  \param [in] space         Space between dashes.
- *  \param [in] origin_x      Page x coordinate to place circle OBJECT.
- *  \param [in] origin_y      Page y coordinate to place circle OBJECT.
- */
-void o_circle_print_dashed(TOPLEVEL *toplevel, FILE *fp,
-			   int x, int y,
-			   int radius,
-			   int color,
-			   int circle_width, int length, int space,
-			   int origin_x, int origin_y)
-{
-
-  o_arc_print_dashed(toplevel, fp,
-                     x, y, radius,
-                     0, FULL_CIRCLE / 64,
-                     color,
-                     circle_width, length, space,
-                     origin_x, origin_y);
-
-}
-
-/*! \brief Print a centered line type circle to Postscript document.
- *  \par Function Description
- *  This function prints the outline of a circle when a centered line
- *  type is required. The circle is defined by its center in
- *  (<B>x</B>, <B>y</B>) and its radius in <B>radius</B>. It is printed with the
- *  color given in <B>color</B>.
- *
- *  It uses the function #o_arc_print_center() to print the outline.
- *  Therefore it acts as an interface between the way a circle is
- *  defined and the way an arc is defined.
- *
- *  All dimensions are in mils.
- *
- *  \param [in] toplevel     The TOPLEVEL object.
- *  \param [in] fp            FILE pointer to Postscript document.
- *  \param [in] x             Center x coordinate of circle.
- *  \param [in] y             Center y coordinate of circle.
- *  \param [in] radius        Circle radius.
- *  \param [in] color         Circle color.
- *  \param [in] circle_width  Width of circle.
- *  \param [in] length        Length of dashed lines.
- *  \param [in] space         Space between dashes.
- *  \param [in] origin_x      Page x coordinate to place circle OBJECT.
- *  \param [in] origin_y      Page y coordinate to place circle OBJECT.
- */
-void o_circle_print_center(TOPLEVEL *toplevel, FILE *fp,
-			   int x, int y,
-			   int radius,
-			   int color,
-			   int circle_width, int length, int space,
-			   int origin_x, int origin_y)
-{
-	
-  o_arc_print_center(toplevel, fp,
-                     x, y, radius,
-                     0, FULL_CIRCLE / 64,
-                     color,
-                     circle_width, length, space,
-                     origin_x, origin_y);
-
-}
-
-/*! \brief Print a phantom line type circle to Postscript document.
- *  \par Function Description
- *  This function prints the outline of a circle when a phantom line type
- *  is required. The circle is defined by its center in
- *  (<B>x</B>, <B>y</B>) and its radius in <B>radius</B>. It is printed with the
- *  color given in <B>color</B>.
- *
- *  It uses the function #o_arc_print_phantom() to print the outline.
- *  Therefore it acts as an interface between the way a circle is defined
- *  and the way an arc is defined.
- *
- *  All dimensions are in mils.
- *
- *  \param [in] toplevel     The TOPLEVEL object.
- *  \param [in] fp            FILE pointer to Postscript document.
- *  \param [in] x             Center x coordinate of circle.
- *  \param [in] y             Center y coordinate of circle.
- *  \param [in] radius        Circle radius.
- *  \param [in] color         Circle color.
- *  \param [in] circle_width  Width of circle.
- *  \param [in] length        Length of dashed lines.
- *  \param [in] space         Space between dashes.
- *  \param [in] origin_x      Page x coordinate to place circle OBJECT.
- *  \param [in] origin_y      Page y coordinate to place circle OBJECT.
- */
-void o_circle_print_phantom(TOPLEVEL *toplevel, FILE *fp,
-			    int x, int y,
-			    int radius,
-			    int color,
-			    int circle_width, int length, int space,
-			    int origin_x, int origin_y)
-{
-
-  o_arc_print_phantom(toplevel, fp,
-                      x, y, radius,
-                      0, FULL_CIRCLE / 64,
-                      color,
-                      circle_width, length, space,
-                      origin_x, origin_y);
-
-}
-
-/*! \brief Print a solid pattern circle to Postscript document.
- *  \par Function Description
- *  The function prints a filled circle with a solid pattern.
- *  No outline is printed. 
- *  The circle is defined by the coordinates of its center in
- *  (<B>x</B>,<B>y</B>) and its radius given by the <B>radius</B> parameter. 
- *  The postscript file is defined by the file pointer <B>fp</B>.
- *  <B>fill_width</B>, <B>angle1</B> and <B>pitch1</B>, <B>angle2</B>
- *  and <B>pitch2</B> parameters are ignored in this functions but
- *  kept for compatibility with other fill functions.
- *
- *  All dimensions are in mils (except <B>angle1</B> and <B>angle2</B> in degree). 
- *
- *  \param [in] toplevel   The TOPLEVEL object.
- *  \param [in] fp          FILE pointer to Postscript document.
- *  \param [in] x           Center x coordinate of circle.
- *  \param [in] y           Center y coordinate of circle.
- *  \param [in] radius      Radius of circle.
- *  \param [in] color       Circle color.
- *  \param [in] fill_width  Circle fill width. (unused).
- *  \param [in] angle1      (unused).
- *  \param [in] pitch1      (unused).
- *  \param [in] angle2      (unused).
- *  \param [in] pitch2      (unused).
- *  \param [in] origin_x    Page x coordinate to place circle OBJECT.
- *  \param [in] origin_y    Page y coordinate to place circle OBJECT.
- */
-void o_circle_print_filled(TOPLEVEL *toplevel, FILE *fp,
-			   int x, int y, int radius,
-			   int color,
-			   int fill_width,
-			   int angle1, int pitch1,
-			   int angle2, int pitch2,
-			   int origin_x, int origin_y)
-{
-  f_print_set_color(toplevel, fp, color);
-
-  fprintf(fp, "%d %d %d dot\n",
-	  x-origin_x, y-origin_y,
-	  radius);
-	
-}
-
-/*! \brief Print a mesh pattern circle to Postscript document.
- *  \par Function Description
- *  This function prints a meshed circle. No outline is printed. 
- *  The circle is defined by the coordinates of its center in
- *  (<B>x</B>,<B>y</B>) and its radius by the <B>radius</B> parameter. 
- *  The Postscript document is defined by the file pointer <B>fp</B>. 
- *
- *  The inside mesh is achieved by two successive call to the
- *  #o_circle_print_hatch() function, given <B>angle1</B> and <B>pitch1</B>
- *  the first time and <B>angle2</B> and <B>pitch2</B> the second time.
- *
- *  Negative or null values for <B>pitch1</B> and/or <B>pitch2</B> are
- *  not allowed as it leads to an endless loop in #o_circle_print_hatch().
- *
- *  All dimensions are in mils (except <B>angle1</B> and <B>angle2</B> in degree).
- *
- *  \param [in] toplevel   The TOPLEVEL object.
- *  \param [in] fp          FILE pointer to Postscript document.
- *  \param [in] x           Center x coordinate of circle.
- *  \param [in] y           Center y coordinate of circle.
- *  \param [in] radius      Radius of circle.
- *  \param [in] color       Circle color.
- *  \param [in] fill_width  Circle fill width.
- *  \param [in] angle1      1st angle for mesh pattern.
- *  \param [in] pitch1      1st pitch for mesh pattern.
- *  \param [in] angle2      2nd angle for mesh pattern.
- *  \param [in] pitch2      2nd pitch for mesh pattern.
- *  \param [in] origin_x    Page x coordinate to place circle OBJECT.
- *  \param [in] origin_y    Page y coordinate to place circle OBJECT.
- */
-void o_circle_print_mesh(TOPLEVEL *toplevel, FILE *fp,
-			 int x, int y, int radius,
-			 int color,
-			 int fill_width,
-			 int angle1, int pitch1,
-			 int angle2, int pitch2,
-			 int origin_x, int origin_y)
-{
-  o_circle_print_hatch(toplevel, fp,
-                       x, y, radius,
-                       color,
-                       fill_width,
-                       angle1, pitch1,
-                       -1, -1,
-                       origin_x, origin_y);
-  o_circle_print_hatch(toplevel, fp,
-                       x, y, radius,
-                       color,
-                       fill_width,
-                       angle2, pitch2,
-                       -1, -1,
-                       origin_x, origin_y);
-	
-}
-
-/*! \brief Print a hatch pattern circle to Postscript document.
- *  \par Function Description
- *  The function prints a hatched circle. No outline is printed. 
- *  The circle is defined by the coordinates of its center in
- *  (<B>x</B>,<B>y</B>) and its radius by the <B>radius</B> parameter. 
- *  The Postscript document is defined by the file pointer <B>fp</B>. 
- *  <B>angle2</B> and <B>pitch2</B> parameters are ignored in this
- *  functions but kept for compatibility with other fill functions.
- *
- *  The only attribute of line here is its width from the parameter <B>width</B>.
- *
- *  Negative or null values for <B>pitch1</B> is not allowed as it
- *  leads to an endless loop.
- *
- *  All dimensions are in mils (except <B>angle1</B> is in degrees).
- *
- *  \param [in] toplevel   The TOPLEVEL object.
- *  \param [in] fp          FILE pointer to Postscript document.
- *  \param [in] x           Center x coordinate of circle.
- *  \param [in] y           Center y coordinate of circle.
- *  \param [in] radius      Radius of circle.
- *  \param [in] color       Circle color.
- *  \param [in] fill_width  Circle fill width.
- *  \param [in] angle1      Angle for hatch pattern.
- *  \param [in] pitch1      Pitch for hatch pattern.
- *  \param [in] angle2      (unused).
- *  \param [in] pitch2      (unused).
- *  \param [in] origin_x    Page x coordinate to place circle OBJECT.
- *  \param [in] origin_y    Page y coordinate to place circle OBJECT.
- */
-void o_circle_print_hatch(TOPLEVEL *toplevel, FILE *fp,
-			  int x, int y, int radius,
-			  int color,
-			  int fill_width,
-			  int angle1, int pitch1,
-			  int angle2, int pitch2,
-			  int origin_x, int origin_y)
-{
-  CIRCLE circle;
-  gint index;
-  GArray *lines;
-
-  g_return_if_fail(toplevel != NULL);
-  g_return_if_fail(fp != NULL);
-
-  f_print_set_color(toplevel, fp, color);
-
-  /* Avoid printing line widths too small */
-  if (fill_width <= 1) fill_width = 2;
-
-  lines = g_array_new(FALSE, FALSE, sizeof(LINE));
-
-  circle.center_x = x;
-  circle.center_y = y;
-  circle.radius   = radius;
-
-  m_hatch_circle(&circle, angle1, pitch1, lines);
-
-  for(index=0; index<lines->len; index++) {
-    LINE *line = &g_array_index(lines, LINE, index);
-
-    fprintf(fp,"%d %d %d %d %d line\n",
-            line->x[0], line->y[0],
-            line->x[1], line->y[1],
-            fill_width);
-  }
-
-  g_array_free(lines, TRUE);
 }
 
 /*! \brief Calculates the distance between the given point and the closest
  * point on the perimeter of the circle.
  *
+ *  \param [in] toplevel     The TOPLEVEL object.
  *  \param [in] object       The circle OBJECT.
  *  \param [in] x            The x coordinate of the given point.
  *  \param [in] y            The y coordinate of the given point.
@@ -1113,12 +501,14 @@ void o_circle_print_hatch(TOPLEVEL *toplevel, FILE *fp,
  *  \return The shortest distance from the object to the point.  With an
  *  invalid parameter, this function returns G_MAXDOUBLE.
  */
-double o_circle_shortest_distance (OBJECT *object, int x, int y,
-                                   int force_solid)
+double o_circle_shortest_distance (TOPLEVEL *toplevel, OBJECT *object,
+                                   int x, int y, int force_solid)
 {
   int solid;
 
+  g_return_val_if_fail (object != NULL, FALSE);
   g_return_val_if_fail (object->circle != NULL, G_MAXDOUBLE);
+  g_return_val_if_fail (object->type == OBJ_CIRCLE, FALSE);
 
   solid = force_solid || object->fill_type != FILLING_HOLLOW;
 

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <config.h>
-#include <missing.h>
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -36,10 +35,6 @@
 
 #include "libgeda_priv.h"
 #include "libgedaguile.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 static void process_error_stack (SCM s_stack, SCM s_key, SCM s_args, GError **err);
 
@@ -77,7 +72,7 @@ static SCM protected_body_eval (void *data)
  *  \par Function Description
  *
  *  Often a libgeda program (or libgeda itself) will need to call out
- *  to Scheme code, for example to load a Scheme configuration file.
+ *  to Scheme code, for example to load a Scheme initialisation (RC) file.
  *  If an error or exception caused by such code goes uncaught, it
  *  locks up the Scheme interpreter, stopping any further Scheme code
  *  from being run until the program is restarted.
@@ -100,7 +95,7 @@ SCM g_scm_eval_protected (SCM exp, SCM module_or_state)
   SCM body_data;
   SCM result;
 
-  if (module_or_state == SCM_UNDEFINED) {
+  if (SCM_UNBNDP (module_or_state)) {
     body_data = scm_list_2 (exp, scm_interaction_environment ());
   } else {
     body_data = scm_list_2 (exp, module_or_state);

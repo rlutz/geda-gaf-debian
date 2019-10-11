@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2012 Ales Hvezda
- * Copyright (C) 1998-2012 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
  */
 #include <config.h>
 #include <version.h>
-#include <missing.h>
 
 #include <stdio.h>
 #include <ctype.h>
@@ -28,10 +27,6 @@
 #endif
 
 #include "gschem.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 #define GETOPT_OPTIONS "c:hL:o:pqr:s:vV"
 
@@ -53,6 +48,7 @@ struct option long_options[] =
     {"verbose", 0, 0, 'v'},
     {"config-file", 0, 0, 'r'},
     {"output", 0, 0, 'o'},
+    {"control-fd", required_argument, NULL, -4},
     {0, 0, 0, 0}
   };
 #endif
@@ -94,6 +90,7 @@ usage(char *cmd)
 "  -s FILE                  Scheme script to run at startup.\n"
 "  -o, --output=FILE        Output filename (for printing).\n"
 "  -p                       Automatically place the window.\n"
+"  --control-fd=stdin|FD    Read control commands from file descriptor.\n"
 "  -V, --version            Show version information.\n"
 "  -h, --help               Help; this message.\n"
 "  --                       Treat all remaining arguments as filenames.\n"
@@ -114,7 +111,7 @@ version ()
 {
   printf(_(
 "gEDA %s (g%.7s)\n"
-"Copyright (C) 1998-2012 gEDA developers\n"
+"Copyright (C) 1998-2019 gEDA developers\n"
 "This is free software, and you are welcome to redistribute it under\n"
 "certain conditions. For details, see the file `COPYING', which is\n"
 "included in the gEDA distribution.\n"
@@ -200,6 +197,10 @@ parse_commandline(int argc, char *argv[])
                                             scm_from_locale_string (optarg),
                                             sym_load_path)),
                     s_pre_load_expr);
+        break;
+
+      case -4:
+        x_controlfd_parsearg (optarg);
         break;
 
       case 'h':

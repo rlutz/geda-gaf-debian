@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gsymcheck - gEDA Symbol Check 
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
  */
 
 #include <config.h>
-#include <missing.h>
 #include <version.h>
 
 #include <stdio.h>
@@ -42,6 +41,7 @@
 #include "../include/globals.h"
 #include "../include/i_vars.h"
 #include "../include/prototype.h"
+#include "../include/gettext.h"
 
 SCM g_rc_gsymcheck_version(SCM scm_version)
 {
@@ -52,15 +52,13 @@ SCM g_rc_gsymcheck_version(SCM scm_version)
 	      SCM_ARG1, "gsymcheck-version");
 
   version = scm_to_utf8_string (scm_version);
-  if (g_strcasecmp (version, PACKAGE_DATE_VERSION) != 0) {
-    fprintf(stderr,
-            "You are running gEDA/gaf version [%s%s.%s],\n",
-            PREPEND_VERSION_STRING, PACKAGE_DOTTED_VERSION, PACKAGE_DATE_VERSION);
-    fprintf(stderr,
-            "but you have a version [%s] gsymcheckrc file:\n[%s]\n",
+  if (g_ascii_strcasecmp (version, PACKAGE_DATE_VERSION) != 0) {
+    fprintf(stderr, _(
+            "You are running gEDA/gaf version [%s%s.%s],\n"
+            "but you have a version [%s] gsymcheckrc file:\n[%s]\n"
+            "Please be sure that you have the latest rc file.\n"),
+            PREPEND_VERSION_STRING, PACKAGE_DOTTED_VERSION, PACKAGE_DATE_VERSION,
             version, rc_filename);
-    fprintf(stderr,
-            "Please be sure that you have the latest rc file.\n");
     ret = SCM_BOOL_F;
   }
 

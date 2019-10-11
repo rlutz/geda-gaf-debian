@@ -49,10 +49,7 @@
 #include "../include/struct.h"     /* typdef and struct declarations */
 #include "../include/prototype.h"  /* function prototypes */
 #include "../include/globals.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
+#include "../include/gettext.h"
 
 /*------------------------------------------------------------------
  * Gattrib specific defines
@@ -93,11 +90,10 @@ x_window_init()
   /*  window is a global declared in globals.h.  */
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);  
 
-  gtk_window_set_title( GTK_WINDOW(window), "gattrib -- gEDA attribute editor"); 
-  gtk_window_set_default_size(GTK_WINDOW(window), 750, 600);  
+  gtk_window_set_title( GTK_WINDOW(window), _("gattrib -- gEDA attribute editor")); 
   
-  gtk_signal_connect (GTK_OBJECT (window), "delete_event",
-		      GTK_SIGNAL_FUNC (gattrib_really_quit), 0);
+  g_signal_connect(window, "delete_event",
+                   G_CALLBACK (gattrib_really_quit), 0);
 
   /* -----  Now create main_vbox.  This is a container which organizes child  ----- */  
   /* -----  widgets into a vertical column.  ----- */  
@@ -285,7 +281,7 @@ x_window_create_menu(GtkWindow *window, GtkWidget **menubar)
   gtk_ui_manager_add_ui_from_file(ui, menu_file, &error);
   if(error != NULL) {
     /* An error occured, terminate */
-    fprintf(stderr, "Error loading %s:\n%s\n", menu_file, error->message);
+    fprintf(stderr, _("Error loading %s:\n%s\n"), menu_file, error->message);
     exit(1);
   }
 
@@ -322,20 +318,17 @@ x_window_add_items()
   
   /* Do these sanity check to prevent later segfaults */
   if (sheet_head->comp_count == 0) {
-    error_string = "No components found in entire design!\n"
-            "Do you have refdeses on your components?";
+    error_string = _("No components found in entire design!\nDo you have refdeses on your components?");
     x_dialog_fatal_error(error_string, 1);
   }
 
   if (sheet_head->comp_attrib_count == 0) {
-    error_string = "No configurable component attributes found in entire design!\n"
-            "Please attach at least some attributes before running gattrib.";
+    error_string = _("No configurable component attributes found in entire design!\nPlease attach at least some attributes before running gattrib.");
     x_dialog_fatal_error(error_string, 2);
   }
 
   if (sheet_head->pin_count == 0) {
-    error_string = "No pins found on any components!\n"
-            "Please check your design.";
+    error_string = _("No pins found on any components!\nPlease check your design.");
     x_dialog_fatal_error(error_string, 3);
   }
 

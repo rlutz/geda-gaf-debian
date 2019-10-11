@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschlas - gEDA Load and Save
  * Copyright (C) 2002-2010 Ales Hvezda
- * Copyright (C) 2002-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 2002-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,18 +30,14 @@
 
 #include "../include/globals.h"
 #include "../include/prototype.h"
-#include "../include/papersizes.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
-int default_force_boundingbox = FALSE;
-
+/*! \brief Initialize variables in the TOPLEVEL
+ *
+ * Initialize the variables in toplevel.
+ * \param toplevel pointer to the TOPLEVEL structure.
+ */
 void i_vars_set(TOPLEVEL * pr_current)
-{ 
+{
     i_vars_libgeda_set(pr_current);
-
-    pr_current->force_boundingbox = default_force_boundingbox;
 }
-
