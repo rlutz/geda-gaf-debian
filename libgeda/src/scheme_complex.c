@@ -153,15 +153,14 @@ SCM_DEFINE (set_complex_x, "%set-complex!", 6, 0, 0,
 
   int x = scm_to_int (x_s);
   int y = scm_to_int (y_s);
-  o_translate_world (toplevel,
+  o_translate_world (obj,
                      x - obj->complex->x,
-                     y - obj->complex->y,
-                     obj);
+                     y - obj->complex->y);
   obj->complex->angle = angle;
   obj->complex->mirror = scm_is_true (mirror_s);
   obj->selectable = scm_is_false (locked_s);
 
-  o_complex_recalc (toplevel, obj); /* We need to do this explicitly... */
+  obj->w_bounds_valid_for = NULL; /* We need to do this explicitly... */
 
   o_emit_change_notify (toplevel, obj);
 
@@ -256,9 +255,10 @@ SCM_DEFINE (complex_append_x, "%complex-append!", 2, 0, 0,
   OBJECT *parent = edascm_to_object (complex_s);
   OBJECT *child = edascm_to_object (obj_s);
 
+  PAGE* page = o_get_page (toplevel, child);
   /* Check that object is not already attached to a page or a
      different complex. */
-  if ((o_get_page (toplevel, child) != NULL)
+  if ((page != NULL)
       || ((child->parent != NULL) && (child->parent != parent))) {
     scm_error (edascm_object_state_sym,
                s_complex_append_x,
@@ -279,11 +279,13 @@ SCM_DEFINE (complex_append_x, "%complex-append!", 2, 0, 0,
     g_list_append (parent->complex->prim_objs, child);
   child->parent = parent;
 
-  o_complex_recalc (toplevel, parent);
+  parent->w_bounds_valid_for = NULL;
 
+  PAGE* parent_page = o_get_page (toplevel, parent);
   /* We may need to update connections */
-  s_tile_update_object (toplevel, child);
-  s_conn_update_object (toplevel, child);
+  if (parent_page != NULL) {
+    s_conn_update_object (parent_page, child);
+  }
 
   o_emit_change_notify (toplevel, parent);
 
@@ -358,8 +360,8 @@ SCM_DEFINE (complex_remove_x, "%complex-remove!", 2, 0, 0,
   child->parent = NULL;
 
   /* We may need to update connections */
-  s_tile_remove_object (child);
-  s_conn_remove_object (toplevel, child);
+  s_conn_remove_object (child_page, child);
+  s_conn_remove_object_connections (toplevel, child);
 
   o_emit_change_notify (toplevel, parent);
 
@@ -392,7 +394,7 @@ init_module_geda_core_complex ()
  * \brief Initialise the basic gEDA complex object manipulation procedures.
  * \par Function Description
  * Registers some Scheme procedures for working with complex #OBJECT
- * smobs. Should only be called by scheme_api_init().
+ * smobs. Should only be called by edascm_init().
  */
 void
 edascm_init_complex ()

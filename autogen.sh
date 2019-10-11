@@ -1,7 +1,7 @@
 #!/bin/sh
 #                                                   -*-Shell-script-*-
 # Developer helper script for setting up gEDA build environment
-# Copyright (C) 2009  Peter Brett <peter@peter-b.co.uk>
+# Copyright (C) 2009, 2016  Peter Brett <peter@peter-b.co.uk>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ ac_script=configure.ac
 am_version=1.11.0
 aclocal_flags="$ACLOCAL_FLAGS -I m4"
 tooldir=build-tools
-podirs="libgeda/po gschem/po gattrib/po"
+podirs="libgeda/po gaf/po gschem/po gattrib/po gaf/po gnetlist-legacy/po gsymcheck/po"
 
 srcdir=`dirname $0`
 if test "x$srcdir" = x ; then srcdir=.; fi
@@ -111,6 +111,11 @@ run_tool() {
 # the top-level po directory.  If it has, we copy the files to po
 # directories that we actually use.
 #
+# In newer versions of autopoint, there is a second bug whereby the
+# "intl" embedded internationalization library installed by autopoint
+# requires a "ChangeLog" file for "make dist", but doesn't actually
+# provide one.
+#
 # N.b. when this function is called we've cd'd into $srcdir.
 autopoint_fix() {
   top_po="po"
@@ -127,6 +132,12 @@ autopoint_fix() {
           cp -p $top_po/* $d || break
         done
       } && rm -rf $top_po
+    fi
+
+    cl="intl/ChangeLog"
+    if test -d "intl" -a ! -e "$cl"; then
+        echo "$script_name: creating file $cl"
+        touch "$cl"
     fi
   else
     exit $?
@@ -213,4 +224,5 @@ fi
   run_tool "$ACLOCAL" $aclocal_flags &&
   run_tool "$AUTOHEADER" &&
   run_tool "$AUTOMAKE" -Wall --copy --add-missing --gnu &&
-  run_tool "$AUTOCONF" )
+  run_tool "$AUTOCONF" &&
+  (cd xorn && autoreconf -if))

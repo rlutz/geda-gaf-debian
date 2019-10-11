@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,10 +32,6 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 #define X_IMAGE_DEFAULT_SIZE "800x600"
 
 #define X_IMAGE_SIZE_MENU_NAME "image_size_menu"
@@ -45,34 +41,6 @@
 
 static char *x_image_sizes[] = {"320x240", "640x480", "800x600", "1200x768",
   "1280x960", "1600x1200", "3200x2400", NULL};
-
-#if ((GTK_MAJOR_VERSION == 2) && (GTK_MINOR_VERSION < 6))
-/* gtk_combo_box_get_active_text was included in GTK 2.6, so we need to store
-   the different image type descriptions in a list. */
-GSList *image_type_descriptions = NULL;
-#endif
-
-
-#if ((GTK_MAJOR_VERSION == 2) && (GTK_MINOR_VERSION < 6))
-static void free_image_type_descriptions_list ()
-{
-  GSList *ptr;
-
-  /* Free the data stored in each node */
-  ptr = image_type_descriptions;
-  while (ptr) {
-    g_free(ptr->data);
-    ptr->data = NULL;
-    ptr = g_slist_next(ptr);
-  }
-
-  /* Free the list */
-  if (!ptr)
-    g_slist_free(image_type_descriptions);
-  image_type_descriptions = NULL;
-}
-
-#endif
 
 /*! \brief Create the options of the image size combobox
  *  \par This function adds the options of the image size to the given combobox.
@@ -121,23 +89,12 @@ static void create_type_menu(GtkComboBox *combo)
   char *buf;
   int i=0, default_index=0;
 
-#if ((GTK_MAJOR_VERSION == 2) && (GTK_MINOR_VERSION < 6))
-  /* If GTK < 2.6, free the descriptions list */
-  free_image_type_descriptions_list();
-#endif
-
   ptr = formats;
   while (ptr) {
     if (gdk_pixbuf_format_is_writable (ptr->data)) {
       /* Get the format description and add it to the menu */
       buf = g_strdup (gdk_pixbuf_format_get_description(ptr->data));
       gtk_combo_box_append_text (GTK_COMBO_BOX (combo), buf);
-
-      /* If GTK < 2.6, then add it also to the descriptions list. */
-#if ((GTK_MAJOR_VERSION == 2) && (GTK_MINOR_VERSION < 6))
-      image_type_descriptions = g_slist_append(image_type_descriptions,
-          buf);
-#endif
 
       /* Compare the name with "png" and store the index */
       buf = g_strdup (gdk_pixbuf_format_get_name(ptr->data));
@@ -151,14 +108,14 @@ static void create_type_menu(GtkComboBox *combo)
     ptr = ptr->next;
   }
   g_slist_free (formats);
-  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Encapsulated Postscript");
+  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Portable Document Format");
 
   /* Set the default menu */
   gtk_combo_box_set_active(GTK_COMBO_BOX(combo), default_index);
   return;
 }
 
-/*! \brief Given a gdk-pixbuf image type description, it returns the type, 
+/*! \brief Given a gdk-pixbuf image type description, it returns the type,
  *  or extension of the image.
  *  \par Return the gdk-pixbuf image type, or extension, which has the
  *  given gdk-pixbuf description.
@@ -166,29 +123,28 @@ static void create_type_menu(GtkComboBox *combo)
  *  \return The gdk-pixbuf type, or extension, of the image.
  *  \note This function is only used in this file.
  */
-static char *x_image_get_type_from_description(char *description) {
-  gchar *descr = g_strdup (description);
-  GSList *formats = gdk_pixbuf_get_formats ();
+static char *
+x_image_get_type_from_description (const char *description)
+{
   GSList *ptr;
-  gchar *ptr_descr;
 
-  /*WK - catch EPS export case*/
-  if (strcmp(descr, _("Encapsulated Postscript")) == 0) { 
-    return(g_strdup("eps"));
+  if (strcmp (description, "Portable Document Format") == 0) {
+    return "pdf";
   }
 
-  ptr = formats;
-  while (ptr) {
-    ptr_descr = gdk_pixbuf_format_get_description (ptr->data);
-    if (ptr_descr && (strcasecmp(ptr_descr, descr) == 0)) {
-      g_free(descr);
-      return(gdk_pixbuf_format_get_name(ptr->data));
+  ptr = gdk_pixbuf_get_formats ();
+
+  while (ptr != NULL) {
+    gchar *ptr_descr = gdk_pixbuf_format_get_description (ptr->data);
+
+    if (ptr_descr && (strcasecmp (ptr_descr, description) == 0)) {
+      return gdk_pixbuf_format_get_name (ptr->data);
     }
 
-    ptr = ptr->next;
+    ptr = g_slist_next (ptr);
   }
-  g_free (descr);
-  return NULL;  
+
+  return NULL;
 }
 
 /*! \brief Update the filename of a file dialog, when the image type has changed.
@@ -196,13 +152,13 @@ static char *x_image_get_type_from_description(char *description) {
  *  the filename displayed by the dialog, removing the current extension, and
  *  adding the extension of the image type selected.
  *  \param combo     [in] A combobox inside a file chooser dialog, with gdk-pixbuf image type descriptions.
- *  \param w_current [in] the GSCHEM_TOPLEVEL structure.
+ *  \param w_current [in] the GschemToplevel structure.
  *  \return nothing.
- * 
+ *
  */
-static void x_image_update_dialog_filename(GtkComboBox *combo, 
-    GSCHEM_TOPLEVEL *w_current) {
-  TOPLEVEL *toplevel = w_current->toplevel;
+static void x_image_update_dialog_filename(GtkComboBox *combo,
+    GschemToplevel *w_current) {
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   char* image_type_descr = NULL;
   char *image_type = NULL;
   char *old_image_filename = NULL;
@@ -212,19 +168,7 @@ static void x_image_update_dialog_filename(GtkComboBox *combo,
   GtkWidget *file_chooser;
 
   /* Get the current image type */
-#if ((GTK_MAJOR_VERSION == 2) && (GTK_MINOR_VERSION < 6))
-  GSList *ptr;
-  /* If GTK < 2.6, get the description from the descriptions list */
-  ptr = g_slist_nth(image_type_descriptions,
-      gtk_combo_box_get_active(GTK_COMBO_BOX(combo)));
-  if (ptr != NULL) {
-    image_type_descr = (char *) (ptr->data);
-  } else {
-    image_type_descr = NULL;
-  }
-#else
   image_type_descr = gtk_combo_box_get_active_text(GTK_COMBO_BOX(combo));
-#endif
   image_type = x_image_get_type_from_description(image_type_descr);
 
   /* Get the parent dialog */
@@ -242,17 +186,17 @@ static void x_image_update_dialog_filename(GtkComboBox *combo,
     file_basename = g_path_get_basename(old_image_filename);
 
     if (g_strrstr(file_basename, ".") != NULL) {
-      file_name = g_strndup(file_basename, 
+      file_name = g_strndup(file_basename,
           g_strrstr(file_basename, ".") - file_basename);
     }
   }
 
   /* Add the extension */
   if (file_name) {
-    new_image_filename = g_strdup_printf("%s.%s", file_name, 
+    new_image_filename = g_strdup_printf("%s.%s", file_name,
         image_type);
   } else {
-    new_image_filename = g_strdup_printf("%s.%s", file_basename, 
+    new_image_filename = g_strdup_printf("%s.%s", file_basename,
         image_type);
   }
 
@@ -269,83 +213,43 @@ static void x_image_update_dialog_filename(GtkComboBox *combo,
   g_free(new_image_filename);
 }
 
-/*! \brief Write eps image file.
- *  \par This function writes the eps file, using the postscript print code
- *  from libgeda. Orientation is portrait and type is extents without margins.
- *  \param w_current [in] the GSCHEM_TOPLEVEL structure.
- *  \param filename  [in] the image filename.
- *  \return nothing
- *
- */
-void x_image_write_eps(GSCHEM_TOPLEVEL *w_current, const char* filename)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int result;
-  int w, h, orientation, type;
-  w = toplevel->paper_width;
-  h = toplevel->paper_height;
-  orientation = toplevel->print_orientation;
-  type = toplevel->print_output_type;
-
-  toplevel->paper_width = 0;
-  toplevel->paper_height = 0;
-  toplevel->print_orientation = PORTRAIT;
-  toplevel->print_output_type = EXTENTS_NOMARGINS;
-  result = f_print_file (toplevel, toplevel->page_current, filename);
-  if (result) {
-    s_log_message(_("x_image_lowlevel: Unable to write eps file %s.\n"),
-        filename);
-  }   
-
-  toplevel->paper_width = w;
-  toplevel->paper_height = h;
-  toplevel->print_orientation = orientation;
-  toplevel->print_output_type = type;
-}
-
 /*! \brief Write the image file, with the desired options.
  *  \par This function writes the image file, with the options set in the
  *  dialog by the user.
- *  \param w_current [in] the GSCHEM_TOPLEVEL structure.
+ *  \param w_current [in] the GschemToplevel structure.
  *  \param filename  [in] the image filename.
- *  \param desired_width  [in] the image width chosen by the user.
- *  \param desired_height [in] the image height chosen by the user.
- *  \param filetype [in] image filetype.
+ *  \param width     [in] the image width chosen by the user.
+ *  \param height    [in] the image height chosen by the user.
+ *  \param filetype  [in] image filetype.
  *  \return nothing
  *
  */
-void x_image_lowlevel(GSCHEM_TOPLEVEL *w_current, const char* filename,
-    int desired_width, int desired_height, char *filetype)
+void x_image_lowlevel(GschemToplevel *w_current, const char* filename,
+    int width, int height, char *filetype)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int width, height;
-  int save_height, save_width;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   int save_page_left, save_page_right, save_page_top, save_page_bottom;
   int page_width, page_height, page_center_left, page_center_top;
   GdkPixbuf *pixbuf;
   GError *gerror = NULL;
   GtkWidget *dialog;
   float prop;
+  GschemPageView *view = gschem_toplevel_get_current_page_view (w_current);
 
-  w_current->image_width = width = desired_width;
-  w_current->image_height = height = desired_height;
+  GschemPageGeometry *geometry = gschem_page_view_get_page_geometry (view);
+  g_return_if_fail (geometry != NULL);
 
-  save_width = toplevel->width;
-  save_height = toplevel->height;
+  /* Save geometry */
+  save_page_left = geometry->viewport_left;
+  save_page_right = geometry->viewport_right;
+  save_page_top = geometry->viewport_top;
+  save_page_bottom = geometry->viewport_bottom;
 
-  toplevel->width = width;
-  toplevel->height = height;
+  page_width = geometry->viewport_right - geometry->viewport_left;
+  page_height = geometry->viewport_bottom - geometry->viewport_top;
 
-  save_page_left = toplevel->page_current->left;
-  save_page_right = toplevel->page_current->right;
-  save_page_top = toplevel->page_current->top;
-  save_page_bottom = toplevel->page_current->bottom;
-
-  page_width = save_page_right - save_page_left;
-  page_height = save_page_bottom - save_page_top;
-
-  page_center_left = save_page_left + (page_width / 2);
-  page_center_top = save_page_top + (page_height / 2);
+  page_center_left = geometry->viewport_left + (page_width / 2);
+  page_center_top = geometry->viewport_top + (page_height / 2);
 
   /* Preserve proportions */
   prop = (float)width / height;
@@ -355,20 +259,18 @@ void x_image_lowlevel(GSCHEM_TOPLEVEL *w_current, const char* filename,
     page_width = (page_height * prop);
   }
 
-  /* need to do this every time you change width / height */
-  set_window(toplevel, toplevel->page_current,
-      page_center_left - (page_width / 2),
-      page_center_left + (page_width / 2),
-      page_center_top - (page_height / 2),
-      page_center_top + (page_height / 2));
+  gschem_page_geometry_set_viewport_left   (geometry, page_center_left - (page_width / 2));
+  gschem_page_geometry_set_viewport_right  (geometry, page_center_left + (page_width / 2));
+  gschem_page_geometry_set_viewport_top    (geometry, page_center_top - (page_height / 2));
+  gschem_page_geometry_set_viewport_bottom (geometry, page_center_top + (page_height / 2));
 
   /* de select everything first */
   o_select_unselect_all( w_current );
 
-  if (strcmp(filetype, "eps") == 0) /*WK - catch EPS export case*/
-    x_image_write_eps(w_current, filename);
+  if (strcmp(filetype, "pdf") == 0)
+    x_print_export_pdf (w_current, filename);
   else {
-    pixbuf = x_image_get_pixbuf(w_current);
+    pixbuf = x_image_get_pixbuf(w_current, width, height);
     if (pixbuf != NULL) {
       if (!gdk_pixbuf_save(pixbuf, filename, filetype, &gerror, NULL)) {
         s_log_message(_("x_image_lowlevel: Unable to write %s file %s.\n"),
@@ -414,28 +316,23 @@ void x_image_lowlevel(GSCHEM_TOPLEVEL *w_current, const char* filename,
     }
   }
 
-  toplevel->width = save_width;
-  toplevel->height = save_height;
+  /* Restore geometry */
+  gschem_page_geometry_set_viewport_left   (geometry, save_page_left  );
+  gschem_page_geometry_set_viewport_right  (geometry, save_page_right );
+  gschem_page_geometry_set_viewport_top    (geometry, save_page_top   );
+  gschem_page_geometry_set_viewport_bottom (geometry, save_page_bottom);
 
-  /* need to do this every time you change width / height */
-  set_window(toplevel, toplevel->page_current,
-      save_page_left,
-      save_page_right,
-      save_page_top,
-      save_page_bottom);
-
-  o_invalidate_all (w_current);
-
+  gschem_page_view_invalidate_all (view);
 }
 
 /*! \brief Display the image file selection dialog.
  *  \par Display the image file selection dialog, allowing the user to
  *  set several options, like image size and image type.
  *  When the user hits "ok", then it writes the image file.
- *  \param w_current [in] the GSCHEM_TOPLEVEL structure.
+ *  \param w_current [in] the GschemToplevel structure.
  *  \return nothing
  */
-void x_image_setup (GSCHEM_TOPLEVEL *w_current)
+void x_image_setup (GschemToplevel *w_current)
 {
   GtkWidget *dialog;
   GtkWidget *vbox1;
@@ -484,7 +381,7 @@ void x_image_setup (GSCHEM_TOPLEVEL *w_current)
 
   /* Connect the changed signal to the callback, so the filename
      gets updated every time the image type is changed */
-  g_signal_connect (type_combo, "changed", 
+  g_signal_connect (type_combo, "changed",
       G_CALLBACK(x_image_update_dialog_filename),
       w_current);
 
@@ -514,45 +411,29 @@ void x_image_setup (GSCHEM_TOPLEVEL *w_current)
   g_object_set (dialog,
       /* GtkFileChooser */
       "select-multiple", FALSE,
-#if ((GTK_MAJOR_VERSION > 2) || ((GTK_MAJOR_VERSION == 2) && (GTK_MINOR_VERSION >=8)))
       /* only in GTK 2.8 */
       "do-overwrite-confirmation", TRUE,
-#endif
       NULL);
 
   /* Update the filename */
-  x_image_update_dialog_filename(GTK_COMBO_BOX(type_combo), w_current);  
+  x_image_update_dialog_filename(GTK_COMBO_BOX(type_combo), w_current);
 
   gtk_dialog_set_default_response(GTK_DIALOG(dialog),
       GTK_RESPONSE_ACCEPT);
 
-  gtk_window_position (GTK_WINDOW (dialog),
-      GTK_WIN_POS_MOUSE);
+  gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_MOUSE);
 
   gtk_container_set_border_width(GTK_CONTAINER(dialog),
       DIALOG_BORDER_SPACING);
-  gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox), 
+  gtk_box_set_spacing(GTK_BOX(GTK_DIALOG(dialog)->vbox),
       DIALOG_V_SPACING);
 
   gtk_widget_show (dialog);
 
-  if (gtk_dialog_run((GTK_DIALOG(dialog))) == GTK_RESPONSE_ACCEPT) {    
-#if ((GTK_MAJOR_VERSION == 2) && (GTK_MINOR_VERSION < 6))
-    image_size = 
-      x_image_sizes[gtk_combo_box_get_active(GTK_COMBO_BOX(size_combo))];
-#else
+  if (gtk_dialog_run((GTK_DIALOG(dialog))) == GTK_RESPONSE_ACCEPT) {
     image_size = gtk_combo_box_get_active_text(GTK_COMBO_BOX(size_combo));
-#endif
 
-#if ((GTK_MAJOR_VERSION == 2) && (GTK_MINOR_VERSION < 6))
-    GSList *ptr;
-    /* If GTK < 2.6, get the description from the descriptions list */
-    ptr = g_slist_nth(image_type_descriptions,
-        gtk_combo_box_get_active(GTK_COMBO_BOX(type_combo)));
-    image_type_descr = (char *) (ptr->data);
-#else
     image_type_descr = gtk_combo_box_get_active_text(GTK_COMBO_BOX(type_combo));
-#endif
 
     image_type = x_image_get_type_from_description(image_type_descr);
     sscanf(image_size, "%ix%i", &width, &height);
@@ -560,11 +441,6 @@ void x_image_setup (GSCHEM_TOPLEVEL *w_current)
 
     x_image_lowlevel(w_current, filename, width, height, image_type);
   }
-
-#if ((GTK_MAJOR_VERSION == 2) && (GTK_MINOR_VERSION < 6))
-  /* If GTK < 2.6, free the descriptions list */
-  free_image_type_descriptions_list();
-#endif
 
   gtk_widget_destroy (dialog);
 }
@@ -622,120 +498,84 @@ static void x_image_convert_to_greyscale(GdkPixbuf *pixbuf)
  *  \par Function Description
  *
  */
-GdkPixbuf *x_image_get_pixbuf (GSCHEM_TOPLEVEL *w_current)
+GdkPixbuf
+*x_image_get_pixbuf (GschemToplevel *w_current, int width, int height)
 {
   GdkPixbuf *pixbuf;
+  GschemPageView *page_view;
   int origin_x, origin_y, bottom, right;
-  int size_x, size_y, s_right, s_left, s_top,s_bottom;
-  GSCHEM_TOPLEVEL new_w_current;
+  GschemToplevel new_w_current;
+  GschemOptions options;
   TOPLEVEL toplevel;
   GdkRectangle rect;
+  GschemPageGeometry *old_geometry, *new_geometry;
+  GdkPixmap *window = NULL;
+
+  page_view = gschem_toplevel_get_current_page_view (w_current);
+
+  old_geometry = gschem_page_view_get_page_geometry (page_view);
 
   /* Do a copy of the w_current struct and work with it */
-  memcpy(&new_w_current, w_current, sizeof(GSCHEM_TOPLEVEL));
+  memcpy(&new_w_current, w_current, sizeof(GschemToplevel));
+  /* Do a copy of the options struct and work with it */
+  memcpy(&options, w_current->options, sizeof(GschemOptions));
   /* Do a copy of the toplevel struct and work with it */
   memcpy(&toplevel, w_current->toplevel, sizeof(TOPLEVEL));
 
   new_w_current.toplevel = &toplevel;
+  new_w_current.options = &options;
 
-  WORLDtoSCREEN (&new_w_current, toplevel.page_current->right,
-                                 toplevel.page_current->left, &s_right, &s_left);
-  WORLDtoSCREEN (&new_w_current, toplevel.page_current->bottom,
-                                 toplevel.page_current->top,  &s_bottom, &s_top);
+  window = gdk_pixmap_new (gtk_widget_get_window (GTK_WIDGET(page_view)), width, height, -1);
 
-  size_x = s_left - s_right;
-  size_y = s_bottom - s_top;
-
-  size_x = new_w_current.image_width;
-  size_y = new_w_current.image_height;
-
-  new_w_current.window = gdk_pixmap_new (w_current->window, size_x, size_y, -1);
-  new_w_current.drawable = new_w_current.window;
-  new_w_current.cr = gdk_cairo_create (new_w_current.window);
-  new_w_current.pl = pango_cairo_create_layout (new_w_current.cr);
-
-  new_w_current.grid = 0;
-  new_w_current.text_origin_marker = FALSE;
-
-  new_w_current.win_width = new_w_current.image_width;
-  new_w_current.win_height = new_w_current.image_height;
+  gschem_options_set_grid_mode (new_w_current.options, GRID_MODE_NONE);
 
   if (toplevel.image_color == FALSE)
   {
-    /* FIXME this assumes -- not necessarily correctly! -- that the
-     * color at index 0 in the color map is black, and the color at
-     * index 1 is white! */
-
-    /* We are going to be doing black&white (grayscale) output, so change the */
-    /* color of all objects to a nice and dark color, say black */
-    toplevel.override_color = 0;
-
-    /* also reset the background to white */
-    toplevel.background_color = 1;
+    /*! \bug Need to handle image color setting properly. See
+     * Launchpad bug 1086530. */
   }
 
   origin_x = origin_y = 0;
-  right = size_x;
-  bottom = size_y;
+  right = width;
+  bottom = height;
 
-  /* ------------------  Begin optional code ------------------------ */
-  /* If the the code in this region is commented, the PNG returned will
-     be the same as the one returned using libgd.
-     I mean: there will be some border all around the schematic.
-     This code is used to adjust the schematic to the border of the image */
-#if 0
-
-  /* Do a zoom extents to get fit all the schematic in the window */
-  /* Commented so the image returned will be the same as with libgd */  
-  a_zoom_extents (&toplevel,
-		  toplevel.page_current->object_list,
-		  A_PAN_DONT_REDRAW);
-
-  
-  /* See if there are objects */
-  
-  aux = toplevel->page_current->object_list;
-  while (aux != NULL) {
-    if (aux->type != -1) {
-      object_found = 1;
-      break;
-    }
-    aux = aux->next;
-  }
-
-  
-  /* If there are no objects, can't use zoom_extents */
-  if (object_found) {
-    get_object_glist_bounds (&toplevel,
-                             toplevel.page_current->object_list,
-                             &origin_x, &origin_y,
-                             &right, &bottom);
-  }
-#endif
-  /* ------------------  End optional code ------------------------ */
-  
   rect.x = origin_x;
   rect.y = origin_y;
   rect.width = right - origin_x;
   rect.height = bottom - origin_y;
 
-  o_redraw_rects (&new_w_current, &rect, 1);
+  new_geometry = gschem_page_geometry_new_with_values (width,
+                                                   height,
+                                                   old_geometry->viewport_left,
+                                                   old_geometry->viewport_top,
+                                                   old_geometry->viewport_right,
+                                                   old_geometry->viewport_bottom,
+                                                   toplevel.init_left,
+                                                   toplevel.init_top,
+                                                   toplevel.init_right,
+                                                   toplevel.init_bottom);
+
+  o_redraw_rect (&new_w_current,
+                 window,
+                 toplevel.page_current,
+                 new_geometry,
+                 &rect);
+
+  gschem_page_geometry_free (new_geometry);
 
   /* Get the pixbuf */
-  pixbuf = gdk_pixbuf_get_from_drawable (NULL,new_w_current.drawable, NULL,
+  pixbuf = gdk_pixbuf_get_from_drawable (NULL, window, NULL,
                                         origin_x, origin_y, 0, 0,
                                         right-origin_x,
                                         bottom-origin_y);
 
   if (toplevel.image_color == FALSE)
   {
-    x_image_convert_to_greyscale(pixbuf); 
+    x_image_convert_to_greyscale(pixbuf);
   }
 
-  if (new_w_current.cr != NULL) cairo_destroy (new_w_current.cr);
-  if (new_w_current.pl != NULL) g_object_unref (new_w_current.pl);
-  if (new_w_current.window != NULL) {
-    g_object_unref(new_w_current.window);
+  if (window != NULL) {
+    g_object_unref(window);
   }
 
   return(pixbuf);

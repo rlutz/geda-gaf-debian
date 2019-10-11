@@ -105,7 +105,7 @@ edascm_to_object_glist (SCM objs, const char *subr)
   scm_dynwind_begin (0);
   scm_dynwind_unwind_handler ((void (*)(void *))g_list_free, result, 0);
 
-  for (lst = objs; lst != SCM_EOL; lst = SCM_CDR (lst)) {
+  for (lst = objs; !scm_is_null (lst); lst = SCM_CDR (lst)) {
     SCM smob = SCM_CAR (lst);
     result = g_list_prepend (result, (gpointer) edascm_to_object (smob));
   }
@@ -273,14 +273,23 @@ SCM_DEFINE (object_bounds, "%object-bounds", 0, 0, 1,
     success = world_get_object_glist_bounds (toplevel, obj_list,
                                              &left, &top, &right, &bottom);
   } else {
+    GList *list;
     toplevel->show_hidden_text = TRUE;
-    o_recalc_object_glist (toplevel, obj_list);
+
+    for (list = obj_list; list != NULL; list = g_list_next(list)) {
+      OBJECT *o_current = (OBJECT *) list->data;
+      o_current->w_bounds_valid_for = NULL;
+    }
 
     success = world_get_object_glist_bounds (toplevel, obj_list,
                                              &left, &top, &right, &bottom);
 
     toplevel->show_hidden_text = FALSE;
-    o_recalc_object_glist (toplevel, obj_list);
+
+    for (list = obj_list; list != NULL; list = g_list_next(list)) {
+      OBJECT *o_current = (OBJECT *) list->data;
+      o_current->w_bounds_valid_for = NULL;
+    }
   }
 
   SCM result = SCM_BOOL_F;
@@ -415,20 +424,20 @@ SCM_DEFINE (set_object_stroke_x, "%set-object-stroke!", 4, 2, 0,
 
   width = scm_to_int (width_s);
 
-  if      (cap_s == none_sym)   { cap = END_NONE;   }
-  else if (cap_s == square_sym) { cap = END_SQUARE; }
-  else if (cap_s == round_sym)  { cap = END_ROUND;  }
+  if      (scm_is_eq (cap_s, none_sym))   { cap = END_NONE;   }
+  else if (scm_is_eq (cap_s, square_sym)) { cap = END_SQUARE; }
+  else if (scm_is_eq (cap_s, round_sym))  { cap = END_ROUND;  }
   else {
     scm_misc_error (s_set_object_stroke_x,
                     _("Invalid stroke cap style ~A."),
                     scm_list_1 (cap_s));
   }
 
-  if      (dash_s == solid_sym)   { type = TYPE_SOLID;   }
-  else if (dash_s == dotted_sym)  { type = TYPE_DOTTED;  }
-  else if (dash_s == dashed_sym)  { type = TYPE_DASHED;  }
-  else if (dash_s == center_sym)  { type = TYPE_CENTER;  }
-  else if (dash_s == phantom_sym) { type = TYPE_PHANTOM; }
+  if      (scm_is_eq (dash_s, solid_sym))   { type = TYPE_SOLID;   }
+  else if (scm_is_eq (dash_s, dotted_sym))  { type = TYPE_DOTTED;  }
+  else if (scm_is_eq (dash_s, dashed_sym))  { type = TYPE_DASHED;  }
+  else if (scm_is_eq (dash_s, center_sym))  { type = TYPE_CENTER;  }
+  else if (scm_is_eq (dash_s, phantom_sym)) { type = TYPE_PHANTOM; }
   else {
     scm_misc_error (s_set_object_stroke_x,
                     _("Invalid stroke dash style ~A."),
@@ -439,7 +448,7 @@ SCM_DEFINE (set_object_stroke_x, "%set-object-stroke!", 4, 2, 0,
   case TYPE_DASHED:
   case TYPE_CENTER:
   case TYPE_PHANTOM:
-    if (length_s == SCM_UNDEFINED) {
+    if (SCM_UNBNDP (length_s)) {
       scm_misc_error (s_set_object_stroke_x,
                       _("Missing dash length parameter for dash style ~A."),
                       scm_list_1 (length_s));
@@ -449,7 +458,7 @@ SCM_DEFINE (set_object_stroke_x, "%set-object-stroke!", 4, 2, 0,
     length = scm_to_int (length_s);
     /* This case intentionally falls through */
   case TYPE_DOTTED:
-    if (space_s == SCM_UNDEFINED) {
+    if (SCM_UNBNDP (space_s)) {
       scm_misc_error (s_set_object_stroke_x,
                       _("Missing dot/dash space parameter for dash style ~A."),
                       scm_list_1 (space_s));
@@ -556,10 +565,10 @@ SCM_DEFINE (set_object_fill_x, "%set-object-fill!", 2, 5, 0,
   OBJECT *obj = edascm_to_object (obj_s);
   int type, width = -1, angle1 = -1, space1 = -1, angle2 = -1, space2 = -1;
 
-  if      (type_s == hollow_sym)   { type = FILLING_HOLLOW;   }
-  else if (type_s == solid_sym) { type = FILLING_FILL; }
-  else if (type_s == hatch_sym)  { type = FILLING_HATCH;  }
-  else if (type_s == mesh_sym)  { type = FILLING_MESH;  }
+  if      (scm_is_eq (type_s, hollow_sym))   { type = FILLING_HOLLOW;   }
+  else if (scm_is_eq (type_s, solid_sym)) { type = FILLING_FILL; }
+  else if (scm_is_eq (type_s, hatch_sym))  { type = FILLING_HATCH;  }
+  else if (scm_is_eq (type_s, mesh_sym))  { type = FILLING_MESH;  }
   else {
     scm_misc_error (s_set_object_fill_x,
                     _("Invalid fill style ~A."),
@@ -568,7 +577,7 @@ SCM_DEFINE (set_object_fill_x, "%set-object-fill!", 2, 5, 0,
 
   switch (type) {
   case FILLING_MESH:
-    if (space2_s == SCM_UNDEFINED) {
+    if (SCM_UNBNDP (space2_s)) {
       scm_misc_error (s_set_object_fill_x,
                       _("Missing second space parameter for fill style ~A."),
                       scm_list_1 (space2_s));
@@ -577,7 +586,7 @@ SCM_DEFINE (set_object_fill_x, "%set-object-fill!", 2, 5, 0,
                 SCM_ARG6, s_set_object_fill_x);
     space2 = scm_to_int (space2_s);
 
-    if (angle2_s == SCM_UNDEFINED) {
+    if (SCM_UNBNDP (angle2_s)) {
       scm_misc_error (s_set_object_fill_x,
                       _("Missing second angle parameter for fill style ~A."),
                       scm_list_1 (angle2_s));
@@ -587,7 +596,7 @@ SCM_DEFINE (set_object_fill_x, "%set-object-fill!", 2, 5, 0,
     angle2 = scm_to_int (angle2_s);
     /* This case intentionally falls through */
   case FILLING_HATCH:
-    if (width_s == SCM_UNDEFINED) {
+    if (SCM_UNBNDP (width_s)) {
       scm_misc_error (s_set_object_fill_x,
                       _("Missing stroke width parameter for fill style ~A."),
                       scm_list_1 (width_s));
@@ -596,7 +605,7 @@ SCM_DEFINE (set_object_fill_x, "%set-object-fill!", 2, 5, 0,
                 SCM_ARG3, s_set_object_fill_x);
     width = scm_to_int (width_s);
 
-    if (space1_s == SCM_UNDEFINED) {
+    if (SCM_UNBNDP (space1_s)) {
       scm_misc_error (s_set_object_fill_x,
                       _("Missing space parameter for fill style ~A."),
                       scm_list_1 (space1_s));
@@ -605,7 +614,7 @@ SCM_DEFINE (set_object_fill_x, "%set-object-fill!", 2, 5, 0,
                 SCM_ARG4, s_set_object_fill_x);
     space1 = scm_to_int (space1_s);
 
-    if (angle1_s == SCM_UNDEFINED) {
+    if (SCM_UNBNDP (angle1_s)) {
       scm_misc_error (s_set_object_fill_x,
                       _("Missing angle parameter for fill style ~A."),
                       scm_list_1 (angle1_s));
@@ -689,8 +698,7 @@ SCM_DEFINE (make_line, "%make-line", 0, 0, 0,
             (), "Create a new line object.")
 {
   OBJECT *obj = o_line_new (edascm_c_current_toplevel (),
-                            OBJ_LINE, DEFAULT_COLOR,
-                            0, 0, 0, 0);
+                            DEFAULT_COLOR, 0, 0, 0, 0);
 
   SCM result = edascm_from_object (obj);
 
@@ -745,7 +753,7 @@ SCM_DEFINE (set_line_x, "%set-line!", 6, 0, 0,
   int y2 = scm_to_int (y2_s);
 
   /* We may need to update connectivity. */
-  s_conn_remove_object (toplevel, obj);
+  s_conn_remove_object_connections (toplevel, obj);
 
   switch (obj->type) {
   case OBJ_LINE:
@@ -771,8 +779,10 @@ SCM_DEFINE (set_line_x, "%set-line!", 6, 0, 0,
   o_set_color (toplevel, obj, scm_to_int (color_s));
 
   /* We may need to update connectivity. */
-  s_tile_update_object (toplevel, obj);
-  s_conn_update_object (toplevel, obj);
+  PAGE *page = o_get_page (toplevel, obj);
+  if (page != NULL) {
+    s_conn_update_object (page, obj);
+  }
 
   o_page_changed (toplevel, obj);
 
@@ -870,7 +880,7 @@ SCM_DEFINE (make_bus, "%make-bus", 0, 0, 0,
   SCM result;
 
   obj = o_bus_new (edascm_c_current_toplevel (),
-                   OBJ_BUS, BUS_COLOR, 0, 0, 0, 0,
+                   BUS_COLOR, 0, 0, 0, 0,
                    0); /* Bus ripper direction */
 
   result = edascm_from_object (obj);
@@ -900,9 +910,9 @@ SCM_DEFINE (make_pin, "%make-pin", 1, 0, 0,
               type_s, SCM_ARG1, s_make_pin);
 
   int type;
-  if (type_s == net_sym) {
+  if (scm_is_eq (type_s, net_sym)) {
     type = PIN_TYPE_NET;
-  } else if (type_s == bus_sym) {
+  } else if (scm_is_eq (type_s, bus_sym)) {
     type = PIN_TYPE_BUS;
   } else {
     scm_misc_error (s_make_pin,
@@ -911,7 +921,7 @@ SCM_DEFINE (make_pin, "%make-pin", 1, 0, 0,
   }
 
   OBJECT *obj = o_pin_new (edascm_c_current_toplevel (),
-                           OBJ_PIN, PIN_COLOR, 0, 0, 0, 0, type, 0);
+                           PIN_COLOR, 0, 0, 0, 0, type, 0);
   SCM result = edascm_from_object (obj);
 
   /* At the moment, the only pointer to the object is owned by the
@@ -1068,8 +1078,7 @@ SCM_DEFINE (make_circle, "%make-circle", 0, 0, 0,
             (), "Create a new circle object.")
 {
   OBJECT *obj = o_circle_new (edascm_c_current_toplevel (),
-                              OBJ_CIRCLE, DEFAULT_COLOR,
-                              0, 0, 1);
+                              DEFAULT_COLOR, 0, 0, 1);
 
   SCM result = edascm_from_object (obj);
 
@@ -1162,8 +1171,7 @@ SCM_DEFINE (make_arc, "%make-arc", 0, 0, 0,
             (), "Create a new arc object.")
 {
   OBJECT *obj = o_arc_new (edascm_c_current_toplevel (),
-                              OBJ_ARC, DEFAULT_COLOR,
-                           0, 0, 1, 0, 0);
+                           DEFAULT_COLOR, 0, 0, 1, 0, 0);
 
   SCM result = edascm_from_object (obj);
 
@@ -1186,7 +1194,7 @@ SCM_DEFINE (make_arc, "%make-arc", 0, 0, 0,
  * \param y_s           the new y-coordinate of the center of the arc.
  * \param r_s           the new radius of the arc.
  * \param start_angle_s the start angle of the arc.
- * \param end_angle_s   the start angle of the arc.
+ * \param sweep_angle_s the sweep angle of the arc.
  * \param color_s       the colormap index of the color to be used for
  *                      drawing the arc.
  *
@@ -1194,7 +1202,7 @@ SCM_DEFINE (make_arc, "%make-arc", 0, 0, 0,
  */
 SCM_DEFINE (set_arc_x, "%set-arc!", 7, 0, 0,
             (SCM arc_s, SCM x_s, SCM y_s, SCM r_s, SCM start_angle_s,
-             SCM end_angle_s, SCM color_s),
+             SCM sweep_angle_s, SCM color_s),
             "Set arc parameters")
 {
   SCM_ASSERT (edascm_is_object_type (arc_s, OBJ_ARC), arc_s,
@@ -1205,8 +1213,8 @@ SCM_DEFINE (set_arc_x, "%set-arc!", 7, 0, 0,
   SCM_ASSERT (scm_is_integer (color_s), color_s, SCM_ARG7, s_set_arc_x);
   SCM_ASSERT (scm_is_integer (start_angle_s),
                                   start_angle_s, SCM_ARG5, s_set_arc_x);
-  SCM_ASSERT (scm_is_integer (end_angle_s),
-                                  end_angle_s, SCM_ARG6, s_set_arc_x);
+  SCM_ASSERT (scm_is_integer (sweep_angle_s),
+                                  sweep_angle_s, SCM_ARG6, s_set_arc_x);
 
   TOPLEVEL *toplevel = edascm_c_current_toplevel ();
   OBJECT *obj = edascm_to_object (arc_s);
@@ -1214,7 +1222,7 @@ SCM_DEFINE (set_arc_x, "%set-arc!", 7, 0, 0,
                    ARC_CENTER);
   o_arc_modify (toplevel, obj, scm_to_int(r_s), 0, ARC_RADIUS);
   o_arc_modify (toplevel, obj, scm_to_int(start_angle_s), 0, ARC_START_ANGLE);
-  o_arc_modify (toplevel, obj, scm_to_int(end_angle_s), 0, ARC_END_ANGLE);
+  o_arc_modify (toplevel, obj, scm_to_int(sweep_angle_s), 0, ARC_SWEEP_ANGLE);
   o_set_color (toplevel, obj, scm_to_int (color_s));
 
   o_page_changed (toplevel, obj);
@@ -1250,9 +1258,9 @@ SCM_DEFINE (arc_info, "%arc-info", 1, 0, 0,
 
   return scm_list_n (scm_from_int (obj->arc->x),
                      scm_from_int (obj->arc->y),
-                     scm_from_int (obj->arc->width / 2),
+                     scm_from_int (obj->arc->radius),
                      scm_from_int (obj->arc->start_angle),
-                     scm_from_int (obj->arc->end_angle),
+                     scm_from_int (obj->arc->sweep_angle),
                      scm_from_int (obj->color),
                      SCM_UNDEFINED);
 }
@@ -1271,7 +1279,7 @@ SCM_DEFINE (make_text, "%make-text", 0, 0, 0,
             (), "Create a new text object.")
 {
   OBJECT *obj = o_text_new (edascm_c_current_toplevel (),
-                            OBJ_TEXT, DEFAULT_COLOR,
+                            DEFAULT_COLOR,
                             0, 0, LOWER_LEFT, 0, "", 10,
                             VISIBLE, SHOW_NAME_VALUE);
 
@@ -1333,15 +1341,15 @@ SCM_DEFINE (set_text_x, "%set-text!", 10, 0, 0,
 
   /* Alignment. Sadly we can't switch on pointers. :-( */
   int align;
-  if      (align_s == lower_left_sym)    { align = LOWER_LEFT;    }
-  else if (align_s == middle_left_sym)   { align = MIDDLE_LEFT;   }
-  else if (align_s == upper_left_sym)    { align = UPPER_LEFT;    }
-  else if (align_s == lower_center_sym)  { align = LOWER_MIDDLE;  }
-  else if (align_s == middle_center_sym) { align = MIDDLE_MIDDLE; }
-  else if (align_s == upper_center_sym)  { align = UPPER_MIDDLE;  }
-  else if (align_s == lower_right_sym)   { align = LOWER_RIGHT;   }
-  else if (align_s == middle_right_sym)  { align = MIDDLE_RIGHT;  }
-  else if (align_s == upper_right_sym)   { align = UPPER_RIGHT;   }
+  if      (scm_is_eq (align_s, lower_left_sym))    { align = LOWER_LEFT;    }
+  else if (scm_is_eq (align_s, middle_left_sym))   { align = MIDDLE_LEFT;   }
+  else if (scm_is_eq (align_s, upper_left_sym))    { align = UPPER_LEFT;    }
+  else if (scm_is_eq (align_s, lower_center_sym))  { align = LOWER_MIDDLE;  }
+  else if (scm_is_eq (align_s, middle_center_sym)) { align = MIDDLE_MIDDLE; }
+  else if (scm_is_eq (align_s, upper_center_sym))  { align = UPPER_MIDDLE;  }
+  else if (scm_is_eq (align_s, lower_right_sym))   { align = LOWER_RIGHT;   }
+  else if (scm_is_eq (align_s, middle_right_sym))  { align = MIDDLE_RIGHT;  }
+  else if (scm_is_eq (align_s, upper_right_sym))   { align = UPPER_RIGHT;   }
   else {
     scm_misc_error (s_set_text_x,
                     _("Invalid text alignment ~A."),
@@ -1374,9 +1382,9 @@ SCM_DEFINE (set_text_x, "%set-text!", 10, 0, 0,
 
   /* Name/value visibility */
   int show;
-  if      (show_s == name_sym)  { show = SHOW_NAME;       }
-  else if (show_s == value_sym) { show = SHOW_VALUE;      }
-  else if (show_s == both_sym)  { show = SHOW_NAME_VALUE; }
+  if      (scm_is_eq (show_s, name_sym))  { show = SHOW_NAME;       }
+  else if (scm_is_eq (show_s, value_sym)) { show = SHOW_VALUE;      }
+  else if (scm_is_eq (show_s, both_sym))  { show = SHOW_NAME_VALUE; }
   else {
     scm_misc_error (s_set_text_x,
                     _("Invalid text name/value visibility ~A."),
@@ -1775,10 +1783,10 @@ SCM_DEFINE (path_insert_x, "%path-insert", 3, 6, 0,
   PATH_SECTION section = {0, 0, 0, 0, 0, 0, 0};
 
   /* Check & extract path element type. */
-  if      (type_s == closepath_sym) { section.code = PATH_END;     }
-  else if (type_s == moveto_sym)    { section.code = PATH_MOVETO;  }
-  else if (type_s == lineto_sym)    { section.code = PATH_LINETO;  }
-  else if (type_s == curveto_sym)   { section.code = PATH_CURVETO; }
+  if      (scm_is_eq (type_s, closepath_sym)) { section.code = PATH_END;     }
+  else if (scm_is_eq (type_s, moveto_sym))    { section.code = PATH_MOVETO;  }
+  else if (scm_is_eq (type_s, lineto_sym))    { section.code = PATH_LINETO;  }
+  else if (scm_is_eq (type_s, curveto_sym))   { section.code = PATH_CURVETO; }
   else {
     scm_misc_error (s_path_insert_x,
                     _("Invalid path element type ~A."),
@@ -1892,9 +1900,8 @@ SCM_DEFINE (picture_info, "%picture-info", 1, 0, 0,
   SCM_ASSERT (edascm_is_object_type (obj_s, OBJ_PICTURE), obj_s,
               SCM_ARG1, s_picture_info);
 
-  TOPLEVEL *toplevel = edascm_c_current_toplevel ();
   OBJECT *obj = edascm_to_object (obj_s);
-  const gchar *filename = o_picture_get_filename (toplevel, obj);
+  const gchar *filename = o_picture_get_filename (obj);
 
   SCM filename_s = SCM_BOOL_F;
   if (filename != NULL) {
@@ -2071,7 +2078,7 @@ SCM_DEFINE (translate_object_x, "%translate-object!", 3, 0, 0,
   int dy = scm_to_int (dy_s);
 
   o_emit_pre_change_notify (toplevel, obj);
-  o_translate_world (toplevel, dx, dy, obj);
+  o_translate_world (obj, dx, dy);
   o_emit_change_notify (toplevel, obj);
   o_page_changed (toplevel, obj);
 
@@ -2200,7 +2207,7 @@ init_module_geda_core_object ()
  * \brief Initialise the basic gEDA object manipulation procedures.
  * \par Function Description
  * Registers some Scheme procedures for working with #OBJECT
- * smobs. Should only be called by scheme_api_init().
+ * smobs. Should only be called by edascm_init().
  */
 void
 edascm_init_object ()

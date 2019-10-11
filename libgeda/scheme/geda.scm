@@ -1,6 +1,6 @@
 ; -*-Scheme-*-
 (use-modules (geda os) (ice-9 optargs) (ice-9 ftw))
-(define path-sep separator)
+(define path-sep file-name-separator-string)
 (define geda-data-path (car (sys-data-dirs)))
 (define geda-rc-path (car (sys-config-dirs)))
 
@@ -45,7 +45,7 @@
           (if (and (regular-file? path)
                    (has-suffix? path ".scm")
                    (access? path R_OK))
-            (eval-protected `(load ,path))
+            (eval-protected `(primitive-load ,path))
             #f
           )))
       (closedir dir))
@@ -55,7 +55,8 @@
 ;; Add all symbol libraries found below DIR to be searched for
 ;; components, naming them with an optional PREFIX.
 (define* (component-library-search rootdir  #:optional prefix)
-  (let ((dht (make-hash-table 31)))
+  (let ((dht (make-hash-table 31))
+        (rootdir (expand-env-variables rootdir)))
     ;; Build symbol directory list
     (ftw rootdir
          (lambda (filename statinfo flags)

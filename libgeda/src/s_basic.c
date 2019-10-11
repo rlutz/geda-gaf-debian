@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,14 +30,12 @@
 
 #include "libgeda_priv.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 #ifdef G_OS_WIN32
-#  define STRICT
-#  include <windows.h>
-#  undef STRICT
+#  ifndef STRICT
+#    define STRICT
+#    include <windows.h>
+#    undef STRICT
+#  endif
 #  ifndef GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
 #    define GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT 2
 #    define GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS 4
@@ -73,7 +71,7 @@ OBJECT *s_basic_init_object(OBJECT *new_node, int type, char const *name)
   new_node->w_left = 0;
   new_node->w_right = 0;
   new_node->w_bottom = 0;
-  new_node->w_bounds_valid = FALSE;
+  new_node->w_bounds_valid_for = NULL;
 
   /* Setup line/circle structs */
   new_node->line = NULL;
@@ -84,8 +82,6 @@ OBJECT *s_basic_init_object(OBJECT *new_node, int type, char const *name)
   new_node->picture = NULL;
   new_node->text = NULL;
   new_node->complex = NULL;
-
-  new_node->tiles = NULL;
 
   new_node->conn_list = NULL;
 
@@ -121,16 +117,7 @@ OBJECT *s_basic_init_object(OBJECT *new_node, int type, char const *name)
   new_node->pin_type = PIN_TYPE_NET;
   new_node->whichend = -1;
 
-  new_node->net_num_connected = 0;
-  new_node->valid_num_connected = FALSE;
-
   new_node->weak_refs = NULL;
-
-  new_node->attrib_notify_freeze_count = 0;
-  new_node->attrib_notify_pending = 0;
-
-  new_node->conn_notify_freeze_count = 0;
-  new_node->conn_notify_pending = 0;
 
   return(new_node);
 }
@@ -185,34 +172,6 @@ void print_struct_forw (GList *list)
  *  \par Function Description
  *
  */
-void print_struct(OBJECT *ptr)
-{
-  OBJECT *o_current=NULL;
-
-  o_current = ptr;
-
-  if (o_current != NULL) {
-    printf("Name: %s\n", o_current->name);
-    printf("Type: %d\n", o_current->type);
-    printf("Sid: %d\n", o_current->sid);
-    if (o_current->line != NULL) {
-      printf("Line points.x1: %d\n", o_current->line->x[0]);
-      printf("Line points.y1: %d\n", o_current->line->y[0]);
-      printf("Line points.x2: %d\n", o_current->line->x[1]);
-      printf("Line points.y2: %d\n", o_current->line->y[1]);
-    }
-
-    o_attrib_print (o_current->attribs);
-
-    printf("----\n");
-  }
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
 void
 s_delete_object(TOPLEVEL *toplevel, OBJECT *o_current)
 {
@@ -222,18 +181,12 @@ s_delete_object(TOPLEVEL *toplevel, OBJECT *o_current)
       s_page_remove (toplevel, o_current->page, o_current);
     }
 
-    s_conn_remove_object (toplevel, o_current);
+    s_conn_remove_object_connections (toplevel, o_current);
 
     if (o_current->attached_to != NULL) {
       /* do the actual remove */
       o_attrib_remove(toplevel, &o_current->attached_to->attribs, o_current);
     }
-
-    /* Don't bother with hooks for this dying object,
-     * leak the freeze count, so the object dies frozen.
-     */
-    o_attrib_freeze_hooks (toplevel, o_current);
-    o_attrib_detach_all (toplevel, o_current);
 
     if (o_current->line) {
       /*	printf("sdeleting line\n");*/
@@ -300,6 +253,8 @@ s_delete_object(TOPLEVEL *toplevel, OBJECT *o_current)
       g_free(o_current->complex);
       o_current->complex = NULL;
     }
+
+    o_attrib_detach_all (toplevel, o_current);
 
     s_weakref_notify (o_current, o_current->weak_refs);
 
@@ -410,18 +365,19 @@ s_object_remove_weak_ptr (OBJECT *object,
                                             weak_pointer_loc);
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
+/*! \brief Gets the first line of the string
  *
+ *  This function modifies the string in place, so statically allocated strings
+ *  cannot be passed to this function.
+ *
+ *  \param [in,out] string the input string, NUL terminated
+ *  \return the first line of the string with no ending newline
  */
-/* used by o_text_read */
 char *remove_nl(char *string)
 {
   int i;
 
-  if (!string)
-    return NULL;
+  g_return_val_if_fail (string != NULL, NULL);
   
   i = 0;
   while(string[i] != '\0' && string[i] != '\n' && string[i] != '\r') {
@@ -433,21 +389,26 @@ char *remove_nl(char *string)
   return(string);
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
+/*! \brief Remove the ending newline
  *
+ *  This function removes the ending newline from the string. If no newline
+ *  exists at the end of the string, this function returns the passed in
+ *  string.
+ *
+ *  This function modifies the string in place, so statically allocated strings
+ *  cannot be passed to this function.
+ *
+ *  \param [in,out] string the input string
+ *  \return the string with no ending newline
  */
-/* used by o_text_read */
 char *remove_last_nl(char *string)
 {
   int len;
 
-  if (!string)
-    return NULL;		
+  g_return_val_if_fail (string != NULL, NULL);
 
   len = strlen(string);
-  if (string[len-1] == '\n' || string[len-1] == '\r')
+  if (len != 0 && (string[len-1] == '\n' || string[len-1] == '\r'))
     string[len-1] = '\0';
      
   return(string);
@@ -623,7 +584,6 @@ const char *s_path_sys_data () {
     /* On other platforms, use the compiled-in path */
     p = GEDADATADIR;
 # endif
-    g_setenv ("GEDADATA", p, FALSE);
   }
   return p;
 }
@@ -660,7 +620,6 @@ const char *s_path_sys_config () {
     p = s_path_sys_data ();
 #endif
   }
-  if (p != NULL) g_setenv("GEDADATARC", p, FALSE);
   return p;
 }
 

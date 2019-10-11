@@ -1,0 +1,77 @@
+#!/bin/sh
+
+t=`basename "$1" .out`
+
+TESTLIST="${srcdir}/tests.list"
+INPUT_DIR="${srcdir}/inputs"
+GOLDEN_DIR="${srcdir}/outputs"
+
+rundir="${t}.run"
+
+
+# figure out what files we need to copy for this test and what
+# arguments to feed refdes_renum
+
+files=`grep "^[ \t]*${t}[ \t]*|" "${TESTLIST}" | awk 'BEGIN{FS="|"} {print $2}'`
+adjust_file=`grep "^[ \t]*${t}[ \t]*|" "${TESTLIST}" | awk 'BEGIN{FS="|"} {print $3}'`
+args=`grep "^[ \t]*${t}[ \t]*|" "${TESTLIST}" | awk 'BEGIN{FS="|"} {print $4}'`
+code=`grep "^[ \t]*${t}[ \t]*|" "${TESTLIST}" | awk 'BEGIN{FS="|"} {print $5}'`
+
+if test "X${code}" = "X" ; then
+    code=0
+fi
+
+
+# create temporary run directory with the needed files
+
+rm -fr "${rundir}"
+mkdir -p "${rundir}"
+
+if test ! -z "${files}" ; then
+    for f in ${files} ${adjust_file}; do
+	cp "${INPUT_DIR}/${f}" "${rundir}"
+	chmod 644 "${rundir}/${f}"
+    done
+fi
+
+
+# run gxyrs
+
+here=`pwd`
+cd "${rundir}"
+
+if test "X${adjust_file}" = "X" -o "X${adjust_file}" = "X " ; then
+    command="${GXYRS} ${args} ${files} --output stdout 2> stderr"
+else
+    command="${GXYRS} ${args} ${files} --adjust ${adjust_file} --output stdout 2> stderr"
+fi
+echo "${command}"
+eval "${command}"
+
+rc=$?
+if test ${rc} -ne "${code}" ; then
+    echo "gxyrs returned ${rc} which did not match the expected ${code}"
+    exit 1
+fi
+
+cd "${here}"
+
+
+# check output and clean up
+
+ref_out="${GOLDEN_DIR}/${t}.out"
+ref_err="${GOLDEN_DIR}/${t}.err"
+gen_out="${rundir}/stdout"
+gen_err="${rundir}/stderr"
+
+if test "X${REGEN}" = "X1" ; then
+    cp "${gen_out}" "${ref_out}"
+    cp "${gen_err}" "${ref_err}"
+else
+    status=0
+    diff -wu "${ref_out}" "${gen_out}" || status=1
+    diff -wu "${ref_err}" "${gen_err}" || status=1
+    test ${status} = 0 || exit 1
+fi
+
+rm -fr "${rundir}"

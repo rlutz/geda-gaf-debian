@@ -1,3 +1,167 @@
+commit 6d2253170902183bbee127606df6ff0ec839b010
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 26 16:13:58 2019 +0200
+
+    symbols: Remove extra symbols from sym/ on "make install"
+    
+    Most users probably don't run "make uninstall", so the conflicting
+    symbol libraries will be present in both "sym/" and "extra-sym/".
+    
+    As a workaround, remove any symbols installed to "extra-sym/" from
+    "sym/" at installation time.
+
+commit 800b5e6e3bac18dbfd5a5f30b6ebb6a66cec2771
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 19 18:15:17 2019 +0200
+
+    symbols: Move conflicting libraries to "extra-sym/"
+
+commit 872848569daad07350ade8c646b2cc246f9edcfb
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 19 18:01:37 2019 +0200
+
+    symbols: Remove symbol template "asicpads/pad.sym"
+    
+    This resolves a name conflict with "IEC417/pad.sym".
+
+commit a6026cb26708227e1e0b37591a8053ca5938bc53
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 23 21:09:11 2016 +0000
+
+    build: Generate an empty ChangeLog when git history unavailable
+    
+    When no git history is available -- for example, when the git
+    repository was cloned using the `--depth` option to limit the amount
+    of git history downloaded -- the changelog-generation rule can fail
+    because the changelog's base git commit (i.e. the 1.0 release tag)
+    isn't available in the repository.
+    
+    This patch makes generation of `ChangeLog` succeed in that situation,
+    by creating an empty log and printing a warning to stderr.  It allows
+    `make dist` and `make distcheck` to pass on shallow clones.
+
+commit a0e12c3ea81617ddbcb3749a4617d7a528b1104f
+Author: dmn <graahnul.grom@gmail.com>
+Date:   Mon Jul 27 23:39:14 2015 +0300
+
+    Fix build and install with non-GNU make.
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit a16137f21785751e3430e7db295acc61b3af1844
+Author: Onno Kortmann <onno@gmx.net>
+Date:   Mon Jan 26 12:40:56 2015 +0100
+
+    Removed wrong power supply pin declarations.
+    
+    Closes-bug: lp-1414612
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 3769128e175d81026de706789555575791eb0467
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sat Feb 14 01:33:07 2015 +0300
+
+    Updated arrow.sym.
+    
+    Cap style is now "round", it just looks better.
+    Added two attributes: 'version' and 'graphical'.
+    Lack of the second one caused problems when importing the file into PCB.
+    
+    Reported-by: Richard Rasker <rasker@linetec.nl>
+
+commit 25c033ff1aa64e9133b5b8697f44ec9a89c8461e
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Dec 29 20:45:21 2014 +0300
+
+    Bumped the version number for quad_opamp-1.sym
+    
+    This symbol was significantly changed in commit bf22162.
+
+commit bf22162722309999459dda4257780dbc33aa861b
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Nov 7 23:13:06 2014 +0300
+
+    Fixed wrong pinout of pwr pins for quad_opamp-1.sym
+    
+    Closes-bug: lp-1381156
+    
+    Reported-by: Rostislav Kouznetsov
+
+commit 9d53a688d49a34f019cd9c375c53705b89df852b
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed May 14 16:11:24 2014 +0400
+
+    Fixed some attributes of the nullor symbol
+    
+    Two missing attributes have been added: "value" and "symversion".
+    The "device" attribute has been moved to the visible area of gschem.
+
+commit 3f0987e69b1736a96977966f6a3eec72cfa7fe1d
+Author: Alex Jakimenko <alex.jakimenko@gmail.com>
+Date:   Wed Apr 9 18:19:10 2014 +0300
+
+    gnetlist: fixed pin order of notif verilog symbols
+    
+    Closes-bug: lp-1304681
+
+commit b7f86664c70ddc920c0055841fed55aee4aa730b
+Author: Alex Jakimenko <alex.jakimenko@gmail.com>
+Date:   Sat Apr 5 18:35:27 2014 +0300
+
+    gnetlist: fixed two bufif symbols
+    
+    As the gnetlist verilog backend does not respect pinseq numbers, this
+    results in a wrong parameter order inside produced verilog files.
+    
+    Affects-bug: lp-1304681
+
+commit 127397ef29afc235ad691c950e336d79043bed7e
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Oct 2 09:21:00 2013 +0400
+
+    symbols: fix refdes placement for a VHDL symbol
+    
+    Closes-bug: lp-1216798
+
+commit f1cdf6a3884ed56d317454fe47b10fcfb2471171
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Oct 2 09:14:06 2013 +0400
+
+    symbols: changed attribute visibility for some VHDL symbols
+    
+    Discussed in the geda-user mailing list.
+    The visibility of some attributes considered to be confused to some
+    users (e.g. input port has visible pintype=OUT attribute, which is
+    right in itself since the attribute is used for the gnetlist DRC
+    backend).
+    
+    Affects-bug: lp-1216798
+
+commit 7daccdefe4ad6f5351c91b844f5558293f50c021
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Oct 2 09:08:38 2013 +0400
+
+    symbols: removed mistaken attribute from VHDL symbols
+    
+    The attribute VERILOG_PORTS has been mistakenly added some time ago
+    because of an error in the converting script (deleted in the previous
+    commit).
+    
+    Affects-bug: lp-1216798
+
+commit f54ae0a06346df44461778d2a857c370f81e86bf
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Thu Oct 3 12:11:30 2013 +0400
+
+    symbols: removed two not more functional scripts
+    
+    These scripts have not been working since the sch/sym format
+    change and update of the VHDL symbols with gsymupdate in 2003 (in
+    the commit 7b142bcdcff026e6726d23474533eb4f130f07e5).
+    
+    Affects-bug: lp-1216798
+
 commit f7fab3715f984c374f41d7c2d74fc2802bbb4e7a
 Author: Gareth Edwards <gareth@edwardsfamily.org.uk>
 Date:   Wed Nov 14 22:58:12 2012 +0000
@@ -255,7 +419,7 @@ Date:   Sat Mar 28 15:22:19 2009 -0400
     Updated all ChangeLogs
     
     Updated the ChangeLogs by running:
-    	./update-changelogs.sh 1.0-20070526..master
+            ./update-changelogs.sh 1.0-20070526..master
     in the toplevel directory
 
 commit 859abe69912ba99ca27bb58c378284e9eec56259

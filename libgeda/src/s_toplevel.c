@@ -2,7 +2,7 @@
  * libgeda - gEDA's library
  * Copyright (C) 1998, 1999, 2000 Kazu Hirata / Ales Hvezda
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+/*! \file s_toplevel.c
+ */
 #include <config.h>
 
 #include <stdio.h>
@@ -30,38 +32,6 @@
 
 #include "libgeda_priv.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
-static GList *new_toplevel_hooks = NULL;
-
-typedef struct {
-  NewToplevelFunc func;
-  void *data;
-} NewToplevelHook;
-
-
-void s_toplevel_append_new_hook (NewToplevelFunc func, void *data)
-{
-  NewToplevelHook *new_hook;
-
-  new_hook = g_new0 (NewToplevelHook, 1);
-  new_hook->func = func;
-  new_hook->data = data;
-
-  new_toplevel_hooks = g_list_append (new_toplevel_hooks, new_hook);
-}
-
-
-static void call_new_toplevel_hook (gpointer hook, gpointer toplevel)
-{
-  NewToplevelHook *h = (NewToplevelHook*) hook;
-  TOPLEVEL *t = (TOPLEVEL*) toplevel;
-
-  h->func (t, h->data);
-}
-
 /*!
  *  \brief Create a TOPLEVEL object
  *  \par Function Description
@@ -69,8 +39,6 @@ static void call_new_toplevel_hook (gpointer hook, gpointer toplevel)
  *  for its properties.
  *
  *  \returns the newly created TOPLEVEL.
- *
- *  \todo rethink block below that is set in gschem but used in libgeda.
  */
 TOPLEVEL *s_toplevel_new (void)
 {
@@ -80,17 +48,12 @@ TOPLEVEL *s_toplevel_new (void)
 
   toplevel->RC_list = NULL;
 
-  toplevel->untitled_name      = NULL;
   toplevel->bitmap_directory   = NULL;
 
   toplevel->init_left = 0;
   toplevel->init_top  = 0;
-  /* init_right and _bottom are set before this function is called */
-
-  toplevel->width  = 1;
-  toplevel->height = 1;
-
-  toplevel->override_color = -1;
+  toplevel->init_right  = 0;
+  toplevel->init_bottom = 0;
 
   toplevel->pages = geda_list_new();
   toplevel->page_current = NULL;
@@ -99,32 +62,7 @@ TOPLEVEL *s_toplevel_new (void)
 
   toplevel->major_changed_refdes = NULL;
 
-  /* BLOCK SET IN GSCHEM, BUT USED IN LIBGEDA - NEEDS A RETHINK */
-  toplevel->background_color   = 0;
-  toplevel->override_net_color = -1;
-  toplevel->override_bus_color = -1;
-  toplevel->override_pin_color = -1;
-  toplevel->pin_style = 0;
-  toplevel->net_style = 0;
-  toplevel->bus_style = 0;
-  toplevel->line_style = 0;
-  /* END BLOCK - ALTHOUGH THERE ARE MORE CASES! */
-
-  toplevel->object_clipping = 0;
-
-  toplevel->print_orientation = 0;
-
   toplevel->image_color = FALSE;
-
-  toplevel->print_color = FALSE;
-
-  toplevel->print_color_background = 0;
-
-  toplevel->setpagedevice_orientation = FALSE;
-
-  toplevel->setpagedevice_pagesize = FALSE;
-
-  toplevel->postscript_prolog = NULL;
 
   toplevel->net_consolidate = FALSE;
 
@@ -135,13 +73,6 @@ TOPLEVEL *s_toplevel_new (void)
   toplevel->keep_invisible      = FALSE;
 
   toplevel->make_backup_files = TRUE;
-
-  toplevel->print_output_type = 0;
-
-  toplevel->print_output_capstyle = BUTT_CAP;
-
-  toplevel->paper_width  = 0;
-  toplevel->paper_height = 0;
 
   toplevel->bus_ripper_symname = NULL;
 
@@ -168,10 +99,6 @@ TOPLEVEL *s_toplevel_new (void)
 
   toplevel->change_notify_funcs = NULL;
 
-  toplevel->attribs_changed_hooks = NULL;
-
-  toplevel->conns_changed_hooks = NULL;
-
   toplevel->load_newer_backup_func = NULL;
   toplevel->load_newer_backup_data = NULL;
 
@@ -180,10 +107,6 @@ TOPLEVEL *s_toplevel_new (void)
   toplevel->auto_save_timeout = 0;
 
   toplevel->weak_refs = NULL;
-
-  /* Call hooks */
-  g_list_foreach (new_toplevel_hooks, call_new_toplevel_hook, toplevel);
-
   return toplevel;
 }
 
@@ -201,7 +124,6 @@ void s_toplevel_delete (TOPLEVEL *toplevel)
     g_source_remove (toplevel->auto_save_timeout);
   }
 
-  g_free (toplevel->untitled_name);
   g_free (toplevel->bitmap_directory);
   g_free (toplevel->bus_ripper_symname);
   
@@ -229,6 +151,22 @@ void s_toplevel_delete (TOPLEVEL *toplevel)
   g_free (toplevel);
 
 }
+
+
+
+/*\ brief Set the current page
+ *
+ *  \param [in,out] toplevel This toplevel
+ *  \param [in]     page     The new current page
+ */
+void
+s_toplevel_set_page_current (TOPLEVEL *toplevel, PAGE *page)
+{
+  g_return_if_fail (toplevel != NULL);
+
+  toplevel->page_current = page;
+}
+
 
 /*! \brief Add a weak reference watcher to an TOPLEVEL.
  * \par Function Description

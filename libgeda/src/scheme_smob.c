@@ -1,6 +1,6 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library - Scheme API
- * Copyright (C) 2010-2012 Peter Brett <peter@peter-b.co.uk>
+ * Copyright (C) 2010-2013 Peter Brett <peter@peter-b.co.uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,9 @@
  *    yet re-added to a #PAGE.
  *
  * \sa weakref.c
+ *
+ * This file also provides support for a variety of GObject-based gEDA
+ * types, including EdaConfig instances.
  */
 
 #include <config.h>
@@ -68,7 +71,7 @@ scm_t_bits geda_smob_tag;
  */
 static void
 smob_weakref_notify (void *target, void *smob) {
-  SCM s = (SCM) smob;
+  SCM s = SCM_PACK ((scm_t_bits) smob);
   SCM_SET_SMOB_DATA (s, NULL);
 }
 
@@ -81,7 +84,7 @@ smob_weakref_notify (void *target, void *smob) {
  */
 static void
 smob_weakref2_notify (void *target, void *smob) {
-  SCM s = (SCM) smob;
+  SCM s = SCM_PACK ((scm_t_bits) smob);
   SCM_SET_SMOB_DATA_2 (s, NULL);
 }
 
@@ -104,17 +107,22 @@ smob_free (SCM smob)
   /* Otherwise, clear the weak reference */
   switch (EDASCM_SMOB_TYPE (smob)) {
   case GEDA_SMOB_TOPLEVEL:
-    s_toplevel_weak_unref ((TOPLEVEL *) data, smob_weakref_notify, smob);
+    s_toplevel_weak_unref ((TOPLEVEL *) data, smob_weakref_notify, (void *) SCM_UNPACK (smob));
     break;
   case GEDA_SMOB_PAGE:
-    s_page_weak_unref ((PAGE *) data, smob_weakref_notify, smob);
+    s_page_weak_unref ((PAGE *) data, smob_weakref_notify, (void *) SCM_UNPACK (smob));
     break;
   case GEDA_SMOB_OBJECT:
     /* See edascm_from_object() for an explanation of why OBJECT
      * smobs store a TOPLEVEL in the second data word */
-    s_object_weak_unref ((OBJECT *) data, smob_weakref_notify, smob);
+    s_object_weak_unref ((OBJECT *) data, smob_weakref_notify, (void *) SCM_UNPACK (smob));
     s_toplevel_weak_unref ((TOPLEVEL *) SCM_SMOB_DATA_2 (smob),
-                           smob_weakref2_notify, smob);
+                           smob_weakref2_notify, (void *) SCM_UNPACK (smob));
+    break;
+  case GEDA_SMOB_CONFIG:
+    g_object_unref (G_OBJECT (data));
+    break;
+  case GEDA_SMOB_CLOSURE:
     break;
   default:
     /* This should REALLY definitely never be run */
@@ -141,6 +149,12 @@ smob_free (SCM smob)
       /* See edascm_from_object() for an explanation of why OBJECT
        * smobs store a TOPLEVEL in the second data word */
       s_delete_object ((TOPLEVEL *) SCM_SMOB_DATA_2 (smob), (OBJECT *) data);
+      break;
+    case GEDA_SMOB_CONFIG:
+      /* These are reference counted, so the structure will have
+       * already been destroyed above if appropriate. */
+      break;
+    case GEDA_SMOB_CLOSURE:
       break;
     default:
       /* This should REALLY definitely never be run */
@@ -174,6 +188,12 @@ smob_print (SCM smob, SCM port, scm_print_state *pstate)
     break;
   case GEDA_SMOB_OBJECT:
     scm_puts ("object", port);
+    break;
+  case GEDA_SMOB_CONFIG:
+    scm_puts ("config", port);
+    break;
+  case GEDA_SMOB_CLOSURE:
+    scm_puts ("closure", port);
     break;
   default:
     g_critical ("%s: received bad smob flags.", __FUNCTION__);
@@ -233,7 +253,7 @@ edascm_from_toplevel (TOPLEVEL *toplevel)
   SCM_SET_SMOB_FLAGS (smob, GEDA_SMOB_TOPLEVEL);
 
   /* Set weak reference */
-  s_toplevel_weak_ref (toplevel, smob_weakref_notify, smob);
+  s_toplevel_weak_ref (toplevel, smob_weakref_notify, (void *) SCM_UNPACK (smob));
 
   return smob;
 }
@@ -255,7 +275,7 @@ edascm_from_page (PAGE *page)
   SCM_SET_SMOB_FLAGS (smob, GEDA_SMOB_PAGE);
 
   /* Set weak reference */
-  s_page_weak_ref (page, smob_weakref_notify, smob);
+  s_page_weak_ref (page, smob_weakref_notify, (void *) SCM_UNPACK (smob));
 
   return smob;
 }
@@ -313,8 +333,8 @@ edascm_from_object (OBJECT *object)
   SCM_SET_SMOB_FLAGS (smob, GEDA_SMOB_OBJECT);
 
   /* Set weak references */
-  s_object_weak_ref (object, smob_weakref_notify, smob);
-  s_toplevel_weak_ref (toplevel, smob_weakref2_notify, smob);
+  s_object_weak_ref (object, smob_weakref_notify, (void *) SCM_UNPACK (smob));
+  s_toplevel_weak_ref (toplevel, smob_weakref2_notify, (void *) SCM_UNPACK (smob));
 
   return smob;
 }
@@ -337,6 +357,63 @@ edascm_to_object (SCM smob)
   EDASCM_ASSERT_SMOB_VALID (smob);
 
   return (OBJECT *) SCM_SMOB_DATA (smob);
+}
+
+/*! \brief Get a smob for a configuration context.
+ * \ingroup guile_c_iface
+ * \par Function Description
+ * Create a new smob representing \a cfg.
+ *
+ * \param cfg Configuration context to create a smob for.
+ * \return a smob representing \a cfg.
+ */
+SCM
+edascm_from_config (EdaConfig *cfg)
+{
+  SCM smob;
+  SCM_NEWSMOB (smob, geda_smob_tag, g_object_ref (cfg));
+  SCM_SET_SMOB_FLAGS (smob, GEDA_SMOB_CONFIG);
+  return smob;
+}
+
+/*! \brief Get a configuration context from a smob.
+ * \ingroup guile_c_iface
+ * \par Function Description
+ * Return the #EdaConfig represented by \a smob.
+ *
+ * \param [in] smob Guile value to retrieve #EdaConfig from.
+ * \return the #EdaConfig represented by \a smob.
+ */
+EdaConfig *
+edascm_to_config (SCM smob)
+{
+#ifndef NDEBUG
+  SCM_ASSERT (EDASCM_CONFIGP (smob), smob,
+              SCM_ARG1, "edascm_to_object");
+#endif
+  EDASCM_ASSERT_SMOB_VALID (smob);
+
+  return EDA_CONFIG (SCM_SMOB_DATA (smob));
+}
+
+/*! \brief Get a smob for a C closure.
+ * \par Function Description
+ * Create a new smob representing a C closure.
+ *
+ * \warning Do not call this function from user code; use
+ * edascm_c_make_closure() instead.
+ *
+ * \param func C function to make closure around.
+ * \param user_data User data for function.
+ * \return a C closure smob.
+ */
+SCM
+edascm_from_closure (SCM (*func)(SCM, gpointer), gpointer user_data)
+{
+  SCM smob;
+  SCM_NEWSMOB2 (smob, geda_smob_tag, func, user_data);
+  SCM_SET_SMOB_FLAGS (smob, GEDA_SMOB_CLOSURE);
+  return smob;
 }
 
 /*! \brief Set whether a gEDA object may be garbage collected.
@@ -388,6 +465,21 @@ edascm_is_page (SCM smob)
   return EDASCM_PAGEP (smob);
 }
 
+/*! \brief Test whether a smob is an #EdaConfig instance.
+ * \ingroup guile_c_iface
+ * \par Function Description
+ * If \a smob is a configuration context, returns non-zero. Otherwise,
+ * returns zero.
+ *
+ * \param [in] smob Guile value to test.
+ * \return non-zero iff \a smob is an #EdaConfig instance.
+ */
+int
+edascm_is_config (SCM smob)
+{
+  return EDASCM_CONFIGP (smob);
+}
+
 /*! \brief Test whether a smob is a #PAGE instance.
  * \par Function Description
  * If \a page_smob is a #PAGE instance, returns \b SCM_BOOL_T;
@@ -426,6 +518,25 @@ SCM_DEFINE (object_p, "%object?", 1, 0, 0,
   return (EDASCM_OBJECTP (object_smob) ? SCM_BOOL_T : SCM_BOOL_F);
 }
 
+/*! \brief Test whether a smob is an #EdaConfig instance.
+ * \par Function Description
+ * If \a config_smob is a configuration context, returns \b
+ * SCM_BOOL_T; otherwise returns \b SCM_BOOL_F.
+ *
+ * \note Scheme API: Implements the %config? procedure in the (geda
+ * core smob) module.
+ *
+ * \param [in] config_smob Guile value to test.
+ *
+ * \return SCM_BOOL_T iff \a config_smob is an #EdaConfig instance.
+ */
+SCM_DEFINE (config_p, "%config?", 1, 0, 0,
+            (SCM config_smob),
+            "Test whether the value is a gEDA configuration context.")
+{
+  return (EDASCM_CONFIGP (config_smob) ? SCM_BOOL_T : SCM_BOOL_F);
+}
+
 /*!
  * \brief Create the (geda core smob) Scheme module.
  * \par Function Description
@@ -439,7 +550,7 @@ init_module_geda_core_smob ()
   #include "scheme_smob.x"
 
   /* Add them to the module's public definitions. */ 
-  scm_c_export (s_page_p, s_object_p, NULL);
+  scm_c_export (s_page_p, s_object_p, s_config_p, NULL);
 }
 
 /*!

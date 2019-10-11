@@ -1,6 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library - Scheme API
- * Copyright (C) 2010-2012 Peter Brett <peter@peter-b.co.uk>
+ * Copyright (C) 2010-2013 Peter Brett <peter@peter-b.co.uk>
+ * Copyright (C) 2010-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,7 +84,6 @@
  * by Scheme API source files.
  */
 
-#include <missing.h>
 #include <libgeda/libgedaguile.h>
 
 void edascm_init_smob ();
@@ -93,6 +93,9 @@ void edascm_init_complex ();
 void edascm_init_page ();
 void edascm_init_attrib ();
 void edascm_init_os ();
+void edascm_init_config ();
+void edascm_init_closure (void);
+void edascm_init_log (void);
 void edascm_init_deprecated ();
 
 /* ---------------------------------------- */
@@ -109,6 +112,8 @@ enum geda_smob_flags {
   GEDA_SMOB_TOPLEVEL = 0,
   GEDA_SMOB_PAGE = 1,
   GEDA_SMOB_OBJECT = 2,
+  GEDA_SMOB_CONFIG = 3,
+  GEDA_SMOB_CLOSURE = 4,
   GEDA_SMOB_TYPE_MASK = 0xf,
   GEDA_SMOB_GC_FLAG = 0x100,
 };
@@ -157,6 +162,12 @@ SCM edascm_from_toplevel (TOPLEVEL *toplevel);
 /*! Tests whether a Scheme value is an OBJECT smob. */
 #define EDASCM_OBJECTP(x) EDASCM_SMOB_TYPEP(x, GEDA_SMOB_OBJECT)
 
+/*! Tests whether a Scheme value is an EdaConfig smob. */
+#define EDASCM_CONFIGP(x) EDASCM_SMOB_TYPEP(x, GEDA_SMOB_CONFIG)
+
+/*! Tests whether a Scheme value is a C closure smob. */
+#define EDASCM_CLOSUREP(x) EDASCM_SMOB_TYPEP(x, GEDA_SMOB_CLOSURE)
+
 /*!
  * \brief Test whether a structure may be garbage-collected
  * \par Macro Description
@@ -190,8 +201,12 @@ int edascm_is_object_type (SCM smob, int type);
 
 
 /*! \brief Flag an object's page as having been changed. */
-extern inline void o_page_changed (TOPLEVEL *t, OBJECT *o);
+extern void o_page_changed (TOPLEVEL *t, OBJECT *o);
 
 /* ---------------------------------------- */
 
 extern SCM edascm_object_state_sym;
+
+/* ---------------------------------------- */
+
+SCM edascm_from_closure (SCM (*func)(SCM, gpointer), gpointer user_data);

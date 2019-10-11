@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,60 +23,6 @@
 #include <math.h>
 
 #include "libgeda_priv.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
-
-/*! \brief Set the contraints for the current page.
- *  \par Function Description
- *  This function will set the current page constraints.
- *
- *  \param [in]     toplevel  The TOPLEVEL object.
- *  \param [in,out] page       The PAGE object to set constraints on.
- *  \param [in]     xmin       The minimum x coordinate for the page.
- *  \param [in]     xmax       The maximum x coordinate for the page.
- *  \param [in]     ymin       The minimum y coordinate for the page.
- *  \param [in]     ymax       The maximum y coordinate for the page.
- */
-void set_window(TOPLEVEL *toplevel, PAGE *page,
-                int xmin, int xmax, int ymin, int ymax)
-{
-  double fs,f0,f1;
-  double fw0,fw1,fw;
-
-  page->left   = xmin;
-  page->right  = xmax;
-  page->top    = ymin; 
-  page->bottom = ymax;
-
-  /* now do the constant setups */
-
-  /* pix_x */
-  f0 = page->left;
-  f1 = page->right;
-  fs = toplevel->width;
-  page->to_screen_x_constant = fs / (f1 - f0);
-
-  /* pix_y */
-  f0 = page->top;
-  f1 = page->bottom;
-  fs = toplevel->height;
-  page->to_screen_y_constant = fs / (f1 - f0); 
-
-  /* mil_x */
-  fw1 = page->right;
-  fw0 = page->left;
-  fw  = toplevel->width;
-  page->to_world_x_constant = (fw1 - fw0) / fw;
-
-  /* mil_y */
-  fw1 = page->bottom;
-  fw0 = page->top;
-  fw  = toplevel->height;
-  page->to_world_y_constant = (fw1 - fw0) / fw;
-}
 
 
 /*! \brief Rotate a point by an arbitrary angle.

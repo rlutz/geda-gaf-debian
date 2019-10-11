@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,33 +26,30 @@
 
 #include "libgeda_priv.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 /*! \brief */
-static int page_control_counter=0;
+int page_control_counter = 0;
 
-/*! \todo Finish function documentation!!!
+/*!
  *  \brief Search for schematic associated source files and load them.
  *  \par Function Description
  *  This function searches the associated source file refered by the
  *  <B>filename</B> and loads it.  If the <B>flag</B> is set to
- *  <B>HIERARCHY_NORMAL_LOAD</B> and the page is allready in the list of
+ *  <B>HIERARCHY_NORMAL_LOAD</B> and the page is already in the list of
  *  pages it will return the <B>pid</B> of that page.
  *  If the <B>flag</B> is set to <B>HIERARCHY_FORCE_LOAD</B> then this
  *  function will load the page again with a new page id. The second case
  *  is mainly used by gnetlist where pushed down schematics MUST be unique.
  *
- *  \param [in] toplevel     The TOPLEVEL object.
+ *  \param [in] toplevel      The TOPLEVEL object.
  *  \param [in] filename      Schematic file name.
  *  \param [in] parent        The parent page of the schematic.
  *  \param [in] page_control
- *  \param [in] flag
+ *  \param [in] flag          sets whether to force load
+ *  \param [out] err         Location to return a GError on failure.
  *  \return The page loaded, or NULL if failed.
  *
  *  \note
- *  This function goes and finds the associated source files and
+ *  This function finds the associated source files and
  *  loads all up
  *  It only works for schematic files though
  *  this is basically push
@@ -61,7 +58,8 @@ static int page_control_counter=0;
  */
 PAGE *
 s_hierarchy_down_schematic_single(TOPLEVEL *toplevel, const gchar *filename,
-                                  PAGE *parent, int page_control, int flag)
+                                  PAGE *parent, int page_control, int flag,
+                                  GError **err)
 {
   gchar *string;
   PAGE *found = NULL;
@@ -73,6 +71,8 @@ s_hierarchy_down_schematic_single(TOPLEVEL *toplevel, const gchar *filename,
 
   string = s_slib_search_single(filename);
   if (string == NULL) {
+    g_set_error (err, EDA_ERROR, EDA_ERROR_NOLIB,
+                 _("Schematic not found in source library."));
     return NULL;
   }
 
@@ -91,8 +91,8 @@ s_hierarchy_down_schematic_single(TOPLEVEL *toplevel, const gchar *filename,
           ; /* void */
 
         if (forbear != NULL && found->pid == forbear->pid) {
-          s_log_message(_("hierarchy loop detected while visiting page:\n"
-                          "  \"%s\"\n"), found->page_filename);
+          g_set_error (err, EDA_ERROR, EDA_ERROR_LOOP,
+                       _("Hierarchy contains a circular dependency."));
           return NULL;  /* error signal */
         }
         s_page_goto (toplevel, found);
@@ -135,67 +135,60 @@ s_hierarchy_down_schematic_single(TOPLEVEL *toplevel, const gchar *filename,
   return found;
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
+/*! \brief Load a subpage
  *
+ *  \par Function Description
+ *  Implements s_hierarchy_down_schematic(), but without changing variables
+ *  related to the UI.
+ *
+ *  - Ensures a duplicate page is not loaded
+ *  - Does not change the current page
+ *  - Does not modify the most recent "up" page
+ *
+ *  \param [in]  page
+ *  \param [in]  filename
+ *  \param [out] error
+ *  \return A pointer to the subpage or NULL if an error occured.
  */
-void
-s_hierarchy_down_symbol (TOPLEVEL *toplevel, const CLibSymbol *symbol,
-                         PAGE *parent)
+PAGE*
+s_hierarchy_load_subpage (PAGE *page, const char *filename, GError **error)
 {
-  PAGE *page;
-  gchar *filename;
+  char *string;
+  PAGE *subpage = NULL;
 
-  filename = s_clib_symbol_get_filename (symbol);
+  g_return_val_if_fail (filename != NULL, NULL);
+  g_return_val_if_fail (page != NULL, NULL);
 
-  page = s_page_search (toplevel, filename);
-  if (page) {
-    /* change link to parent page since we
-     * can come here from any parent and must
-     * come back to the same page */
-    page->up = parent->pid;
-    s_page_goto (toplevel, page);
-    g_free (filename);
-    return;
+  string = s_slib_search_single (filename);
+
+  if (string == NULL) {
+    g_set_error (error,
+                 EDA_ERROR,
+                 EDA_ERROR_NOLIB,
+                 _("Schematic not found in source library."));
+  } else {
+    gchar *normalized = f_normalize_filename (string, error);
+
+    subpage = s_page_search (page->toplevel, normalized);
+
+    if (subpage == NULL) {
+      int success;
+
+      subpage = s_page_new (page->toplevel, string);
+      success = f_open (page->toplevel, subpage, subpage->page_filename, error);
+
+      if (success) {
+        subpage->page_control = ++page_control_counter;
+      } else {
+        s_page_delete (page->toplevel, subpage);
+        subpage = NULL;
+      }
+    }
+
+    g_free (normalized);
   }
 
-  page = s_page_new (toplevel, filename);
-  g_free(filename);
-
-  s_page_goto (toplevel, page);
-
-  f_open(toplevel, page, page->page_filename, NULL);
-
-  page->up = parent->pid;
-  page_control_counter++;
-  page->page_control = page_control_counter;
-
-}
-
-/*! \brief Search for the parent page of a page in hierarchy.
- *  \par Function Description
- *  This function searches the parent page of page \a page in the
- *  hierarchy. It checks all the pages in the list \a page_list.
- *
- *  It returns a pointer on the page if found, NULL otherwise.
- *
- *  \note
- *  The page \a current_page must be in the list \a page_list.
- *
- *  \param [in] page_list    The list of pages in which to search.
- *  \param [in] current_page The reference page for the search.
- *  \returns A pointer on the page found or NULL if not found.
- */
-PAGE *
-s_hierarchy_find_up_page (GedaPageList *page_list, PAGE *current_page)
-{
-  if (current_page->up < 0) {
-    s_log_message(_("There are no schematics above the current one!\n"));
-    return NULL;
-  }
-
-  return s_page_search_by_page_id (page_list, current_page->up);
+  return subpage;
 }
 
 /*! \brief Find page hierarchy below a page.
@@ -264,16 +257,17 @@ s_hierarchy_traversepages (TOPLEVEL *toplevel, PAGE *p_current, gint flags)
 
     /* we got a schematic source attribute
        lets load the page and dive into it */
+    GError *err = NULL;
     child_page =
       s_hierarchy_down_schematic_single (toplevel, filename, p_current, 0,
-                                         HIERARCHY_NORMAL_LOAD);
+                                         HIERARCHY_NORMAL_LOAD, &err);
     if (child_page != NULL) {
       /* call the recursive function */
       s_hierarchy_traversepages (toplevel, child_page, flags | HIERARCHY_INNERLOOP);
     } else {
-      s_log_message (_("ERROR in s_hierarchy_traverse: "
-                       "schematic not found: %s\n"),
-                     filename);
+      s_log_message (_("Failed to descend hierarchy into '%s': %s\n"),
+                     filename, err->message);
+      g_error_free (err);
     }
 
     g_free (filename);
@@ -298,7 +292,7 @@ s_hierarchy_traversepages (TOPLEVEL *toplevel, PAGE *p_current, gint flags)
  *  \par Function Description
  *
  *  \note
- *  Test function which only prints the name of a page and it's number.
+ *  Test function which only prints the name of a page and its number.
  */
 gint
 s_hierarchy_print_page (PAGE *p_current, void * data)

@@ -1,32 +1,691 @@
-commit 875406c9d1211fd88e3e7e1ee5349cba41a7becf
+commit 0ab03654668ba723a287c97406e45329ff8e4e3d
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Oct 8 20:21:05 2019 +0200
+
+    Regenerate PO files
+
+commit 4839aad1a7611bdb0b2de77352bfd3e0d2ecd927
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 14:52:43 2019 +0200
+
+    Add `GEDALOG' to manpages
+
+commit 1e84095451714063aab4717001b4bcc93395fc8f
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 14:15:39 2019 +0200
+
+    Add silent rules for HTML generation
+
+commit 6e9c900c781bb24f5d5941bd21480ba13883bb49
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 7 14:00:50 2019 +0200
+
+    Add silent rules for manpage generation
+
+commit 45cd7d2d2f1c15ac710d4705dba03c310b5a4c74
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Sep 9 14:42:14 2019 +0200
+
+    API documentation: Disable include and call graphs
+    
+    These graphs aren't very helpful and increase both documentation size
+    and generation time.
+
+commit 5784d76e273ab8113f070d9f5c127088fc162015
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sat Jul 27 17:10:29 2019 +0200
+
+    Detect whether C compiler supports warning flags
+    
+    clang doesn't support certain warnings.  Add checks so the warning
+    flags can be conditionally passed if the compiler recognizes them.
+
+commit 88b385ea608f6c32eac81bff3f5cdd295262c3b2
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sat Jul 27 14:31:47 2019 +0200
+
+    gattrib: Suppress compilation warnings
+    
+    These warnings don't appear to indicate actual problems.  Since I
+    don't want to change gtksheet_2_2.c, just mask the warnings.
+    
+    This suppresses the following compilation warnings:
+    gattrib/src/gtksheet_2_2.c:104:21: warning: unused function
+        'DEFAULT_FONT_ASCENT' [-Wunused-function]
+    gattrib/src/gtksheet_2_2.c: In function 'gtk_sheet_range_draw':
+    gattrib/src/gtksheet_2_2.c:3388:2: warning: this 'for' clause does
+        not guard... [-Wmisleading-indentation]
+    gattrib/src/gtksheet_2_2.c:3394:3: note: ...this statement, but the
+        latter is misleadingly indented as if it is guarded by the 'for'
+
+commit e6d2b4c11e7c1fd7a64045ee7792dfb8271db2eb
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 13 15:59:28 2018 +0200
+
+    Fix `make doxygen' for VPATH builds
+
+commit 57afc7921a9aba3810d56d1760d8e1cd9dbc034b
 Author: Peter TB Brett <peter@peter-b.co.uk>
-Date:   Wed Sep 25 22:17:56 2013 +0100
+Date:   Sat Jan 23 21:09:11 2016 +0000
 
-    Update NEWS and version information for 1.8.2.
+    build: Generate an empty ChangeLog when git history unavailable
+    
+    When no git history is available -- for example, when the git
+    repository was cloned using the `--depth` option to limit the amount
+    of git history downloaded -- the changelog-generation rule can fail
+    because the changelog's base git commit (i.e. the 1.0 release tag)
+    isn't available in the repository.
+    
+    This patch makes generation of `ChangeLog` succeed in that situation,
+    by creating an empty log and printing a warning to stderr.  It allows
+    `make dist` and `make distcheck` to pass on shallow clones.
 
-commit 1ae405d39a3822875d3dbc5f20f8152bf172bed7
+commit 88b95509796acdbc7e5acb9772a98ada251780d5
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Mon Jan 18 18:27:08 2016 -0800
+
+    libgeda: remove unused parameter from o_text_new
+
+commit 66bc95199157b8ef524ecb89d0640edc3c796f82
 Author: Peter TB Brett <peter@peter-b.co.uk>
-Date:   Wed Sep 25 22:24:51 2013 +0100
+Date:   Sat Jan 16 11:26:32 2016 +0000
 
-    Update translations.
+    Remove uses of deprecated g_strcasecmp().
+    
+    The deprecated GLib function `g_strcasecmp()` is used very rarely in
+    the engine, and in exactly two places:
+    
+    * Checking the version from an rc file: in this case, we can ensure
+      that the compiled-in `PACKAGE_DATE_VERSION` string is ASCII and
+      safely use `g_ascii_strcasecmp()`.
+    
+    * Checking whether a page has a particular filename in
+      `s_page_search()`.  For most of the platforms we support, the
+      filesystem is case-insensitive, so it may well be possible to have a
+      `FOO.sch` and `foo.sch` open at the same time.  For now, replace the
+      filesystem comparion with a straightforward `strcmp()` call.
 
-commit d088ec192ac9fbc1dff3509527cb238520c2ee33
+commit 231211dbfacd931be4ab404ee19eadd7d2f36d06
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sat Dec 9 00:08:26 2017 +0100
+
+    Remove 'toplevel' parameter from o_is_visible
+
+commit a28576df7fed33442320d8eb4675b47a3b951dad
+Merge: 4cc1c7ce5 8fd737c25
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Thu Oct 8 13:00:11 2015 +0300
+
+    Merge branch 'unstable-1.9'
+
+commit 686dae3a6ee7d08290af74b6d4eb438bd44cafcc
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Oct 7 17:01:26 2015 +0300
+
+    libgeda: Get rid of tales.
+    
+    Tiles in libgeda had little benefits (if any) but increased
+    libgeda complexity. They have been removed completely. Some
+    functions related to tiles have been renamed and moved into s_conn.c.
+
+commit 10d1eead3cae2dabef83aca8923d84396619690b
+Author: Sergey Stepanov <no.such.process@gmail.com>
+Date:   Tue Oct 6 23:23:22 2015 +0500
+
+    gattrib: fix warning: Value stored to 'color' is never read
+
+commit cf60e1d772c2d2b1dc820748b5048cf8381fa289
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Sep 27 15:47:36 2015 +0300
+
+    Automatically update Copyright in man pages.
+
+commit faf4911952a331d647b68a351ea9452d9a9a1caf
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Sep 27 13:34:24 2015 +0300
+
+    Update translation files.
+
+commit f742fe7303bc08ba0829aaf927ed17423cc38ec5
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:16:56 2014 +0200
+
+    Remove deprecated use of GTK_WIDGET_DRAWABLE()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "GTK_WIDGET_DRAWABLE has been
+    deprecated since version 2.20 and should not be used in newly-written
+    code. Use gtk_widget_is_drawable() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit bf983e41f0375d8e934078b5ca61c34b3258c571
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:32 2014 +0200
+
+    Remove deprecated use of GTK_WIDGET_NO_WINDOW()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "GTK_WIDGET_NO_WINDOW has been
+    deprecated since version 2.20 and should not be used in newly-written
+    code. Use gtk_widget_get_has_window() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 0e7b2a1bcded1e074a7212c7f1be2375f4293d20
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:17 2014 +0200
+
+    Remove deprecated use of GTK_WIDGET_VISIBLE()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "GTK_WIDGET_VISIBLE has been
+    deprecated since version 2.20 and should not be used in newly-written
+    code. Use gtk_widget_get_visible() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 6b3064863ea4fc57ab3773de50663eae131ff8a5
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Thu Sep 3 11:33:23 2015 +0300
+
+    Removed deprecated gtk_window_set_default_size().
+
+commit fa7e86e83d466dbe4d045c99cb8fa896480b9e77
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:20 2014 +0200
+
+    Remove deprecated use of gtk_entry_set_editable()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_entry_set_editable has
+    been deprecated since version 2.0 and should not be used in
+    newly-written code. Use gtk_editable_set_editable() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit fdf05af2e04d8726656d7835f3990fbbae95e7e1
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:16:59 2014 +0200
+
+    Remove deprecated use of gtk_entry_new_with_max_length()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_entry_new_with_max_length
+    has been deprecated since version 2.0 and should not be used in
+    newly-written code. Use gtk_entry_set_max_length() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 7a6a106845c846994eae327ddce784f230549898
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:03 2014 +0200
+
+    Remove deprecated use of gtk_label_set()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_label_set is deprecated
+    and should not be used in newly-written code. Use gtk_label_set_text()
+    instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 6da76d97aa93d2544658ef7fa9a844beb039d366
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:08 2014 +0200
+
+    Remove deprecated use of gtk_timeout_remove()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_timeout_remove has been
+    deprecated since version 2.4 and should not be used in newly-written
+    code. Use g_source_remove() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 8e3e8459f7e4922a0a5475a7f59b429ccc7af105
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:01 2014 +0200
+
+    Remove deprecated use of gtk_timeout_add()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_timeout_add has been
+    deprecated since version 2.4 and should not be used in newly-written
+    code. Use g_timeout_add() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 06677c8e6e02fa3229d1d2a5d5953f646a1fa6a9
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:34 2014 +0200
+
+    Remove deprecated use of gtk_type_is_a()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_type_is_a is deprecated
+    and should not be used in newly-written code." Use g_type_is_a
+    instead.
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 4c1e875482c220e1d79896486fcd18d21a08007d
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:16 2014 +0200
+
+    Remove deprecated use of GTK_OBJECT_TYPE()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "GTK_OBJECT_TYPE has been
+    deprecated since version 2.20 and should not be used in newly-written
+    code. Use G_OBJECT_TYPE() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 424080250e67882ad3f5e67265866e4cdd03fa16
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Sep 1 08:11:22 2015 +0300
+
+    Replaced deprecated GtkSignalFunc with GCallback.
+
+commit 779b27ea7b4bbbcd5bd34e1f2c9ad091f0192511
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:29 2014 +0200
+
+    Remove deprecated use of GTK_SIGNAL_FUNC()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "GTK_SIGNAL_FUNC is deprecated
+    and should not be used in newly-written code." Use G_CALLBACK instead.
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 7219cb301e6a5bdf2abfd5805f5ae4d34bd12eae
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sat Aug 29 12:53:50 2015 +0300
+
+    Replaced deprecated gtk_signal_disconnect_by_func().
+
+commit 4c4c0f20f95c26718ceb2c6176ee24f2accf78d0
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Aug 28 12:27:17 2015 +0300
+
+    Replaced deprecated gtk_signal_new() with g_signal_new().
+
+commit f18f0b6b9e2b6e66af9338e3cb838d06e7630104
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Aug 28 11:23:33 2015 +0300
+
+    Replace gtk_signal_emit() with g_signal_emit().
+    
+    gtk_signal_emit is deprecated in gtk+ version 2.
+
+commit 790339e227e25f6e32f58ddf55ac13df162afadd
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:31 2014 +0200
+
+    Remove deprecated use of gtk_signal_connect_object()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_signal_connect_object is
+    deprecated and should not be used in newly-written code." Use
+    g_signal_connect_swapped instead.
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 2e7860ad7a76eac8f8d004a57064396f1528ddb6
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:22 2014 +0200
+
+    Remove deprecated use of gtk_signal_connect()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_signal_connect is
+    deprecated and should not be used in newly-written code. Use
+    g_signal_connect() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 954809a1c0c52789383311e5590d0a33e04f9b7d
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Thu Sep 18 13:06:12 2014 +0200
+
+    Remove deprecated use of gtk_signal_emit_stop_by_name()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_signal_emit_stop_by_name
+    is deprecated and should not be used in newly-written code. Use
+    g_signal_stop_emission_by_name() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 0e25f339a6157302bcc14d80785ea44294335b6e
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Thu Sep 18 13:06:26 2014 +0200
+
+    Remove deprecated use of gtk_signal_emit_by_name()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_signal_emit_by_name is
+    deprecated and should not be used in newly-written code. Use
+    g_signal_emit_by_name() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 970418e20e7b0e5cb42ed821ce9fa62bf414a0e1
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:28 2014 +0200
+
+    Remove deprecated use of gtk_object_sink()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_object_sink has been
+    deprecated since version 2.10 and should not be used in newly-written
+    code. Use g_object_ref_sink() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit c0d498d4b6b9a24a1d14802af0ef9535641bb319
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:26 2014 +0200
+
+    Remove deprecated use of gtk_widget_ref()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_widget_ref has been
+    deprecated since version 2.12 and should not be used in newly-written
+    code. Use g_object_ref() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit c7d5297cc69c88c7fa84cf2083d571ac930aab68
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:35 2014 +0200
+
+    Remove deprecated use of gtk_object_ref()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_object_ref is deprecated
+    and should not be used in newly-written code. Use g_object_ref()
+    instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit a615040e76f0441f246163bcd8a8f191777d6109
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Thu Aug 27 13:17:49 2015 +0300
+
+    Replace gdk_pixmap_unref() with g_object_unref().
+    
+    According to GTK+ manual gdk_pixmap_unref is deprecated equivalent of
+    g_object_unref().
+
+commit cfeded192e6213f24246064150e895f5f83e14a4
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Thu Aug 27 13:06:21 2015 +0300
+
+    Replace gdk_gc_unref() with g_object_unref().
+    
+    gdk_gc_unref has been deprecated since gdk version 2.0.
+
+commit 484c33d768fec5cf1646a4495da52eb289e10979
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:15 2014 +0200
+
+    Remove deprecated use of gtk_style_unref()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_style_unref has been
+    deprecated since version 2.0 and should not be used in newly-written
+    code. use g_object_unref() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 7ec78eca22541c3909c2097e3f6f6415772e5848
+Author: Riccardo Lucchese <riccardo.lucchese@gmail.com>
+Date:   Tue Oct 14 22:17:00 2014 +0200
+
+    Remove deprecated use of gtk_object_unref()
+    
+    Verbatim from Gtk+ 2 Reference Manual: "gtk_object_unref has been
+    deprecated since version 2.12 and should not be used in newly-written
+    code. Use g_object_unref() instead."
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 2e702f019ac11ba221818712b74eaa7b6c9d8e74
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Apr 20 10:19:10 2015 +0300
+
+    Drop compatibility with guile 1.8.
+    
+    Revert "build-sys: Test for scm_{to,from}_utf8_string()."
+    This reverts commit 3dbc8982a4e598a3435dfa7857c48c1b64fbe721.
+    and facilitates building geda-gaf in MinGW with guile 2.0.
+
+commit fda37d67334d41abdd9988053b11930ea4f30ffe
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Tue Jul 14 22:54:34 2015 +0300
+
+    Replaced non-portable 'date -d' with a portable guile script.
+    
+    Closes-bug: lp-1473456
+
+commit aea330a649859b9cf7dc2fcfc18196fcd15e1f4d
+Merge: bf2216272 361fcbd98
 Author: Peter TB Brett <peter@peter-b.co.uk>
-Date:   Fri Nov 23 21:24:42 2012 +0000
+Date:   Sat Dec 13 19:11:33 2014 +0000
 
-    Update version numbers to 1.8.1.
+    Merge branch 'dutch' of https://github.com/bert/geda-gaf.
 
-commit 988e63ef358d7d44e447e08f4be58ac15f008d3e
+commit 3b25ac0e20bd2dd9b55cee2d7249bc3276a31761
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Aug 11 13:28:35 2014 +0400
+
+    gattrib: fixed some comments
+    
+    They were rudiments of removed code.
+
+commit c92a29885637b7230a125adce0ca9721461e1698
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Sat Sep 13 10:19:25 2014 -0700
+
+    Add include directives for locale.h
+
+commit 765b5f24a81d8071629727e833bf2c5b616a9343
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Sep 10 14:34:01 2014 +0200
+
+    gattrib: Fix non-ASCII 'o' character
+
+commit 317a8a126e2f181cd16934abc29197d75091e9bb
+Author: bert <bert.timmerman@xs4all.nl>
+Date:   Sun Aug 31 20:33:05 2014 +0200
+
+    Updated the Dutch translation of gattrib.
+    
+    Signed-off-by: bert <bert.timmerman@xs4all.nl>
+
+commit 587592b8fa62553431cfd9f5d37d3eea82a97270
 Author: Peter TB Brett <peter@peter-b.co.uk>
-Date:   Fri Nov 23 21:32:49 2012 +0000
+Date:   Sat Mar 8 22:38:00 2014 +0000
 
-    Update translations.
+    Update translation files.
+
+commit 6c97b1957c127ba086f5ce393834aa1af558e9a8
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sat Mar 8 20:54:27 2014 +0400
+
+    Updated Russian translation
+    
+    The translation has been updated for all tools including changes as
+    follows:
+    - full (new) translation for gattrib
+    - consistent quotes everywhere
+    - changes in copyright headers
+    - notes for translators into Russian
+    - consistent usage output
+    - spelling, rephrasing, formatting, etc.
+
+commit 2057462495904ee366741ad1aee4d215889f8456
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Feb 24 22:58:39 2014 +0400
+
+    gattrib: don't translate formatting tags
+
+commit f61c3bc1725320cd62adb593192e1b50dc63c3f8
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Feb 24 22:58:04 2014 +0400
+
+    gattrib: fix two typos
+
+commit 35f3f9958ab8a66c377cd05af0c185ff3e6017fa
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Feb 24 22:56:42 2014 +0400
+
+    gattrib: avoid translating of a special string
+
+commit 31d7f9c9bdf74e0b4471613670df745cea8d4d2f
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Feb 24 22:53:36 2014 +0400
+
+    gattrib: don't translate a debug message
+
+commit ebf4230da64acc74fa9caf0dc57cd56c35ae3483
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Feb 24 22:49:50 2014 +0400
+
+    gattrib: i18n
+
+commit 26447bcd088f55f7a48b6140f8216271ef24a3ee
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Sep 29 09:36:04 2013 +0100
+
+    Remove all libdmalloc cruft.
+
+commit 91231774a8a40ca60720c654516d68894caa248d
+Author: Edward Hennessy <ehennes@sbcglobal.net>
+Date:   Wed Sep 25 22:42:28 2013 -0700
+
+    libgeda: Add accessor to TOPLEVEL for page_current
+
+commit 4e2417d23eec6837b71ccca6c46835efdd51020c
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Sep 3 21:52:17 2013 +0100
+
+    gschem: Page->Discard considered harmful
+    
+    Page->Discard closes the current page and throws away any unsaved
+    changes without prompting the user.  Get rid of this command entirely
+    -- there is no situation in which you shouldn't use Page->Close
+    instead.
+
+commit 143c46d43b7b25a4008c888f9c3f614d4a885b6a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Thu Dec 13 23:02:28 2012 +0000
+
+    Avoid using getenv for GEDADATA/GEDADATARC in rc files.
+    
+    Affects-bug: lp-1088724
+
+commit c0cb29fc0c85f604a6628a56d19797392baa24ae
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Wed Dec 12 12:12:08 2012 +0000
+
+    Don't suppress warnings about deprecated Guile features.
+    
+    Don't set GUILE_WARN_DEPRECATED=no when not set in the environment;
+    use the setting compiled into Guile.
+
+commit f74515efcd70f0669b5ada908e62b9ef36a29fc7
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Dec 4 10:25:23 2012 +0000
+
+    Add built manpages to .gitignore files.
+
+commit 06d228d70301d8a5178b9b979e5e8268b9821f34
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 20:12:32 2012 +0000
+
+    Automatically update man page version/date info.
+
+commit 222ae70f66062549e2c664be85895dc9a76bc2ff
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 17:57:18 2012 +0000
+
+    Update translation files.
+
+commit 6243f3b4586b7ce0a2d17539444083eed97287e9
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 17:45:36 2012 +0000
+
+    Update version numbers for 1.9.0.
+
+commit ba22912365a24b12b275fcc4a3476b2937f4cf8b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 11:59:29 2012 +0000
+
+    Update message bugs report address.
+    
+    Closes-bug: lp-1085611
+
+commit 866a1d19261eac6636bf6702fdaa74bbaade06dc
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 27 09:28:33 2012 +0000
+
+    gattrib: Correctly declare s_string_list_find_in_list().
+    
+    Fixes a compiler warning.
+
+commit 313f00888c95b48edd6b4983c683c050cdbd68b5
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 23 18:48:29 2012 +0000
+
+    Remove all printing-related code from libgeda.
+    
+    We now only ship a single schematic renderer, in libgedacairo.
+
+commit c0d38ce9b4d9383f0953598304d84e1657af1916
+Merge: ffb0349ec 2f5799e39
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Nov 20 11:47:53 2012 +0000
+
+    Merge branch 'stable-1.8' branch into 'master'.
+    
+    Conflicts:
+            gattrib/po/ar.po
+            gattrib/po/bg.po
+            gattrib/po/de.po
+            gattrib/po/es.po
+            gattrib/po/fr.po
+            gattrib/po/hu.po
+            gattrib/po/it.po
+            gattrib/po/ml.po
+            gattrib/po/nl.po
+            gattrib/po/pl.po
+            gattrib/po/pt.po
+            gattrib/po/pt_BR.po
+            gattrib/po/ru.po
+            gattrib/po/tr.po
+            gattrib/po/zh_CN.po
+            gattrib/po/zh_TW.po
+            gschem/po/nl.po
+            gschem/src/o_arc.c
+            gschem/src/o_cue.c
+            libgeda/po/nl.po
+            libgeda/src/s_hierarchy.c
+
+commit 88654dac0f5856571d4c9a71398e34e31a09b571
+Merge: 57940f94c df4df8901
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 19 07:48:17 2012 +0000
+
+    Merge branch 'gattrib_dox' of https://github.com/bert/geda-gaf
+
+commit 5c2d23c592f74e1b7845c0485bec2712610fae7b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Nov 18 23:10:51 2012 +0000
+
+    gattrib: Distribute gettext convenience header.
+    
+    In commit f3d2d3d7a810, a gettext.h header was added to gattrib, but
+    was not added to the list of files to be distributed.  This broke
+    `make distcheck'.
 
 commit 87f1e0e76965a514277c949dbf2191993962cb88
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Sun Nov 18 15:26:09 2012 +0000
 
     Update version numbers to 1.8.0-20121118.
+
+commit df4df8901d6d27fcae6de32336ac06b7f56f2f6b
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sun Nov 18 16:17:22 2012 +0100
+
+    gattrib: removed interfering "\mainpage" tag and added to "what-is-gattrib" page.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
 
 commit e9b3fa86d721324688ab6d28bfbc2f417e7828a0
 Author: Joe Mac <joe.eli.mac@gmail.com>
@@ -55,6 +714,12 @@ Date:   Sat Nov 17 21:31:24 2012 +0000
     Closes-bug: lp-698575
     Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
 
+commit c15c1ba663983f04af89b78ab8d8d766155eaaaf
+Author: Karl Hammar <karl@aspodata.se>
+Date:   Sat Nov 17 22:25:56 2012 +0100
+
+        doxygen command \param misspelled
+
 commit e6cdf09ad9330c2066363809f7839f698ca2476b
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Thu Nov 15 23:22:20 2012 +0000
@@ -64,11 +729,267 @@ Date:   Thu Nov 15 23:22:20 2012 +0000
     Merge Dutch translation improvements made by Bert Timmerman in from
     the unstable branch (commits 4b17c888, f9bd70f6, and a164660f).
 
+commit 4b17c8883a36ccfab593b0e7f2fa205f653903e4
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Thu Nov 15 09:00:43 2012 +0100
+
+    Updated the Dutch translation of gattrib.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
 commit 8eb5b8724c3ce8c2d3e7db9c030ad97dc585c1ee
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Wed Nov 14 17:32:48 2012 +0000
 
     gattrib: Import translations from Launchpad
+
+commit 9947b179c89d91e59d67a69ba6b6fdae3f266416
+Author: Eike Krumbacher <eike.krumbacher@x-eike.de>
+Date:   Wed Feb 8 16:51:52 2012 +0100
+
+    gattrib: gtksheet cleanups.
+    
+    I compiled using the compiler option -DGTK_DISABLE_SINGLE_INCLUDES
+    
+    This option looks for needless extra included gtk and gdk headers. The
+    only place was gattrib/src/gtksheet_2_2.c where I fixed the includes
+    and looked for unused but maybe assigned variables, which I removed.
+    
+    Minor code cleanup in this file.
+    
+    Tested gattrib with a file.
+
+commit df696b1789093482ecf5ff18effd60558438adc9
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Wed Jan 18 20:33:31 2012 +0100
+
+    gattrib: Updated po files.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit c9c00176c520222c7c1739f4ca75ca0d93a6dfa8
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Wed Jan 18 19:05:15 2012 +0100
+
+    gattrib: Updated the Dutch translation.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 153f20a19f9d2e17a3f5e6ff52579e202a489534
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Jan 14 11:06:39 2012 +0100
+
+    gattrib: Updated nl.po.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit e317e65cb917b43be2c9b8b11762c690c6f0a544
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Jan 14 10:34:29 2012 +0100
+
+    gattrib: Missed some translatable strings in x_gtksheet.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit c2431158f288280c695c4d9852373a95db541a1d
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Jan 14 10:15:25 2012 +0100
+
+    gattrib: Missed a translatable string in x_fileselect.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 77fdef2ac57c8b0fe7e6afcb78115251eec9c75c
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Jan 14 10:10:14 2012 +0100
+
+    gattrib: Missed a translatable string in s_toplevel.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit a6ba79d7f04d87d6c7089206e2adf4ed6c7450e8
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Jan 14 09:26:28 2012 +0100
+
+    gattrib: Multiple printf() concatenated into single printf() in s_rename.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 7acbf8933c6cfbc2f183330459248633788849df
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Jan 14 09:25:52 2012 +0100
+
+    gattrib: Multiple printf() concatenated into single printf() in parsecmd.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit b4e2ca004cacb5b6300f8f5d6bf57a03cdc5635e
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Jan 14 09:25:29 2012 +0100
+
+    gattrib: Multiple printf() concatenated into single printf() in gattrib.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 8a28341473acb0555a29c02d8d3bf0756b637b1c
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Jan 14 09:24:46 2012 +0100
+
+    gattrib: Multiple printf() concatenated into single printf() in g_rc.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit d053c78bf88ab32e5c8e0a01e080643fe22db365
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 20:27:35 2012 +0100
+
+    gattrib: Created translatable strings in x_window.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 9b17280150d80fcea8ed066109622d7bd7644ca3
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 20:27:12 2012 +0100
+
+    gattrib: Created translatable strings in x_gtksheet.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 0cd40e301abd591a2a4f42c690aeaa5a11a6887a
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 20:26:36 2012 +0100
+
+    gattrib: Created translatable strings in x_fileselect.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 511a471ed349a61c3dd1d90ab66bca750cd64248
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 20:26:00 2012 +0100
+
+    gattrib: Created translatable strings in x_dialog.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 4659abb2a06bdabd03047c88ea4732cb5a2128fe
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 20:25:42 2012 +0100
+
+    gattrib: Created translatable strings in s_toplevel.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit f5a0cf6fb1f689ce604429df0947d41edb7c978e
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 20:24:48 2012 +0100
+
+    gattrib: Created translatable strings in s_table.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 2dba63589727eb47d3aad4f8867976f2373b23b3
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 20:24:30 2012 +0100
+
+    gattrib: Created translatable strings in s_string_list.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit e8237c549f9dca37340ba591bbbce825cc86e3f0
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 20:24:12 2012 +0100
+
+    gattrib: Created translatable strings in s_sheet_data.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 350198e3c2dd8285c92a001578a3530ca83b98ad
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 20:23:50 2012 +0100
+
+    gattrib: Created translatable strings in s_rename.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 5a6a53b7efa978dd7955824a3a3e737113b54cd8
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 19:21:31 2012 +0100
+
+    gattrib: Created translatable strings in s_object.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 80a0583af0c9bdb6221a83392f1550ce053ce78a
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 19:20:30 2012 +0100
+
+    gattrib: Created translatable strings in s_misc.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit abe250e622583f99da25bfec27c2373712d6798a
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 19:20:11 2012 +0100
+
+    gattrib: Created translatable strings in s_attrib.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 17672e33b8dd13485cebf1dc9b51292dbba7f89a
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 19:19:16 2012 +0100
+
+    gattrib: Created translatable strings in parsecmd.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit a47684b383bd84ffd3703033764c659ad3014da8
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 19:18:34 2012 +0100
+
+    gattrib: Created translatable strings in gtksheet_2_2.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 52e6d5a9b09c840a6841031ef2fbf792e42aceaf
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 19:18:05 2012 +0100
+
+    gattrib: Created translatable strings in gattrib.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 14bf158dfc1a36175f559af5ec9c736bf4a0124d
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 19:17:48 2012 +0100
+
+    gattrib: Created translatable strings in g_rc.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit d5f652d5aa9690fd01526fa2f2f8222a9363c33e
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 19:17:13 2012 +0100
+
+    gattrib: Created translatable strings in f_export.c.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit 9f71b8c10db544c35c93e32853a3e34b15bf549f
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Fri Jan 13 19:16:28 2012 +0100
+
+    gattrib: Added source files to POTFILES.in for inclusion of translatable strings.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit f3d2d3d7a810f976d8cc842d7bf678ea15193a44
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Thu Jan 12 21:00:28 2012 +0100
+
+    gattrib: Added a convenience header for gettext.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
 
 commit 3671d4acdab78025b658cdba81f53c2ecec0208d
 Author: Peter TB Brett <peter@peter-b.co.uk>
@@ -192,19 +1113,19 @@ Date:   Thu Jan 13 01:37:59 2011 +0100
     Reviewed-by: Peter Clifton <pcjc2@cam.ac.uk>
 
 commit 502ab80495c45e092eca6052edd6cf8e7ff55429
-Merge: 27f7a52 e1c3ba4
+Merge: 27f7a522a e1c3ba4c4
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Thu Jan 13 19:59:35 2011 +0000
 
     Merge branch 'stable-1.6'
     
     Conflicts:
-    	NEWS
-    	libgeda/include/prototype_priv.h
-    	libgeda/src/gdk-pixbuf-hacks.c
-    	libgeda/src/o_basic.c
-    	libgeda/src/o_complex_basic.c
-    	utils/src/gsch2pcb.c
+            NEWS
+            libgeda/include/prototype_priv.h
+            libgeda/src/gdk-pixbuf-hacks.c
+            libgeda/src/o_basic.c
+            libgeda/src/o_complex_basic.c
+            utils/src/gsch2pcb.c
 
 commit 7ca2b049dbcfb9f0eb8d3dd3fcf21cbd66c0ec95
 Author: Peter TB Brett <peter@peter-b.co.uk>
@@ -296,7 +1217,7 @@ Date:   Wed Nov 3 21:29:24 2010 -0700
     Reviewed-by: Peter TB Brett <peter@peter-b.co.uk>
 
 commit 0b94d2379a5bd5d14690f941690e0df761df13c9
-Merge: 63cd6d7 a33839a
+Merge: 63cd6d754 a33839ade
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Sun Dec 12 09:48:07 2010 +0000
 
@@ -386,7 +1307,7 @@ Date:   Sat May 1 13:42:35 2010 +0100
     MINGW_GUI_LDFLAGS where the required -mwindows was set.
 
 commit e85bf2f103667368768939dfc2c40484be8abf8f
-Merge: 0e5defe 93b0370
+Merge: 0e5defe48 93b0370c4
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Mon Feb 15 20:30:22 2010 +0000
 
@@ -444,7 +1365,7 @@ Date:   Mon Feb 8 16:31:00 2010 +0000
     Merge translations with those exported from launchpad
 
 commit 99c5e8ce7cb7d2f06d3da3c3b841b0d40c583583
-Merge: 89ad783 d3b0112
+Merge: 89ad783e3 d3b0112dd
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Sat Feb 6 21:36:08 2010 +0000
 
@@ -594,7 +1515,7 @@ Date:   Tue Sep 29 01:43:05 2009 +0100
       o_attrib_find_attrib_by_name() is no longer static to o_attrib.c
 
 commit a1bff619eb7f1c7be77cca7c47b82dc80b4e3571
-Merge: 488a484 1d83fae
+Merge: 488a48499 1d83fae5a
 Author: Peter Clifton <pcjc2@cam.ac.uk>
 Date:   Mon Sep 28 17:07:21 2009 +0100
 
@@ -1090,7 +2011,7 @@ Date:   Sat Mar 28 15:22:19 2009 -0400
     Updated all ChangeLogs
     
     Updated the ChangeLogs by running:
-    	./update-changelogs.sh 1.0-20070526..master
+            ./update-changelogs.sh 1.0-20070526..master
     in the toplevel directory
 
 commit 859abe69912ba99ca27bb58c378284e9eec56259
@@ -2011,7 +2932,7 @@ Date:   Fri Dec 7 17:20:55 2007 +0000
     concise, and will be addressed in later patches.
 
 commit ae225157603f063747709fa3d639ed8cdf63f6b1
-Merge: 1abfd25 43b5713
+Merge: 1abfd25bf 43b571362
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Tue Nov 27 07:53:37 2007 +0000
 

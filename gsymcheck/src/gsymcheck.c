@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gsymcheck - gEDA Symbol Check 
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
  */
 
 #include <config.h>
-#include <version.h>
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -36,6 +35,7 @@
 #include "../include/struct.h"
 #include "../include/globals.h"
 #include "../include/prototype.h"
+#include "../include/gettext.h"
 
 void
 gsymcheck_quit(void)
@@ -109,14 +109,14 @@ main_prog(void *closure, int argc, char *argv[])
       g_error_free (err);
       exit(2);
     } else {
-      g_message ("Loaded file [%s]\n", filename);
+      g_message (_("Loaded file [%s]\n"), filename);
     }
     i++;
     g_free (filename);
   }
 
   if (argv[argv_index] == NULL) {
-    fprintf(stderr, "\nERROR! You must specify at least one filename\n\n");
+    fprintf(stderr, _("\nERROR! You must specify at least one filename\n\n"));
     usage(argv[0]);
   }
 
@@ -141,11 +141,6 @@ main_prog(void *closure, int argc, char *argv[])
 int 
 main (int argc, char *argv[])
 {
-  /* disable the deprecated warnings in guile 1.6.3 */
-  /* Eventually the warnings will need to be fixed */
-  if(getenv("GUILE_WARN_DEPRECATED")==NULL)
-    putenv("GUILE_WARN_DEPRECATED=no");
-
   scm_boot_guile (argc, argv, main_prog, NULL);
   return 0;
 }

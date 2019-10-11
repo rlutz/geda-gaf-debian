@@ -2,7 +2,7 @@
  * libgeda - gEDA's library
  * Copyright (C) 1998, 1999, 2000 Kazu Hirata / Ales Hvezda
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,10 +34,6 @@
 #include "libgeda_priv.h"
 #include "libgeda/libgedaguile.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 /*! \brief Perform runtime initialization of libgeda library.
  *  \par Function Description
  *  This function is responsible for making sure that any runtime
@@ -53,18 +49,13 @@ void libgeda_init(void)
   bind_textdomain_codeset(LIBGEDA_GETTEXT_DOMAIN, "UTF-8");
 #endif
 
-  /* Initialise gobject */
-  g_type_init ();
-
   s_path_sys_data ();
   s_path_sys_config ();
 
   s_clib_init();
   s_slib_init();
-  s_menu_init();
   s_attrib_init();
   s_color_init();
-  s_conn_init();
 
   g_register_libgeda_funcs();
   g_register_libgeda_dirs();

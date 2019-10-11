@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,6 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 /* window list */
 GList *global_window_list = NULL;
 
@@ -45,9 +41,6 @@ int logging_dest = LOG_WINDOW;
 int quiet_mode = FALSE;
 int verbose_mode = FALSE;
 int auto_place_mode = FALSE;
-
-/* Global buffers */
-GList *object_buffer[MAX_BUFFERS];
 
 /* Hooks */
 SCM complex_place_list_changed_hook;

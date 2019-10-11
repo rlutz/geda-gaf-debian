@@ -17,89 +17,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * \mainpage
- *
- * \section sdb_notes SDB's original comment in gattrib.c
- *
- * In the spirit of open source/free software, major sections of
- * gattrib's code were borrowed from other sources, and hacked
- * together by SDB in Dec. 2003.  Particularly rich sources for code were
- * gEDA/gnetlist, and the gtkextra program testgtksheet.c.  Thanks to their
- * authors for providing the foundation upon which this is built.
- *
- * Of course, I *did* write major portions of the code too . . . . .
- * Some documentation about the internal operation of this program can be
- * found in the "NOTES" file  in the gattrib top-level directory.
- * -- SDB  December 2003 -
- *
- * \section ml_notes Architecture
- *
- * (extracted from SDB's mailing list posting:
- *  http://osdir.com/ml/cad.geda.devel/2007-06/msg00282.html - believed to
- *  still be relevant)
- *
- * gattrib has three major components:
- *
- * -# It manipulates objects held in the TOPLEVEL data structure. It
- *    does this by importing structs and functions from libgeda.
- * -# Gattrib defines its own layer of structs, notably SHEET_DATA,
- *    which holds a table of attrib name=value pairs, and also holds a
- *    couple of linked lists corresponding to all component's refdeses, and
- *    to all attribute names found in the design. This stuff is native to
- *    gattrib.
- * -# Gattrib uses a spreadsheet widget called GtkSheet. This stuff
- *    came from the GtkExtra project, which at one time offered a bunch of
- *    interesting widgets for graphing and visualization. I think they're
- *    still around; you can do a Google search for them. I stole the two
- *    .h files defining the spreadsheet widgets, and also stole code from
- *    the program itself to implement the run-time functions which deal with
- *    the spreadsheet.
- *
- * When run, gattrib does this:
- *
- * -# It uses libgeda functions to read in your design, and fill up the
- *    TOPLEVEL struct.
- * -# It then loops over everything in TOPLEVEL and fills out the refdes
- *    list and the attribute name list. It sticks these into a STRING_LIST
- *    which is associated with the SHEET_DATA struct.
- * -# Then, knowing all the refdeses and all the attribute names, it
- *    creates a TABLE data struct (a member of SHEET_DATA), and loops over
- *    each cell in the TABLE. For each cell, it queries TOPLEVEL for the
- *    corresponding name=value pair, and sticks the value in the TABLE.
- * -# When done with that, it then creates a GtkSheet and populates it
- *    by looping over TABLE.
- * -# Then it turns over control to the user, who can manipulate the
- *    GtkSheet. As the user adds and deletes values from the GtkSheet, the
- *    values are stored locally there. The GtkSheet is the master
- *    repository of all attributes at that point; the other data structures
- *    are not updated.
- *
- *    Saving out a design is similar, except the process runs in reverse:
- *
- * -# The program loops over all cells in GtkSheet, and sticks the
- *    values found into SHEET_DATA. Handling issues like added/deleted
- *    columns happens first at the GtkSheet, and then to SHEET_DATA and
- *    TOPLEVEL. I've kind of forgotten how I implemented these feaures,
- *    however. :-S
- * -# Then, the program loops over the cells in SHEET_DATA, and updates
- *    the attributes in TOPLEVEL using functions from libgeda, as well as by
- *    reaching directly into the TOPLEVEL data structure (a software
- *    engineering no-no). If a previously existing attrib has been removed,
- *    then it is removed from TOPLEVEL. If a new attrib has been attached
- *    to a component, then it is added to TOPLEVEL.
- * -# Then the design is saved out using the save function from
- *    libgeda.
- *
- * Therefore, think of SHEET_DATA and the other gattrib data structures
- * as a thin layer between GtkSheet and TOPLEVEL. The gattrib data
- * structures are used basically for convenience while trying to build or
- * update either of the two other, more important data structures.
- *
+/*!
+ * \file gattrib.c
  */
 
 
 #include <config.h>
+#include <locale.h>
 #include <version.h>
 
 #ifdef HAVE_UNISTD_H
@@ -107,7 +31,7 @@
 #endif
 
 /*------------------------------------------------------------------*/
-/* Includes originally from testgtksheet -- stuff needed to deal with 
+/* Includes originally from testgtksheet -- stuff needed to deal with
  * spreadsheet widget.
  *------------------------------------------------------------------*/
 #include <stdio.h>
@@ -131,10 +55,6 @@
 #include "../include/prototype.h"  /* function prototypes */
 #include "../include/globals.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 /*------------------------------------------------------------------*/
 /*! \brief GTK callback to quit the program.
  *
@@ -143,7 +63,7 @@
  * x_window_init() and attached to the File->Quit menu item in
  * x_window_create_menu().  On execution, the function checks for
  * unsaved changes before calling gattrib_quit() to quit the program.
- *  
+ *
  *  \return value 0 to the shell to denote a successful quit.
  */
 gboolean gattrib_really_quit(void)
@@ -222,23 +142,18 @@ void gattrib_main(void *closure, int argc, char *argv[])
   /* Initialize gEDA stuff */
   libgeda_init();
 
-  /* Note that argv_index holds index to first non-flag command line option 
+  /* Note that argv_index holds index to first non-flag command line option
    * (that is, to the first file name) */
   argv_index = parse_commandline(argc, argv);
-  
+
   /* ----------  create log file right away ---------- */
   /* ----------  even if logging is enabled ---------- */
   s_log_init ("gattrib");
 
   s_log_message
-    ("gEDA/gattrib version %s%s.%s\n", PREPEND_VERSION_STRING, 
-     PACKAGE_DOTTED_VERSION, PACKAGE_DATE_VERSION);
-  s_log_message
-    ("gEDA/gattrib comes with ABSOLUTELY NO WARRANTY; see COPYING for more details.\n");
-  s_log_message
-    ("This is free software, and you are welcome to redistribute it under certain\n");
-  s_log_message
-    ("conditions; please see the COPYING file for more details.\n\n");
+    (_("gEDA/gattrib version %s%s.%s\ngEDA/gattrib comes with ABSOLUTELY NO WARRANTY; see COPYING for more details.\nThis is free software, and you are welcome to redistribute it under certain\nconditions; please see the COPYING file for more details.\n\n"),
+     PREPEND_VERSION_STRING, PACKAGE_DOTTED_VERSION,
+     PACKAGE_DATE_VERSION);
 
   /* ------  register guile (scheme) functions.  Necessary to parse RC file.  ------ */
   g_register_funcs();
@@ -253,8 +168,8 @@ void gattrib_main(void *closure, int argc, char *argv[])
 
   gtk_init(&argc, &argv);
 
-  x_window_init();  
-  
+  x_window_init();
+
   /* ---------- Initialize SHEET_DATA data structure ---------- */
   sheet_head = s_sheet_data_new();   /* sheet_head was declared in globals.h */
 
@@ -272,7 +187,7 @@ void gattrib_main(void *closure, int argc, char *argv[])
         if (filename != NULL) {
             file_list = g_slist_append(file_list, filename);
         } else {
-            fprintf(stderr, "Couldn't find file [%s]\n", argv[argv_index]);
+            fprintf(stderr, _("Couldn't find file [%s]\n"), argv[argv_index]);
             exit(1);
         }
         argv_index++;
@@ -284,7 +199,7 @@ void gattrib_main(void *closure, int argc, char *argv[])
      /* just exit the program */
      exit(1);
   }
-  
+
   g_slist_foreach(file_list, (GFunc)g_free, NULL);
   g_slist_free(file_list);
 
@@ -305,11 +220,15 @@ void gattrib_main(void *closure, int argc, char *argv[])
  */
 int main(int argc, char *argv[])
 {
-  /* disable the deprecated warnings in guile 1.6.3 */
-  /* Eventually the warnings will need to be fixed */
-  if(getenv("GUILE_WARN_DEPRECATED")==NULL)
-    putenv("GUILE_WARN_DEPRECATED=no");
-  
+
+#if ENABLE_NLS
+  setlocale(LC_ALL, "");
+  setlocale(LC_NUMERIC, "C");
+  bindtextdomain("geda-gattrib", LOCALEDIR);
+  textdomain("geda-gattrib");
+  bind_textdomain_codeset("geda-gattrib", "UTF-8");
+#endif
+
   /* Initialize the Guile Scheme interpreter. This function does not
    * return but calls exit(0) on completion.
    */

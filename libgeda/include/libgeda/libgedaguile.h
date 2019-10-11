@@ -1,6 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library - Scheme API
- * Copyright (C) 2010-2012 Peter Brett <peter@peter-b.co.uk>
+ * Copyright (C) 2010-2014 Peter Brett <peter@peter-b.co.uk>
+ * Copyright (C) 2010-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +17,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 USA
  */
+
+#include <libgeda/edascmvaluetypes.h>
+#include <libgeda/edascmhookproxy.h>
 
 /*!
  * \file libgedaguile.h
@@ -44,11 +48,17 @@ SCM edascm_from_page (PAGE *page);
 /* Create a Guile value from an object structure. */
 SCM edascm_from_object (OBJECT *object);
 
+/* Create a Guile value from a configuration context structure. */
+SCM edascm_from_config (EdaConfig *cfg);
+
 /* Retrieve a page structure from a Guile value. */
 PAGE *edascm_to_page (SCM smob);
 
 /* Retrieve an object structure from a Guile value. */
 OBJECT *edascm_to_object (SCM smob);
+
+/* Retrieve an configuration context structure from a Guile value. */
+EdaConfig *edascm_to_config (SCM smob);
 
 /* Test if smob is a gEDA page. */
 int edascm_is_page (SCM smob);
@@ -56,5 +66,11 @@ int edascm_is_page (SCM smob);
 /* Test if smob is a gEDA object. */
 int edascm_is_object (SCM smob);
 
+/* Test if smob is a gEDA configuration context. */
+int edascm_is_config (SCM smob);
+
 /* Set whether a gEDA object may be garbage collected. */
 void edascm_c_set_gc (SCM smob, int gc);
+
+/* Create a Scheme closure around a C function. */
+SCM edascm_c_make_closure (SCM (*func)(SCM, gpointer), gpointer user_data);

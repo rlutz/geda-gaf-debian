@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <config.h>
-#include <missing.h>
 
 #include <stdio.h>
 #include <math.h>
@@ -27,10 +26,6 @@
 #endif
 
 #include "libgeda_priv.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 COLOR print_colors[MAX_COLORS];
 
@@ -65,6 +60,8 @@ static COLOR default_colors[] = {
   BLACK,           /* 21: junction           */
   GRAY,            /* 22: mesh-grid-major    */
   NOCOLOR,         /* 23: mesh-grid-minor    */
+  BLACK,           /* 24: origin             */
+  BLACK,           /* 25: place-origin       */
   ENDMAP
 };
 
@@ -194,32 +191,6 @@ s_color_rgba_encode (guint8 r, guint8 g, guint8 b, guint8 a)
                            (gint) r, (gint) g, (gint) b);
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-gchar *s_color_ps_string(gint color)
-{
-  COLOR c;
-
-  if (color >= MAX_COLORS) {
-    g_warning (_("Color index out of range"));
-    return NULL;
-  }
-
-  c = print_colors[color];
-
-  if ((c.a == 0) || !c.enabled) {
-    return NULL;
-  } else {
-    return g_strdup_printf ("%.3f %.3f %.3f",
-                            (gdouble) c.r/255.0,
-                            (gdouble) c.g/255.0,
-                            (gdouble) c.b/255.0);
-  }
-}
-
 SCM
 s_color_map_to_scm (const COLOR *map)
 {
@@ -247,7 +218,7 @@ s_color_map_from_scm (COLOR *map, SCM lst, const char *scheme_proc_name)
   SCM curr = lst;
   SCM wrong_type_arg_sym = scm_from_utf8_symbol ("wrong-type-arg");
   SCM proc_name = scm_from_utf8_string (scheme_proc_name);
-  while (curr != SCM_EOL) {
+  while (!scm_is_null (curr)) {
     int i;
     char *rgba;
     SCM s;

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,85 +24,15 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 /*! \todo Finish function documentation!!!
  *  \brief
  *  \par Function Description
  *
  */
-void o_pin_draw(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
+void o_pin_start(GschemToplevel *w_current, int w_x, int w_y)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int x1, y1, x2, y2;
-  int size = 0;
+  i_action_start (w_current);
 
-  if (o_current->line == NULL) {
-    return;
-  }
-
-  /* reuse line's routine */
-  if (!o_line_visible (w_current, o_current->line, &x1, &y1, &x2, &y2)) {
-    return;
-  }
-
-  if (toplevel->pin_style == THICK)
-    size = o_current->line_width;
-
-  gschem_cairo_line (w_current, END_NONE, size, x1, y1, x2, y2);
-
-  gschem_cairo_set_source_color (w_current,
-                                 o_drawing_color (w_current, o_current));
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, size, -1, -1);
-
-  /* draw the cue directly */
-  o_cue_draw_lowlevel(w_current, o_current, o_current->whichend);
-
-#if DEBUG
-  printf("drawing pin\n");
-#endif
-
-  if (o_current->selected && w_current->draw_grips) {
-    o_line_draw_grips (w_current, o_current);
-  }
-}
-
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-void o_pin_draw_place (GSCHEM_TOPLEVEL *w_current, int dx, int dy, OBJECT *o_current)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int size = 0;
-
-  if (o_current->line == NULL) {
-    return;
-  }
-
-  if (toplevel->pin_style == THICK)
-    size = o_current->line_width;
-
-  gschem_cairo_line (w_current, END_NONE, size,
-                     o_current->line->x[0] + dx, o_current->line->y[0] + dy,
-                     o_current->line->x[1] + dx, o_current->line->y[1] + dy);
-
-  gschem_cairo_set_source_color (w_current,
-                                 x_color_lookup_dark (o_current->color));
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, size, -1, -1);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-void o_pin_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
-{
   w_current->first_wx = w_current->second_wx = w_x;
   w_current->first_wy = w_current->second_wy = w_y;
 }
@@ -112,41 +42,37 @@ void o_pin_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
  *  \par Function Description
  *
  */
-void o_pin_end(GSCHEM_TOPLEVEL *w_current, int x, int y)
+void o_pin_end(GschemToplevel *w_current, int x, int y)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   OBJECT *new_obj;
-  int color;
 
   g_assert( w_current->inside_action != 0 );
 
-  if (toplevel->override_pin_color == -1) {
-    color = PIN_COLOR;
-  } else {
-    color = toplevel->override_pin_color;
-  }
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
+
+  PAGE *page = gschem_page_view_get_page (page_view);
+  g_return_if_fail (page != NULL);
+
+  TOPLEVEL *toplevel = page->toplevel;
+  g_return_if_fail (toplevel != NULL);
 
   /* undraw rubber line */
   /* o_pin_invalidate_rubber (w_current); */
   w_current->rubber_visible = 0;
 
-  /* don't allow zero length pins */
-  if ((w_current->first_wx == w_current->second_wx) &&
-      (w_current->first_wy == w_current->second_wy)) {
-    return;
-  }
-
-  new_obj = o_pin_new(toplevel, OBJ_PIN, color,
+  new_obj = o_pin_new(toplevel, PIN_COLOR,
                       w_current->first_wx, w_current->first_wy,
                       w_current->second_wx, w_current->second_wy,
                       PIN_TYPE_NET, 0);
-  s_page_append (toplevel, toplevel->page_current, new_obj);
+  s_page_append (toplevel, page, new_obj);
 
   /* Call add-objects-hook */
   g_run_hook_object (w_current, "%add-objects-hook", new_obj);
 
-  toplevel->page_current->CHANGED=1;
-  o_undo_savestate(w_current, UNDO_ALL);
+  gschem_toplevel_page_content_changed (w_current, page);
+  o_undo_savestate (w_current, page, UNDO_ALL, _("Add Pin"));
+  i_action_stop (w_current);
 }
 
 /*! \todo Finish function documentation!!!
@@ -154,7 +80,7 @@ void o_pin_end(GSCHEM_TOPLEVEL *w_current, int x, int y)
  *  \par Function Description
  *
  */
-void o_pin_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void o_pin_motion (GschemToplevel *w_current, int w_x, int w_y)
 {
   g_assert( w_current->inside_action != 0 );
 
@@ -181,27 +107,17 @@ void o_pin_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
  *  \brief
  *  \par Function Description
  */
-void o_pin_invalidate_rubber (GSCHEM_TOPLEVEL *w_current)
+void o_pin_invalidate_rubber (GschemToplevel *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
-  int x1, y1, x2, y2;
-  int min_x, min_y, max_x, max_y;
-  int bloat = 0;
+  g_return_if_fail (w_current != NULL);
 
-  WORLDtoSCREEN (w_current, w_current->first_wx, w_current->first_wy, &x1, &y1);
-  WORLDtoSCREEN (w_current, w_current->second_wx, w_current->second_wy, &x2, &y2);
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
 
-  /* Pins are always first created as net pins, use net pin width */
-  if (toplevel->net_style == THICK ) {
-    bloat = SCREENabs (w_current, PIN_WIDTH_NET) / 2;
-  }
-
-  min_x = min (x1, x2) - bloat;
-  max_x = max (x1, x2) + bloat;
-  min_y = min (y1, y2) - bloat;
-  max_y = max (y1, y2) + bloat;
-
-  o_invalidate_rect (w_current, min_x, min_y, max_x, max_y);
+  gschem_page_view_invalidate_world_rect (page_view,
+                                          w_current->first_wx,
+                                          w_current->first_wy,
+                                          w_current->second_wx,
+                                          w_current->second_wy);
 }
 
 
@@ -210,19 +126,17 @@ void o_pin_invalidate_rubber (GSCHEM_TOPLEVEL *w_current)
  *  \par Function Description
  *
  */
-void o_pin_draw_rubber (GSCHEM_TOPLEVEL *w_current)
+void o_pin_draw_rubber (GschemToplevel *w_current, EdaRenderer *renderer)
 {
-  int size = 0;
+  double wwidth = PIN_WIDTH_NET;
+  cairo_t *cr = eda_renderer_get_cairo_context (renderer);
+  GArray *color_map = eda_renderer_get_color_map (renderer);
+  int flags = eda_renderer_get_cairo_flags (renderer);
 
-  /* Pins are always first created as net pins, use net pin width */
-  if (w_current->toplevel->net_style == THICK)
-    size = PIN_WIDTH_NET;
+  eda_cairo_line (cr, flags, END_NONE, wwidth,
+                  w_current->first_wx, w_current->first_wy,
+                  w_current->second_wx, w_current->second_wy);
 
-  gschem_cairo_line (w_current, END_NONE, size,
-                     w_current->first_wx,  w_current->first_wy,
-                     w_current->second_wx, w_current->second_wy);
-
-  gschem_cairo_set_source_color (w_current,
-                                 x_color_lookup_dark (SELECT_COLOR));
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, size, -1, -1);
+  eda_cairo_set_source_color (cr, SELECT_COLOR, color_map);
+  eda_cairo_stroke (cr, flags, TYPE_SOLID, END_NONE, wwidth, -1, -1);
 }

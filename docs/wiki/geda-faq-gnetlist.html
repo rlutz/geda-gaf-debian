@@ -2,7 +2,6 @@
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-  <title></title>
   <link rel="stylesheet" media="screen" type="text/css" href="./style.css" />
   <link rel="stylesheet" media="screen" type="text/css" href="./design.css" />
   <link rel="stylesheet" media="print" type="text/css" href="./print.css" />
@@ -11,22 +10,25 @@
 </head>
 <body>
 
+<p>
+<em>Translations of this page are also available in the following languages:</em> <a href="geda-faq-gnetlist.fr.html" class="wikilink1" title="geda-faq-gnetlist.fr.html">Français</a>, <a href="geda-faq-gnetlist.ru.html" class="wikilink1" title="geda-faq-gnetlist.ru.html">Русский</a>.
+</p>
 
-<h1 class="sectionedit1063"><a name="gnetlist" id="gnetlist">Gnetlist</a></h1>
+<h1 id="gnetlist">Gnetlist</h1>
 <div class="level1">
 
 </div>
-<!-- EDIT1063 SECTION "Gnetlist" [1-28] -->
-<h1 class="sectionedit1064"><a name="bill_of_materials_bom_generation" id="bill_of_materials_bom_generation">Bill of Materials (BOM) Generation</a></h1>
+
+<h1 id="billofmaterialsbomgeneration">Bill of Materials (BOM) Generation</h1>
 <div class="level1">
 
 <p>
-There are five different backends for <a href="http://geda.seul.org/tools/gnetlist/index.html" class="urlextern" title="http://geda.seul.org/tools/gnetlist/index.html"  rel="nofollow">gnetlist</a> which enable you to export a BOM. Call them with -g and be sure to give the output file name with the -o option:
+There are five different backends for gnetlist which enable you to export a BOM. Call them with -g and be sure to give the output file name with the -o option:
 </p>
-<pre class="code">   gnetlist -g partslist3 -o output.bom schematic.sch </pre>
+<pre class="code">   gnetlist -g partslist3 -o output.bom schematic.sch</pre>
 
 <p>
-gnetlist descends into sub sheets and list the contents of these schematics along with the parts from the top document. 
+gnetlist descends into sub sheets and list the contents of these schematics along with the parts from the top document.
 </p>
 
 <p>
@@ -42,34 +44,34 @@ Each of the backends lists and sorts the parts in different ways in an ascii fil
 
 </div>
 
-<h4><a name="bom" id="bom">bom</a></h4>
+<h4 id="bom">bom</h4>
 <div class="level4">
 
 <p>
-The bom backend needs to read an attribs file (see above). The list produced by ”-g bom” will contain as many lines as there are components. Columns are seperated by tab characters. Lines are not sorted.
+The bom backend needs to read an attribs file (see above). The list produced by &quot;-g bom&quot; will contain as many lines as there are components. Columns are seperated by tab characters. Lines are not sorted.
 </p>
 
 </div>
 
-<h4><a name="bom2" id="bom2">bom2</a></h4>
+<h4 id="bom2">bom2</h4>
 <div class="level4">
 
 <p>
-The bom2 backend also needs to read an attribs file. With ”-g bom2” the refdeses of all components with the same value will be collected into a single line. Columns are seperated by colons. Different items in the same column are seperated by a komma character.
+The bom2 backend also needs to read an attribs file. With &quot;-g bom2&quot; the refdeses of all components with the same value will be collected into a single line. Columns are seperated by colons. Different items in the same column are seperated by a komma character.
 </p>
 
 </div>
 
-<h4><a name="partslist1" id="partslist1">partslist1</a></h4>
+<h4 id="partslist1">partslist1</h4>
 <div class="level4">
 
 <p>
-A list produced by the partlist1 backend gives a line for each and every component. Lines are sorted alphabetically by refdes. Columns are “refdes”, “device”, “value”, “footprint” and “quantity”. Since every line contains just one part, the quantity is always “1”.
+A list produced by the partlist1 backend gives a line for each and every component. Lines are sorted alphabetically by refdes. Columns are &quot;refdes&quot;, &quot;device&quot;, &quot;value&quot;, &quot;footprint&quot; and &quot;quantity&quot;. Since every line contains just one part, the quantity is always &quot;1&quot;.
 </p>
 
 </div>
 
-<h4><a name="partslist2" id="partslist2">partslist2</a></h4>
+<h4 id="partslist2">partslist2</h4>
 <div class="level4">
 
 <p>
@@ -78,7 +80,7 @@ This backend produces output similar to partslist1. Lines are sorted by the valu
 
 </div>
 
-<h4><a name="partslist3" id="partslist3">partslist3</a></h4>
+<h4 id="partslist3">partslist3</h4>
 <div class="level4">
 
 <p>
@@ -86,13 +88,13 @@ The backend partslist3 assembles all parts with the same value in a single line,
 </p>
 
 </div>
-<!-- EDIT1064 SECTION "Bill of Materials (BOM) Generation" [29-2012] -->
-<h1 class="sectionedit1065"><a name="design_rule_check_drc" id="design_rule_check_drc">Design Rule Check (DRC)</a></h1>
+
+<h1 id="designrulecheckdrc">Design Rule Check (DRC)</h1>
 <div class="level1">
 
 </div>
-<!-- EDIT1065 SECTION "Design Rule Check (DRC)" [2013-2050] -->
-<h2 class="sectionedit1066"><a name="how_do_i_check_my_schematics" id="how_do_i_check_my_schematics">How do I check my schematics?</a></h2>
+
+<h2 id="howdoicheckmyschematics">How do I check my schematics?</h2>
 <div class="level2">
 
 <p>
@@ -109,8 +111,8 @@ With this command, the DRC output is written into the file “MyDesign.drc”. Y
 </p>
 
 </div>
-<!-- EDIT1066 SECTION "How do I check my schematics?" [2051-2555] -->
-<h2 class="sectionedit1067"><a name="how_do_i_see_the_drc_output_in_the_screen_without_writing_to_a_file" id="how_do_i_see_the_drc_output_in_the_screen_without_writing_to_a_file">How do I see the DRC output in the screen, without writing to a file?</a></h2>
+
+<h2 id="howdoiseethedrcoutputinthescreenwithoutwritingtoafile">How do I see the DRC output in the screen, without writing to a file?</h2>
 <div class="level2">
 
 <p>
@@ -123,8 +125,8 @@ This way, you will see the DRC output directly in your screen.
 </p>
 
 </div>
-<!-- EDIT1067 SECTION "How do I see the DRC output in the screen, without writing to a file?" [2556-2799] -->
-<h2 class="sectionedit1068"><a name="i_want_to_disable_some_of_the_schematic_drc_checks_how_can_i_do_it" id="i_want_to_disable_some_of_the_schematic_drc_checks_how_can_i_do_it">I want to disable some of the schematic DRC checks. How can I do it?</a></h2>
+
+<h2 id="iwanttodisablesomeoftheschematicdrccheckshowcanidoit">I want to disable some of the schematic DRC checks. How can I do it?</h2>
 <div class="level2">
 
 <p>
@@ -177,8 +179,8 @@ With this command, the DRC output is written into the file “MyDesign.drc”. Y
 </p>
 
 </div>
-<!-- EDIT1068 SECTION "I want to disable some of the schematic DRC checks. How can I do it?" [2800-4628] -->
-<h2 class="sectionedit1069"><a name="can_i_include_the_drc_checking_into_a_makefile_and_stop_when_errors_or_warnings_are_found" id="can_i_include_the_drc_checking_into_a_makefile_and_stop_when_errors_or_warnings_are_found">Can I include the DRC checking into a Makefile and stop when errors or warnings are found?</a></h2>
+
+<h2 id="caniincludethedrccheckingintoamakefileandstopwhenerrorsorwarningsarefound">Can I include the DRC checking into a Makefile and stop when errors or warnings are found?</h2>
 <div class="level2">
 
 <p>
@@ -199,8 +201,8 @@ If not, please use the above example and adapt it to your own workflow.
 </p>
 
 </div>
-<!-- EDIT1069 SECTION "Can I include the DRC checking into a Makefile and stop when errors or warnings are found?" [4629-5306] -->
-<h2 class="sectionedit1070"><a name="there_are_some_warnings_in_my_design_i_m_aware_of_can_i_ignore_the_warnings_in_the_return_value" id="there_are_some_warnings_in_my_design_i_m_aware_of_can_i_ignore_the_warnings_in_the_return_value">There are some warnings in my design I&#039;m aware of. Can I ignore the warnings in the return value?</a></h2>
+
+<h2 id="therearesomewarningsinmydesignimawareofcaniignorethewarningsinthereturnvalue">There are some warnings in my design I&#039;m aware of. Can I ignore the warnings in the return value?</h2>
 <div class="level2">
 
 <p>
@@ -213,13 +215,13 @@ Do this with caution! You will be missing all the warnings!
 </p>
 
 </div>
-<!-- EDIT1070 SECTION "There are some warnings in my design I'm aware of. Can I ignore the warnings in the return value?" [5307-5617] -->
-<h1 class="sectionedit1071"><a name="gnetlist_build_run-time_problems" id="gnetlist_build_run-time_problems">Gnetlist build/run-time problems</a></h1>
+
+<h1 id="gnetlistbuildrun-timeproblems">Gnetlist build/run-time problems</h1>
 <div class="level1">
 
 </div>
-<!-- EDIT1071 SECTION "Gnetlist build/run-time problems" [5618-5665] -->
-<h2 class="sectionedit1072"><a name="i_get_a_parenthesis_mismatch_error_when_running_gnetlist_what_s_up" id="i_get_a_parenthesis_mismatch_error_when_running_gnetlist_what_s_up">I get a &quot;parenthesis mismatch&quot; error when running gnetlist.  What&#039;s up?</a></h2>
+
+<h2 id="igetaparenthesismismatcherrorwhenrunninggnetlistwhatsup">I get a &quot;parenthesis mismatch&quot; error when running gnetlist.  What&#039;s up?</h2>
 <div class="level2">
 
 <p>
@@ -250,8 +252,8 @@ This is a bug in guile-1.8.X.  The gEDA developers are working on a fix.  Meanwh
 </p>
 
 </div>
-<!-- EDIT1072 SECTION "I get a parenthesis mismatch error when running gnetlist.  What's up?" [5666-6932] -->
-<h2 class="sectionedit1073"><a name="the_gnetlist_bom_backend_does_not_work_what_is_wrong" id="the_gnetlist_bom_backend_does_not_work_what_is_wrong">The gnetlist bom backend does not work. What is wrong?</a></h2>
+
+<h2 id="thegnetlistbombackenddoesnotworkwhatiswrong">The gnetlist bom backend does not work. What is wrong?</h2>
 <div class="level2">
 
 <p>
@@ -273,12 +275,12 @@ then you need to create a file called “attribs” in the current directory whi
 value</pre>
 
 <p>
-For information about BOM generation see <a href="#bill_of_materials_bom_generation" title=":geda:faq-gnetlist.txt &crarr;" class="wikilink1">above</a>.
+For information about BOM generation see <a href="#billofmaterialsbomgeneration" title=":geda:faq-gnetlist.txt ↵" class="wikilink1">above</a>.
 </p>
 
 </div>
-<!-- EDIT1073 SECTION "The gnetlist bom backend does not work. What is wrong?" [6933-7541] -->
-<h2 class="sectionedit1074"><a name="some_gnetlist_backends_overflow_the_stack_how_do_i_solve_this" id="some_gnetlist_backends_overflow_the_stack_how_do_i_solve_this">Some gnetlist backends overflow the stack. How do I solve this?</a></h2>
+
+<h2 id="somegnetlistbackendsoverflowthestackhowdoisolvethis">Some gnetlist backends overflow the stack. How do I solve this?</h2>
 <div class="level2">
 
 <p>
@@ -297,8 +299,8 @@ If this does not work, then edit the appropriate backend (usually named: gnet-ba
 </p>
 
 </div>
-<!-- EDIT1074 SECTION "Some gnetlist backends overflow the stack. How do I solve this?" [7542-8337] -->
-<h2 class="sectionedit1075"><a name="gnetlist_has_created_a_netlist_with_duplicate_pins" id="gnetlist_has_created_a_netlist_with_duplicate_pins">gnetlist has created a netlist with duplicate pins!?</a></h2>
+
+<h2 id="gnetlisthascreatedanetlistwithduplicatepins">gnetlist has created a netlist with duplicate pins!?</h2>
 <div class="level2">
 
 <p>
@@ -312,7 +314,7 @@ What has happened is gnetlist (really libgeda) created two nets instead of one. 
 </p>
 
 <p>
-<a href="media/geda/ambiguous1.png" class="media" target="_blank" title="geda:ambiguous1.png"><img src="media/geda/ambiguous1.png" class="media" alt="" /></a>
+<a href="media/geda/ambiguous1.png" class="media" target="_blank" title="geda:ambiguous1.png">geda:ambiguous1.png</a>
 </p>
 
 <p>
@@ -320,9 +322,9 @@ The developers are debating whether or not this is a bug in gnetlist, but for no
 </p>
 
 <p>
-<a href="media/geda/ambiguous1_fixed.png" class="media" target="_blank" title="geda:ambiguous1_fixed.png"><img src="media/geda/ambiguous1_fixed.png" class="media" alt="" /></a>
+<a href="media/geda/ambiguous1_fixed.png" class="media" target="_blank" title="geda:ambiguous1_fixed.png">geda:ambiguous1_fixed.png</a>
 </p>
 
 </div>
-<!-- EDIT1075 SECTION "gnetlist has created a netlist with duplicate pins!?" [8338-] --></body>
+</body>
 </html>

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
  */
 #include <config.h>
 #include <version.h>
-#include <missing.h>
 
 #include <stdio.h>
 #ifdef HAVE_STRING_H
@@ -32,10 +31,6 @@
 #include <glib.h>
 
 #include "gschem.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
@@ -93,15 +88,14 @@ void gschem_quit(void)
   }
   g_list_free(exit_functions);
 
+  x_controlfd_free ();
+
   s_clib_free();
   s_slib_free();
-  s_menu_free();
   /* o_text_freeallfonts();*/
   s_attrib_free();
-  s_papersizes_free();
-#ifdef HAVE_LIBSTROKE
+  x_fam_free ();
   x_stroke_free ();
-#endif /* HAVE_LIBSTROKE */
   o_undo_cleanup();
   /* s_stroke_free(); no longer needed */
 
@@ -115,9 +109,128 @@ void gschem_quit(void)
   /* enable this to get more memory usage from glib */
   /* You also have to enable something in glib I think */
   /* g_mem_profile();*/
-	 
+
 
   gtk_main_quit();
+}
+
+/*! \brief Show warning dialog if certain configuration options are set.
+ *
+ * Some gnetlist configuration options, but not all, have been moved
+ * from gnetlistrc to geda.conf in 1.9.1.  This is not compatible with
+ * the way gnetlist configuration currently works, so the options have
+ * been moved back to gnetlistrc.
+ *
+ * Chances are users which have used gEDA/gaf 1.9.1 or 1.9.2 changed
+ * their gnetlist configuration to geda.conf, so their options are now
+ * ignored.  Unfortunately, I don't see a way to resolve this silently
+ * (short of adding geda.conf support to gnetlist just for these four
+ * options).  Silently producing a broken netlist is a bad thing, so
+ * warn about this issue on gschem startup.
+ */
+static void
+warn_if_using_invalid_config ()
+{
+  EdaConfig *cfg = eda_config_get_context_for_file (NULL);
+  EdaConfig *cfg_hierarchy_traversal =
+    eda_config_get_source (cfg, "gnetlist", "traverse-hierarchy", NULL);
+  EdaConfig *cfg_net_naming_priority =
+    eda_config_get_source (cfg, "gnetlist", "net-naming-priority", NULL);
+  EdaConfig *cfg_unnamed_netname =
+    eda_config_get_source (cfg, "gnetlist", "default-net-name", NULL);
+  EdaConfig *cfg_unnamed_busname =
+    eda_config_get_source (cfg, "gnetlist", "default-bus-name", NULL);
+
+  if (cfg_hierarchy_traversal == NULL && cfg_net_naming_priority == NULL &&
+      cfg_unnamed_netname == NULL && cfg_unnamed_busname == NULL)
+    return;
+
+  GtkWidget *dialog;
+  gchar *hierarchy_traversal_before = "", *hierarchy_traversal_after = "";
+  gchar *net_naming_priority_before = "", *net_naming_priority_after = "";
+  gchar *unnamed_netname_before = "", *unnamed_netname_after = "";
+  gchar *unnamed_busname_before = "", *unnamed_busname_after = "";
+
+  if (cfg_hierarchy_traversal != NULL) {
+    hierarchy_traversal_before = g_strdup_printf (
+      "  traverse-hierarchy (in %s)\n",
+      eda_config_get_filename (cfg_hierarchy_traversal));
+    hierarchy_traversal_after = g_strdup_printf (
+      "  (hierarchy-traversal \"%s\")\n",
+      eda_config_get_boolean (cfg, "gnetlist", "traverse-hierarchy", NULL)
+        ? "enabled" : "disabled");
+  }
+
+  if (cfg_net_naming_priority != NULL) {
+    gchar *str;
+    net_naming_priority_before = g_strdup_printf (
+      "  net-naming-priority (in %s)\n",
+      eda_config_get_filename (cfg_net_naming_priority));
+    str = eda_config_get_string (cfg, "gnetlist", "net-naming-priority", NULL);
+    net_naming_priority_after = g_strdup_printf (
+      "  (net-naming-priority \"%s\")\n",
+      strcmp (str, "netname-attribute") == 0 ? "netname" : "netattrib");
+    g_free (str);
+  }
+
+  if (cfg_unnamed_netname != NULL) {
+    gchar *str;
+    unnamed_netname_before = g_strdup_printf (
+      "  default-net-name (in %s)\n",
+      eda_config_get_filename (cfg_unnamed_netname));
+    str = eda_config_get_string (cfg, "gnetlist", "default-net-name", NULL);
+    unnamed_netname_after = g_strdup_printf (
+      "  (unnamed-netname \"%s\")\n", str);
+    g_free (str);
+  }
+
+  if (cfg_unnamed_busname != NULL) {
+    gchar *str;
+    unnamed_busname_before = g_strdup_printf (
+      "  default-bus-name (in %s)\n",
+      eda_config_get_filename (cfg_unnamed_busname));
+    str = eda_config_get_string (cfg, "gnetlist", "default-bus-name", NULL);
+    unnamed_busname_after = g_strdup_printf (
+      "  (unnamed-busname \"%s\")\n", str);
+    g_free (str);
+  }
+
+  dialog = gtk_message_dialog_new (
+    NULL,
+    GTK_DIALOG_MODAL,
+    GTK_MESSAGE_WARNING,
+    GTK_BUTTONS_OK,
+    _("The following options are present in your configuration:\n\n%s%s%s%s\n"
+      "These options were introduced in gEDA/gaf 1.9.1 as a replacement for "
+      "the corresponding gnetlistrc options but were removed again in "
+      "gEDA/gaf 1.10.0. The current version of gnetlist uses gnetlistrc "
+      "options instead:\n\n%s%s%s%s\n"
+      "Please make sure to update your configuration as the options currently "
+      "set won't have the desired effect."),
+    hierarchy_traversal_before, net_naming_priority_before,
+    unnamed_netname_before, unnamed_busname_before,
+    hierarchy_traversal_after, net_naming_priority_after,
+    unnamed_netname_after, unnamed_busname_after);
+
+  if (cfg_hierarchy_traversal != NULL) {
+    g_free (hierarchy_traversal_before);
+    g_free (hierarchy_traversal_after);
+  }
+  if (cfg_net_naming_priority != NULL) {
+    g_free (net_naming_priority_before);
+    g_free (net_naming_priority_after);
+  }
+  if (cfg_unnamed_netname != NULL) {
+    g_free (unnamed_netname_before);
+    g_free (unnamed_netname_after);
+  }
+  if (cfg_unnamed_busname != NULL) {
+    g_free (unnamed_busname_before);
+    g_free (unnamed_busname_after);
+  }
+
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
 }
 
 /*! \brief Main Scheme(GUILE) program function.
@@ -130,10 +243,11 @@ void main_prog(void *closure, int argc, char *argv[])
 {
   int i;
   char *cwd = NULL;
-  GSCHEM_TOPLEVEL *w_current = NULL;
+  GschemToplevel *w_current = NULL;
+  TOPLEVEL *toplevel = NULL;
   char *input_str = NULL;
   int argv_index;
-  int first_page = 1;
+  GSList *filenames;
   char *filename;
   SCM scm_tmp;
 
@@ -146,26 +260,15 @@ void main_prog(void *closure, int argc, char *argv[])
 #endif
 
 #if ENABLE_NLS
-  /* this should be equivalent to setlocale (LC_ALL, "") */
-  gtk_set_locale();
-
   /* This must be the same for all locales */
   setlocale(LC_NUMERIC, "C");
-
-  /* Disable gtk's ability to set the locale. */ 
-  /* If gtk is allowed to set the locale, then it will override the     */
-  /* setlocale for LC_NUMERIC (which is important for proper PS output. */
-  /* This may look funny here, given we make a call to gtk_set_locale() */
-  /* above.  I don't know yet, if this is really the right thing to do. */
-  gtk_disable_setlocale(); 
-
 #endif
 
   gtk_init(&argc, &argv);
 
   argv_index = parse_commandline(argc, argv);
   cwd = g_get_current_dir();
-  
+
   libgeda_init();
 
   /* create log file right away even if logging is enabled */
@@ -177,13 +280,12 @@ void main_prog(void *closure, int argc, char *argv[])
   s_log_message(
                 _("gEDA/gschem comes with ABSOLUTELY NO WARRANTY; see COPYING for more details.\n"));
   s_log_message(
-                _("This is free software, and you are welcome to redistribute it under certain\n"));
-  s_log_message(
-                _("conditions; please see the COPYING file for more details.\n\n")); 
+                _("This is free software, and you are welcome to redistribute it under certain\n"
+                  "conditions; please see the COPYING file for more details.\n\n"));
 
 #if defined(__MINGW32__) && defined(DEBUG)
   fprintf(stderr, _("This is the MINGW32 port.\n"));
-#endif  
+#endif
 
 #if DEBUG
   fprintf(stderr, _("Current locale settings: %s\n"), setlocale(LC_ALL, NULL));
@@ -199,15 +301,16 @@ void main_prog(void *closure, int argc, char *argv[])
   g_init_hook ();
   g_init_attrib ();
   g_init_keys ();
+  gschem_action_init ();
   g_init_util ();
 
   /* initialise color map (need to do this before reading rc files */
   x_color_init ();
 
-  o_undo_init(); 
+  o_undo_init();
 
   if (s_path_sys_data () == NULL) {
-    const gchar *message = 
+    const gchar *message =
       _("You must set the GEDADATA environment variable!\n\n"
         "gschem cannot locate its data files. You must set the GEDADATA\n"
         "environment variable to point to the correct location.\n");
@@ -219,24 +322,7 @@ void main_prog(void *closure, int argc, char *argv[])
     g_error ("%s", message);
   }
 
-  /* Allocate w_current */
-  w_current = gschem_toplevel_new ();
-
-  gschem_toplevel_alloc_libgeda_toplevel (w_current);
-
-  w_current->toplevel->load_newer_backup_func = x_fileselect_load_backup;
-  w_current->toplevel->load_newer_backup_data = w_current;
-
-  o_text_set_rendered_bounds_func (w_current->toplevel,
-                                   o_text_get_rendered_bounds, w_current);
-
-  /* Damage notifications should invalidate the object on screen */
-  o_add_change_notify (w_current->toplevel,
-                       (ChangeNotifyFunc) o_invalidate,
-                       (ChangeNotifyFunc) o_invalidate, w_current);
-
   scm_dynwind_begin (0);
-  g_dynwind_window (w_current);
 
   /* Run pre-load Scheme expressions */
   g_scm_eval_protected (s_pre_load_expr, scm_current_module ());
@@ -245,10 +331,41 @@ void main_prog(void *closure, int argc, char *argv[])
    * we can take advantage of that.  */
   scm_tmp = scm_sys_search_load_path (scm_from_utf8_string ("gschem.scm"));
   if (scm_is_false (scm_tmp)) {
-    s_log_message (_("Couldn't find init scm file [%s]\n"), "gschem.scm");
+    GtkWidget *dialog;
+    GString *string;
+    gchar *msg;
+    dialog = gtk_message_dialog_new (
+      NULL,
+      GTK_DIALOG_MODAL,
+      GTK_MESSAGE_ERROR,
+      GTK_BUTTONS_CLOSE,
+      _("Can't find Scheme initialization file \"%s\"."),
+      "gschem.scm");
+    string = g_string_new (NULL);
+    g_string_printf (
+      string,
+      _("It appears the gschem data files are missing, or they are not where "
+        "the gschem binary expects them to be.\n\n"
+        "Are you sure you installed gschem?\n\n"
+        "The following directories have been searched for \"%s\":"),
+      "gschem.scm");
+    for (SCM l = scm_variable_ref (scm_c_lookup ("%load-path"));
+         scm_is_pair (l); l = scm_cdr (l)) {
+      char *path = scm_to_utf8_string (scm_car (l));
+      g_string_append_printf (string, "\n\t%s", path);
+      free (path);
+    }
+    msg = g_string_free (string, FALSE);
+    g_object_set (dialog, "secondary-text", msg, NULL);
+    g_free (msg);
+    gtk_window_set_title (GTK_WINDOW (dialog), _("gschem"));
+    gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
+    exit (1);
   }
   input_str = scm_to_utf8_string (scm_tmp);
-  if (g_read_file(w_current->toplevel, input_str, NULL)) {
+  toplevel = s_toplevel_new ();
+  if (g_read_file(toplevel, input_str, NULL)) {
     s_log_message(_("Read init scm file [%s]\n"), input_str);
   } else {
     /*! \todo These two messages are the same. Should be
@@ -259,20 +376,30 @@ void main_prog(void *closure, int argc, char *argv[])
   free (input_str); /* M'allocated by scm_to_utf8_string() */
   scm_remember_upto_here_1 (scm_tmp);
 
+  /* Set up default configuration */
+  i_vars_init_gschem_defaults ();
+  gschem_atexit (i_vars_atexit_save_user_config, NULL);
+
   /* Now read in RC files. */
   g_rc_parse_gtkrc();
-  x_rc_parse_gschem (w_current, rc_filename);
+  x_rc_parse_gschem (toplevel, NULL);
 
-  /* Set default icon */
+  /* Set default icon theme and make sure we can find our own icons */
   x_window_set_default_icon();
+  x_window_init_icons ();
 
   /* At end, complete set up of window. */
   x_color_allocate();
-  x_window_setup (w_current);
 
-#ifdef HAVE_LIBSTROKE
+  /* Allocate w_current */
+  w_current = x_window_new (toplevel);
+
+  g_dynwind_window (w_current);
+
   x_stroke_init ();
-#endif /* HAVE_LIBSTROKE */
+  x_fam_init ();
+
+  filenames = NULL;
 
   for (i = argv_index; i < argc; i++) {
 
@@ -284,28 +411,24 @@ void main_prog(void *closure, int argc, char *argv[])
       filename = g_build_filename (cwd, argv[i], NULL);
     }
 
-    if ( first_page )
-      first_page = 0;
-
+    filenames = g_slist_prepend (filenames, filename);
     /*
      * SDB notes:  at this point the filename might be unnormalized, like
-     * /path/to/foo/../bar/baz.sch.  Bad filenames will be normalized in
-     * f_open (called by x_window_open_page). This works for Linux and MINGW32.
+     *             /path/to/foo/../bar/baz.sch.  Bad filenames will be
+     *             normalized in f_open (called by x_highlevel_open_pages).
+     *             This works for Linux and MINGW32.
      */
-    x_window_open_page(w_current, filename);
-    g_free (filename);
   }
+
+  filenames = g_slist_reverse (filenames);
+  x_highlevel_open_pages (w_current, filenames, FALSE);
+  g_slist_free_full (filenames, g_free);
 
   g_free(cwd);
 
-  /* If no page has been loaded (wasn't specified in the command line.) */
-  /* Then create an untitled page */
-  if ( first_page ) {
-    x_window_open_page( w_current, NULL );
-  }
-
-  /* Update the window to show the current page */
-  x_window_set_current_page( w_current, w_current->toplevel->page_current );
+  /* Create an empty page if necessary */
+  if (w_current->toplevel->page_current == NULL)
+    x_highlevel_new_page (w_current, NULL);
 
 
 #if DEBUG
@@ -313,18 +436,17 @@ void main_prog(void *closure, int argc, char *argv[])
 #endif
 
   /* Run post-load expressions */
-  g_scm_eval_protected (s_post_load_expr, scm_current_module ());
-
-  /* open up log window on startup */
-  if (w_current->log_window == MAP_ON_STARTUP) {
-    x_log_open ();
+  if (scm_is_false (g_scm_eval_protected (s_post_load_expr, scm_current_module ()))) {
+    fprintf (stderr, _("ERROR: Failed to load or evaluate startup script.\n\n"
+                       "The gschem log may contain more information.\n"));
+    exit (1);
   }
 
-  /* if there were any symbols which had major changes, put up an error */
-  /* dialog box */
-  major_changed_dialog(w_current);
-
   scm_dynwind_end ();
+
+  x_controlfd_init ();
+
+  warn_if_using_invalid_config ();
 
   /* enter main loop */
   gtk_main();
@@ -347,12 +469,7 @@ int main (int argc, char *argv[])
   bind_textdomain_codeset("geda-gschem", "UTF-8");
 #endif
 
-  /* disable the deprecated warnings in guile 1.6.3 */
-  /* Eventually the warnings will need to be fixed */
-  if(getenv("GUILE_WARN_DEPRECATED") == NULL)
-    putenv("GUILE_WARN_DEPRECATED=no");
-
   scm_boot_guile (argc, argv, main_prog, 0);
-  
+
   return 0;
 }

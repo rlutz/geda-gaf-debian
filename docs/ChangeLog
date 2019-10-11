@@ -1,5 +1,300 @@
+commit 705872d767c5f288bdde16247634ebac6e67d9a5
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Oct 8 19:44:30 2019 +0200
+
+    Update wiki pages
+
+commit 854705c958dbdff304796ebce8dc81298148eb95
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Oct 2 21:11:51 2019 +0200
+
+    Add gnetlist(1) manpage
+
+commit d6f2e3dcd073f78c938aec7549567bc31cc61893
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Aug 13 15:40:40 2019 +0200
+
+    gschem: Have page-filename return #f for untitled pages
+
+commit 99e2bbd21a6450f49312d133a00c926429767655
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Apr 30 15:14:06 2019 +0200
+
+    gschem: Update Scheme API reference
+
+commit d040b34d3a90bba8016b57b2d269ab1a9962c362
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Tue Feb 2 23:08:21 2016 +0000
+
+    scheme-api: Add %log! function.
+    
+    This new function allows Scheme code to send log messages through the
+    same GLib message logging API used by the parts of gschem that are
+    implemented in C.
+
+commit 57afc7921a9aba3810d56d1760d8e1cd9dbc034b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Jan 23 21:09:11 2016 +0000
+
+    build: Generate an empty ChangeLog when git history unavailable
+    
+    When no git history is available -- for example, when the git
+    repository was cloned using the `--depth` option to limit the amount
+    of git history downloaded -- the changelog-generation rule can fail
+    because the changelog's base git commit (i.e. the 1.0 release tag)
+    isn't available in the repository.
+    
+    This patch makes generation of `ChangeLog` succeed in that situation,
+    by creating an empty log and printing a warning to stderr.  It allows
+    `make dist` and `make distcheck` to pass on shallow clones.
+
+commit 2f3a6621ebace105218f59a5d617a454651d4f26
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Jul 22 15:46:49 2016 +0300
+
+    docs: Fixed description of picture-info.
+
+commit 16d3f432e8fa4a7d2c34b80610ae5477db41943a
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Jul 22 13:03:35 2016 +0300
+
+    docs: Fix a typo.
+
+commit 2cfa186bde319325eacf03c496b80df9dcc097e7
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Oct 12 11:49:47 2015 +0300
+
+    libgeda: Replaced separator* procedures with stock guile variants.
+
+commit 63ffbfe8e52a4422733e346e5f543c5b7f8d2d8f
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Mon Sep 28 23:27:56 2015 +0300
+
+    Update wiki pages.
+
+commit a0e12c3ea81617ddbcb3749a4617d7a528b1104f
+Author: dmn <graahnul.grom@gmail.com>
+Date:   Mon Jul 27 23:39:14 2015 +0300
+
+    Fix build and install with non-GNU make.
+    
+    Reviewed-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+
+commit 2101e1236c11d72f075e4b941742b91edcbf6ad1
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Jul 17 16:41:42 2015 +0300
+
+    geda-scheme.info: Added info on copy-objects-hook.
+
+commit b95c4b605342b1f67a57b01bd6f93bee1c211270
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Jul 17 15:28:02 2015 +0300
+
+    geda-scheme.info: Fixed a copy-paste mistake.
+
+commit 3a22b411e067aa74672efd23a813f6627970ce9e
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Aug 8 11:08:14 2014 +0400
+
+    libgeda: new function to transform components
+    
+    Unlike the 'set-component!' function, 'set-component-with-transform'
+    applies all the specified transformations to a component and immediately
+    updates it.
+
+commit 49217f4a1754ba6f1df8490823174b20dc4f74b9
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Aug 8 09:04:33 2014 +0400
+
+    Revert "libgeda: support of rotation and mirroring in '%set-complex!'"
+    
+    This reverts commit 4b96fc7edd81168dba652d24a84de5afdf51b7a2
+    since it breaks the stable gEDA API.
+
+commit 4b96fc7edd81168dba652d24a84de5afdf51b7a2
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Fri Jun 27 15:25:22 2014 +0400
+
+    libgeda: support of rotation and mirroring in '%set-complex!'
+    
+    Make the '%set-complex!' procedure take into account angle and mirroring
+    of a new inserted from library component and modify its primitives
+    accordingly, so they are properly displayed in gschem after
+    'page-append!' and return correct coordinates while they are requested
+    by gaf shell.
+
+commit eb0993b707a1868649923d027191f1eea72f5e94
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Mar 16 20:51:25 2014 +0000
+
+    docs: Remove some unused & duplicate files from wiki export.
+    
+    Closes-bug: lp-1081306
+
+commit 1f61259ca5ecb1ea07b08eeedd1331b8d516ce9c
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Sun Mar 9 16:26:56 2014 +0400
+
+    Several fixes for geda-scheme.info
+    
+    - Fixed some typos
+    - Added description of the make-path function
+
+commit 0dff1c1867ca83fd9f2b904e8205a9151ec9e7b1
+Merge: 9fb251362 4b5b48b32
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Mar 8 22:08:02 2014 +0000
+
+    Merge branch 'wiki-import'.
+
+commit 4b5b48b320c10840e43deb7b8a9fce951262931e
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Mar 8 16:53:10 2014 -0500
+
+    Automatic wiki import (Sat Mar  8 21:51:23 UTC 2014)
+
+commit 55f875b134285aba81db0e0c339e9c97ae26886b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Mar 1 08:28:05 2014 +0000
+
+    scheme-api: Correct documentation of object-fill and set-object-fill!
+    
+    The object-fill and set-object-fill! use parameters with fill pitches
+    ordered before angles.  However, the documentation specified angles
+    before pitches.
+    
+    Reported-by: Vladimir Zhbanov <vzhbanov@gmail.com>
+    Closes-bug: lp-1286117
+
+commit 840b69010618be9919a79eaa24ea698870b89951
+Author: Vladimir Zhbanov <vzhbanov@gmail.com>
+Date:   Wed Feb 5 11:37:36 2014 +0400
+
+    Updated the gEDA site addresses in several places
+
+commit d21c4dc0b2703e8025af9b935c843988b569053b
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Sep 29 09:36:03 2013 +0100
+
+    scheme-api: Add version information to documentation.
+    
+    Add info on which versions of gEDA introduced various new functions,
+    variables etc. to the Scheme API.
+    
+    Since the next stable version to be released will probably be 1.10,
+    use that for now.
+
+commit 50785b760de910ce2189db968113680a11866167
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Sep 14 20:17:43 2013 +0100
+
+    gschem: Add bind-keys-hook.
+    
+    Add a hook that is run whenever a key sequence is rebound.
+
+commit 3f2a8a582d6cc197094b5d9ca906679817738fd0
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Sep 14 12:07:07 2013 +0100
+
+    gschem: Add action-property-hook.
+    
+    Add a new hook that's called when any action's properties change.
+
+commit c1945240f152c7779c456cd37975d6ea947c29e1
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Sep 15 11:57:20 2013 +0100
+
+    gschem: First-class actions.
+
+commit 94fd117138beb009820b0792c9d0201a8aefbc28
+Author: Patrick Bernaud <patrickb@chez.com>
+Date:   Tue Sep 10 23:22:59 2013 +0100
+
+    scheme-api: Correct typo in docs.
+    
+    Closes-bug: lp-1198663
+
+commit da7a2e02fec4b87e2b8e8ad4dce49b7cc2646e59
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sun Sep 1 22:19:00 2013 +0100
+
+    gschem: Make sure actions are always evaluated in the same way.
+    
+    This patch makes all gschem actions be evaluated by a new
+    `eval-action' procedure in the (gschem action) Scheme module.
+
+commit ff21393a9c8cb200e508908a0975e72c7535e5de
+Author: Bert Timmerman <bert.timmerman@xs4all.nl>
+Date:   Sat Dec 15 13:59:52 2012 +0100
+
+    scheme-api: correction of a typo.
+    
+    Signed-off-by: Bert Timmerman <bert.timmerman@xs4all.nl>
+
+commit adfcde051935230593135375da750d1a0cce9691
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Sat Dec 8 09:12:54 2012 +0000
+
+    libgeda: Use GFile to load/save configuration.
+
+commit d8ff759cef0083b5d53972753b5c10ee81b81cbb
+Merge: aa42e0c30 2db0d6a9a
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Dec 3 17:27:34 2012 +0000
+
+    Merge branch 'wiki-import' into 'master'.
+
+commit 2db0d6a9a894f75f26ec9f7be504f3417d972281
+Author: Peter TB Brett <peter-b@geda-project.org>
+Date:   Mon Dec 3 12:22:50 2012 -0500
+
+    Automatic wiki import (Mon Dec  3 17:22:50 UTC 2012)
+
+commit df7ab6dd8fbdb98f48cc48233224c7073080c063
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 26 16:07:01 2012 +0000
+
+    libgedaguile: Update geda-scheme.info copyright info.
+
+commit b39ed004b51d0fca6e3af3c20a35bb652e45104d
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Mon Nov 26 14:26:06 2012 +0000
+
+    libgedaguile: Document (geda config) module.
+
+commit f41b4d164422f6d60ec6646709ed66cbb8794a95
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 23 22:13:55 2012 +0000
+
+    libgeda: Config API improvements.
+    
+    Suggested by istankovic:
+    
+    - Clarified that the contexts returned by the configuration context
+      accessor functions (e.g. eda_config_get_system_context()) shouldn't
+      be disposed of with g_object_unref(), since they are owned by the
+      library.
+    - Made it clearer when `length' arguments are mandatory.
+    - Changed the `length' arguments to eda_config_get_groups() and
+      eda_config_get_keys() to gsize pointers instead of gint pointers,
+      and don't attempt to dereference the `length' argument if it's NULL.
+    - Correctly initialised and reset `parent_handler_id' field.
+    - Cleaned up unused variable in eda_config_get_user_context.
+    - Corrected some doc comment errors.
+    - Update propagate_key_file_error() to cope better with bad
+      destination error pointers.
+
+commit 9799998924f49ad1e52fcbda4aea19bf7ec0c419
+Author: Peter TB Brett <peter@peter-b.co.uk>
+Date:   Fri Nov 23 22:13:54 2012 +0000
+
+    Configuration system API specification.
+    
+    Initial specification for new configuration API that supports per-page
+    values and provides parsed rather than evaluated configuration files.
+
 commit ab37d4abc3e64078aeb2b6e5bda69f7afefc31bd
-Merge: 22b71fb 3d3d9b7
+Merge: 22b71fb85 3d3d9b7b7
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Sun Nov 18 17:14:21 2012 +0000
 
@@ -12,15 +307,15 @@ Date:   Sun Nov 18 10:46:11 2012 -0500
     Automatic wiki import (Sun Nov 18 15:46:11 UTC 2012)
 
 commit 9b3d4d13339ee0f20ddb6d19bf294e3a2e97aabd
-Merge: 928786d 846f4cf
+Merge: 928786d23 846f4cfa3
 Author: Peter TB Brett <peter@peter-b.co.uk>
 Date:   Sat Nov 17 20:35:18 2012 +0000
 
     Merge branch 'wiki-import' into stable-1.8
     
     Conflicts:
-    	configure.ac
-    	docs/Makefile.am
+            configure.ac
+            docs/Makefile.am
 
 commit 846f4cfa3a6c75e7e443a95a1f0e969f0334d313
 Author: Peter TB Brett <peter-b@geda-project.org>
@@ -558,7 +853,7 @@ Date:   Sat Mar 28 15:22:19 2009 -0400
     Updated all ChangeLogs
     
     Updated the ChangeLogs by running:
-    	./update-changelogs.sh 1.0-20070526..master
+            ./update-changelogs.sh 1.0-20070526..master
     in the toplevel directory
 
 commit 859abe69912ba99ca27bb58c378284e9eec56259

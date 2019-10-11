@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,10 +26,6 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 #define MAX_SLOT_SIZE 10
 
 /*! \todo Finish function documentation!!!
@@ -37,14 +33,16 @@
  *  \par Function Description
  *
  */
-void o_slot_start (GSCHEM_TOPLEVEL *w_current, OBJECT *object)
+void o_slot_start (GschemToplevel *w_current, OBJECT *object)
 {
+  char *slot_count;
   char *slot_value;
 
   /* single object for now */
   if (object->type != OBJ_COMPLEX)
     return;
 
+  slot_count = o_attrib_search_object_attribs_by_name (object, "numslots", 0);
   slot_value = o_attrib_search_object_attribs_by_name (object, "slot", 0);
 
   if (slot_value == NULL) {
@@ -53,7 +51,9 @@ void o_slot_start (GSCHEM_TOPLEVEL *w_current, OBJECT *object)
     slot_value = g_strdup ("1");
   }
 
-  slot_edit_dialog (w_current, slot_value);
+  slot_edit_dialog (w_current, slot_count, slot_value);
+
+  g_free (slot_count);
   g_free (slot_value);
 }
 
@@ -62,9 +62,9 @@ void o_slot_start (GSCHEM_TOPLEVEL *w_current, OBJECT *object)
  *  \par Function Description
  *
  */
-void o_slot_end(GSCHEM_TOPLEVEL *w_current, OBJECT *object, const char *string)
+void o_slot_end(GschemToplevel *w_current, OBJECT *object, const char *string)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   OBJECT *new_obj;
   char *slot_value;
   char *numslots_value;
@@ -117,7 +117,7 @@ void o_slot_end(GSCHEM_TOPLEVEL *w_current, OBJECT *object, const char *string)
   } else {
     /* here you need to do the add the slot
        attribute since it doesn't exist */
-    new_obj = o_text_new (toplevel, OBJ_TEXT, ATTRIBUTE_COLOR,
+    new_obj = o_text_new (toplevel, ATTRIBUTE_COLOR,
                           object->complex->x, object->complex->y,
                           LOWER_LEFT, 0, /* zero is angle */
                           string, 10, INVISIBLE, SHOW_NAME_VALUE);
@@ -132,6 +132,7 @@ void o_slot_end(GSCHEM_TOPLEVEL *w_current, OBJECT *object, const char *string)
 
   s_slot_update_object (toplevel, object);
 
-  toplevel->page_current->CHANGED = 1;
+  gschem_toplevel_page_content_changed (w_current, toplevel->page_current);
+  o_undo_savestate_old (w_current, UNDO_ALL, _("Change Slot"));
   g_free (value);
 }

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,10 +28,6 @@
 #include <stdio.h>
 
 #include "libgeda_priv.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 
 /*! \brief Calculates the distance between the given point and the closest
@@ -69,7 +65,7 @@ double m_box_shortest_distance (BOX *box, int x, int y, int solid)
 
   if (dx < 0) {
     if (dy < 0) {
-      shortest_distance = sqrt ((dx * dx) + (dy * dy));
+      shortest_distance = hypot (dx, dy);
     } else {
       shortest_distance = fabs (dx);
     }

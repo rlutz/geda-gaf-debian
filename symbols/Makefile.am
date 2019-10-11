@@ -15,7 +15,6 @@ symbol_dirs = \
 	dec \
 	diode \
 	ecl \
-	gnetman \
 	idt \
 	io \
 	irf \
@@ -43,9 +42,12 @@ symbol_dirs = \
 	titleblock \
 	transistor \
 	tube \
-	verilog \
-	vhdl \
 	xilinx
+
+extra_symbol_dirs = \
+	gnetman \
+	verilog \
+	vhdl
 
 SUBDIRS = documentation
 
@@ -53,22 +55,25 @@ gafrcddir = $(GEDADATADIR)/gafrc.d
 dist_gafrcd_DATA = geda-clib.scm
 
 datasymdir = $(GEDADATADIR)/sym
-nobase_dist_datasym_DATA = \
-	vhdl/verilog2vhdl.sh vhdl/script.sed
+dataextrasymdir = $(GEDADATADIR)/extra-sym
 
 EXTRA_DIST = ChangeLog ChangeLog-1.0 \
 	radio/README AUTHORS
 
 if HAVE_GIT_REPO
 ChangeLog: $(top_builddir)/stamp-git
-	(cd $(srcdir) && $(GIT) log --pretty=medium $(CHANGELOG_BASE).. -- .) > $@
+	( \
+	  cd $(srcdir) && \
+	  $(GIT) log --pretty=medium $(CHANGELOG_BASE).. -- . || \
+	  echo "WARNING: ChangeLog information not available from git" >&2 ; \
+	) > $@
 endif HAVE_GIT_REPO
 
 # Copies symbols into distribution
 dist-hook:
-	@for lib in $(symbol_dirs); do \
+	@for lib in $(symbol_dirs) $(extra_symbol_dirs); do \
 	  $(MKDIR_P) $(distdir)/$$lib && \
-	  list=`(ls $(srcdir)/$$lib) | grep '.[Ss][Yy][Mm]$$'`; \
+	  list=`(cd $(srcdir)/$$lib && find . -name '*.[sS][yY][mM]' | sed -e 's:^\./::')`; \
 	  for file in $$list; do \
 	    cp -p $(srcdir)/$$lib/$$file $(distdir)/$$lib || exit $$?; \
 	  done; \
@@ -80,11 +85,23 @@ install-data-local:
 	@for lib in $(symbol_dirs); do \
 	  d="$(DESTDIR)$(datasymdir)/$$lib"; \
 	  $(MKDIR_P) "$$d"; \
-	  list=`(ls $(srcdir)/$$lib) | grep '.[Ss][Yy][Mm]$$'`; \
+	  list=`(cd $(srcdir)/$$lib && find . -name '*.[sS][yY][mM]' | sed -e 's:^\./::')`; \
 	  if test -n "$$list"; then \
 	    echo " ( cd $(srcdir)/$$lib && $(INSTALL_DATA)" $$list "'$$d' )"; \
 	    (cd $(srcdir)/$$lib && $(INSTALL_DATA) $$list "$$d") || exit $$?; \
 	  fi; \
+	done
+	@for lib in $(extra_symbol_dirs); do \
+	  d="$(DESTDIR)$(dataextrasymdir)/$$lib"; \
+	  $(MKDIR_P) "$$d"; \
+	  list=`(cd $(srcdir)/$$lib && find . -name '*.[sS][yY][mM]' | sed -e 's:^\./::')`; \
+	  if test -n "$$list"; then \
+	    echo " ( cd $(srcdir)/$$lib && $(INSTALL_DATA)" $$list "'$$d' )"; \
+	    (cd $(srcdir)/$$lib && $(INSTALL_DATA) $$list "$$d") || exit $$?; \
+	    echo " ( cd '$(DESTDIR)$(datasymdir)/$$lib' && rm -f" $$list ")"; \
+	    (cd "$(DESTDIR)$(datasymdir)/$$lib" && rm -f $$list); \
+	  fi; \
+	  rmdir "$(DESTDIR)$(datasymdir)/$$lib" || true; \
 	done
 
 # Uninstalls symbols
@@ -92,7 +109,15 @@ uninstall-local:
 	@$(NORMAL_UNINSTALL)
 	@for lib in $(symbol_dirs); do \
 	  d="$(DESTDIR)$(datasymdir)/$$lib"; \
-	  list=`(ls $(srcdir)/$$lib) | grep '\.[Ss][Yy][Mm]$$'`; \
+	  list=`(cd $(srcdir)/$$lib && find . -name '*.[sS][yY][mM]' | sed -e 's:^\./::')`; \
+	  if test -n "$$list"; then \
+	    echo " ( cd '$$d' && rm -f" $$list ")"; \
+	    (cd "$$d" && rm -f $$list) || exit $$?; \
+	  fi; \
+	done
+	@for lib in $(extra_symbol_dirs); do \
+	  d="$(DESTDIR)$(dataextrasymdir)/$$lib"; \
+	  list=`(cd $(srcdir)/$$lib && find . -name '*.[sS][yY][mM]' | sed -e 's:^\./::')`; \
 	  if test -n "$$list"; then \
 	    echo " ( cd '$$d' && rm -f" $$list ")"; \
 	    (cd "$$d" && rm -f $$list) || exit $$?; \

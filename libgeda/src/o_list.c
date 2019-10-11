@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,6 @@
 #endif
 
 #include "libgeda_priv.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 /*! global which is used in o_list_copy_all */
 extern int global_sid;
@@ -221,18 +217,20 @@ GList *o_glist_copy_all (TOPLEVEL *toplevel,
 }
 
 
-/*! \todo Finish function description!!!
- *  \brief
- *  \par Function Description
+/*! \brief Translate a list of objects
+ *
+ *  \param [ref] objects A GList of objects to translate.
+ *  \param [in]  dx      The x distance to move.
+ *  \param [in]  dy      The y distance to move.
  */
-void o_glist_translate_world(TOPLEVEL *toplevel, int dx, int dy, const GList *list)
+void o_glist_translate_world (const GList *objects, int dx, int dy)
 {
-  const GList *iter = list;
-  OBJECT *o_current;
+  const GList *iter = objects;
 
-  while ( iter != NULL ) {
-    o_current = (OBJECT *)iter->data;
-    o_translate_world(toplevel, dx, dy, o_current);
+  while (iter != NULL) {
+    OBJECT *object = (OBJECT *)iter->data;
+
+    o_translate_world (object, dx, dy);
     iter = g_list_next (iter);
   }
 }

@@ -1,57 +1,84 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 1998-2010 Ales V. Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2010 Ales Hvezda
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02111-1301 USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifndef GSCHEM_ACTION_H
+#define GSCHEM_ACTION_H
 
-#ifndef __GSCHEM_ACTION_H__
-#define __GSCHEM_ACTION_H__
+#define GSCHEM_ACTION(obj) ((GschemAction *) (obj))
 
+typedef enum {
+  GSCHEM_ACTION_TYPE_ACTUATE,
+  GSCHEM_ACTION_TYPE_TOGGLE_PLAIN,
+  GSCHEM_ACTION_TYPE_TOGGLE_CHECK,
+  GSCHEM_ACTION_TYPE_TOGGLE_RADIO
+} GschemActionType;
 
-#define GSCHEM_TYPE_ACTION           (gschem_action_get_type())
-#define GSCHEM_ACTION(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSCHEM_TYPE_ACTION, GschemAction))
-#define GSCHEM_ACTION_CLASS(klass)   (G_TYPE_CHECK_CLASS_CAST ((klass),  GSCHEM_TYPE_ACTION, GschemActionClass))
-#define GSCHEM_IS_ACTION(obj)        (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSCHEM_TYPE_ACTION))
-#define GSCHEM_ACTION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj),  GSCHEM_TYPE_ACTION, GschemActionClass))
-
-typedef struct _GschemActionClass GschemActionClass;
-typedef struct _GschemAction      GschemAction;
-
-
-struct _GschemActionClass {
-  GtkActionClass parent_class;
-
-};
+typedef struct _GschemAction GschemAction;
 
 struct _GschemAction {
-  GtkAction parent_instance;
+  gchar *id;
+  gchar *icon_name;
+  gchar *name;
+  gchar *label;
+  gchar *menu_label;
+  gchar *tooltip;
+  GschemActionType type;
 
-  gchar *multikey_accel;
+  void (*activate) (GschemAction *action,
+                    GschemToplevel *w_current);
+
+  SCM thunk;
+  SCM smob;  /* not owned */
 };
 
 
-GType gschem_action_get_type (void);
+int scm_is_action (SCM x);
+GschemAction *scm_to_action (SCM smob);
 
-GschemAction *gschem_action_new           (const gchar *name,
-                                           const gchar *label,
-                                           const gchar *tooltip,
-                                           const gchar *stock_id,
-                                           const gchar *multikey_accel);
+void gschem_action_activate (GschemAction *action,
+                             GschemToplevel *w_current);
 
-#endif /* __GSCHEM_ACTION_H__ */
+GtkWidget *gschem_action_create_menu_item (GschemAction *action,
+                                           gboolean use_menu_label,
+                                           GschemToplevel *w_current);
+GtkToolItem *gschem_action_create_tool_button (GschemAction *action,
+                                               GschemToplevel *w_current);
+
+void gschem_action_set_sensitive (GschemAction *action, gboolean sensitive,
+                                  GschemToplevel *w_current);
+void gschem_action_set_active (GschemAction *action, gboolean is_active,
+                               GschemToplevel *w_current);
+void gschem_action_set_strings (GschemAction *action,
+                                gchar *name, gchar *label, gchar *menu_label,
+                                GschemToplevel *w_current);
+
+GschemAction *gschem_action_register (gchar *id,
+                                      gchar *icon_name,
+                                      gchar *name,
+                                      gchar *label,
+                                      gchar *menu_label,
+                                      gchar *tooltip,
+                                      GschemActionType type,
+                                      void (*activate) (GschemAction *,
+                                                        GschemToplevel *));
+
+void gschem_action_init (void);
+
+#endif /* GSCHEM_ACTION_H */

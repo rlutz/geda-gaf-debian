@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,6 @@
 
 #include "libgeda_priv.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 /*! \file o_net_basic.c 
  *  \brief functions for the net object
  */
@@ -36,16 +32,26 @@
  *  \par Function Description
  *  This function gets the position of the first point of a net object.
  *
- *  \param [in] toplevel The toplevel environment.
+ *  \param [in] object   The object to get the position.
  *  \param [out] x       pointer to the x-position
  *  \param [out] y       pointer to the y-position
- *  \param [in] object   The object to get the position.
  *  \return TRUE if successfully determined the position, FALSE otherwise
  */
-gboolean o_net_get_position (TOPLEVEL *toplevel, gint *x, gint *y,
-                              OBJECT *object)
+gboolean o_net_get_position (OBJECT *object, gint *x, gint *y)
 {
-  return o_line_get_position(toplevel, x, y, object);
+  g_return_val_if_fail (object != NULL, FALSE);
+  g_return_val_if_fail (object->type == OBJ_NET, FALSE);
+  g_return_val_if_fail (object->line != NULL, FALSE);
+
+  if (x != NULL) {
+    *x = object->line->x[0];
+  }
+
+  if (y != NULL) {
+    *y = object->line->y[0];
+  }
+
+  return TRUE;
 }
 
 /*! \brief calculate and return the boundaries of a net object
@@ -95,39 +101,9 @@ OBJECT *o_net_new(TOPLEVEL *toplevel, char type,
   new_node->line->y[1] = y2;
   new_node->line_width = NET_WIDTH;
 
-  o_net_recalc (toplevel, new_node);
+  new_node->w_bounds_valid_for = NULL;
 
   return new_node;
-}
-
-/*! \brief recalc the visual properties of a net object
- *  \par Function Description
- *  This function updates the visual coords of the \a o_current object.
- *  
- *  \param [in]     toplevel    The TOPLEVEL object.
- *  \param [in]     o_current   a net object.
- *
- */
-void o_net_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
-{
-  int left, right, top, bottom;
-
-  if (o_current == NULL) {
-    return;
-  }
-
-  if (o_current->line == NULL) {
-    return;
-  }
-
-  world_get_net_bounds(toplevel, o_current, &left, &top, &right,
-                 &bottom);
-
-  o_current->w_left = left;
-  o_current->w_top = top;
-  o_current->w_right = right;
-  o_current->w_bottom = bottom;
-  o_current->w_bounds_valid = TRUE;
 }
 
 /*! \brief read a net object from a char buffer
@@ -162,12 +138,7 @@ OBJECT *o_net_read (TOPLEVEL *toplevel, const char buf[],
                    type, x1, y1, x2, y2, color);
   }
 
-
-  if (toplevel->override_net_color != -1) {
-    color = toplevel->override_net_color;
-  }
-
-  if (color < 0 || color > MAX_COLORS) {
+  if (color < 0 || color >= MAX_OBJECT_COLORS) {
     s_log_message (_("Found an invalid color [ %s ]\n"), buf);
     s_log_message (_("Setting color to default color\n"));
     color = DEFAULT_COLOR;
@@ -183,37 +154,38 @@ OBJECT *o_net_read (TOPLEVEL *toplevel, const char buf[],
  *  This function takes a net \a object and return a string
  *  according to the file format definition.
  *
- *  \param [in] toplevel  a TOPLEVEL structure
  *  \param [in] object  a net OBJECT
  *  \return the string representation of the net OBJECT
  */
-char *o_net_save(TOPLEVEL *toplevel, OBJECT *object)
+char *o_net_save(OBJECT *object)
 {
-  int x1, x2, y1, y2;
-  char *buf;
+  g_return_val_if_fail (object != NULL, NULL);
+  g_return_val_if_fail (object->line != NULL, NULL);
+  g_return_val_if_fail (object->type == OBJ_NET, NULL);
 
-  x1 = object->line->x[0];
-  y1 = object->line->y[0];
-  x2 = object->line->x[1];
-  y2 = object->line->y[1];
-
-  buf = g_strdup_printf("%c %d %d %d %d %d", object->type, x1, y1, x2, y2, object->color);
-  return (buf);
+  return g_strdup_printf ("%c %d %d %d %d %d",
+                          OBJ_NET,
+                          object->line->x[0],
+                          object->line->y[0],
+                          object->line->x[1],
+                          object->line->y[1],
+                          object->color);
 }
 
 /*! \brief move a net object
  *  \par Function Description
  *  This function changes the position of a net \a object.
  *
- *  \param [in] toplevel     The TOPLEVEL object
+ *  \param [ref] object      The net OBJECT to be moved
  *  \param [in] dx           The x-distance to move the object
  *  \param [in] dy           The y-distance to move the object
- *  \param [in] object       The net OBJECT to be moved
- *
  */
-void o_net_translate_world(TOPLEVEL *toplevel, int dx, int dy,
-			   OBJECT *object)
+void o_net_translate_world(OBJECT *object, int dx, int dy)
 {
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->line != NULL);
+  g_return_if_fail (object->type == OBJ_NET);
+
   /* Update world coords */
   object->line->x[0] = object->line->x[0] + dx;
   object->line->y[0] = object->line->y[0] + dy;
@@ -221,9 +193,7 @@ void o_net_translate_world(TOPLEVEL *toplevel, int dx, int dy,
   object->line->y[1] = object->line->y[1] + dy;
 
   /* Update bounding box */
-  o_net_recalc (toplevel, object);
-
-  s_tile_update_object(toplevel, object);
+  object->w_bounds_valid_for = NULL;
 }
 
 /*! \brief create a copy of a net object
@@ -249,45 +219,6 @@ OBJECT *o_net_copy(TOPLEVEL *toplevel,  OBJECT *o_current)
   return new_obj;
 }
 
-/*! \brief postscript print command for a net object
- *  \par Function Description
- *  This function writes the postscript command of the net object \a o_current
- *  into the FILE \a fp points to.
- *  
- *  \param [in] toplevel     The TOPLEVEL object
- *  \param [in] fp           pointer to a FILE structure
- *  \param [in] o_current    The OBJECT to print
- *  \param [in] origin_x     x-coord of the postscript origin
- *  \param [in] origin_y     y-coord of the postscript origin
- */
-void o_net_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
-		 int origin_x, int origin_y)
-{
-  int net_width;
-  int x1, y1;
-  int x2, y2;
-
-  if (o_current == NULL) {
-    printf("got null in o_net_print\n");
-    return;
-  }
-
-  f_print_set_color(toplevel, fp, o_current->color);
-
-  net_width = 2;
-  if (toplevel->net_style == THICK) {
-    net_width = NET_WIDTH;
-  }
-
-  x1 = o_current->line->x[0] - origin_x,
-  y1 = o_current->line->y[0] - origin_y;
-  x2 = o_current->line->x[1] - origin_x,
-  y2 = o_current->line->y[1] - origin_y;
-
-  fprintf(fp, "%d %d %d %d %d line\n", x1,y1,x2,y2,net_width);
-}
-
-
 /*! \brief rotate a net object around a centerpoint
  *  \par Function Description
  *  This function rotates a net \a object around the point
@@ -306,12 +237,15 @@ void o_net_rotate_world(TOPLEVEL *toplevel,
 {
   int newx, newy;
 
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->line != NULL);
+  g_return_if_fail (object->type == OBJ_NET);
+
   if (angle == 0)
     return;
 
   /* translate object to origin */
-  o_net_translate_world(toplevel, -world_centerx, -world_centery,
-                        object);
+  o_net_translate_world(object, -world_centerx, -world_centery);
 
   rotate_point_90(object->line->x[0], object->line->y[0], angle,
                   &newx, &newy);
@@ -325,7 +259,7 @@ void o_net_rotate_world(TOPLEVEL *toplevel,
   object->line->x[1] = newx;
   object->line->y[1] = newy;
 
-  o_net_translate_world(toplevel, world_centerx, world_centery, object);
+  o_net_translate_world(object, world_centerx, world_centery);
 }
 
 /*! \brief mirror a net object horizontaly at a centerpoint
@@ -341,15 +275,18 @@ void o_net_rotate_world(TOPLEVEL *toplevel,
 void o_net_mirror_world(TOPLEVEL *toplevel, int world_centerx,
 			int world_centery, OBJECT *object)
 {
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->line != NULL);
+  g_return_if_fail (object->type == OBJ_NET);
+
   /* translate object to origin */
-  o_net_translate_world(toplevel, -world_centerx, -world_centery,
-                        object);
+  o_net_translate_world(object, -world_centerx, -world_centery);
 
   object->line->x[0] = -object->line->x[0];
 
   object->line->x[1] = -object->line->x[1];
 
-  o_net_translate_world(toplevel, world_centerx, world_centery, object);
+  o_net_translate_world(object, world_centerx, world_centery);
 }
 
 /*! \brief calculate the orientation of a net object
@@ -376,7 +313,7 @@ int o_net_orientation(OBJECT *object)
 /*! \brief merge two net object
  *  \par Function Description
  *  This function does the actual work of making one net segment out of two
- *  connected segments. The first net segment is extended to the lenght of 
+ *  connected segments. The first net segment is extended to the length of
  *  both objects.
  *  The second object (\a del_object) is the object that should be deleted.
  *  
@@ -564,9 +501,8 @@ static int o_net_consolidate_segments (TOPLEVEL *toplevel, OBJECT *object)
           }
 
           s_delete_object (toplevel, other_object);
-          o_net_recalc(toplevel, object);
-          s_tile_update_object(toplevel, object);
-          s_conn_update_object (toplevel, object);
+          object->w_bounds_valid_for = NULL;
+          s_conn_update_object (page, object);
           return(-1);
         }
       }
@@ -633,160 +569,5 @@ void o_net_modify(TOPLEVEL *toplevel, OBJECT *object,
   object->line->x[whichone] = x;
   object->line->y[whichone] = y;
 
-  o_net_recalc (toplevel, object);
-
-  s_tile_update_object(toplevel, object);
-}
-
-/*! \brief Refresh & cache number of connected entities.
- *
- *  \par Function Description
- *  Traverse all network segments reachable from this net and count
- *  total number of unique entities connected to all net segments.
- *
- *  For the purpose of this function, an entity is:
- *    - pin
- *    - bus
- *    - attached netname attribute
- *
- *  Computed number of entities is afterwards stored in all traversed
- *  net segments.
- *
- *  The algorithm does not handle corner cases, ie two bus segments
- *  belonging to the same bus will be counted twice.
- *
- *  \param [in] toplevel    The TOPLEVEL object
- *  \param [in] o_current   The NET OBJECT to check connectivity of
- */
-void o_net_refresh_conn_cache(TOPLEVEL *toplevel, OBJECT *o_current)
-{
-  gint            num_conns = 0;
-  GHashTable     *visited;
-  GHashTableIter  iter;
-  GList          *stack = NULL;
-  OBJECT         *obj;
-  gpointer       key;
-
-  g_return_if_fail (toplevel);
-  g_return_if_fail (o_current);
-  g_return_if_fail (o_current->type == OBJ_NET);
-
-  /* Keep track of visited nets, pins and buses in the hash table.
-   * This way we short-circuit the search and avoid loops.
-   */
-  visited = g_hash_table_new (NULL, NULL);
-
-  /*
-   * Add the starting net to the hash so:
-   *   1. it is not traversed twice
-   *   2. it is updated at the end if no connections are found
-   */
-  g_hash_table_insert (visited, o_current, o_current);
-
-  /* Check if a netname= is attached to the starting net segment */
-  if (NULL != o_attrib_search_object_attribs_by_name (o_current,
-                                                      "netname",
-                                                      0)) {
-    num_conns += 1;
-  }
-
-  /* Keep track of connections to search at each net segment in a stack.
-   * Each stack entry points to an entry in obj->conn_list.
-   * Pop the stack when we have no more connections to check.
-   * Push next entry on the stack if we encounter a net segment.
-   */
-
-  /* Initialise the stack for the starting net segment. */
-  stack = g_list_prepend (stack, o_current->conn_list);
-
-  while (stack != NULL) {
-    /* At start of the loop, take a new connection from the stack. */
-    GList *conn_list = (GList*) stack->data;
-    CONN *conn;
-
-    if (conn_list == NULL) {
-      /* No more connections to check at this level. Pop the stack. */
-      stack = g_list_delete_link (stack, stack);
-      continue;
-    }
-
-    /* Extract the next connected object and advance the connection list. */
-    conn = (CONN*) conn_list->data;
-    stack->data = (gpointer) g_list_next (conn_list);
-
-    if (conn == NULL)
-        /* should not happen */
-        continue;
-    obj = conn->other_object;
-    if (obj == NULL)
-        /* should not happen */
-        continue;
-
-    /* Act upon the object that is connected to the segment. */
-    switch (obj->type) {
-      case OBJ_PIN:
-      case OBJ_BUS:
-        if (NULL == g_hash_table_lookup (visited, obj)) {
-          g_hash_table_insert (visited, obj, obj);
-          num_conns += 1;
-        }
-        break;
-      case OBJ_NET:
-        if (NULL == g_hash_table_lookup (visited, obj)) {
-          g_hash_table_insert (visited, obj, obj);
-          /* Check if a netname= is attached to this net segment */
-          if (NULL != o_attrib_search_object_attribs_by_name (obj,
-                                                              "netname",
-                                                              0)) {
-            num_conns += 1;
-          }
-          /* Push new list of connections to check onto the stack */
-          stack = g_list_prepend (stack, obj->conn_list);
-        }
-        break;
-      default:
-        break;
-    }
-  }
-
-  /* Cache value of num_conns in all visited objects */
-  g_hash_table_iter_init (&iter, visited);
-
-  while (g_hash_table_iter_next (&iter, &key, NULL)) {
-    obj = (OBJECT*) key;
-    if (obj->type == OBJ_NET) {
-      obj->net_num_connected = num_conns;
-      obj->valid_num_connected = TRUE;
-    }
-  }
-
-  g_hash_table_destroy (visited);
-  g_list_free (stack);
-}
-
-/*! \brief Check if net is fully connected.
- *
- *  \par Function Description
- *  Net is fully connected when it connects at least
- *  two separate entities.
- *
- *  \sa o_net_refresh_conn_cache
- *
- *  \param [in] toplevel    The TOPLEVEL object
- *  \param [in] o_current   The OBJECT to check connectivity of
- *  \return TRUE if net is fully connected, FALSE otherwise
- */
-gboolean o_net_is_fully_connected (TOPLEVEL *toplevel,
-                                   OBJECT   *o_current)
-{
-  g_return_val_if_fail (toplevel, FALSE);
-  g_return_val_if_fail (o_current, FALSE);
-  g_return_val_if_fail (o_current->type == OBJ_NET, FALSE);
-
-  if (!o_current->valid_num_connected)
-    o_net_refresh_conn_cache (toplevel, o_current);
-
-  g_return_val_if_fail (o_current->valid_num_connected, FALSE);
-
-  return o_current->net_num_connected > 1 ? TRUE : FALSE;
+  object->w_bounds_valid_for = NULL;
 }

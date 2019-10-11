@@ -4,19 +4,23 @@ libgedaincludedir = $(includedir)/libgeda
 libgedainclude_HEADERS = \
 	libgeda/colors.h \
 	libgeda/defines.h \
+	libgeda/edaconfig.h \
 	libgeda/edaerrors.h \
+	libgeda/edascmhookproxy.h \
+	libgeda/edascmvaluetypes.h \
 	libgeda/funcs.h \
 	libgeda/geda_list.h \
 	libgeda/globals.h \
 	libgeda/libgeda.h \
 	libgeda/o_types.h \
-	libgeda/papersizes.h \
 	libgeda/prototype.h \
 	libgeda/libgedaguile.h \
-	libgeda/struct.h
+	libgeda/struct.h \
+	libgeda/s_toplevel.h
 
 
 noinst_HEADERS = \
+	defines_priv.h \
 	gettext_priv.h \
 	i_vars_priv.h \
 	libgeda_priv.h \

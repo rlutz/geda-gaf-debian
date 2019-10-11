@@ -24,7 +24,6 @@
  */
 
 #include <config.h>
-#include <missing.h>
 
 #include "gschem.h"
 
@@ -79,8 +78,8 @@ SCM_DEFINE (add_attrib_x, "%add-attrib!", 5, 0, 0,
   SCM_ASSERT (scm_is_string (value_s), value_s, SCM_ARG3, s_add_attrib_x);
   SCM_ASSERT (scm_is_symbol (show_s), show_s, SCM_ARG5, s_add_attrib_x);
 
-  GSCHEM_TOPLEVEL *w_current = g_current_window ();
-  TOPLEVEL *toplevel = w_current->toplevel;
+  GschemToplevel *w_current = g_current_window ();
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
 
   /* Check target object, if present */
   OBJECT *obj = NULL;
@@ -104,9 +103,9 @@ SCM_DEFINE (add_attrib_x, "%add-attrib!", 5, 0, 0,
 
   /* Name/value visibility */
   int show;
-  if      (show_s == name_sym)  { show = SHOW_NAME;       }
-  else if (show_s == value_sym) { show = SHOW_VALUE;      }
-  else if (show_s == both_sym)  { show = SHOW_NAME_VALUE; }
+  if      (scm_is_eq (show_s, name_sym))  { show = SHOW_NAME;       }
+  else if (scm_is_eq (show_s, value_sym)) { show = SHOW_VALUE;      }
+  else if (scm_is_eq (show_s, both_sym))  { show = SHOW_NAME_VALUE; }
   else {
     scm_misc_error (s_add_attrib_x,
                     _("Invalid text name/value visibility ~A."),
@@ -135,10 +134,10 @@ SCM_DEFINE (add_attrib_x, "%add-attrib!", 5, 0, 0,
 }
 
 /*!
- * \brief Create the (geda core object) Scheme module.
+ * \brief Create the (gschem core attrib) Scheme module.
  * \par Function Description
- * Defines procedures in the (geda core object) module. The module can
- * be accessed using (use-modules (geda core object)).
+ * Defines procedures in the (gschem core attrib) module. The module can
+ * be accessed using (use-modules (gschem core attrib)).
  */
 static void
 init_module_gschem_core_attrib ()

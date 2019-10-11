@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include <config.h>
-#include <missing.h>
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -35,66 +34,29 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 /*! \todo Finish function documentation!!!
  *  \brief
  *  \par Function Description
  *
  */
-SCM g_funcs_print(SCM scm_filename)
+SCM g_funcs_pdf (SCM scm_filename)
 {
   char *filename;
-  TOPLEVEL *toplevel = edascm_c_current_toplevel ();
-  
+  gboolean status;
+  GschemToplevel *w_current = g_current_window ();
+
   SCM_ASSERT (scm_is_string (scm_filename), scm_filename,
-              SCM_ARG1, "gschem-print");
+              SCM_ARG1, "gschem-pdf");
 
   if (output_filename) {
-    if (f_print_file (toplevel, toplevel->page_current,
-                      output_filename))
-      return SCM_BOOL_F;
+    status = x_print_export_pdf (w_current, output_filename);
   } else  {
     filename = scm_to_utf8_string(scm_filename);
-    if (f_print_file (toplevel, toplevel->page_current, filename)) {
-      free(filename);
-      return SCM_BOOL_F;
-    }
+    status = x_print_export_pdf (w_current, filename);
     free(filename);
   }
   
-  return SCM_BOOL_T;
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-SCM g_funcs_postscript(SCM scm_filename)
-{
-  char *filename;
-  TOPLEVEL *toplevel = edascm_c_current_toplevel ();
-
-  SCM_ASSERT (scm_is_string (scm_filename), scm_filename,
-              SCM_ARG1, "gschem-postscript");
-
-  if (output_filename) {
-    if (f_print_file (toplevel, toplevel->page_current,
-                      output_filename))
-      return SCM_BOOL_F;
-  } else  {
-    filename = scm_to_utf8_string(scm_filename);
-    if (f_print_file (toplevel, toplevel->page_current, filename)) {
-      free(filename);
-      return SCM_BOOL_F;
-    }
-    free(filename);
-  }
-  
-  return SCM_BOOL_T;
+  return (status ? SCM_BOOL_T : SCM_BOOL_F);
 }
 
 /*! \todo Finish function documentation!!!
@@ -109,7 +71,7 @@ SCM g_funcs_image(SCM scm_filename)
   SCM_ASSERT (scm_is_string (scm_filename), scm_filename,
               SCM_ARG1, "gschem-image");
 
-  GSCHEM_TOPLEVEL *w_current = g_current_window ();
+  GschemToplevel *w_current = g_current_window ();
 
   if (output_filename) {
     x_image_lowlevel (w_current, output_filename,

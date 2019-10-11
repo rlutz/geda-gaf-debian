@@ -1,6 +1,6 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * Code based on GTK 2.14.5 gtk/gtkaccellabel.c (LGPL)
  *
@@ -208,7 +208,7 @@ gschem_accel_label_expose_event (GtkWidget      *widget,
 
   direction = gtk_widget_get_direction (widget);
 
-  if (GTK_WIDGET_DRAWABLE (accel_label))
+  if (gtk_widget_is_drawable (GTK_WIDGET (accel_label)))
     {
       guint ac_width;
 
@@ -256,7 +256,7 @@ gschem_accel_label_expose_event (GtkWidget      *widget,
 
           gtk_paint_layout (widget->style,
                             widget->window,
-                            GTK_WIDGET_STATE (widget),
+                            gtk_widget_get_state (widget),
                             FALSE,
                             &event->area,
                             widget,

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,10 +37,6 @@
 
 #include "libgeda_priv.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 
 /*! \brief Return the bounds of the given object.
  *  \par Given an object, calculate the bounds coordinates.
@@ -57,44 +53,128 @@
 int world_get_single_object_bounds(TOPLEVEL *toplevel, OBJECT *o_current,
                                    int *rleft, int *rtop, int *rright, int *rbottom)
 {
-  if (o_current != NULL) {
+  if (o_current == NULL) {
+    return 0;
+  }
+
+  /* only do bounding boxes for visible or doing show_hidden_text*/
+  /* you might lose some attrs though */
+  if (o_current->type == OBJ_TEXT &&
+      ! (o_is_visible (o_current) || toplevel->show_hidden_text)) {
+    return 0;
+  }
+
+  if (o_current->w_bounds_valid_for != toplevel) {
+    int left, right, top, bottom;
     switch(o_current->type) {
-      case(OBJ_TEXT):
-        /* only do bounding boxes for visible or doing show_hidden_text*/
-        /* you might lose some attrs though */
-        if (! (o_is_visible (toplevel, o_current) ||
-                toplevel->show_hidden_text)) {
+
+      case(OBJ_LINE):
+        if (o_current->line == NULL) {
           return 0;
         }
-        /* This case falls through intentionally */
-      case(OBJ_LINE):
+        world_get_line_bounds(toplevel, o_current,
+                              &left, &top, &right, &bottom);
+        break;
+
       case(OBJ_NET):
+        if (o_current->line == NULL) {
+          return 0;
+        }
+        world_get_net_bounds(toplevel, o_current,
+                             &left, &top, &right, &bottom);
+        break;
+
       case(OBJ_BUS):
+        if (o_current->line == NULL) {
+          return 0;
+        }
+        world_get_bus_bounds(toplevel, o_current,
+                             &left, &top, &right, &bottom);
+        break;
+
       case(OBJ_BOX):
-      case(OBJ_PICTURE):
-      case(OBJ_CIRCLE):
+        if (o_current->box == NULL) {
+          return 0;
+        }
+        world_get_box_bounds(toplevel, o_current,
+                             &left, &top, &right, &bottom);
+        break;
+
       case(OBJ_PATH):
-      case(OBJ_PIN):
-      case(OBJ_ARC):
+        g_return_val_if_fail (o_current->path != NULL, 0);
+        if (o_current->path->num_sections <= 0) {
+          return 0;
+        }
+        world_get_path_bounds (toplevel, o_current,
+                               &left, &top, &right, &bottom);
+        break;
+
+      case(OBJ_PICTURE):
+        if (o_current->picture == NULL) {
+          return 0;
+        }
+        world_get_picture_bounds(toplevel, o_current,
+                                 &left, &top, &right, &bottom);
+        break;
+
+      case(OBJ_CIRCLE):
+        if (o_current->circle == NULL) {
+          return 0;
+        }
+        world_get_circle_bounds(toplevel, o_current,
+                                &left, &top, &right, &bottom);
+        break;
+
       case(OBJ_COMPLEX):
       case(OBJ_PLACEHOLDER):
-        if (!o_current->w_bounds_valid) {
-          o_recalc_single_object (toplevel, o_current);
-          if (!o_current->w_bounds_valid) {
-            return 0;
-          }
+        /* realc routine Add this somewhere */
+        /* libhack */
+        /* o_recalc(toplevel, o_current->complex);*/
+
+        if (o_current->complex->prim_objs == NULL)
+          return 0;
+
+        world_get_complex_bounds(toplevel, o_current,
+                                 &left, &top, &right, &bottom);
+        break;
+
+      case(OBJ_PIN):
+        if (o_current->line == NULL) {
+          return 0;
         }
-        *rleft = o_current->w_left;
-        *rtop = o_current->w_top;
-        *rright = o_current->w_right;
-        *rbottom = o_current->w_bottom;
-        return 1;
+        world_get_pin_bounds(toplevel, o_current,
+                             &left, &top, &right, &bottom);
+        break;
+
+      case(OBJ_ARC):
+        if (o_current->arc == NULL) {
+          return 0;
+        }
+        world_get_arc_bounds(toplevel, o_current,
+                             &left, &top, &right, &bottom);
+        break;
+
+      case(OBJ_TEXT):
+        if ( !world_get_text_bounds(toplevel, o_current,
+                                    &left, &top, &right, &bottom) ) {
+          return 0;
+        }
+        break;
 
       default:
-        break;
+        return 0;
     }
+    o_current->w_left   = left;
+    o_current->w_top    = top;
+    o_current->w_right  = right;
+    o_current->w_bottom = bottom;
+    o_current->w_bounds_valid_for = toplevel;
   }
-  return 0;
+  *rleft = o_current->w_left;
+  *rtop = o_current->w_top;
+  *rright = o_current->w_right;
+  *rbottom = o_current->w_bottom;
+  return 1;
 }
 
 
@@ -178,17 +258,25 @@ void world_get_complex_bounds(TOPLEVEL *toplevel, OBJECT *complex,
  *  \par Function Description
  *  This function gets the position of the base point of a complex object.
  *
- *  \param [in] toplevel The toplevel environment.
+ *  \param [in] object   The object to get the position.
  *  \param [out] x       pointer to the x-position
  *  \param [out] y       pointer to the y-position
- *  \param [in] object   The object to get the position.
  *  \return TRUE if successfully determined the position, FALSE otherwise
  */
-gboolean o_complex_get_position (TOPLEVEL *toplevel, gint *x, gint *y,
-                              OBJECT *object)
+gboolean o_complex_get_position (OBJECT *object, gint *x, gint *y)
 {
-  *x = object->complex->x;
-  *y = object->complex->y;
+  g_return_val_if_fail (object != NULL, FALSE);
+  g_return_val_if_fail (((object->type == OBJ_COMPLEX) || (object->type == OBJ_PLACEHOLDER)), FALSE);
+  g_return_val_if_fail (object->complex != NULL, FALSE);
+
+  if (x != NULL) {
+    *x = object->complex->x;
+  }
+
+  if (y != NULL) {
+    *y = object->complex->y;
+  }
+
   return TRUE;
 }
 
@@ -227,8 +315,7 @@ static int o_complex_is_eligible_attribute (TOPLEVEL *toplevel, OBJECT *object)
   }
 
   /* object is invisible and we do not want to promote invisible text */
-  if ((!o_is_visible (toplevel, object)) &&
-      (toplevel->promote_invisible == FALSE))
+  if ((!o_is_visible (object)) && (toplevel->promote_invisible == FALSE))
     return FALSE; /* attribute not eligible for promotion */
 
   /* yup, attribute can be promoted */
@@ -408,11 +495,11 @@ static void create_placeholder(TOPLEVEL * toplevel, OBJECT * new_node, int x, in
     new_node->type = OBJ_PLACEHOLDER;
 
     /* Mark the origin of the missing component */
-    new_prim_obj = o_line_new(toplevel, OBJ_LINE,
+    new_prim_obj = o_line_new(toplevel,
                            DETACHED_ATTRIBUTE_COLOR,
                            x - 50, y, x + 50, y);
     new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
-    new_prim_obj = o_line_new(toplevel, OBJ_LINE,
+    new_prim_obj = o_line_new(toplevel,
                            DETACHED_ATTRIBUTE_COLOR,
                            x, y + 50, x, y - 50); 
     new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
@@ -422,7 +509,7 @@ static void create_placeholder(TOPLEVEL * toplevel, OBJECT * new_node, int x, in
       g_strdup_printf (_("Component not found:\n %s"),
            new_node->complex_basename);
     new_prim_obj = o_text_new(toplevel,
-                           OBJ_TEXT, DETACHED_ATTRIBUTE_COLOR, 
+                           DETACHED_ATTRIBUTE_COLOR,
                            x + NOT_FOUND_TEXT_X, 
                            y + NOT_FOUND_TEXT_Y, LOWER_LEFT, 0, 
                            not_found_text, 8,
@@ -436,7 +523,7 @@ static void create_placeholder(TOPLEVEL * toplevel, OBJECT * new_node, int x, in
     y_offset = bottom - top + 100;  /* 100 is just an additional offset */
 
     /* add hazard triangle */
-    new_prim_obj = o_line_new(toplevel, OBJ_LINE,
+    new_prim_obj = o_line_new(toplevel,
                            DETACHED_ATTRIBUTE_COLOR,
                            x + NOT_FOUND_TEXT_X + x_offset, 
                            y + NOT_FOUND_TEXT_Y + y_offset, 
@@ -445,7 +532,7 @@ static void create_placeholder(TOPLEVEL * toplevel, OBJECT * new_node, int x, in
     o_set_line_options(toplevel, new_prim_obj, END_ROUND, TYPE_SOLID,
                        50, -1, -1);
     new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
-    new_prim_obj = o_line_new(toplevel, OBJ_LINE,
+    new_prim_obj = o_line_new(toplevel,
                            DETACHED_ATTRIBUTE_COLOR,
                            x + NOT_FOUND_TEXT_X + x_offset, 
                            y + NOT_FOUND_TEXT_Y + y_offset, 
@@ -454,7 +541,7 @@ static void create_placeholder(TOPLEVEL * toplevel, OBJECT * new_node, int x, in
     o_set_line_options(toplevel, new_prim_obj, END_ROUND, TYPE_SOLID,
                        50, -1, -1);
     new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
-    new_prim_obj = o_line_new(toplevel, OBJ_LINE,
+    new_prim_obj = o_line_new(toplevel,
                            DETACHED_ATTRIBUTE_COLOR,
                            x + NOT_FOUND_TEXT_X + x_offset + 300, 
                            y + NOT_FOUND_TEXT_Y + y_offset + 500, 
@@ -464,7 +551,7 @@ static void create_placeholder(TOPLEVEL * toplevel, OBJECT * new_node, int x, in
                        50, -1, -1);
     new_node->complex->prim_objs = g_list_prepend (new_node->complex->prim_objs, new_prim_obj);
     new_prim_obj = o_text_new(toplevel,
-                           OBJ_TEXT, DETACHED_ATTRIBUTE_COLOR, 
+                           DETACHED_ATTRIBUTE_COLOR,
                            x + NOT_FOUND_TEXT_X + x_offset + 270, 
                            y + NOT_FOUND_TEXT_Y + y_offset + 90, 
                            LOWER_LEFT, 0, "!", 18,
@@ -532,7 +619,7 @@ OBJECT *o_complex_new(TOPLEVEL *toplevel,
       }
       
       o_glist_rotate_world (toplevel, 0, 0, angle, new_node->complex->prim_objs);
-      o_glist_translate_world (toplevel, x, y, new_node->complex->prim_objs);
+      o_glist_translate_world (new_node->complex->prim_objs, x, y);
     }
 
     g_free (buffer);
@@ -545,7 +632,7 @@ OBJECT *o_complex_new(TOPLEVEL *toplevel,
     tmp->parent = new_node;
   }
 
-  o_complex_recalc(toplevel, new_node);
+  new_node->w_bounds_valid_for = NULL;
 
   return new_node;
 }
@@ -592,35 +679,6 @@ OBJECT *o_complex_new_embedded(TOPLEVEL *toplevel,
   /* don't have to translate/rotate/mirror here at all since the */
   /* object is in place */
   return new_node;
-}
-
-/*! \brief update the visual boundaries of the complex object
- *  \par Function Description
- *  This function updates the boundaries of the object \a o_current.
- *
- *  \param [in]  toplevel  The TOPLEVEL object
- *  \param [in]  o_current The OBJECT to update
- */
-void o_complex_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
-{
-  int left, right, top, bottom;
-
-  /* realc routine Add this somewhere */
-  /* libhack */
-  /* o_recalc(toplevel, o_current->complex);*/
-
-  if ((!o_current) || (o_current->type != OBJ_COMPLEX && o_current->type != OBJ_PLACEHOLDER))
-    return;
-
-  if (o_current->complex->prim_objs == NULL)
-    return;
-
-  world_get_complex_bounds(toplevel, o_current, &left, &top, &right, &bottom);
-  o_current->w_left = left;
-  o_current->w_top = top;
-  o_current->w_right = right;
-  o_current->w_bottom = bottom;
-  o_current->w_bounds_valid = TRUE;
 }
 
 /*! \brief read a complex object from a char buffer
@@ -711,47 +769,51 @@ OBJECT *o_complex_read (TOPLEVEL *toplevel,
  *  This function takes a complex \a object and return a string
  *  according to the file format definition.
  *
- *  \param [in] toplevel  a TOPLEVEL structure
+ *  On failure, this function returns NULL.
+ *
  *  \param [in] object  a complex OBJECT
  *  \return the string representation of the complex OBJECT
  */
-char *o_complex_save(TOPLEVEL *toplevel, OBJECT *object)
+char *o_complex_save(OBJECT *object)
 {
-  int selectable;
-  char *buf = NULL;
-  char *basename;
+  gchar *basename;
+  gchar *buffer;
 
   g_return_val_if_fail (object != NULL, NULL);
+  g_return_val_if_fail (object->complex != NULL, NULL);
+  g_return_val_if_fail ((object->type == OBJ_COMPLEX) ||
+                        (object->type == OBJ_PLACEHOLDER), NULL);
 
-  selectable = (object->selectable) ? 1 : 0;
+  basename = g_strdup_printf ("%s%s",
+                              object->complex_embedded ? "EMBEDDED" : "",
+                              object->complex_basename);
 
-  if ((object->type == OBJ_COMPLEX) || (object->type == OBJ_PLACEHOLDER)) {
-    basename = g_strdup_printf ("%s%s",
-				object->complex_embedded ? "EMBEDDED" : "",
-				object->complex_basename);
-    /* We force the object type to be output as OBJ_COMPLEX for both
-     * these object types. */
-    buf = g_strdup_printf("%c %d %d %d %d %d %s", OBJ_COMPLEX,
-                          object->complex->x, object->complex->y,
-                          selectable, object->complex->angle,
-                          object->complex->mirror, basename);
-    g_free (basename);
-  }
+  /* We force the object type to be output as OBJ_COMPLEX for both these object
+   * types.
+   */
+  buffer = g_strdup_printf ("%c %d %d %d %d %d %s",
+                            OBJ_COMPLEX,
+                            object->complex->x,
+                            object->complex->y,
+                            object->selectable ? 1 : 0,
+                            object->complex->angle,
+                            object->complex->mirror,
+                            basename);
 
-  return(buf);
+  g_free (basename);
+
+  return buffer;
 }
 
 /*! \brief move a complex object
  *  \par Function Description
  *  This function changes the position of a complex \a object.
  *
- *  \param [in] toplevel     The TOPLEVEL object
+ *  \param [ref] object      The complex OBJECT to be moved
  *  \param [in] dx           The x-distance to move the object
  *  \param [in] dy           The y-distance to move the object
- *  \param [in] object       The complex OBJECT to be moved
  */
-void o_complex_translate_world(TOPLEVEL *toplevel, int dx, int dy,
-                               OBJECT *object)
+void o_complex_translate_world(OBJECT *object, int dx, int dy)
 {
   g_return_if_fail (object != NULL &&
                     (object->type == OBJ_COMPLEX ||
@@ -760,9 +822,9 @@ void o_complex_translate_world(TOPLEVEL *toplevel, int dx, int dy,
   object->complex->x = object->complex->x + dx;
   object->complex->y = object->complex->y + dy;
 
-  o_glist_translate_world (toplevel, dx, dy, object->complex->prim_objs);
+  o_glist_translate_world (object->complex->prim_objs, dx, dy);
 
-  o_complex_recalc (toplevel, object);
+  object->w_bounds_valid_for = NULL;
 }
 
 /*! \brief Create a copy of a COMPLEX object
@@ -804,7 +866,7 @@ OBJECT *o_complex_copy(TOPLEVEL *toplevel, OBJECT *o_current)
   }
 
   /* Recalculate bounds */
-  o_complex_recalc(toplevel, o_new);
+  o_new->w_bounds_valid_for = NULL;
 
   /* Delete or hide attributes eligible for promotion inside the complex */
   o_complex_remove_promotable_attribs (toplevel, o_new);
@@ -821,10 +883,17 @@ OBJECT *o_complex_copy(TOPLEVEL *toplevel, OBJECT *o_current)
 }
 
 
-/*! \todo Finish function documentation!!!
- *  \brief
+/*! \brief Rotates a complex object in world coordinates
  *  \par Function Description
+ *  This function rotates a complex \a object around the
+ *  (\a centerx,\a centery) point by \a angle degrees.
+ *  The center of rotation is in world units.
  *
+ *  \param [in]      toplevel  The toplevel environment.
+ *  \param [in]      centerx   X coordinate of rotation center (world coords).
+ *  \param [in]      centery   Y coordinate of rotation center (world coords).
+ *  \param [in]      angle     Rotation angle in degrees.
+ *  \param [in,out]  object    Complex object to rotate.
  */
 void o_complex_rotate_world(TOPLEVEL *toplevel,
                             int centerx, int centery,
@@ -845,15 +914,15 @@ void o_complex_rotate_world(TOPLEVEL *toplevel,
   x = newx + (centerx);
   y = newy + (centery);
 
-  o_complex_translate_world(toplevel,
+  o_complex_translate_world(object,
                             -object->complex->x,
-                            -object->complex->y, object);
+                            -object->complex->y);
   o_glist_rotate_world (toplevel, 0, 0, angle, object->complex->prim_objs);
 
   object->complex->x = 0;
   object->complex->y = 0;
 
-  o_complex_translate_world(toplevel, x, y, object);
+  o_complex_translate_world(object, x, y);
 
   object->complex->angle = ( object->complex->angle + angle ) % 360;
 }
@@ -878,9 +947,9 @@ void o_complex_mirror_world(TOPLEVEL *toplevel,
   x = 2 * world_centerx - object->complex->x;
   y = object->complex->y;
 
-  o_complex_translate_world(toplevel,
+  o_complex_translate_world(object,
                             -object->complex->x,
-                            -object->complex->y, object);
+                            -object->complex->y);
 
   o_glist_mirror_world (toplevel, 0, 0, object->complex->prim_objs);
 
@@ -897,7 +966,7 @@ void o_complex_mirror_world(TOPLEVEL *toplevel,
 
   object->complex->mirror = !object->complex->mirror;
 
-  o_complex_translate_world(toplevel, x, y, object);
+  o_complex_translate_world(object, x, y);
 }
 
 
@@ -1129,6 +1198,7 @@ done:
  *        force treating them as solid filled.
  *        We ignore the force_solid argument to this function.
  *
+ *  \param [in] toplevel     The TOPLEVEL object.
  *  \param [in] object       The complex  OBJECT.
  *  \param [in] x            The x coordinate of the given point.
  *  \param [in] y            The y coordinate of the given point.
@@ -1138,8 +1208,8 @@ done:
  *  number (G_MAXDOUBLE).  With an invalid parameter, this function returns
  *  G_MAXDOUBLE.
  */
-double o_complex_shortest_distance (OBJECT *object, int x, int y,
-                                    int force_solid)
+double o_complex_shortest_distance (TOPLEVEL *toplevel, OBJECT *object,
+                                    int x, int y, int force_solid)
 {
   double shortest_distance = G_MAXDOUBLE;
   double distance;
@@ -1152,25 +1222,26 @@ double o_complex_shortest_distance (OBJECT *object, int x, int y,
   for (iter = object->complex->prim_objs;
        iter != NULL; iter= g_list_next (iter)) {
     OBJECT *obj = iter->data;
+    int left, top, right, bottom;
 
     /* Collect the bounds of any lines and arcs in the symbol */
     if ((obj->type == OBJ_LINE || obj->type == OBJ_ARC) &&
-        obj->w_bounds_valid) {
-
+        world_get_single_object_bounds(toplevel, obj,
+                                       &left, &top, &right, &bottom)) {
       if (found_line_bounds) {
-        line_bounds.lower_x = min (line_bounds.lower_x, obj->w_left);
-        line_bounds.lower_y = min (line_bounds.lower_y, obj->w_top);
-        line_bounds.upper_x = max (line_bounds.upper_x, obj->w_right);
-        line_bounds.upper_y = max (line_bounds.upper_y, obj->w_bottom);
+        line_bounds.lower_x = min (line_bounds.lower_x, left);
+        line_bounds.lower_y = min (line_bounds.lower_y, top);
+        line_bounds.upper_x = max (line_bounds.upper_x, right);
+        line_bounds.upper_y = max (line_bounds.upper_y, bottom);
       } else {
-        line_bounds.lower_x = obj->w_left;
-        line_bounds.lower_y = obj->w_top;
-        line_bounds.upper_x = obj->w_right;
-        line_bounds.upper_y = obj->w_bottom;
+        line_bounds.lower_x = left;
+        line_bounds.lower_y = top;
+        line_bounds.upper_x = right;
+        line_bounds.upper_y = bottom;
         found_line_bounds = 1;
       }
     } else {
-      distance = o_shortest_distance_full (obj, x, y, TRUE);
+      distance = o_shortest_distance_full (toplevel, obj, x, y, TRUE);
       shortest_distance = min (shortest_distance, distance);
     }
 

@@ -1,6 +1,6 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's Library
- * Copyright (C) 2011      gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 2011-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,10 @@ G_BEGIN_DECLS
 typedef enum {
   EDA_ERROR_SCHEME,   /* A Scheme error occurred */
   EDA_ERROR_RC_TWICE, /* Attempted to read a configuration file twice */
-  EDA_ERROR_PARSE,    /* A schematic file could not be parsed. */
+  EDA_ERROR_PARSE,    /* Schematic data could not be parsed. */
+  EDA_ERROR_NOLIB,    /* A requested library resource was missing. */
+  EDA_ERROR_LOOP,     /* The data model contains a circular dependency. */
+  EDA_ERROR_UNKNOWN_ENCODING, /* Schematic data was not UTF-8-encoded. */
   EDA_ERROR_NUM_ERRORS,
 } EdaError;
 

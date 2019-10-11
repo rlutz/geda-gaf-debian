@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,13 +32,9 @@
 #include "gschem.h"
 #include <gdk/gdkkeysyms.h>
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
-    gtk_widget_ref (widget), (GDestroyNotify) gtk_widget_unref)
+    g_object_ref (widget), (GDestroyNotify) g_object_unref)
 
 /** @brief How many entries to keep in the "Search text" combo box. */
 #define HISTORY_LENGTH		15
@@ -96,8 +92,8 @@ struct autonumber_text_t {
   /** @brief Pointer to the dialog */ 
   GtkWidget *dialog;
 
-  /** @brief Pointer to the GSCHEM_TOPLEVEL struct */
-  GSCHEM_TOPLEVEL *w_current;
+  /** @brief Pointer to the GschemToplevel struct */
+  GschemToplevel *w_current;
 
   /* variables used while autonumbering */
   gchar * current_searchtext;
@@ -385,7 +381,7 @@ gint autonumber_match(AUTONUMBER_TEXT *autotext, OBJECT *o_current, gint *number
  *  multislotted symbols, that were used only partially.
  *  The criterias are derivated from the autonumber dialog entries.
  */
-void autonumber_get_used(GSCHEM_TOPLEVEL *w_current, AUTONUMBER_TEXT *autotext)
+void autonumber_get_used(GschemToplevel *w_current, AUTONUMBER_TEXT *autotext)
 {
   gint number, numslots, slotnr, i;
   OBJECT *o_current, *o_parent;
@@ -591,7 +587,9 @@ void autonumber_remove_number(AUTONUMBER_TEXT * autotext, OBJECT *o_current)
       }
     }
   }
-  autotext->w_current->toplevel->page_current->CHANGED = 1;
+
+  gschem_toplevel_page_content_changed (autotext->w_current,
+                                        autotext->w_current->toplevel->page_current);
 }
 
 /*! \brief Changes the number <B>OBJECT</B> element. Changes the slot attribute.
@@ -605,17 +603,20 @@ void autonumber_apply_new_text(AUTONUMBER_TEXT * autotext, OBJECT *o_current,
 {
   char *str;
 
-  /* update the slot on the owning object */
-  str = g_strdup_printf ("slot=%d", slot);
-  o_slot_end (autotext->w_current, o_current->attached_to, str);
-  g_free (str);
+  if (slot != 0) {
+    /* update the slot on the owning object */
+    str = g_strdup_printf ("slot=%d", slot);
+    o_slot_end (autotext->w_current, o_current->attached_to, str);
+    g_free (str);
+  }
 
   /* replace old text */
   str = g_strdup_printf("%s%d", autotext->current_searchtext, number);
   o_text_set_string (autotext->w_current->toplevel, o_current, str);
   g_free (str);
 
-  autotext->w_current->toplevel->page_current->CHANGED = 1;
+  gschem_toplevel_page_content_changed (autotext->w_current,
+                                        autotext->w_current->toplevel->page_current);
 }
 
 
@@ -634,7 +635,8 @@ void autonumber_text_autonumber(AUTONUMBER_TEXT *autotext)
   GList *searchtext_list=NULL;
   GList *text_item, *obj_item, *page_item;
   OBJECT *o_current;
-  GSCHEM_TOPLEVEL *w_current;
+  GschemToplevel *w_current;
+  PAGE *saved_page;
   gchar *searchtext;
   gchar *scope_text;
   gchar *new_searchtext;
@@ -643,6 +645,7 @@ void autonumber_text_autonumber(AUTONUMBER_TEXT *autotext)
   const GList *iter;
   
   w_current = autotext->w_current;
+  saved_page = w_current->toplevel->page_current;
   autotext->current_searchtext = NULL;
   autotext->root_page = 1;
   autotext->used_numbers = NULL;
@@ -683,6 +686,7 @@ void autonumber_text_autonumber(AUTONUMBER_TEXT *autotext)
     /* collect all the possible searchtexts in all pages of the hierarchy */
     for (page_item = pages; page_item != NULL; page_item = g_list_next(page_item)) {
       s_page_goto(w_current->toplevel, page_item->data);
+      gschem_toplevel_page_changed (w_current);
       /* iterate over all objects an look for matching searchtext's */
       for (iter = s_page_objects (w_current->toplevel->page_current);
            iter != NULL;
@@ -737,6 +741,7 @@ void autonumber_text_autonumber(AUTONUMBER_TEXT *autotext)
 	for (page_item = pages; page_item != NULL; page_item = g_list_next(page_item)) {
 	  autotext->root_page = (pages->data == page_item->data);
 	  s_page_goto(w_current->toplevel, page_item->data);
+      gschem_toplevel_page_changed (w_current);
 	  autonumber_get_used(w_current, autotext);
 	}
       }
@@ -745,6 +750,7 @@ void autonumber_text_autonumber(AUTONUMBER_TEXT *autotext)
     /* renumber the elements */
     for (page_item = pages; page_item != NULL; page_item = g_list_next(page_item)) {
       s_page_goto(w_current->toplevel, page_item->data);
+      gschem_toplevel_page_changed (w_current);
       autotext->root_page = (pages->data == page_item->data);
       /* build a page database if we're numbering pagebypage or selection only*/
       if (autotext->scope_skip == SCOPE_PAGE || autotext->scope_skip == SCOPE_SELECTED) {
@@ -814,10 +820,16 @@ void autonumber_text_autonumber(AUTONUMBER_TEXT *autotext)
   /* cleanup and redraw all*/
   g_list_foreach(searchtext_list, (GFunc) g_free, NULL);
   g_list_free(searchtext_list);
-  s_page_goto(w_current->toplevel, pages->data); /* go back to the root page */
-  o_invalidate_all (w_current);
+  if (saved_page != NULL) {
+    s_page_goto (w_current->toplevel, saved_page);
+    gschem_toplevel_page_changed (w_current);
+  }
+  gschem_page_view_invalidate_all (gschem_toplevel_get_current_page_view (w_current));
   g_list_free(pages);
-  o_undo_savestate(w_current, UNDO_ALL);
+  /* FIXME: If hierarchy renumbering is enabled, an undo step should be
+   *        added for all pages which were modified.  Also, an undo step
+   *        shouldn't be added if the page wasn't actually modified. */
+  o_undo_savestate_old (w_current, UNDO_ALL, _("Autonumber"));
 }
 
 /* ***** UTILITY GUI FUNCTIONS (move to a separate file in the future?) **** */
@@ -842,7 +854,7 @@ GtkWidget* lookup_widget(GtkWidget *widget, const gchar *widget_name)
  *  Load all bitmaps for the combobox and store them together with the label
  *  in a GtkListStore.
  */
-void autonumber_sortorder_create(GSCHEM_TOPLEVEL *w_current, GtkWidget *sort_order)
+void autonumber_sortorder_create(GschemToplevel *w_current, GtkWidget *sort_order)
 {
   GtkListStore *store;
   GtkTreeIter iter;
@@ -1167,7 +1179,7 @@ void autonumber_removenum_toggled(GtkWidget * opt_removenum,
  * @param w_current Pointer to the top level struct.
  * @return Pointer to the dialog window.
  */
-GtkWidget* autonumber_create_dialog(GSCHEM_TOPLEVEL *w_current)
+GtkWidget* autonumber_create_dialog(GschemToplevel *w_current)
 {
   GtkWidget *autonumber_text;
   GtkWidget *vbox1;
@@ -1210,11 +1222,10 @@ GtkWidget* autonumber_create_dialog(GSCHEM_TOPLEVEL *w_current)
 					  GTK_RESPONSE_REJECT,
 					  -1);
 
-  gtk_window_position (GTK_WINDOW (autonumber_text),
-		       GTK_WIN_POS_MOUSE);
+  gtk_window_set_position (GTK_WINDOW (autonumber_text), GTK_WIN_POS_MOUSE);
   
-  gtk_container_border_width(GTK_CONTAINER(autonumber_text), 
-			     DIALOG_BORDER_SPACING);
+  gtk_container_set_border_width (GTK_CONTAINER (autonumber_text),
+                                  DIALOG_BORDER_SPACING);
   vbox1 = GTK_DIALOG(autonumber_text)->vbox;
   gtk_box_set_spacing(GTK_BOX(vbox1), DIALOG_V_SPACING);
 
@@ -1370,7 +1381,7 @@ GtkWidget* autonumber_create_dialog(GSCHEM_TOPLEVEL *w_current)
  *
  *  @param w_current Pointer to the top level struct
  */
-void autonumber_text_dialog(GSCHEM_TOPLEVEL *w_current)
+void autonumber_text_dialog(GschemToplevel *w_current)
 {
   static AUTONUMBER_TEXT *autotext = NULL;
 
@@ -1382,7 +1393,7 @@ void autonumber_text_dialog(GSCHEM_TOPLEVEL *w_current)
     autotext=autonumber_init_state();
   }
 
-  /* set the GSCHEM_TOPLEVEL always. Can it be changed between the calls??? */
+  /* set the GschemToplevel always. Can it be changed between the calls??? */
   autotext->w_current = w_current;
 
   if(autotext->dialog == NULL) {

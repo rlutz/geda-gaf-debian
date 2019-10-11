@@ -1,0 +1,81 @@
+# Copyright (C) 2013-2019 Roland Lutz
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+SUBDIRS = \
+	po \
+	src/storage \
+	src/cpython/storage \
+	src/cpython/guile \
+	src/python \
+	src/gaf \
+	src/command \
+	src/backend \
+	. \
+	tests \
+	tests/netlist
+
+include_HEADERS = include/xornstorage.h
+
+nodist_noinst_PYTHON = built-packages/xorn.py built-packages/gaf.py
+all-local: $(nodist_noinst_PYTHON)
+built-packages/xorn.py: Makefile
+	$(AM_V_GEN)$(MKDIR_P) built-packages && { \
+	    echo '__path__ = ["$(abs_builddir)/src/cpython/storage/.libs",'; \
+	    echo '            "$(abs_builddir)/src/cpython/guile/.libs",'; \
+	    echo '            "$(abs_builddir)/src/python",'; \
+	    echo '            "$(abs_srcdir)/src/python"]'; \
+	} > $@
+built-packages/gaf.py: Makefile
+	$(AM_V_GEN)$(MKDIR_P) built-packages && { \
+	    echo '__path__ = ["$(abs_srcdir)/src/gaf"]'; \
+	} > $@
+
+CLEANFILES = \
+	built-packages/xorn.py \
+	built-packages/xorn.pyc \
+	built-packages/gaf.py \
+	built-packages/gaf.pyc
+
+ACLOCAL_AMFLAGS = -I m4
+
+EXTRA_DIST = \
+	pprint-chlog \
+	doc/HACKING \
+	doc/mainpage.md \
+	doc/storage.md \
+	doc/api/Doxyfile \
+	doc/api/storage.dox \
+	doc/api/using-storage.md \
+	doc/geda/colors.md \
+	doc/geda/coordinatespace.jpg \
+	doc/geda/data.dox \
+	doc/geda/file_format_spec \
+	doc/geda/fileformat_textgraphic.jpg \
+	doc/geda/filltype.svg \
+	doc/geda/linetype.svg \
+	doc/geda/path_example_and_gate-smaller.png \
+	doc/geda/xml-file-format.md
+
+dist-hook:
+	if test -d $(srcdir)/.git; \
+	then	chmod u+w $(distdir)/ChangeLog; \
+		( cd $(srcdir); ./pprint-chlog ) > $(distdir)/ChangeLog; \
+	fi
+
+doxygen:
+	cd $(srcdir)/doc/api && doxygen
+
+.PHONY: doxygen

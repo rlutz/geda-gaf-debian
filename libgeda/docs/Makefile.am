@@ -11,11 +11,8 @@ all:
 doxygen: libgeda.dox
 	@echo 'Creating doxygen documentation for libgeda...'
 if ENABLE_DOXYGEN
-	-cd images && $(MAKE) images
-	-cd ..
-	$(DOXYGEN) libgeda.dox
-	-cd latex && $(MAKE)
-	-cd ..
+	cd images && $(MAKE) images
+	cd $(srcdir) && $(DOXYGEN) libgeda.dox
 else
 	@echo 'configure was not run with the --enable-doxygen switch.'
 	@echo 'The documentation cannot be built from the sources.'

@@ -31,10 +31,6 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 #define GSC2PCB_VERSION "1.6"
 
 #define DEFAULT_PCB_INC "pcb.inc"
@@ -1076,7 +1072,8 @@ static gchar *
 expand_dir (gchar * dir)
 {
   gchar *s;
-
+  if (dir == NULL)
+    return NULL;
   if (*dir == '~')
     s = g_build_filename ((gchar *) g_get_home_dir (), dir + 1, NULL);
   else
@@ -1174,11 +1171,12 @@ parse_config (gchar * config, gchar * arg)
     return 0;
   }
   if (!strcmp (config, "elements-dir") || !strcmp (config, "d")) {
+    gchar *elements_dir = expand_dir (arg);
     if (verbose > 1)
       printf ("\tAdding directory to file element directory list: %s\n",
-              expand_dir (arg));
+              elements_dir);
     element_directory_list =
-      g_list_prepend (element_directory_list, expand_dir (arg));
+      g_list_prepend (element_directory_list, elements_dir);
   } else if (!strcmp (config, "output-name") || !strcmp (config, "o"))
     sch_basename = g_strdup (arg);
   else if (!strcmp (config, "schematics"))
@@ -1319,15 +1317,15 @@ static gchar *usage_string1 =
   "\n"
   "Additional Resources:\n"
   "\n"
-  "  gnetlist user guide:  http://geda.seul.org/wiki/geda:gnetlist_ug\n"
-  "  gEDA homepage:        http://www.gpleda.org\n"
-  "  PCB homepage:         http://pcb.gpleda.org\n"  "\n";
+  "  gnetlist user guide:  http://wiki.geda-project.org/geda:gnetlist_ug\n"
+  "  gEDA homepage:        http://www.geda-project.org\n"
+  "  PCB homepage:         http://pcb.geda-project.org\n"  "\n";
 
 static void
 usage ()
 {
   puts (usage_string0);
-  printf ("                         %s\n", default_m4_pcbdir);
+  printf ("                         %s\n\n", default_m4_pcbdir);
   puts (usage_string1);
   exit (0);
 }
@@ -1390,23 +1388,28 @@ main (gint argc, gchar ** argv)
   gboolean created_pcb_file = TRUE;
   char *path, *p;
   const char *pcbdata_path;
-
-  if (argc < 2)
-    usage ();
+  const char *configure_m4_pcbdir = PCBM4DIR; /* do not free it */
 
   pcbdata_path = g_getenv ("PCBDATA");  /* do not free return value */
   if (pcbdata_path != NULL) {
     /* If PCBDATA is set, use the value */
-    m4_pcbdir = g_strconcat (pcbdata_path, "/pcb/m4", NULL);
-  } else {
+    m4_pcbdir = g_strconcat (pcbdata_path, "/m4", NULL);
+  } else if (configure_m4_pcbdir != NULL) {
     /* Use the default value passed in from the configure script
      * instead of trying to hard code a value which is very
      * likely wrong
      */
-    m4_pcbdir = g_strconcat (PCBDATADIR, "/pcb/m4", NULL);
+    m4_pcbdir = g_strdup (configure_m4_pcbdir);
+  } else {
+    /* Neither PCBDATA was set nor PCBM4DIR has been configured */
+    /* Fall back to using the "m4" subdirectory in the current directory */
+    m4_pcbdir = g_strdup ("./m4");
   }
 
   default_m4_pcbdir = g_strdup (m4_pcbdir);
+
+  if (argc < 2)
+    usage ();
 
   get_args (argc, argv);
 

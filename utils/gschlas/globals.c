@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschlas - gEDA Load and Save
  * Copyright (C) 2002-2010 Ales Hvezda
- * Copyright (C) 2002-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 2002-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/*! \file
+ *  \brief Global declarations
+ *
+ * Global declarations
+ */
+
 #include <config.h>
 
 #include <stdio.h>
@@ -27,21 +33,8 @@
 #include "../include/globals.h"
 #include "../include/prototype.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
-char *rc_filename = NULL; 
-
-int logfile_fd=-1;
-int logging_dest=LOG_WINDOW;
-
 /* command line arguments */
 int verbose_mode=FALSE;
-int interactive_mode=FALSE;
 int quiet_mode=FALSE;
-int embed_mode=FALSE; 
+int embed_mode=FALSE;
 int unembed_mode=FALSE;
-
-
-

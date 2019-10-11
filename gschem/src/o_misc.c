@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +31,7 @@
 #include <unistd.h>
 
 #include "gschem.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
+#include "actions.decl.x"
 
 /* break with the tradition here and input a list */
 /*! \todo probably should go back and do the same for o_copy o_move
@@ -45,14 +42,12 @@
  *  \par Function Description
  *
  */
-void o_edit(GSCHEM_TOPLEVEL *w_current, GList *list)
+void o_edit(GschemToplevel *w_current, GList *list, gboolean double_click)
 {
   OBJECT *o_current;
   const gchar *str = NULL;
 
   if (list == NULL) {
-    w_current->inside_action = 0;
-    i_set_state(w_current, SELECT);
     return;
   }
 
@@ -61,6 +56,13 @@ void o_edit(GSCHEM_TOPLEVEL *w_current, GList *list)
     fprintf(stderr, _("Got an unexpected NULL in o_edit\n"));
     exit(-1);
   }
+
+  /* on double-click, see if we can enter a subschematic */
+  if (double_click && !w_current->SHIFTKEY &&
+      (o_current->type == OBJ_COMPLEX ||
+       o_current->type == OBJ_PLACEHOLDER) &&
+      x_hierarchy_down_schematic (w_current, o_current))
+    return;
 
   /* for now deal with only the first item */
   switch(o_current->type) {
@@ -71,7 +73,7 @@ void o_edit(GSCHEM_TOPLEVEL *w_current, GList *list)
     case(OBJ_NET):
     case(OBJ_PIN):
     case(OBJ_BUS):
-    x_multiattrib_open (w_current);
+    gschem_dockable_present (w_current->multiattrib_dockable);
     break;
 
     case(OBJ_PICTURE):
@@ -85,88 +87,15 @@ void o_edit(GSCHEM_TOPLEVEL *w_current, GList *list)
       if (o_attrib_get_name_value (o_current, NULL, NULL) &&
         /* attribute editor only accept 1-line values for attribute */
         o_text_num_lines (str) == 1) {
-        attrib_edit_dialog(w_current,o_current, FROM_MENU);
+        x_multiattrib_edit_attribute (w_current, o_current);
     } else {
-      o_text_edit(w_current, o_current);
+      gschem_dockable_present (w_current->text_properties_dockable);
     }
     break;
   }
 
   /* has to be more extensive in the future */
   /* some sort of redrawing? */
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-/* This locks the entire selected list.  It does lock components, but does NOT
- * change the color (of primatives of the components) though
- * this cannot be called recursively */
-void o_lock(GSCHEM_TOPLEVEL *w_current)
-{
-  OBJECT *object = NULL;
-  GList *s_current = NULL;
-
-  /* skip over head */
-  s_current = geda_list_get_glist( w_current->toplevel->page_current->selection_list );
-
-  while(s_current != NULL) {
-    object = (OBJECT *) s_current->data;
-    if (object) {
-      /* check to see if locked_color is already being used */
-      if (object->locked_color == -1) {
-        object->selectable = FALSE;
-        object->locked_color = object->color;
-        object->color = LOCK_COLOR;
-        w_current->toplevel->page_current->CHANGED=1;
-      } else {
-        s_log_message(_("Object already locked\n"));
-      }
-    }
-
-    s_current = g_list_next(s_current);
-  }
-
-  if (!w_current->SHIFTKEY) o_select_unselect_all(w_current);
-  o_undo_savestate(w_current, UNDO_ALL);
-  i_update_menus(w_current);
-}
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- */
-/* You can unlock something by selecting it with a bounding box... */
-/* this will probably change in the future, but for now it's a
-   something.. :-) */
-/* this cannot be called recursively */
-void o_unlock(GSCHEM_TOPLEVEL *w_current)
-{
-  OBJECT *object = NULL;
-  GList *s_current = NULL;
-
-  s_current = geda_list_get_glist( w_current->toplevel->page_current->selection_list );
-
-  while(s_current != NULL) {
-    object = (OBJECT *) s_current->data;
-    if (object) {
-      /* only unlock if the object is locked */
-      if (object->selectable == FALSE) {
-        object->selectable = TRUE;
-        object->color = object->locked_color;
-        object->locked_color = -1;
-        w_current->toplevel->page_current->CHANGED = 1;
-      } else {
-        s_log_message(_("Object already unlocked\n"));
-      }
-    }
-
-    s_current = g_list_next(s_current);
-  }
-  o_undo_savestate(w_current, UNDO_ALL);
 }
 
 /*! \brief Rotate all objects in list.
@@ -179,22 +108,22 @@ void o_unlock(GSCHEM_TOPLEVEL *w_current)
  *  There is a second pass to run the rotate hooks of non-simple objects,
  *  like pin or complex objects, for example.
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current  The GschemToplevel object.
  *  \param [in] centerx    Center x coordinate of rotation.
  *  \param [in] centery    Center y coordinate of rotation.
  *  \param [in] angle      Angle to rotate the objects through.
  *  \param [in] list       The list of objects to rotate.
  */
-void o_rotate_world_update(GSCHEM_TOPLEVEL *w_current,
+void o_rotate_world_update(GschemToplevel *w_current,
                            int centerx, int centery, int angle, GList *list)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   OBJECT *o_current;
   GList *o_iter;
 
   /* this is okay if you just hit rotate and have nothing selected */
   if (list == NULL) {
-    w_current->inside_action = 0;
+    i_action_stop (w_current);
     i_set_state(w_current, SELECT);
     return;
   }
@@ -208,7 +137,7 @@ void o_rotate_world_update(GSCHEM_TOPLEVEL *w_current,
   for (o_iter = list; o_iter != NULL; o_iter = g_list_next (o_iter)) {
     o_current = o_iter->data;
 
-    s_conn_remove_object (toplevel, o_current);
+    s_conn_remove_object_connections (toplevel, o_current);
   }
 
   o_glist_rotate_world( toplevel, centerx, centery, angle, list );
@@ -220,7 +149,7 @@ void o_rotate_world_update(GSCHEM_TOPLEVEL *w_current,
   for (o_iter = list; o_iter != NULL; o_iter = g_list_next (o_iter)) {
     o_current = o_iter->data;
 
-    s_conn_update_object (toplevel, o_current);
+    s_conn_update_object (o_current->page, o_current);
   }
 
   o_invalidate_glist (w_current, list);
@@ -230,9 +159,13 @@ void o_rotate_world_update(GSCHEM_TOPLEVEL *w_current,
 
   /* Don't save the undo state if we are inside an action */
   /* This is useful when rotating the selection while moving, for example */
-  toplevel->page_current->CHANGED = 1;
+  gschem_toplevel_page_content_changed (w_current, toplevel->page_current);
   if (!w_current->inside_action) {
-    o_undo_savestate(w_current, UNDO_ALL);
+    o_undo_savestate_old (w_current, UNDO_ALL, _("Rotate"));
+  }
+
+  if (w_current->event_state == ROTATEMODE) {
+    i_set_state(w_current, SELECT);
   }
 }
 
@@ -241,14 +174,14 @@ void o_rotate_world_update(GSCHEM_TOPLEVEL *w_current,
  *  \par Function Description
  *
  */
-void o_mirror_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery, GList *list)
+void o_mirror_world_update(GschemToplevel *w_current, int centerx, int centery, GList *list)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   OBJECT *o_current;
   GList *o_iter;
 
   if (list == NULL) {
-    w_current->inside_action = 0;
+    i_action_stop (w_current);
     i_set_state(w_current, SELECT);
     return;
   }
@@ -262,7 +195,7 @@ void o_mirror_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery,
   for (o_iter = list; o_iter != NULL; o_iter = g_list_next (o_iter)) {
     o_current = o_iter->data;
 
-    s_conn_remove_object (toplevel, o_current);
+    s_conn_remove_object_connections (toplevel, o_current);
   }
 
   o_glist_mirror_world( toplevel, centerx, centery, list );
@@ -274,7 +207,7 @@ void o_mirror_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery,
   for (o_iter = list; o_iter != NULL; o_iter = g_list_next (o_iter)) {
     o_current = o_iter->data;
 
-    s_conn_update_object (toplevel, o_current);
+    s_conn_update_object (o_current->page, o_current);
   }
 
   o_invalidate_glist (w_current, list);
@@ -282,8 +215,12 @@ void o_mirror_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery,
   /* Run mirror-objects-hook */
   g_run_hook_object_list (w_current, "%mirror-objects-hook", list);
 
-  toplevel->page_current->CHANGED=1;
-  o_undo_savestate(w_current, UNDO_ALL);
+  gschem_toplevel_page_content_changed (w_current, toplevel->page_current);
+  o_undo_savestate_old (w_current, UNDO_ALL, _("Mirror"));
+
+  if (w_current->event_state == MIRRORMODE) {
+    i_set_state(w_current, SELECT);
+  }
 }
 
 /*! \todo Finish function documentation!!!
@@ -291,17 +228,17 @@ void o_mirror_world_update(GSCHEM_TOPLEVEL *w_current, int centerx, int centery,
  *  \par Function Description
  *
  */
-void o_edit_show_hidden_lowlevel (GSCHEM_TOPLEVEL *w_current,
+void o_edit_show_hidden_lowlevel (GschemToplevel *w_current,
                                   const GList *o_list)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   OBJECT *o_current;
   const GList *iter;
 
   iter = o_list;
   while (iter != NULL) {
     o_current = (OBJECT *)iter->data;
-    if (o_current->type == OBJ_TEXT && !o_is_visible (toplevel, o_current)) {
+    if (o_current->type == OBJ_TEXT && !o_is_visible (o_current)) {
 
       /* don't toggle the visibility flag */
       o_text_recreate (toplevel, o_current);
@@ -309,7 +246,7 @@ void o_edit_show_hidden_lowlevel (GSCHEM_TOPLEVEL *w_current,
 
     if (o_current->type == OBJ_COMPLEX || o_current->type == OBJ_PLACEHOLDER) {
       o_edit_show_hidden_lowlevel(w_current, o_current->complex->prim_objs);
-      o_recalc_single_object(toplevel, o_current);
+      o_current->w_bounds_valid_for = NULL;
     }
 
     iter = g_list_next (iter);
@@ -321,7 +258,7 @@ void o_edit_show_hidden_lowlevel (GSCHEM_TOPLEVEL *w_current,
  *  \par Function Description
  *
  */
-void o_edit_show_hidden (GSCHEM_TOPLEVEL *w_current, const GList *o_list)
+void o_edit_show_hidden (GschemToplevel *w_current, const GList *o_list)
 {
   /* this function just shows the hidden text, but doesn't toggle it */
   /* this function does not change the CHANGED bit, no real changes are */
@@ -333,146 +270,32 @@ void o_edit_show_hidden (GSCHEM_TOPLEVEL *w_current, const GList *o_list)
   i_show_state(w_current, NULL); /* update screen status */
 
   o_edit_show_hidden_lowlevel(w_current, o_list);
-  o_invalidate_all (w_current);
+  gschem_page_view_invalidate_all (gschem_toplevel_get_current_page_view (w_current));
 
   if (w_current->toplevel->show_hidden_text) {
     s_log_message(_("Hidden text is now visible\n"));
   } else {
     s_log_message(_("Hidden text is now invisible\n"));
   }
+
+  gschem_action_set_active (action_edit_show_hidden,
+                            w_current->toplevel->show_hidden_text,
+                            w_current);
 }
-
-#define FIND_WINDOW_HALF_SIZE (5000)
-
-OBJECT *last_o = NULL;
-int skiplast;
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
- *
- *  \todo Only descends into the first source schematic
- *
- */
-int o_edit_find_text (GSCHEM_TOPLEVEL *w_current, const GList *o_list,
-                      char *stext, int descend, int skip)
-{
-  TOPLEVEL *toplevel = w_current->toplevel;
-  char *attrib = NULL;
-  int count = 0;
-  PAGE *parent = NULL;
-  char *current_filename = NULL;
-  int page_control = 0;
-  int pcount = 0;
-  int rv;
-  int text_screen_height;
-  const GList *iter;
-
-  OBJECT *o_current;
-
-  skiplast = skip;
-
-  iter = o_list;
-  while (iter != NULL) {
-    o_current = (OBJECT *)iter->data;
-
-    if (descend) {
-      if (o_current->type == OBJ_COMPLEX) {
-        parent = toplevel->page_current;
-        attrib = o_attrib_search_attached_attribs_by_name (o_current,
-                                                           "source", count);
-
-        /* if above is null, then look inside symbol */
-        if (attrib == NULL) {
-          attrib = o_attrib_search_inherited_attribs_by_name (o_current,
-                                                              "source", count);
-          /*          looking_inside = TRUE; */
-        }
-
-        if (attrib) {
-          pcount = 0;
-          current_filename = u_basic_breakup_string(attrib, ',', pcount);
-          if (current_filename != NULL) {
-            PAGE *child_page =
-              s_hierarchy_down_schematic_single(toplevel,
-                                                current_filename,
-                                                parent,
-                                                page_control,
-                                                HIERARCHY_NORMAL_LOAD);
-
-            if (child_page != NULL) {
-              page_control = child_page->page_control;
-              rv = o_edit_find_text (w_current,
-                                     s_page_objects (child_page),
-                                     stext, descend, skiplast);
-              if (!rv) {
-                s_page_goto( toplevel, child_page );
-                return 0;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (o_current->type == OBJ_TEXT &&
-        (o_is_visible (toplevel, o_current) || toplevel->show_hidden_text)) {
-
-      const gchar *str = o_text_get_string (toplevel, o_current);
-     /* replaced strcmp with strstr to simplify the search */
-      if (strstr (str,stext)) {
-        if (!skiplast) {
-          int x1, y1, x2, y2;
-
-          a_zoom(w_current, ZOOM_FULL, DONTCARE, A_PAN_DONT_REDRAW);
-          g_assert( world_get_single_object_bounds (toplevel, o_current, &x1, &y1, &x2, &y2) );
-          text_screen_height = SCREENabs (w_current, y2 - y1);
-          /* this code will zoom/pan till the text screen height is about */
-          /* 50 pixels high, perhaps a future enhancement will be to make */
-          /* this number configurable */
-          while (text_screen_height < 50) {
-            a_zoom(w_current, ZOOM_IN, DONTCARE, A_PAN_DONT_REDRAW);
-            text_screen_height = SCREENabs (w_current, y2 - y1);
-          }
-          a_pan_general(w_current,
-                        o_current->text->x, o_current->text->y,
-                        1, 0);
-
-	  /* Make sure the titlebar and scrollbars are up-to-date */
-	  x_window_set_current_page(w_current, 
-                                    w_current->toplevel->page_current );
-
-          last_o = o_current;
-          break;
-        }
-        if (last_o == o_current) {
-          skiplast = 0;
-        }
-
-      } /* if (strstr(o_current->text->string,stext)) */
-    } /* if (o_current->type == OBJ_TEXT) */
-    iter = g_list_next (iter);
-
-    if (iter == NULL) {
-      return 1;
-    }
-  }
-  return (iter == NULL);
-}
-
 
 /*! \todo Finish function documentation!!!
  *  \brief
  *  \par Function Description
  *
  */
-void o_edit_hide_specific_text (GSCHEM_TOPLEVEL *w_current,
+void o_edit_hide_specific_text (GschemToplevel *w_current,
                                 const GList *o_list,
-                                char *stext)
+                                const char *stext)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   OBJECT *o_current;
   const GList *iter;
+  gboolean changed = FALSE;
 
   iter = o_list;
   while (iter != NULL) {
@@ -481,18 +304,21 @@ void o_edit_hide_specific_text (GSCHEM_TOPLEVEL *w_current,
     if (o_current->type == OBJ_TEXT) {
       const gchar *str = o_text_get_string (w_current->toplevel, o_current);
       if (!strncmp (stext, str, strlen (stext))) {
-        if (o_is_visible (toplevel, o_current)) {
+        if (o_is_visible (o_current)) {
           o_set_visibility (toplevel, o_current, INVISIBLE);
           o_text_recreate(toplevel, o_current);
 
-          toplevel->page_current->CHANGED = 1;
+          changed = TRUE;
         }
       }
     }
     iter = g_list_next (iter);
   }
-  o_undo_savestate(w_current, UNDO_ALL);
-  o_invalidate_all (w_current);
+  if (changed) {
+    gschem_toplevel_page_content_changed (w_current, toplevel->page_current);
+    o_undo_savestate_old (w_current, UNDO_ALL, _("Hide Specific Text"));
+  }
+  gschem_page_view_invalidate_all (gschem_toplevel_get_current_page_view (w_current));
 }
 
 /*! \todo Finish function documentation!!!
@@ -500,13 +326,14 @@ void o_edit_hide_specific_text (GSCHEM_TOPLEVEL *w_current,
  *  \par Function Description
  *
  */
-void o_edit_show_specific_text (GSCHEM_TOPLEVEL *w_current,
+void o_edit_show_specific_text (GschemToplevel *w_current,
                                 const GList *o_list,
-                                char *stext)
+                                const char *stext)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   OBJECT *o_current;
   const GList *iter;
+  gboolean changed = FALSE;
 
   iter = o_list;
   while (iter != NULL) {
@@ -515,17 +342,20 @@ void o_edit_show_specific_text (GSCHEM_TOPLEVEL *w_current,
     if (o_current->type == OBJ_TEXT) {
       const gchar *str = o_text_get_string (w_current->toplevel, o_current);
       if (!strncmp (stext, str, strlen (stext))) {
-        if (!o_is_visible (toplevel, o_current)) {
+        if (!o_is_visible (o_current)) {
           o_set_visibility (toplevel, o_current, VISIBLE);
           o_text_recreate(toplevel, o_current);
 
-          toplevel->page_current->CHANGED = 1;
+          changed = TRUE;
         }
       }
     }
     iter = g_list_next (iter);
   }
-  o_undo_savestate(w_current, UNDO_ALL);
+  if (changed) {
+    gschem_toplevel_page_content_changed (w_current, toplevel->page_current);
+    o_undo_savestate_old (w_current, UNDO_ALL, _("Show Specific Text"));
+  }
 }
 
 
@@ -538,15 +368,15 @@ void o_edit_show_specific_text (GSCHEM_TOPLEVEL *w_current,
  * replaces \a o_current on the page; \a o_current is deleted. On
  * failure, returns NULL, and \a o_current is left unchanged.
  *
- * \param [in]     w_current The GSCHEM_TOPLEVEL object.
+ * \param [in]     w_current The GschemToplevel object.
  * \param [in,out] o_current The OBJECT to be updated.
  *
  * \return the new OBJECT that replaces \a o_current.
  */
 OBJECT *
-o_update_component (GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
+o_update_component (GschemToplevel *w_current, OBJECT *o_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   OBJECT *o_new;
   PAGE *page;
   GList *new_attribs;
@@ -633,9 +463,7 @@ o_update_component (GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
   /* Select new OBJECT */
   o_selection_add (toplevel, page->selection_list, o_new);
 
-  /* mark the page as modified */
-  toplevel->page_current->CHANGED = 1;
-  o_undo_savestate (w_current, UNDO_ALL);
+  /* Can't undo this, so there's no point in adding an undo step. */
 
   return o_new;
 }
@@ -645,11 +473,11 @@ o_update_component (GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
  *  Looks for pages with the do_autosave_backup flag activated and
  *  autosaves them.
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object to search for autosave's.
+ *  \param [in] w_current  The GschemToplevel object to search for autosave's.
  */
-void o_autosave_backups(GSCHEM_TOPLEVEL *w_current)
+void o_autosave_backups(GschemToplevel *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   GList *iter;
   PAGE *p_save, *p_current;
   gchar *backup_filename;
@@ -675,6 +503,7 @@ void o_autosave_backups(GSCHEM_TOPLEVEL *w_current)
     if (p_current->ops_since_last_backup != 0) {
       /* make p_current the current page of toplevel */
       s_page_goto (toplevel, p_current);
+      gschem_toplevel_page_changed (w_current);
 
       /* Get the real filename and file permissions */
       real_filename = follow_symlinks (p_current->page_filename, NULL);
@@ -758,4 +587,5 @@ void o_autosave_backups(GSCHEM_TOPLEVEL *w_current)
   }
   /* restore current page */
   s_page_goto (toplevel, p_save);
+  gschem_toplevel_page_changed (w_current);
 }

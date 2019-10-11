@@ -1,6 +1,6 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,10 +28,6 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 #define MIME_TYPE_SCHEMATIC "application/x-geda-schematic"
 #define CLIP_TYPE_SCHEMATIC 1
 
@@ -43,7 +39,7 @@ static void
 clip_handle_owner_change (GtkClipboard *cb, GdkEvent *event,
                           gpointer user_data)
 {
-  GSCHEM_TOPLEVEL *w_current = (GSCHEM_TOPLEVEL *) user_data;
+  GschemToplevel *w_current = (GschemToplevel *) user_data;
 
   i_update_menus (w_current);
 }
@@ -52,14 +48,13 @@ static void
 clip_get (GtkClipboard *cb, GtkSelectionData *selection_data,
           guint info, gpointer user_data_or_owner)
 {
-  GSCHEM_TOPLEVEL *w_current = (GSCHEM_TOPLEVEL *) user_data_or_owner;
-  TOPLEVEL *toplevel = w_current->toplevel;
+  GschemToplevel *w_current = (GschemToplevel *) user_data_or_owner;
   GdkAtom type = gdk_atom_intern (MIME_TYPE_SCHEMATIC, FALSE);
   gchar *buf;
   if (info != CLIP_TYPE_SCHEMATIC) return;
   /* Convert the objects in the clipboard buffer to gEDA schematic
    * format */
-  buf = o_save_buffer (toplevel, w_current->clipboard_buffer);
+  buf = o_save_buffer (w_current->clipboard_buffer);
   /* Set the selection appropriately */
   gtk_selection_data_set (selection_data, type,
                           8, /* 8-bit data (UTF-8) */
@@ -71,8 +66,8 @@ clip_get (GtkClipboard *cb, GtkSelectionData *selection_data,
 static void
 clip_clear (GtkClipboard *cb, gpointer user_data_or_owner)
 {
-  GSCHEM_TOPLEVEL *w_current = user_data_or_owner;
-  TOPLEVEL *toplevel = w_current->toplevel;
+  GschemToplevel *w_current = user_data_or_owner;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
 
   /* Free the objects in the clipboard buffer */
   s_delete_object_glist (toplevel, w_current->clipboard_buffer);
@@ -85,7 +80,7 @@ clip_clear (GtkClipboard *cb, gpointer user_data_or_owner)
  * and update the menu item sensitivity if necessary.
  */
 void
-x_clipboard_init (GSCHEM_TOPLEVEL *w_current)
+x_clipboard_init (GschemToplevel *w_current)
 {
   GtkClipboard *cb = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
   g_signal_connect (G_OBJECT (cb),
@@ -100,7 +95,7 @@ x_clipboard_init (GSCHEM_TOPLEVEL *w_current)
  * and update the menu item sensitivity if necessary.
  */
 void
-x_clipboard_finish (GSCHEM_TOPLEVEL *w_current)
+x_clipboard_finish (GschemToplevel *w_current)
 {
   GtkClipboard *cb = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
   g_signal_handlers_disconnect_by_func (cb, clip_handle_owner_change, w_current);
@@ -150,12 +145,12 @@ query_usable_targets_cb (GtkClipboard *clip, GdkAtom *targets, gint ntargets,
  * recieved, the provided callback is called with a TRUE / FALSE
  * result.
  *
- * \param [in] w_current   The current GSCHEM_TOPLEVEL.
+ * \param [in] w_current   The current GschemToplevel.
  * \param [in] callback    The callback to recieve the response.
  * \param [in] userdata    Arbitrary data to pass the callback.
  */
 void
-x_clipboard_query_usable (GSCHEM_TOPLEVEL *w_current,
+x_clipboard_query_usable (GschemToplevel *w_current,
                           void (*callback) (int, void *), void *userdata)
 {
   GtkClipboard *clip = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
@@ -173,18 +168,18 @@ x_clipboard_query_usable (GSCHEM_TOPLEVEL *w_current,
  * Set the system clipboard to contain the gschem objects listed in \a
  * object_list.
  *
- * \param [in,out] w_current   The current GSCHEM_TOPLEVEL.
+ * \param [in,out] w_current   The current GschemToplevel.
  * \param [in]     object_list The objects to put in the clipboard.
  *
  * \return TRUE if the clipboard is successfully set.
  */
 gboolean
-x_clipboard_set (GSCHEM_TOPLEVEL *w_current, const GList *object_list)
+x_clipboard_set (GschemToplevel *w_current, const GList *object_list)
 {
   GtkClipboard *cb = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
   GtkTargetEntry target = { MIME_TYPE_SCHEMATIC, 0,
                             CLIP_TYPE_SCHEMATIC };
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   gboolean result;
 
   /* Clear the clipboard buffer */
@@ -210,16 +205,16 @@ x_clipboard_set (GSCHEM_TOPLEVEL *w_current, const GList *object_list)
  * \par Function Description
  * If the system clipboard contains schematic data, retrieve it.
  *
- * \param [in,out] w_current   The current GSCHEM_TOPLEVEL.
+ * \param [in,out] w_current   The current GschemToplevel.
  *
  * \returns Any OBJECTs retrieved from the system clipboard, or NULL
  *          if none were available.
  */
 GList *
-x_clipboard_get (GSCHEM_TOPLEVEL *w_current)
+x_clipboard_get (GschemToplevel *w_current)
 {
   GtkClipboard *cb = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   GdkAtom type = gdk_atom_intern (MIME_TYPE_SCHEMATIC, FALSE);
   GtkSelectionData *selection_data;
   GList *object_list = NULL;

@@ -35,13 +35,13 @@ AC_DEFUN([AX_CHECK_GUILE],
   GUILE_MIN_TEENY=`echo ${GUILE_MIN_VER} | sed -e 's;.*\.;;'`
 
   _found_pkg_config_guile=yes
-  PKG_CHECK_MODULES(GUILE, [guile-2.0 >= $GUILE_MIN_VER],
-                           [GUILE_PKG_NAME=guile-2.0], [_found_pkg_config_guile=no])
+  PKG_CHECK_MODULES(GUILE, [guile-2.2 >= $GUILE_MIN_VER],
+                           [GUILE_PKG_NAME=guile-2.2], [_found_pkg_config_guile=no])
 
   if test "${_found_pkg_config_guile}" = "no" ; then
-   PKG_CHECK_MODULES(GUILE, [guile-1.8 >= $GUILE_MIN_VER],
+   PKG_CHECK_MODULES(GUILE, [guile-2.0 >= $GUILE_MIN_VER],
                             [_found_pkg_config_guile=yes
-                             GUILE_PKG_NAME=guile-1.8],
+                             GUILE_PKG_NAME=guile-2.0],
                             [_found_pkg_config_guile=no])
   fi
 
@@ -64,7 +64,7 @@ will not be able to be carried out.])
   # --------------------------------------
   AC_ARG_VAR([GUILE_SNARF], [path to guile-snarf utility])
 
-  AC_CHECK_PROGS([GUILE_SNARF], [guile-snarf guile-1.8-snarf], [no])
+  AC_CHECK_PROG([GUILE_SNARF], [guile-snarf], [guile-snarf], [no])
   if test "x$GUILE_SNARF" = xno ; then
     AC_MSG_ERROR([The `guile-snarf' tool could not be found. Please ensure that the
 Guile development headers and tools are correctly installed, and rerun
@@ -75,28 +75,28 @@ configure.])
   # ------------------------------------------
   if test "X$GUILE" != "Xno"; then
 
-    AC_MSG_CHECKING([whether scm_display_error expects a stack argument])
+    AC_MSG_CHECKING([whether scm_display_error accepts a stack])
     if $GUILE -c \
 "(exit
    (false-if-exception
      (begin
        (display-error (make-stack #t) (current-output-port) \"a\" \"b\" '() '())
-       #t)))" > /dev/null; then
+       #t)))" > /dev/null 2>&1; then
       AC_MSG_RESULT([yes])
       AC_DEFINE([HAVE_SCM_DISPLAY_ERROR_STACK], 1,
-                [Define to 1 if scm_display_error expects a stack as first argument.])
+                [Define to 1 if scm_display_error accepts a stack as first argument.])
     else
       AC_MSG_RESULT([no])
     fi
 
-    AC_MSG_CHECKING([whether scm_display_error expects a frame argument])
+    AC_MSG_CHECKING([whether scm_display_error accepts a frame])
     if $GUILE -c \
 "(exit
    (false-if-exception
      (begin
        (display-error (stack-ref (make-stack #t) 0)
                       (current-output-port) \"a\" \"b\" '() '())
-       #t)))" > /dev/null; then
+       #t)))" > /dev/null 2>&1; then
       AC_MSG_RESULT([yes])
       AC_DEFINE([HAVE_SCM_DISPLAY_ERROR_FRAME], 1,
                 [Define to 1 if scm_display_error expects a frame as first argument.])
@@ -104,26 +104,5 @@ configure.])
       AC_MSG_RESULT([no])
     fi
   fi
-
-  # Check for functions in `libguile'
-  # ---------------------------------
-
-  # Save build-related variables
-  save_CFLAGS="${CFLAGS}"
-  save_LIBS="${LIBS}"
-
-  CFLAGS="${GUILE_CFLAGS} ${CFLAGS}"
-  LIBS="${GUILE_LIBS}"
-
-  AC_CHECK_FUNCS([scm_from_utf8_string])
-  AC_CHECK_FUNCS([scm_from_utf8_stringn])
-  AC_CHECK_FUNCS([scm_to_utf8_string])
-  AC_CHECK_FUNCS([scm_to_utf8_stringn])
-  AC_CHECK_FUNCS([scm_from_utf8_symbol])
-  AC_CHECK_FUNCS([scm_from_utf8_symboln])
-
-  # Restore build-related variables
-  CFLAGS="${save_CFLAGS}"
-  LIBS="${save_LIBS}"
 
 ])dnl AX_CHECK_GUILE

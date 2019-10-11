@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +22,11 @@
 #include <stdio.h>
 
 #include "gschem.h"
+#include "actions.decl.x"
 
 /* This works, but using one macro inside of other doesn't */
 #define GET_PICTURE_WIDTH(w)			\
-  abs((w)->second_wx - (w)->first_wx) 
+  abs((w)->second_wx - (w)->first_wx)
 #define GET_PICTURE_HEIGHT(w)						\
   (w)->pixbuf_wh_ratio == 0 ? 0 : abs((w)->second_wx - (w)->first_wx)/(w)->pixbuf_wh_ratio
 #define GET_PICTURE_LEFT(w)			\
@@ -49,12 +50,14 @@
  *  The other corner will be saved in (<B>w_current->second_wx</B>,
  *  <B>w_current->second_wy</B>).
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] w_x        Current x coordinate of pointer in world units.    
+ *  \param [in] w_current  The GschemToplevel object.
+ *  \param [in] w_x        Current x coordinate of pointer in world units.
  *  \param [in] w_y        Current y coordinate of pointer in world units.
  */
-void o_picture_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void o_picture_start(GschemToplevel *w_current, int w_x, int w_y)
 {
+  i_action_start (w_current);
+
   /* init first_w[x|y], second_w[x|y] to describe box */
   w_current->first_wx = w_current->second_wx = w_x;
   w_current->first_wy = w_current->second_wy = w_y;
@@ -74,13 +77,13 @@ void o_picture_start(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
  *  initialized and linked to the object list ; The object is finally
  *  drawn on the current sheet.
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current  The GschemToplevel object.
  *  \param [in] w_x        (unused)
  *  \param [in] w_y        (unused)
  */
-void o_picture_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void o_picture_end(GschemToplevel *w_current, int w_x, int w_y)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   OBJECT *new_obj;
   int picture_width, picture_height;
   int picture_left, picture_top;
@@ -90,52 +93,50 @@ void o_picture_end(GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
   /* erase the temporary picture */
   /* o_picture_draw_rubber(w_current); */
   w_current->rubber_visible = 0;
-  
+
   picture_width  = GET_PICTURE_WIDTH (w_current);
   picture_height = GET_PICTURE_HEIGHT(w_current);
   picture_left   = GET_PICTURE_LEFT  (w_current);
   picture_top    = GET_PICTURE_TOP   (w_current);
 
-  /* pictures with null width and height are not allowed */
-  if ((picture_width == 0) && (picture_height == 0)) {
-    /* cancel the object creation */
-    return;
+  /* pictures with null width or height are not allowed */
+  if ((picture_width != 0) && (picture_height != 0)) {
+
+    /* create the object */
+    new_obj = o_picture_new(toplevel,
+                            NULL, 0, w_current->pixbuf_filename,
+                            OBJ_PICTURE,
+                            picture_left, picture_top,
+                            picture_left + picture_width,
+                            picture_top - picture_height,
+                            0, FALSE, FALSE);
+    s_page_append (toplevel, toplevel->page_current, new_obj);
+
+    /* Run %add-objects-hook */
+    g_run_hook_object (w_current, "%add-objects-hook", new_obj);
+
+    gschem_toplevel_page_content_changed (w_current, toplevel->page_current);
+    o_undo_savestate_old (w_current, UNDO_ALL, _("Add Picture"));
   }
-
-  /* create the object */
-  new_obj = o_picture_new(toplevel,
-                          NULL, 0, w_current->pixbuf_filename,
-                          OBJ_PICTURE,
-                          picture_left, picture_top,
-                          picture_left + picture_width,
-                          picture_top - picture_height,
-                          0, FALSE, FALSE);
-  s_page_append (toplevel, toplevel->page_current, new_obj);
-
-  /* Run %add-objects-hook */
-  g_run_hook_object (w_current, "%add-objects-hook", new_obj);
-
-  toplevel->page_current->CHANGED = 1;
-  o_undo_savestate(w_current, UNDO_ALL);
+  i_action_stop (w_current);
 }
 
 /*! \brief Creates the add image dialog
  *  \par Function Description
  *  This function creates the add image dialog and loads the selected picture.
  */
-void picture_selection_dialog (GSCHEM_TOPLEVEL *w_current)
+void picture_selection_dialog (GschemToplevel *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   gchar *filename;
   GdkPixbuf *pixbuf;
   GError *error = NULL;
-  
-  w_current->pfswindow = gtk_file_chooser_dialog_new ("Select a picture file...",
+
+  w_current->pfswindow = gtk_file_chooser_dialog_new (_("Select a picture file..."),
 						      GTK_WINDOW(w_current->main_window),
 						      GTK_FILE_CHOOSER_ACTION_OPEN,
-						      GTK_STOCK_CANCEL, 
+						      GTK_STOCK_CANCEL,
 						      GTK_RESPONSE_CANCEL,
-						      GTK_STOCK_OPEN, 
+						      GTK_STOCK_OPEN,
 						      GTK_RESPONSE_ACCEPT,
 						      NULL);
   /* Set the alternative button order (ok, cancel, help) for other systems */
@@ -145,9 +146,9 @@ void picture_selection_dialog (GSCHEM_TOPLEVEL *w_current)
 					  -1);
 
   if (w_current->pixbuf_filename)
-    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w_current->pfswindow), 
+    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w_current->pfswindow),
 				  w_current->pixbuf_filename);
-    
+
   if (gtk_dialog_run (GTK_DIALOG (w_current->pfswindow)) == GTK_RESPONSE_ACCEPT) {
 
     filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (w_current->pfswindow));
@@ -155,10 +156,10 @@ void picture_selection_dialog (GSCHEM_TOPLEVEL *w_current)
     w_current->pfswindow=NULL;
 
     pixbuf = gdk_pixbuf_new_from_file (filename, &error);
-    
+
     if (!pixbuf) {
       GtkWidget *dialog;
-      
+
       dialog = gtk_message_dialog_new (GTK_WINDOW (w_current->main_window),
 				       GTK_DIALOG_DESTROY_WITH_PARENT,
 				       GTK_MESSAGE_ERROR,
@@ -167,7 +168,7 @@ void picture_selection_dialog (GSCHEM_TOPLEVEL *w_current)
 				       error->message);
       /* Wait for any user response */
       gtk_dialog_run (GTK_DIALOG (dialog));
-      
+
       g_error_free (error);
       gtk_widget_destroy(dialog);
     }
@@ -175,20 +176,18 @@ void picture_selection_dialog (GSCHEM_TOPLEVEL *w_current)
 #if DEBUG
       printf("Picture loaded succesfully.\n");
 #endif
-      
+
       o_invalidate_rubber(w_current);
-      i_update_middle_button(w_current, i_callback_add_picture, _("Picture"));
-      w_current->inside_action = 0;
-      
+      i_update_middle_button (w_current, action_add_picture, _("Picture"));
+      i_action_stop (w_current);
+
       o_picture_set_pixbuf(w_current, pixbuf, filename);
-    
-      toplevel->page_current->CHANGED=1;
-      i_set_state(w_current, DRAWPICTURE);
+
+      i_set_state(w_current, PICTUREMODE);
     }
     g_free (filename);
   }
 
-  i_update_toolbar(w_current);
   if (w_current->pfswindow) {
     gtk_widget_destroy(w_current->pfswindow);
     w_current->pfswindow=NULL;
@@ -202,20 +201,18 @@ void picture_selection_dialog (GSCHEM_TOPLEVEL *w_current)
  *  \note
  * used in button cancel code in x_events.c
  */
-void o_picture_invalidate_rubber (GSCHEM_TOPLEVEL *w_current)
+void o_picture_invalidate_rubber (GschemToplevel *w_current)
 {
-  int left, top, width, height;
+  g_return_if_fail (w_current != NULL);
 
-  WORLDtoSCREEN (w_current,
-                 GET_PICTURE_LEFT(w_current), GET_PICTURE_TOP(w_current),
-                 &left, &top);
-  width = SCREENabs (w_current, GET_PICTURE_WIDTH (w_current));
-  height = SCREENabs (w_current, GET_PICTURE_HEIGHT(w_current));
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
 
-  o_invalidate_rect (w_current, left, top, left + width, top);
-  o_invalidate_rect (w_current, left, top, left, top + height);
-  o_invalidate_rect (w_current, left + width, top, left + width, top + height);
-  o_invalidate_rect (w_current, left, top + height, left + width, top + height);
+  gschem_page_view_invalidate_world_rect (page_view,
+                                          GET_PICTURE_LEFT (w_current),
+                                          GET_PICTURE_TOP (w_current),
+                                          GET_PICTURE_LEFT (w_current) + GET_PICTURE_WIDTH (w_current),
+                                          GET_PICTURE_TOP (w_current) + GET_PICTURE_HEIGHT (w_current));
 }
 
 /*! \brief Draw temporary picture while dragging edge.
@@ -229,11 +226,11 @@ void o_picture_invalidate_rubber (GSCHEM_TOPLEVEL *w_current)
  *  width, height and left and top values are recomputed by the corresponding
  *  macros.
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current  The GschemToplevel object.
  *  \param [in] w_x        Current x coordinate of pointer in world units.
  *  \param [in] w_y        Current y coordinate of pointer in world units.
  */
-void o_picture_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void o_picture_motion (GschemToplevel *w_current, int w_x, int w_y)
 {
 #if DEBUG
   printf("o_picture_rubberbox called\n");
@@ -245,8 +242,8 @@ void o_picture_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
     o_picture_invalidate_rubber (w_current);
 
   /*
-   * New values are fixed according to the <B>w_x</B> and <B>w_y</B> parameters. 
-   * These are saved in <B>w_current</B> pointed structure as new temporary values. 
+   * New values are fixed according to the <B>w_x</B> and <B>w_y</B> parameters.
+   * These are saved in <B>w_current</B> pointed structure as new temporary values.
    * The new box is then drawn.
    */
 
@@ -259,19 +256,23 @@ void o_picture_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
   w_current->rubber_visible = 1;
 }
 
-/*! \brief Draw picture from GSCHEM_TOPLEVEL object.
+/*! \brief Draw picture from GschemToplevel object.
  *  \par Function Description
- *  This function draws the box from the variables in the GSCHEM_TOPLEVEL
+ *  This function draws the box from the variables in the GschemToplevel
  *  structure <B>*w_current</B>.
  *  One corner of the box is at (<B>w_current->first_wx</B>,
  *  <B>w_current->first_wy</B>) and the second corner is at
  *  (<B>w_current->second_wx</B>,<B>w_current->second_wy</B>.
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current  The GschemToplevel object.
  */
-void o_picture_draw_rubber (GSCHEM_TOPLEVEL *w_current)
+void o_picture_draw_rubber (GschemToplevel *w_current, EdaRenderer *renderer)
 {
   int left, top, width, height;
+  double wwidth = 0;
+  cairo_t *cr = eda_renderer_get_cairo_context (renderer);
+  GArray *color_map = eda_renderer_get_color_map (renderer);
+  int flags = eda_renderer_get_cairo_flags (renderer);
 
   /* get the width/height and the upper left corner of the picture */
   left =   GET_PICTURE_LEFT (w_current);
@@ -279,194 +280,25 @@ void o_picture_draw_rubber (GSCHEM_TOPLEVEL *w_current)
   width =  GET_PICTURE_WIDTH (w_current);
   height = GET_PICTURE_HEIGHT (w_current);
 
-  gschem_cairo_box (w_current, 0, left, top - height, left + width, top);
-
-  gschem_cairo_set_source_color (w_current,
-                                 x_color_lookup_dark (SELECT_COLOR));
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, 0, -1, -1);
-}
-
-/*! \brief Draw a picture on the screen.
- *  \par Function Description
- *  This function is used to draw a picture on screen. The picture is
- *  described in the OBJECT which is referred by <B>o_current</B>. The picture
- *  is displayed according to the current state, described in the
- *  GSCHEM_TOPLEVEL object pointed by <B>w_current</B>.
- *
- *  It first checks if the OBJECT pointed is valid or not. If not it
- *  returns and do not output anything. That should never happen though.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  Picture OBJECT to draw.
- */
-void o_picture_draw (GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
-{
-  int s_upper_x, s_upper_y, s_lower_x, s_lower_y;
-  GdkPixbuf *pixbuf;
-
-  g_return_if_fail (w_current != NULL);
-  g_return_if_fail (w_current->toplevel != NULL);
-  g_return_if_fail (o_current != NULL);
-  g_return_if_fail (o_current->picture != NULL);
-
-  pixbuf = o_picture_get_pixbuf (w_current->toplevel, o_current);
-
-  /* If the image failed to load, get the fallback image. */
-  if (pixbuf == NULL) pixbuf = o_picture_get_fallback_pixbuf (w_current->toplevel);
-  /* If the fallback image failed to load, draw a box with a cross in it. */
-  if (pixbuf == NULL) {
-    int line_width = (w_current->toplevel->line_style == THICK) ? LINE_WIDTH : 2;
-    gschem_cairo_set_source_color (w_current,
-                                   o_drawing_color (w_current, o_current));
-    gschem_cairo_box (w_current, line_width,
-                      o_current->picture->lower_x, o_current->picture->lower_y,
-                      o_current->picture->upper_x, o_current->picture->upper_y);
-    gschem_cairo_line (w_current, END_ROUND, line_width,
-                      o_current->picture->lower_x, o_current->picture->lower_y,
-                      o_current->picture->upper_x, o_current->picture->upper_y);
-    gschem_cairo_line (w_current, END_ROUND, line_width,
-                      o_current->picture->lower_x, o_current->picture->upper_y,
-                      o_current->picture->upper_x, o_current->picture->lower_y);
-    gschem_cairo_stroke (w_current, TYPE_SOLID, END_ROUND, line_width, -1, -1);
-    return;
-  }
-
-  g_assert (GDK_IS_PIXBUF (pixbuf));
-
-  WORLDtoSCREEN (w_current, o_current->picture->upper_x,
-                            o_current->picture->upper_y, &s_upper_x, &s_upper_y);
-  WORLDtoSCREEN (w_current, o_current->picture->lower_x,
-                            o_current->picture->lower_y, &s_lower_x, &s_lower_y);
-
-  cairo_save (w_current->cr);
-
-  int swap_wh = (o_current->picture->angle == 90 || o_current->picture->angle == 270);
-  float orig_width  = swap_wh ? gdk_pixbuf_get_height (pixbuf) :
-                                gdk_pixbuf_get_width  (pixbuf);
-  float orig_height = swap_wh ? gdk_pixbuf_get_width  (pixbuf) :
-                                gdk_pixbuf_get_height (pixbuf);
-
-  cairo_translate (w_current->cr, s_upper_x, s_upper_y);
-  cairo_scale (w_current->cr,
-    (float)SCREENabs (w_current, abs (o_current->picture->upper_x -
-                                      o_current->picture->lower_x)) / orig_width,
-    (float)SCREENabs (w_current, abs (o_current->picture->upper_y -
-                                      o_current->picture->lower_y)) / orig_height);
-
-  /* Evil magic translates picture origin to the right position for a given rotation */
-  switch (o_current->picture->angle) {
-    case 0:                                                               break;
-    case 90:   cairo_translate (w_current->cr, 0,          orig_height);  break;
-    case 180:  cairo_translate (w_current->cr, orig_width, orig_height);  break;
-    case 270:  cairo_translate (w_current->cr, orig_width, 0          );  break;
-  }
-  cairo_rotate (w_current->cr, -o_current->picture->angle * M_PI / 180.);
-  if (o_current->picture->mirrored) {
-    cairo_translate (w_current->cr, gdk_pixbuf_get_width (pixbuf), 0);
-    cairo_scale (w_current->cr, -1, 1);
-  }
-
-  gdk_cairo_set_source_pixbuf (w_current->cr,
-                               pixbuf, 0,0);
-  cairo_rectangle (w_current->cr, 0, 0,
-                   gdk_pixbuf_get_width (pixbuf),
-                   gdk_pixbuf_get_height (pixbuf));
-
-  cairo_clip (w_current->cr);
-  cairo_paint (w_current->cr);
-  cairo_restore (w_current->cr);
-
-  /* Grip specific stuff */
-  if (o_current->selected && w_current->draw_grips) {
-    o_picture_draw_grips (w_current, o_current);
-  }
-
-  g_object_unref (pixbuf);
-}
-
-/*! \brief Draw grip marks on picture.
- *  \par Function Description
- *  This function draws four grips on the corners of the picture described
- *  by <B>*o_current</B>.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] o_current  Picture OBJECT to draw grip points on.
- */
-void o_picture_draw_grips(GSCHEM_TOPLEVEL *w_current, OBJECT *o_current)
-{
-  if (w_current->draw_grips == FALSE)
-    return;
-
-  /* grip on upper left corner (whichone = PICTURE_UPPER_LEFT) */
-  o_grips_draw (w_current, o_current->picture->upper_x,
-                           o_current->picture->upper_y);
-
-  /* grip on upper right corner (whichone = PICTURE_UPPER_RIGHT) */
-  o_grips_draw (w_current, o_current->picture->lower_x,
-                           o_current->picture->upper_y);
-
-  /* grip on lower left corner (whichone = PICTURE_LOWER_LEFT) */
-  o_grips_draw (w_current, o_current->picture->upper_x,
-                           o_current->picture->lower_y);
-
-  /* grip on lower right corner (whichone = PICTURE_LOWER_RIGHT) */
-  o_grips_draw (w_current, o_current->picture->lower_x,
-                           o_current->picture->lower_y);
-
-  /* Box surrounding the picture */
-  gschem_cairo_box (w_current, 0,
-                    o_current->picture->upper_x, o_current->picture->upper_y,
-                    o_current->picture->lower_x, o_current->picture->lower_y);
-
-  gschem_cairo_set_source_color (w_current,
-                                 x_color_lookup_dark (SELECT_COLOR));
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, 0, -1, -1);
-}
-
-
-/*! \brief Draw a picture described by OBJECT with translation
- *  \par Function Description
- *  This function daws the picture object described by <B>*o_current</B>
- *  translated by the vector (<B>dx</B>,<B>dy</B>).
- *  The translation vector is in world unit.
- *
- *  The picture is displayed with the color of the object.
- *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
- *  \param [in] dx         Delta x coordinate for picture.
- *  \param [in] dy         Delta y coordinate for picture.
- *  \param [in] o_current  Picture OBJECT to draw.
- */
-void o_picture_draw_place (GSCHEM_TOPLEVEL *w_current, int dx, int dy, OBJECT *o_current)
-{
-  if (o_current->picture == NULL) {
-    return;
-  }
-
-  gschem_cairo_box (w_current, 0, o_current->picture->upper_x + dx,
-                                  o_current->picture->upper_y + dy,
-                                  o_current->picture->lower_x + dx,
-                                  o_current->picture->lower_y + dy);
-
-  gschem_cairo_set_source_color (w_current,
-                                 x_color_lookup_dark (o_current->color));
-  gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, 0, -1, -1);
+  eda_cairo_box (cr, flags, wwidth, left, top - height, left + width, top);
+  eda_cairo_set_source_color (cr, SELECT_COLOR, color_map);
+  eda_cairo_stroke (cr, flags, TYPE_SOLID, END_NONE, wwidth, -1, -1);
 }
 
 /*! \brief Replace all selected pictures with a new picture
  * \par Function Description
  * Replaces all pictures in the current selection with a new image.
  *
- * \param [in] w_current  The GSCHEM_TOPLEVEL object
+ * \param [in] w_current  The GschemToplevel object
  * \param [in] filename   The filename of the new picture
  * \param [out] error     The location to return error information.
  * \return TRUE on success, FALSE on failure.
  */
 gboolean
-o_picture_exchange (GSCHEM_TOPLEVEL *w_current,
+o_picture_exchange (GschemToplevel *w_current,
                     const gchar *filename, GError **error)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   GList *iter;
 
   for (iter = geda_list_get_glist (toplevel->page_current->selection_list);
@@ -499,19 +331,19 @@ o_picture_exchange (GSCHEM_TOPLEVEL *w_current,
  *
  *  \todo Maybe merge this dialog function with picture_selection_dialog()
  */
-void picture_change_filename_dialog (GSCHEM_TOPLEVEL *w_current)
+void picture_change_filename_dialog (GschemToplevel *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   gchar *filename;
   gboolean result;
   GError *error = NULL;
-  
-  w_current->pfswindow = gtk_file_chooser_dialog_new ("Select a picture file...",
+
+  w_current->pfswindow = gtk_file_chooser_dialog_new (_("Select a picture file..."),
 						      GTK_WINDOW(w_current->main_window),
 						      GTK_FILE_CHOOSER_ACTION_OPEN,
-						      GTK_STOCK_CANCEL, 
+						      GTK_STOCK_CANCEL,
 						      GTK_RESPONSE_CANCEL,
-						      GTK_STOCK_OPEN, 
+						      GTK_STOCK_OPEN,
 						      GTK_RESPONSE_ACCEPT,
 						      NULL);
 
@@ -522,9 +354,9 @@ void picture_change_filename_dialog (GSCHEM_TOPLEVEL *w_current)
 					  -1);
 
   if (w_current->pixbuf_filename)
-    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w_current->pfswindow), 
+    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(w_current->pfswindow),
 				  w_current->pixbuf_filename);
-    
+
   if (gtk_dialog_run (GTK_DIALOG (w_current->pfswindow)) == GTK_RESPONSE_ACCEPT) {
 
     filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (w_current->pfswindow));
@@ -549,12 +381,12 @@ void picture_change_filename_dialog (GSCHEM_TOPLEVEL *w_current)
       g_error_free (error);
       gtk_widget_destroy(dialog);
     } else {
-      toplevel->page_current->CHANGED=1;
+      gschem_toplevel_page_content_changed (w_current, toplevel->page_current);
+      o_undo_savestate_old (w_current, UNDO_ALL, _("Replace Picture"));
     }
     g_free (filename);
   }
 
-  i_update_toolbar(w_current);
   if (w_current->pfswindow) {
     gtk_widget_destroy(w_current->pfswindow);
     w_current->pfswindow=NULL;
@@ -565,11 +397,11 @@ void picture_change_filename_dialog (GSCHEM_TOPLEVEL *w_current)
  *  \brief
  *  \par Function Description
  *
- *  \param [in] w_current  The GSCHEM_TOPLEVEL object.
+ *  \param [in] w_current  The GschemToplevel object.
  *  \param [in] pixbuf
  *  \param [in] filename
  */
-void o_picture_set_pixbuf(GSCHEM_TOPLEVEL *w_current,
+void o_picture_set_pixbuf(GschemToplevel *w_current,
                           GdkPixbuf *pixbuf, char *filename)
 {
 

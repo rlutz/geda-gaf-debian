@@ -1,8 +1,8 @@
 if ENABLE_GATTRIB
 GATTRIB_DIR=gattrib
 endif
-SUBDIRS = intl libgeda gschem ${GATTRIB_DIR} gsymcheck gnetlist utils symbols docs \
-	examples
+SUBDIRS = libgeda libgedacairo gaf gschem ${GATTRIB_DIR} \
+	gsymcheck gnetlist-legacy utils symbols docs examples contrib xorn
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -18,7 +18,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--disable-update-xdg-database
 
 BUILT_SOURCES = version.h
-EXTRA_DIST = autogen.sh version.h version.h.in missing.h HACKING \
+EXTRA_DIST = autogen.sh version.h version.h.in HACKING \
 	COPYING.LGPL
 
 # Generate version.h. This works by looking at any git repository that
@@ -37,10 +37,8 @@ version.h: stamp-git $(top_builddir)/configure $(srcdir)/version.h.in
 
 	@date_ver=$(DATE_VERSION); dotted_ver=$(DOTTED_VERSION); \
 	git_commit=`cd $(srcdir) && $(GIT) rev-parse HEAD`; \
-	git_ver=`cd $(srcdir) && $(GIT) describe HEAD`; \
 	sed -e"s:^.*\(PACKAGE_DATE_VERSION\).*$$:#define \1 \"$$date_ver\":" \
 	    -e"s:^.*\(PACKAGE_DOTTED_VERSION\).*$$:#define \1 \"$$dotted_ver\":" \
-	    -e"s:^.*\(PACKAGE_GIT_VERSION\).*$$:#define \1 \"$$git_ver\":" \
 	    -e"s:^.*\(PACKAGE_GIT_COMMIT\).*$$:#define \1 \"$$git_commit\":" \
 	      < $(srcdir)/version.h.in > version.h.new; \
 	if diff version.h version.h.new > /dev/null 2>&1; then \
@@ -62,7 +60,7 @@ endif HAVE_GIT_REPO
 
 doxygen:
 if ENABLE_DOXYGEN
-	@for subdir in gattrib/docs gschem/docs gnetlist/docs \
+	@for subdir in gattrib/docs gschem/docs gnetlist-legacy/docs \
 	  libgeda/docs gsymcheck/docs utils/docs ; do \
 	  (cd $$subdir; $(MAKE) doxygen) || exit 1; \
         done

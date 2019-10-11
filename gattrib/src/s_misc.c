@@ -36,10 +36,7 @@
 #include "../include/struct.h"     /* typdef and struct declarations */
 #include "../include/prototype.h"  /* function prototypes */
 #include "../include/globals.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
+#include "../include/gettext.h"
 
 
 /*------------------------------------------------------------------
@@ -81,9 +78,9 @@ void verbose_done(void)
 {
     if (verbose_mode) {
 	if (char_index >= 70) {
-	    printf("\nDONE\n");
+	    printf(_("\nDONE\n"));
 	} else {
-	    printf(" DONE\n");
+	    printf(_(" DONE\n"));
 	}
 
 	char_index = 0;

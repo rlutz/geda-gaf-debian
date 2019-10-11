@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,10 +50,6 @@
 # endif
 
 #include "libgeda_priv.h"
-
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 /*! \brief Get the autosave filename for a file
  *  \par Function description
@@ -112,7 +108,7 @@ gboolean f_has_active_autosave (const gchar *filename, GError **err)
   }
 
   /* A valid use of goto! (checks for raptors) */
-  if (auto_err & ENOENT) {
+  if (auto_err == ENOENT) {
     /* The autosave file does not exist. */
     result = FALSE;
     goto check_autosave_finish;
@@ -125,7 +121,7 @@ gboolean f_has_active_autosave (const gchar *filename, GError **err)
     result = TRUE;
     goto check_autosave_finish;
   }
-  if (file_err & ENOENT) {
+  if (file_err == ENOENT) {
     /* The autosave file exists, but the actual file does not. */
     result = TRUE;
     goto check_autosave_finish;
@@ -172,12 +168,12 @@ int f_open(TOPLEVEL *toplevel, PAGE *page,
 /*! \brief Opens the schematic file with fine-grained control over behaviour.
  *  \par Function Description
  *  Opens the schematic file and carries out a number of actions
- *  depending on the \a flags set.  If #F_OPEN_RC is set, executes
- *  configuration files found in the target directory.  If
- *  #F_OPEN_CHECK_BACKUP is set, warns user if a backup is found for
- *  the file being loaded, and possibly prompts user for whether to
- *  load the backup instead.  If #F_OPEN_RESTORE_CWD is set, does not
- *  change the working directory to that of the file being loaded.
+ *  depending on the \a flags set.  If #F_OPEN_RC is set, executes RC
+ *  files found in the target directory.  If #F_OPEN_CHECK_BACKUP is
+ *  set, warns user if a backup is found for the file being loaded,
+ *  and possibly prompts user for whether to load the backup instead.
+ *  If #F_OPEN_RESTORE_CWD is set, does not change the working
+ *  directory to that of the file being loaded.
  *
  *  \param [in,out] toplevel  The TOPLEVEL object to load the schematic into.
  *  \param [in]     filename   A character string containing the file name
@@ -194,7 +190,6 @@ int f_open_flags(TOPLEVEL *toplevel, PAGE *page,
 {
   int opened=FALSE;
   char *full_filename = NULL;
-  char *full_rcfilename = NULL;
   char *file_directory = NULL;
   char *saved_cwd = NULL;
   char *backup_filename = NULL;
@@ -203,11 +198,6 @@ int f_open_flags(TOPLEVEL *toplevel, PAGE *page,
 
   /* has the head been freed yet? */
   /* probably not hack PAGE */
-
-  set_window(toplevel, page,
-             toplevel->init_left, toplevel->init_right,
-             toplevel->init_top,  toplevel->init_bottom);
-
 
   /* Cache the cwd so we can restore it later. */
   if (flags & F_OPEN_RESTORE_CWD) {
@@ -221,30 +211,35 @@ int f_open_flags(TOPLEVEL *toplevel, PAGE *page,
                  _("Cannot find file %s: %s"),
                  filename, tmp_err->message);
     g_error_free(tmp_err);
+    g_free (saved_cwd);
     return 0;
   }
 
   /* write full, absolute filename into page->page_filename */
   g_free(page->page_filename);
   page->page_filename = g_strdup(full_filename);
+  page->is_untitled = FALSE;
 
   /* Before we open the page, let's load the corresponding gafrc. */
   /* First cd into file's directory. */
-  file_directory = g_dirname (full_filename);
+  file_directory = g_path_get_dirname (full_filename);
 
-  if (file_directory) { 
-    if (chdir (file_directory)) {
-      /* Error occurred with chdir */
-#warning FIXME: What do we do?
-    }
+  if (chdir (file_directory) == -1) {
+    int chdir_errno = errno;
+    g_set_error (err, G_FILE_ERROR, g_file_error_from_errno (chdir_errno),
+                 _("Failed to chdir to [%s]: %s"),
+                 file_directory, g_strerror (chdir_errno));
+    g_free (file_directory);
+    g_free (full_filename);
+    g_free (saved_cwd);
+    return 0;
   }
 
   /* Now open RC and process file */
   if (flags & F_OPEN_RC) {
-    full_rcfilename = g_build_filename (file_directory, "gafrc", NULL);
-    g_rc_parse_file (toplevel, full_rcfilename, &tmp_err);
+    g_rc_parse_local (toplevel, "gafrc", file_directory, &tmp_err);
     if (tmp_err != NULL) {
-      /* Config files are allowed to be missing or skipped; check for
+      /* RC files are allowed to be missing or skipped; check for
        * this. */
       if (!g_error_matches (tmp_err, G_FILE_ERROR, G_FILE_ERROR_NOENT) &&
           !g_error_matches (tmp_err, EDA_ERROR, EDA_ERROR_RC_TWICE)) {
@@ -316,16 +311,14 @@ int f_open_flags(TOPLEVEL *toplevel, PAGE *page,
   }
 
   g_free(full_filename);
-  g_free(full_rcfilename);
   g_free (backup_filename);
 
   /* Reset the directory to the value it had when f_open was
    * called. */
   if (flags & F_OPEN_RESTORE_CWD) {
-    if (chdir (saved_cwd)) {
-      /* Error occurred with chdir */
-#warning FIXME: What do we do?
-    }
+    if (chdir (saved_cwd) == -1)
+      g_warning (_("Failed to restore working directory to [%s]: %s\n"),
+                 saved_cwd, g_strerror (errno));
     g_free(saved_cwd);
   }
 
@@ -455,6 +448,15 @@ int f_save(TOPLEVEL *toplevel, PAGE *page, const char *filename, GError **err)
   g_free (only_filename);
   
   if (o_save (toplevel, s_page_objects (page), real_filename, &tmp_err)) {
+    struct stat buf;
+
+    if (stat (filename, &buf) == -1) {
+      page->exists_on_disk = FALSE;
+      memset (&page->last_modified, 0, sizeof page->last_modified);
+    } else {
+      page->exists_on_disk = TRUE;
+      page->last_modified = buf.st_mtim;
+    }
 
     page->saved_since_first_loaded = 1;
 
@@ -463,12 +465,17 @@ int f_save(TOPLEVEL *toplevel, PAGE *page, const char *filename, GError **err)
     page->ops_since_last_backup = 0;
     page->do_autosave_backup = 0;
 
-    /* Restore permissions. */
-    chmod (real_filename, st.st_mode);
+    /* Restore permissions/ownership.  We restore both on a
+       best-effort basis; rather than treating failure as an error, we
+       just log a warning. */
+    if (chmod (real_filename, st.st_mode)) {
+      g_warning (_("Failed to restore permissions on '%s': %s\n"),
+                 real_filename, g_strerror (errno));
+    }
 #ifdef HAVE_CHOWN
     if (chown (real_filename, st.st_uid, st.st_gid)) {
-      /* Error occured with chown */
-#warning FIXME: What do we do?
+      g_warning (_("Failed to restore ownership on '%s': %s\n"),
+                 real_filename, g_strerror (errno));
     }
 #endif
 

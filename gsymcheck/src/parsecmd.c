@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gsymcheck - gEDA Symbol Check 
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "../include/struct.h"
 #include "../include/globals.h"
 #include "../include/prototype.h"
+#include "../include/gettext.h"
 
 #define OPTIONS "qvh"
 
@@ -39,17 +40,32 @@ extern char *optarg;
 extern int optind;
 #endif
 
+#ifdef HAVE_GETOPT_H
+#include <getopt.h>
+#endif
+
+#ifdef HAVE_GETOPT_LONG
+struct option long_options[] = 
+  {
+    {"help",    0, 0, 'h'},
+    {"quiet",   0, 0, 'q'},
+    {"verbose", 0, 0, 'v'}
+  };
+#endif
+
 void
 usage(char *cmd)
 {
-	printf("Usage: %s [OPTIONS] filename1 ... filenameN\n", cmd);
-	printf("  -h            Print usage\n");
-	printf("  -q            Quiet mode\n");
-	printf("  -v            Verbose mode (cumulative: errors, warnings, info)\n");
-	printf("                Use this to get the actual symbol error messages\n");
-	printf("\nfilename1 ... filenameN are the symbols to check\n");
-	printf("\n");
-	exit(0);
+  printf(_(
+"Usage: %s [OPTIONS] filename1 ... filenameN\n"
+"  -h, --help        Print usage\n"
+"  -q, --quiet       Quiet mode\n"
+"  -v, --verbose     Verbose mode (cumulative: errors, warnings, info)\n"
+"                    Use this to get the actual symbol error messages\n"
+"\nfilename1 ... filenameN are the symbols to check\n"
+"\n"),
+      cmd);
+  exit(0);
 }
 
 int
@@ -57,7 +73,11 @@ parse_commandline(int argc, char *argv[])
 {
   int ch;
 
+#ifdef HAVE_GETOPT_LONG
+  while ((ch = getopt_long (argc, argv, OPTIONS, long_options, NULL)) != -1) {
+#else    
   while ((ch = getopt (argc, argv, OPTIONS)) != -1) {
+#endif
     switch (ch) {
 
       case 'v':

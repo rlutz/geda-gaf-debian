@@ -1,0 +1,1519 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Roland Lutz
+# This file is distributed under the same license as the xorn package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: xorn 0.0\n"
+"Report-Msgid-Bugs-To: bug-xorn@hedmen.org\n"
+"POT-Creation-Date: 2019-10-08 20:34+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/python/base64.py:150
+msgid "Unexpected end-of-file"
+msgstr ""
+
+#: src/python/command.py:111
+#, python-format
+msgid "%s: %s\n"
+msgstr ""
+
+#: src/python/command.py:112
+#, python-format
+msgid "Try `%s --help' for more information.\n"
+msgstr ""
+
+#: src/python/command.py:123 src/command/netlist.py:235
+msgid "Copyright (C) 2019 Roland Lutz\n"
+msgstr ""
+
+#: src/python/command.py:126 src/command/netlist.py:238
+msgid ""
+"This program is free software; you can redistribute it and/or\n"
+"modify it under the terms of the GNU General Public License\n"
+"as published by the Free Software Foundation; either version 2\n"
+"of the License, or (at your option) any later version.\n"
+msgstr ""
+
+#: src/python/command.py:132 src/command/netlist.py:244
+msgid ""
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+msgstr ""
+
+#: src/python/fileutils.py:197
+#, python-format
+msgid "Failed to back up '%s': %s\n"
+msgstr ""
+
+#: src/python/fileutils.py:212
+#, python-format
+msgid "Failed to restore permissions on '%s': %s\n"
+msgstr ""
+
+#: src/python/fileutils.py:217
+#, python-format
+msgid "Failed to restore ownership on '%s': %s\n"
+msgstr ""
+
+#: src/gaf/clib.py:440
+#, python-format
+msgid "More than one component found with name [%s]\n"
+msgstr ""
+
+#: src/gaf/plainread.py:250
+msgid "unexpected attribute list start marker"
+msgstr ""
+
+#: src/gaf/plainread.py:254
+msgid "can't attach attributes to this object type"
+msgstr ""
+
+#: src/gaf/plainread.py:261
+msgid "unterminated attribute list"
+msgstr ""
+
+#: src/gaf/plainread.py:272
+msgid "tried to attach a non-text item as an attribute"
+msgstr ""
+
+#: src/gaf/plainread.py:282
+msgid "unexpected embedded symbol start marker"
+msgstr ""
+
+#: src/gaf/plainread.py:286
+msgid "embedded symbol start marker following non-component object"
+msgstr ""
+
+#: src/gaf/plainread.py:290
+msgid ""
+"embedded symbol start marker following component with non-embedded symbol"
+msgstr ""
+
+#: src/gaf/plainread.py:294
+msgid "embedded symbol start marker following embedded symbol"
+msgstr ""
+
+#: src/gaf/plainread.py:302
+msgid "unexpected embedded symbol end marker"
+msgstr ""
+
+#: src/gaf/plainread.py:306
+msgid "unexpected attribute list end marker"
+msgstr ""
+
+#: src/gaf/plainread.py:321
+msgid "failed to parse version string"
+msgstr ""
+
+#: src/gaf/plainread.py:333
+msgid ""
+"Read an old format sym/sch file! Please run g[sym|sch]update on this file"
+msgstr ""
+
+#: src/gaf/plainread.py:338
+msgid "read garbage"
+msgstr ""
+
+#: src/gaf/plainread.py:346
+msgid "embedded symbol is missing"
+msgstr ""
+
+#: src/gaf/plainread.py:382
+msgid "file is lacking pin orientation information"
+msgstr ""
+
+#: src/gaf/plainread.py:441
+msgid "failed to parse circle object"
+msgstr ""
+
+#: src/gaf/plainread.py:448
+msgid "circle has radius zero"
+msgstr ""
+
+#: src/gaf/plainread.py:450
+#, python-format
+msgid "circle has negative radius (%d), setting to 0"
+msgstr ""
+
+#: src/gaf/plainread.py:454
+#, python-format
+msgid "circle has invalid color (%d), setting to %d"
+msgstr ""
+
+#: src/gaf/plainread.py:499
+msgid "failed to parse arc object"
+msgstr ""
+
+#: src/gaf/plainread.py:506
+msgid "arc has radius zero"
+msgstr ""
+
+#: src/gaf/plainread.py:508
+#, python-format
+msgid "arc has negative radius (%d), setting to 0"
+msgstr ""
+
+#: src/gaf/plainread.py:512
+#, python-format
+msgid "arc has invalid color (%d), setting to %d"
+msgstr ""
+
+#: src/gaf/plainread.py:558
+msgid "failed to parse box object"
+msgstr ""
+
+#: src/gaf/plainread.py:567
+msgid "box has width/height zero"
+msgstr ""
+
+#: src/gaf/plainread.py:570
+#, python-format
+msgid "box has invalid color (%d), setting to %d"
+msgstr ""
+
+#: src/gaf/plainread.py:615
+msgid "failed to parse bus object"
+msgstr ""
+
+#: src/gaf/plainread.py:622
+msgid "bus has length zero"
+msgstr ""
+
+#: src/gaf/plainread.py:625
+#, python-format
+msgid "bus has invalid color (%d), setting to %d"
+msgstr ""
+
+#: src/gaf/plainread.py:630
+#, python-format
+msgid "bus has invalid ripper direction (%d)"
+msgstr ""
+
+#: src/gaf/plainread.py:656
+msgid "failed to parse complex object"
+msgstr ""
+
+#: src/gaf/plainread.py:663
+#, python-format
+msgid "component has invalid angle (%d), setting to 0"
+msgstr ""
+
+#: src/gaf/plainread.py:667
+#, python-format
+msgid "component has invalid mirror flag (%d), setting to 0"
+msgstr ""
+
+#: src/gaf/plainread.py:706
+msgid "failed to parse line object"
+msgstr ""
+
+#: src/gaf/plainread.py:715
+msgid "line has length zero"
+msgstr ""
+
+#: src/gaf/plainread.py:718
+#, python-format
+msgid "line has invalid color (%d), setting to %d"
+msgstr ""
+
+#: src/gaf/plainread.py:744
+msgid "failed to parse net object"
+msgstr ""
+
+#: src/gaf/plainread.py:751
+msgid "net has length zero"
+msgstr ""
+
+#: src/gaf/plainread.py:754
+#, python-format
+msgid "net has invalid color (%d), setting to %d"
+msgstr ""
+
+#: src/gaf/plainread.py:785
+msgid "failed to parse path object"
+msgstr ""
+
+#: src/gaf/plainread.py:793
+#, python-format
+msgid "path has invalid color (%d), setting to %d"
+msgstr ""
+
+#: src/gaf/plainread.py:802
+#, python-format
+msgid "unexpected end of file after %d lines while reading path"
+msgstr ""
+
+#: src/gaf/plainread.py:844
+msgid "failed to parse picture definition"
+msgstr ""
+
+#: src/gaf/plainread.py:851
+msgid "picture has width/height zero"
+msgstr ""
+
+#: src/gaf/plainread.py:854
+#, python-format
+msgid "picture has wrong 'mirrored' parameter (%d), setting to 0"
+msgstr ""
+
+#: src/gaf/plainread.py:859
+#, python-format
+msgid "picture has unsupported angle (%d), setting to 0"
+msgstr ""
+
+#: src/gaf/plainread.py:865
+msgid "unexpected end of file while reading picture file name"
+msgstr ""
+
+#: src/gaf/plainread.py:873
+msgid "image has no filename"
+msgstr ""
+
+#: src/gaf/plainread.py:878
+#, python-format
+msgid "picture has wrong 'embedded' parameter (%d), setting to not embedded"
+msgstr ""
+
+#: src/gaf/plainread.py:888
+#, python-format
+msgid "failed to load image from embedded data: %s"
+msgstr ""
+
+#: src/gaf/plainread.py:916
+msgid "failed to parse pin object"
+msgstr ""
+
+#: src/gaf/plainread.py:923
+msgid "pin does not have the whichone field set--verify and correct manually!"
+msgstr ""
+
+#: src/gaf/plainread.py:926
+#, python-format
+msgid "pin has invalid whichend (%d), setting to first end"
+msgstr ""
+
+#: src/gaf/plainread.py:931
+#, python-format
+msgid "pin has invalid color (%d), setting to %d"
+msgstr ""
+
+#: src/gaf/plainread.py:940
+#, python-format
+msgid "pin has invalid type (%d), setting to 0"
+msgstr ""
+
+#: src/gaf/plainread.py:985
+msgid "failed to parse text object"
+msgstr ""
+
+#: src/gaf/plainread.py:992
+msgid "text has size zero"
+msgstr ""
+
+#: src/gaf/plainread.py:995
+#, python-format
+msgid "text has unsupported angle (%d), setting to 0"
+msgstr ""
+
+#: src/gaf/plainread.py:1001
+#, python-format
+msgid "text has unsupported alignment (%d), setting to LOWER_LEFT"
+msgstr ""
+
+#: src/gaf/plainread.py:1006
+#, python-format
+msgid "text has invalid color (%d), setting to %d"
+msgstr ""
+
+#: src/gaf/plainread.py:1011
+#, python-format
+msgid "text has invalid number of lines (%d)"
+msgstr ""
+
+#: src/gaf/plainread.py:1018
+#, python-format
+msgid "unexpected end of file after %d lines of text"
+msgstr ""
+
+#: src/gaf/plainread.py:1028
+msgid "mismatched overbar markers"
+msgstr ""
+
+#: src/gaf/plainread.py:1030
+msgid "stray backslash character(s)"
+msgstr ""
+
+#: src/gaf/plainwrite.py:301
+#, python-format
+msgid "Encountered an object with unknown type %s"
+msgstr ""
+
+#: src/gaf/read.py:123 src/gaf/read.py:126
+#, python-format
+msgid "symbol \"%s\" not found in library"
+msgstr ""
+
+#: src/gaf/read.py:159 src/gaf/read.py:162
+#, python-format
+msgid "can't read pixmap file \"%s\": %s"
+msgstr ""
+
+#: src/gaf/xmlread.py:47 src/gaf/xmlread.py:378 src/gaf/xmlread.py:605
+#, python-format
+msgid "unexpected element \"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:56
+#, python-format
+msgid "unexpected character data \"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:124
+msgid "non-ASCII character in path data"
+msgstr ""
+
+#: src/gaf/xmlread.py:176
+msgid "attribute name not specified"
+msgstr ""
+
+#: src/gaf/xmlread.py:184
+msgid "non-text element can't be attached"
+msgstr ""
+
+#: src/gaf/xmlread.py:273
+msgid "symbol not specified"
+msgstr ""
+
+#: src/gaf/xmlread.py:276 src/gaf/xmlread.py:538
+msgid "symbol id can't be empty"
+msgstr ""
+
+#: src/gaf/xmlread.py:368
+msgid "pixmap not specified"
+msgstr ""
+
+#: src/gaf/xmlread.py:371 src/gaf/xmlread.py:593
+msgid "pixmap id can't be empty"
+msgstr ""
+
+#: src/gaf/xmlread.py:396
+msgid "base64 decoding error"
+msgstr ""
+
+#: src/gaf/xmlread.py:401
+#, python-format
+msgid "contents of pixmap file \"%s\" don't match embedded data"
+msgstr ""
+
+#: src/gaf/xmlread.py:428
+#, python-format
+msgid "%s not specified"
+msgstr ""
+
+#: src/gaf/xmlread.py:433
+#, python-format
+msgid "invalid %s \"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:493
+msgid "duplicate content tag"
+msgstr ""
+
+#: src/gaf/xmlread.py:502
+msgid "symbol mode not specified"
+msgstr ""
+
+#: src/gaf/xmlread.py:514
+#, python-format
+msgid "invalid symbol mode \"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:521
+msgid "symbol name not specified"
+msgstr ""
+
+#: src/gaf/xmlread.py:535
+msgid "symbol id not specified"
+msgstr ""
+
+#: src/gaf/xmlread.py:541 src/gaf/xmlread.py:596
+#, python-format
+msgid "duplicate id \"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:557
+msgid "pixmap mode not specified"
+msgstr ""
+
+#: src/gaf/xmlread.py:569
+#, python-format
+msgid "invalid pixmap mode \"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:576
+msgid "pixmap name not specified"
+msgstr ""
+
+#: src/gaf/xmlread.py:590
+msgid "pixmap id not specified"
+msgstr ""
+
+#: src/gaf/xmlread.py:610
+msgid "content missing"
+msgstr ""
+
+#: src/gaf/xmlread.py:618
+#, python-format
+msgid "invalid root element \"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:628
+msgid "duplicate file format feature"
+msgstr ""
+
+#: src/gaf/xmlread.py:631
+#, python-format
+msgid "unsupported file format feature \"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:641
+#, python-format
+msgid "undefined symbol \"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:650
+#, python-format
+msgid "undefined pixmap \"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:666
+#, python-format
+msgid "element name \"%s\" without namespace"
+msgstr ""
+
+#: src/gaf/xmlread.py:670
+#, python-format
+msgid "invalid namespace \"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:687
+#, python-format
+msgid "unexpected attribute(s) %s"
+msgstr ""
+
+#: src/gaf/xmlread.py:687
+msgid ", "
+msgstr ""
+
+#: src/gaf/xmlread.py:688 src/gaf/netlist/blueprint.py:243
+#: src/gaf/netlist/blueprint.py:332 src/gaf/netlist/blueprint.py:450
+#: src/gaf/netlist/net.py:166 src/gaf/netlist/netlist.py:416
+#: src/gaf/netlist/package.py:90 src/gaf/netlist/package.py:202
+#: src/gaf/netlist/package.py:305
+#, python-format
+msgid "\"%s\""
+msgstr ""
+
+#: src/gaf/xmlread.py:702
+msgid "unexpected XML document type declaration"
+msgstr ""
+
+#: src/gaf/xmlread.py:706
+msgid "unexpected XML element type declaration"
+msgstr ""
+
+#: src/gaf/xmlread.py:710
+msgid "unexpected XML element type attribute declaration"
+msgstr ""
+
+#: src/gaf/xmlread.py:714
+msgid "unexpected XML processing instruction"
+msgstr ""
+
+#: src/gaf/xmlread.py:719
+msgid "unexpected XML unparsed entity declaration"
+msgstr ""
+
+#: src/gaf/xmlread.py:724
+msgid "unexpected XML entity declaration"
+msgstr ""
+
+#: src/gaf/xmlread.py:728
+msgid "unexpected XML notation declaration"
+msgstr ""
+
+#: src/gaf/xmlread.py:732
+msgid "unexpected XML CDATA section"
+msgstr ""
+
+#: src/gaf/xmlread.py:736
+msgid "unexpected characters in XML document"
+msgstr ""
+
+#: src/gaf/xmlread.py:740
+msgid "XML document hasn't been declared as standalone"
+msgstr ""
+
+#: src/gaf/xmlread.py:744
+msgid "unexpected reference to external XML entity"
+msgstr ""
+
+#: src/gaf/xmlread.py:774
+#, python-format
+msgid "%s"
+msgstr ""
+
+#: src/gaf/netlist/backend.py:63
+#, python-format
+msgid "Can't open directory %s: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:68
+#, python-format
+msgid "%s: symbol not found"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:90
+#, python-format
+msgid "%s: error: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:94
+#, python-format
+msgid "%s: warning: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:100 src/gaf/netlist/blueprint.py:109
+#, python-format
+msgid "%sx%s:"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:101
+#, python-format
+msgid "%s:%s error: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:110
+#, python-format
+msgid "%s:%s warning: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:172
+#, python-format
+msgid "Found uref=%s. uref= is deprecated, please use refdes=%s"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:176
+#, python-format
+msgid ""
+"placeholder attribute `refdes=%s' left in schematic; please renumber "
+"component(s) before generating netlist"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:242 src/gaf/netlist/blueprint.py:331
+#, python-format
+msgid "inconsistent values for \"%s\": %s"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:243 src/gaf/netlist/blueprint.py:332
+#: src/gaf/netlist/blueprint.py:450 src/gaf/netlist/net.py:165
+#: src/gaf/netlist/net.py:173 src/gaf/netlist/netlist.py:416
+#: src/gaf/netlist/package.py:90 src/gaf/netlist/package.py:202
+#: src/gaf/netlist/package.py:305 src/gaf/netlist/pp_netattrib.py:99
+msgid " vs. "
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:247 src/gaf/netlist/blueprint.py:336
+#, python-format
+msgid "multiple definitions of \"%s=%s\""
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:383 src/gaf/netlist/blueprint.py:402
+#, python-format
+msgid "%s(raw pinnumber)"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:386 src/gaf/netlist/blueprint.py:405
+msgid "?"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:390 src/gaf/netlist/blueprint.py:409
+#, python-format
+msgid "(%sx%s)"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:391
+#, python-format
+msgid "%s:%s-%s%s: error: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:410
+#, python-format
+msgid "%s:%s-%s%s: warning: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:444
+msgid "label= is deprecated, please use netname="
+msgstr ""
+
+#: src/gaf/netlist/blueprint.py:449
+#, python-format
+msgid "multiple names on a single net: %s"
+msgstr ""
+
+#: src/gaf/netlist/guile.py:232
+#, python-format
+msgid "Invalid refdes ('%s') and pin ('%s') passed to get_nets\n"
+msgstr ""
+
+#: src/gaf/netlist/net.py:94
+#, python-format
+msgid "net `%s': error: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/net.py:98
+#, python-format
+msgid "net `%s': warning: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/net.py:164 src/gaf/netlist/net.py:172
+#, python-format
+msgid "net has more than one name: %s"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:145
+#, python-format
+msgid "Loading schematic [%s]\n"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:150
+#, python-format
+msgid "ERROR: Failed to load '%s': %s\n"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:169
+msgid "leading spaces in source names are deprecated"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:178
+#, python-format
+msgid "failed to load subcircuit '%s': schematic not found in source library"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:203
+msgid "source= is set for graphical component"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:208
+msgid "netname= and portname= attributes are mutually exclusive"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:213
+msgid "power symbol can't be a subschematic"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:217 src/gaf/netlist/pp_hierarchy.py:112
+msgid "I/O symbol can't be a subschematic"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:221
+msgid "power symbol can't be graphical"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:223 src/gaf/netlist/pp_hierarchy.py:114
+msgid "I/O symbol can't be graphical"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:238
+#, python-format
+msgid "malformed param= attribute: %s"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:243
+#, python-format
+msgid "duplicate param= attribute: %s"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:365
+#, python-format
+msgid ""
+"refdes conflict across hierarchy: refdes `%s' is used by package `%s' on "
+"page `%s' and by package `%s' on page `%s'"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:379
+#, python-format
+msgid ""
+"net name conflict across hierarchy: net name `%s' is used by net `%s' on "
+"page `%s' and by net `%s' on page `%s'"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:414
+#, python-format
+msgid "inconsistent values for toplevel attribute \"%s\": %s"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:428
+#, python-format
+msgid "error: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/netlist.py:434
+#, python-format
+msgid "warning: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/package.py:89 src/gaf/netlist/package.py:201
+#, python-format
+msgid "attribute conflict for \"%s\": %s"
+msgstr ""
+
+#: src/gaf/netlist/package.py:128
+#, python-format
+msgid "package `%s': error: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/package.py:132
+#, python-format
+msgid "package `%s': warning: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/package.py:217
+#, python-format
+msgid "package `%s', pin `%s': error: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/package.py:221
+#, python-format
+msgid "package `%s' (unmangled), pin `%s': error: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/package.py:229
+#, python-format
+msgid "package `%s', pin `%s': warning: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/package.py:233
+#, python-format
+msgid "package `%s' (unmangled), pin `%s': warning: %s\n"
+msgstr ""
+
+#: src/gaf/netlist/package.py:255
+msgid "component has neither refdes nor pins"
+msgstr ""
+
+#: src/gaf/netlist/package.py:262
+msgid ""
+"could not find refdes on component and could not find net= attribute on pin"
+msgstr ""
+
+#: src/gaf/netlist/package.py:304
+#, python-format
+msgid "multiple nets connected to pin: %s"
+msgstr ""
+
+#: src/gaf/netlist/pp_graphical.py:36
+msgid "invalid value for graphical= attribute"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:36
+msgid "refdes= and portname= attributes are mutually exclusive"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:39
+msgid "portname= and net= attributes are mutually exclusive"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:43 src/gaf/netlist/pp_hierarchy.py:117
+msgid "I/O symbol doesn't have pins"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:45 src/gaf/netlist/pp_hierarchy.py:120
+msgid "multiple pins on I/O symbol"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:48
+msgid "pin attributes on I/O symbol are ignored"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:90
+msgid "pin on composite component is missing a label"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:93
+#, python-format
+msgid "duplicate pin for port `%s' on composite component"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:106
+msgid "netname= attribute can't be used on an I/O symbol"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:109
+msgid "net= attribute can't be used on an I/O symbol"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:126
+#, python-format
+msgid "missing I/O symbol for port `%s' inside schematic"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:129
+#, python-format
+msgid "multiple I/O symbols for port `%s' inside schematic"
+msgstr ""
+
+#: src/gaf/netlist/pp_hierarchy.py:159
+msgid "unmatched I/O symbol"
+msgstr ""
+
+#: src/gaf/netlist/pp_netattrib.py:64
+#, python-format
+msgid "invalid net= attribute: \"%s\""
+msgstr ""
+
+#: src/gaf/netlist/pp_netattrib.py:97
+#, python-format
+msgid "more than one netname assigned via \"net=\" attribute: %s"
+msgstr ""
+
+#: src/gaf/netlist/pp_power.py:34
+msgid "refdes= and netname= attributes are mutually exclusive"
+msgstr ""
+
+#: src/gaf/netlist/pp_power.py:37
+msgid "netname= and net= attributes are mutually exclusive"
+msgstr ""
+
+#: src/gaf/netlist/pp_power.py:41
+msgid "power symbol doesn't have pins"
+msgstr ""
+
+#: src/gaf/netlist/pp_power.py:43
+msgid "multiple pins on power symbol"
+msgstr ""
+
+#: src/gaf/netlist/pp_power.py:47
+msgid "pin attributes on power symbol are ignored"
+msgstr ""
+
+#: src/gaf/netlist/pp_slotting.py:68
+#, python-format
+msgid "non-numeric slot= attribute: %s"
+msgstr ""
+
+#: src/gaf/netlist/pp_slotting.py:80
+#, python-format
+msgid "improper slotdef= syntax: missing \":\" in \"%s\""
+msgstr ""
+
+#: src/gaf/netlist/pp_slotting.py:91
+#, python-format
+msgid "did not find slotdef= attribute for slot %d"
+msgstr ""
+
+#: src/gaf/netlist/pp_slotting.py:100
+#, python-format
+msgid "improper slotdef= syntax: missing definition for slot %d"
+msgstr ""
+
+#: src/gaf/netlist/pp_slotting.py:123
+#, python-format
+msgid "non-numeric pinseq value: %s"
+msgstr ""
+
+#: src/gaf/netlist/pp_slotting.py:129 src/gaf/netlist/pp_slotting.py:131
+#, python-format
+msgid "duplicate pinseq \"%s\""
+msgstr ""
+
+#: src/gaf/netlist/pp_slotting.py:136
+#, python-format
+msgid "pin has pinseq=%d, but only %d pins are covered by slot definition"
+msgstr ""
+
+#: src/gaf/netlist/pp_slotting.py:151
+#, python-format
+msgid "slot definition covers %d pins, but there is no pin with pinseq=%d"
+msgstr ""
+
+#: src/gaf/netlist/pp_slotting.py:163
+msgid "pinnumber missing"
+msgstr ""
+
+#: src/gaf/netlist/pp_slotting.py:166 src/gaf/netlist/pp_slotting.py:168
+#, python-format
+msgid "duplicate pinnumber \"%s\""
+msgstr ""
+
+#: src/command/xorn.in:40
+#, c-format
+msgid ""
+"Usage: %s COMMAND [ARGS]...\n"
+"       %s --help\n"
+"       %s --version\n"
+msgstr ""
+
+#: src/command/xorn.in:48
+msgid "  Valid commands are:\n"
+msgstr ""
+
+#: src/command/xorn.in:51
+msgid ""
+"    convert\n"
+"        Convert files from one file format to another.\n"
+msgstr ""
+
+#: src/command/xorn.in:55
+msgid ""
+"    extract\n"
+"        Extract objects embedded in a schematic into a separate file.\n"
+msgstr ""
+
+#: src/command/xorn.in:59
+msgid ""
+"    find-symbol-by-pinout\n"
+"        Find symbols in a directory matching a given pinout.\n"
+msgstr ""
+
+#: src/command/xorn.in:63
+msgid ""
+"    netlist\n"
+"        Generate a netlist from one or more gEDA schematic files.\n"
+msgstr ""
+
+#: src/command/xorn.in:67
+#, c-format
+msgid ""
+"    For more information about an individual command, type:\n"
+"      `%s COMMAND --help'\n"
+msgstr ""
+
+#: src/command/xorn.in:71
+msgid ""
+"  Command-line options:\n"
+"      --help            give this help\n"
+"      --version         display version number\n"
+msgstr ""
+
+#: src/command/xorn.in:75 src/command/convert.py:162
+#: src/command/find-symbol-by-pinout.py:85 src/command/netlist.py:222
+#, c-format, python-format
+msgid "Report %s bugs to %s\n"
+msgstr ""
+
+#: src/command/xorn.in:84
+msgid "No command name given."
+msgstr ""
+
+#: src/command/xorn.in:99 src/command/convert.py:230 src/command/convert.py:235
+#: src/command/convert.py:260 src/command/netlist.py:628
+#, c-format, python-format
+msgid "%s: %s: %s\n"
+msgstr ""
+
+#: src/command/xorn.in:104
+#, c-format
+msgid "`%s' is not a xorn command."
+msgstr ""
+
+#: src/command/xorn.in:118
+#, c-format
+msgid "`%s' failed to load.\n"
+msgstr ""
+
+#: src/command/xorn.in:119 src/command/xorn.in:135
+#, c-format
+msgid "This is an error.  Please report it to %s\n"
+msgstr ""
+
+#: src/command/xorn.in:133
+#, c-format
+msgid "`%s' raised an uncaught exception.\n"
+msgstr ""
+
+#: src/command/convert.py:30 src/command/netlist.py:62
+#: src/command/netlist.py:92 src/command/netlist.py:102
+#, python-format
+msgid "%s: \"%s\" is not a directory (passed to %s)\n"
+msgstr ""
+
+#: src/command/convert.py:99
+#, python-format
+msgid ""
+"Invalid library command argument: %s\n"
+"Must be 'list' and 'get' commands separated by colons\n"
+msgstr ""
+
+#: src/command/convert.py:127
+#, python-format
+msgid ""
+"Usage: %s [OPTION]... INPUT-FILE [OUTPUT-FILE]\n"
+"       %s [OPTION]... [-o OUTPUT-FILE] [INPUT-FILE]\n"
+msgstr ""
+
+#: src/command/convert.py:131
+msgid "Convert files from one file format to another\n"
+msgstr ""
+
+#: src/command/convert.py:133
+msgid ""
+"  -o, --output-file=FILE        write to FILE (can be `-' for stdout)\n"
+"  -I, --input-format=FORMAT     input file format (optional if it can be\n"
+"                                deduced from the input file name)\n"
+"  -O, --output-format=FORMAT    output file format (optional if it can be\n"
+"                                deduced from the output file name)\n"
+"\n"
+"  --symbol-library=PATH         add PATH to the symbol library\n"
+"  --symbol-library-search=PATH  add PATH and its subdirectories to the "
+"symbol\n"
+"                                library\n"
+"  --symbol-library-command=LISTCMD:GETCMD\n"
+"                                add the source commands LISTCMD and GETCMD "
+"to\n"
+"                                the symbol library\n"
+"  --reset-symbol-library        clear all previous symbol library sources\n"
+"\n"
+"  --omit-symbols                don't include referenced symbols in the "
+"output\n"
+"  --omit-pixmaps                don't include referenced pixmaps in the "
+"output\n"
+"\n"
+"  --enable-hybridnum            enable/disable use of hybrid number format\n"
+"  --disable-hybridnum\n"
+msgstr ""
+
+#: src/command/convert.py:155
+#, python-format
+msgid "Valid formats are: %s\n"
+msgstr ""
+
+#: src/command/convert.py:159
+msgid ""
+"Both input and output filename can be `-' for the standard input or output,\n"
+"respectively.  In this case, the corresponding format option is mandatory.\n"
+msgstr ""
+
+#: src/command/convert.py:192
+#, python-format
+msgid ""
+"%s: Input format could not be deduced from input file name.\n"
+"%s: Please specify an input format using `-I FORMAT'.\n"
+msgstr ""
+
+#: src/command/convert.py:205
+#, python-format
+msgid ""
+"%s: Output format could not be deduced from output file name.\n"
+"%s: Please specify an output format using `-O FORMAT'.\n"
+msgstr ""
+
+#: src/command/extract.py:44
+#, python-format
+msgid ""
+"Usage: %s [OPTION]... SCHEMATIC [SYMBOL|PICTURE]...\n"
+"Extract objects embedded in a schematic into a separate file\n"
+"\n"
+"  -a, --all             extract all embedded objects\n"
+"  -l, --list            list embedded object names\n"
+"      --help            give this help\n"
+"      --version         display version number\n"
+"\n"
+"Report %s bugs to %s\n"
+msgstr ""
+
+#: src/command/extract.py:63
+msgid "options `--all' and `--list' are mutually exclusive"
+msgstr ""
+
+#: src/command/extract.py:66
+msgid "missing argument"
+msgstr ""
+
+#: src/command/extract.py:68
+msgid "too many arguments"
+msgstr ""
+
+#: src/command/extract.py:70
+msgid "not enough arguments"
+msgstr ""
+
+#: src/command/extract.py:75
+#, python-format
+msgid "%s: %s: unrecognized file name extension\n"
+msgstr ""
+
+#: src/command/extract.py:79 src/command/extract.py:84
+#: src/command/find-symbol-by-pinout.py:52
+#, python-format
+msgid "%s: can't read %s: %s\n"
+msgstr ""
+
+#: src/command/extract.py:118
+#, python-format
+msgid "%s: can't extract '%s': No such embedded symbol or pixmap\n"
+msgstr ""
+
+#: src/command/extract.py:129
+#, python-format
+msgid "Warning: Symbol \"%s\" is slotted; pin numbers may have changed.\n"
+msgstr ""
+
+#: src/command/extract.py:136 src/command/extract.py:145
+#, python-format
+msgid "%s: can't write %s: %s\n"
+msgstr ""
+
+#: src/command/find-symbol-by-pinout.py:76
+#, python-format
+msgid "Usage: %s PATH PINNUMBER:PINLABEL...\n"
+msgstr ""
+
+#: src/command/find-symbol-by-pinout.py:79
+msgid "Find symbols in a directory matching a given pinout\n"
+msgstr ""
+
+#: src/command/find-symbol-by-pinout.py:82
+msgid ""
+"      --help            give this help\n"
+"      --version         display version number\n"
+msgstr ""
+
+#: src/command/find-symbol-by-pinout.py:94
+msgid "too few arguments"
+msgstr ""
+
+#: src/command/find-symbol-by-pinout.py:101
+msgid "missing colon in parameter"
+msgstr ""
+
+#: src/command/gnetlist.in:100
+#, c-format
+msgid "Found malformed environment variable in '%s'\n"
+msgstr ""
+
+#: src/command/gnetlist.in:110
+#, c-format
+msgid "Found bad character(s) [%s] in variable name.\n"
+msgstr ""
+
+#: src/command/gnetlist.in:236
+#, c-format
+msgid "Invalid path [%s] passed to component-library\n"
+msgstr ""
+
+#: src/command/gnetlist.in:262
+#, c-format
+msgid "Invalid path [%s] passed to component-library-search\n"
+msgstr ""
+
+#: src/command/gnetlist.in:337
+#, c-format
+msgid "Invalid path [%s] passed to source-library\n"
+msgstr ""
+
+#: src/command/gnetlist.in:367
+#, c-format
+msgid "Invalid path [%s] passed to bitmap-directory\n"
+msgstr ""
+
+#: src/command/gnetlist.in:393
+#, c-format
+msgid "Invalid mode [%s] passed to attribute-promotion\n"
+msgstr ""
+
+#: src/command/gnetlist.in:404
+#, c-format
+msgid "Invalid mode [%s] passed to promote-invisible\n"
+msgstr ""
+
+#: src/command/gnetlist.in:415
+#, c-format
+msgid "Invalid mode [%s] passed to keep-invisible\n"
+msgstr ""
+
+#: src/command/gnetlist.in:425
+msgid ""
+"WARNING: using a string for 'always-promote-attributes' is deprecated. Use a "
+"list of strings instead\n"
+msgstr ""
+
+#: src/command/gnetlist.in:461
+#, c-format
+msgid "Invalid mode [%s] passed to make-backup-files\n"
+msgstr ""
+
+#: src/command/gnetlist.in:473 src/command/gnetlist.in:484
+#: src/command/gnetlist.in:496 src/command/gnetlist.in:532
+#: src/command/gnetlist.in:544 src/command/gnetlist.in:555
+#, c-format
+msgid "Invalid mode [%s] passed to %s\n"
+msgstr ""
+
+#: src/command/gnetlist.in:668
+#, c-format
+msgid "ERROR: Illegal character in RC file name: %s\n"
+msgstr ""
+
+#: src/command/gnetlist.in:679
+#, c-format
+msgid "Failed to load RC file [%s]\n"
+msgstr ""
+
+#: src/command/gnetlist.in:964
+msgid "Options `-g BACKEND' and `-p BACKEND' are mutually exclusive\n"
+msgstr ""
+
+#: src/command/gnetlist.in:970
+msgid "You gave neither backend to execute nor interactive mode!\n"
+msgstr ""
+
+#: src/command/gnetlist.in:980
+#, c-format
+msgid ""
+"An error occurred while evaluating a `-c' option:\n"
+"%s\n"
+msgstr ""
+
+#: src/command/gnetlist.in:987
+#, c-format
+msgid ""
+"Illegal character in extra load path:\n"
+"  %s\n"
+msgstr ""
+
+#: src/command/gnetlist.in:994
+#, c-format
+msgid "ERROR: Illegal character in system data path: %s\n"
+msgstr ""
+
+#: src/command/gnetlist.in:999
+#, c-format
+msgid "ERROR: Illegal character in system config path: %s\n"
+msgstr ""
+
+#: src/command/gnetlist.in:1035 src/command/netlist.py:525
+msgid ""
+"List of available backends:\n"
+"\n"
+msgstr ""
+
+#: src/command/gnetlist.in:1052
+msgid "ERROR: Could not find `gnetlist.scm' in load path.\n"
+msgstr ""
+
+#: src/command/gnetlist.in:1064
+#, c-format
+msgid "Error loading \"%s\"\n"
+msgstr ""
+
+#: src/command/gnetlist.in:1072
+#, c-format
+msgid ""
+"ERROR: Could not find backend `%s' in load path.\n"
+"\n"
+"Run `%s --list-backends' for a full list of available backends.\n"
+msgstr ""
+
+#: src/command/gnetlist.in:1086
+msgid "ERROR: Could not find `gnetlist-post.scm' in load path.\n"
+msgstr ""
+
+#: src/command/netlist.py:42
+#, python-format
+msgid "%s: `%s' is not a valid boolean value\n"
+msgstr ""
+
+#: src/command/netlist.py:50
+#, python-format
+msgid "%s: `%s' is not a valid mangling order\n"
+msgstr ""
+
+#: src/command/netlist.py:52
+#, python-format
+msgid "%s: Allowed values are: append prepend\n"
+msgstr ""
+
+#: src/command/netlist.py:80
+#, python-format
+msgid ""
+"Invalid library command argument: %s\n"
+"Must be 'list' and 'get' commands and name separated by colons\n"
+msgstr ""
+
+#: src/command/netlist.py:145
+#, python-format
+msgid ""
+"Usage: %s [OPTION]... -g BACKEND [--] FILE...\n"
+"       %s [OPTION]... -i [--] FILE...\n"
+msgstr ""
+
+#: src/command/netlist.py:148
+msgid "Generate a netlist from one or more gEDA schematic files.\n"
+msgstr ""
+
+#: src/command/netlist.py:151
+msgid ""
+"General options:\n"
+"  -o FILE               filename for netlist data output  [default: -]\n"
+"  -g BACKEND            specify netlist backend to use\n"
+"  -L DIR                add DIR to backend search path\n"
+"  -O STRING             pass an option string to backend\n"
+"  -c EXPR               evaluate Python expression at startup\n"
+"  -i                    enter interactive Python interpreter after loading\n"
+"  -v, --verbose         verbose mode (print loaded schematics)\n"
+msgstr ""
+
+#: src/command/netlist.py:162
+msgid ""
+"Symbol and source loading paths:\n"
+"  --symbol-library=...\n"
+"  --symbol-library-search=...\n"
+"  --symbol-library-command=...\n"
+"  --symbol-library-funcs=...\n"
+"  --reset-symbol-library\n"
+"\n"
+"  --source-library=...\n"
+"  --source-library-search=...\n"
+"  --reset-source-library\n"
+"\n"
+"  Please note: Since there are no default paths and no configuration\n"
+"               files are read, you will have to specify all symbol and\n"
+"               source paths on the command line.\n"
+msgstr ""
+
+#: src/command/netlist.py:179
+msgid ""
+"Net naming options:\n"
+"  --net-naming-priority=net-attribute|netname-attribute\n"
+"                                            [default: net-attribute]\n"
+"  --default-net-name=...                    [default: unnamed_net]\n"
+"  --default-bus-name=...                    [default: unnamed_bus]\n"
+msgstr ""
+
+#: src/command/netlist.py:187
+msgid ""
+"Hierarchy options:\n"
+"  --traverse-hierarchy                      [default]\n"
+"  --dont-traverse-hierarchy\n"
+"\n"
+"  --hierarchy-refdes-mangle=yes|no          [default: yes]\n"
+"  --hierarchy-netname-mangle=yes|no         [default: yes]\n"
+"  --hierarchy-netattrib-mangle=yes|no       [default: yes]\n"
+"  --hierarchy-refdes-separator=...          [default: /]\n"
+"  --hierarchy-refdes-order=append|prepend   [default: append]\n"
+"  --hierarchy-netname-separator=...         [default: /]\n"
+"  --hierarchy-netname-order=append|prepend  [default: append]\n"
+msgstr ""
+
+#: src/command/netlist.py:201
+msgid ""
+"Ignoring errors:\n"
+"  --ignore-errors\n"
+"  --dont-ignore-errors                      [default]\n"
+msgstr ""
+
+#: src/command/netlist.py:207
+msgid ""
+"Reporting errors:\n"
+"  --report-gui\n"
+"  --show-error-coordinates\n"
+"  --dont-show-error-coordinates             [default]\n"
+msgstr ""
+
+#: src/command/netlist.py:214
+msgid ""
+"Miscellaneous options:\n"
+"      --list-backends     print a list of available netlist backends\n"
+"  -h, --help              help; this message\n"
+"  -V, --version           show version information\n"
+"  --                      treat all remaining arguments as filenames\n"
+msgstr ""
+
+#: src/command/netlist.py:234
+msgid "Copyright (C) 1998-2012 gEDA developers\n"
+msgstr ""
+
+#: src/command/netlist.py:259
+msgid "Redirecting warnings and errors to GUI dialog...\n"
+msgstr ""
+
+#: src/command/netlist.py:450
+#, python-format
+msgid "%s: invalid option: executing scheme code is not supported"
+msgstr ""
+
+#: src/command/netlist.py:478
+#, python-format
+msgid "'%s' is not a valid net-naming-priority value"
+msgstr ""
+
+#: src/command/netlist.py:533
+msgid "No schematics files specified for processing"
+msgstr ""
+
+#: src/command/netlist.py:537
+msgid "You gave neither backend to execute nor interactive mode!"
+msgstr ""
+
+#: src/command/netlist.py:541
+msgid "Specified an output filename but no backend"
+msgstr ""
+
+#: src/command/netlist.py:570
+#, python-format
+msgid "%s: Could not find backend `%s' in load path.\n"
+msgstr ""
+
+#: src/command/netlist.py:573
+#, python-format
+msgid "Run `%s --list-backends' for a full list of available backends.\n"
+msgstr ""
+
+#: src/command/netlist.py:579
+#, python-format
+msgid "%s: The `%s' backend doesn't take arguments.\n"
+msgstr ""
+
+#: src/command/netlist.py:605
+msgid "Exiting due to previous errors.\n"
+msgstr ""
+
+#: src/backend/util_alias.py:42
+#, python-format
+msgid ""
+"net name collision: will be remapped to \"%s\" which is already used by the "
+"net called \"%s\""
+msgstr ""
+
+#: src/backend/util_alias.py:46
+msgid ""
+"This may be caused by netname attributes colliding with others due to "
+"truncation of the name, case insensitivity, or other limitations imposed by "
+"this netlist format."
+msgstr ""
+
+#: src/backend/util_alias.py:69
+#, python-format
+msgid ""
+"refdes name collision: will be mapped to \"%s\" which is already used by \"%s"
+"\""
+msgstr ""
+
+#: src/backend/util_alias.py:73
+msgid ""
+"This may be caused by refdes attributes colliding with others due to "
+"truncation of the refdes, case insensitivity, or other limitations imposed "
+"by this netlist format."
+msgstr ""

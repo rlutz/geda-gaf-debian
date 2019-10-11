@@ -1,21 +1,21 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's Library 
  * Copyright (C) 1998-2010 Ales Hvezda
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02111-1301 USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 /*! \file colors.h
@@ -49,10 +49,8 @@
 #define JUNCTION_COLOR         		21     
 #define MESH_GRID_MAJOR_COLOR           22
 #define MESH_GRID_MINOR_COLOR           23
-
-#define OVERRIDE_NET_COLOR              4
-#define OVERRIDE_PIN_COLOR              1
-#define OVERRIDE_BUS_COLOR              10
+#define ORIGIN_COLOR                    24
+#define PLACE_ORIGIN_COLOR              25
 
 #define DEFAULT_COLOR                   3
 

@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schematic xmlns="https://hedmen.org/xorn/schematic/"
+           file-format-features="experimental">
+  <content>
+    <!-- Objects -->
+    <text x="0" y="10.1" size="16">Objects</text>
+    <box x="0" y="2.8" width="2.5" height="7" linewidth=".01" capstyle="square"/>
+
+    <text x=".5" y="9.2" size="12">Nets and pins</text>
+    <net x0=".5" y0="8.9" x1="2" y1="8.9"/>
+    <net x0=".5" y0="8.7" x1="2" y1="8.7"/>
+    <net x0=".5" y0="8.5" x1="2" y1="8.5" type="bus"/>
+    <pin x0=".5" y0="8.3" x1="2" y1="8.3"/>
+    <pin x0=".5" y0="8.1" x1="2" y1="8.1" inverted="no"/>
+    <pin x0=".5" y0="7.9" x1="2" y1="7.9" inverted="yes"/>
+    <pin x0=".5" y0="7.7" x1="2" y1="7.7" type="bus"/>
+    <pin x0=".5" y0="7.5" x1="2" y1="7.5" type="bus" inverted="no"/>
+    <pin x0=".5" y0="7.3" x1="2" y1="7.3" type="bus" inverted="yes"/>
+
+    <text x=".5" y="6.6" size="12">Circles and arcs</text>
+    <circle x="1" y="5.8" radius=".4" linewidth=".01" capstyle="square"/>
+    <arc x="1" y="5.8" radius=".5" startangle="90" sweepangle="60"
+         linewidth=".05" capstyle="square" dashstyle="dotted" dashspace=".1"/>
+    <arc x="1" y="5.8" radius=".5" startangle="210" sweepangle="60"
+         linewidth=".05" capstyle="square" dashstyle="dotted" dashspace=".1"/>
+    <arc x="1" y="5.8" radius=".5" startangle="330" sweepangle="60"
+         linewidth=".05" capstyle="square" dashstyle="dotted" dashspace=".1"/>
+
+    <text x=".5" y="4.6" size="12">Paths</text>
+    <path linewidth=".01">M 600,3300<br/>C 100,3300 1300,4300 800,4300<br/>C 300,4300 1500,3300 1000,3300<br/>C 500,3300 1700,4300 1200,4300</path>
+
+    <!-- Components and pictures -->
+    <text x="3" y="10.1" size="16">Components and pictures</text>
+    <box x="3" y="0" width="5" height="9.8" linewidth=".01" capstyle="square"/>
+
+    <text x="3.5" y="9.1" size="12">Reference modes</text>
+    <component x="3.5" y="8.2" symbol="referenced-symbol"/>
+    <component x="4.2" y="8.2" symbol="embedded-symbol"/>
+    <component x="4.9" y="8.2" symbol="omitted-symbol"/>
+    <picture x="3.5" y="7" width=".7" height=".9" pixmap="referenced-pixmap"/>
+    <picture x="4.5" y="7" width=".7" height=".9" pixmap="embedded-pixmap"/>
+    <picture x="5.5" y="7" width=".7" height=".9" pixmap="omitted-pixmap"/>
+
+    <text x="3.5" y="6.3" size="12">Component angle/mirror</text>
+    <component x="4.1" y="5.4" angle="0" symbol="referenced-symbol"/>
+    <component x="4.1" y="5.4" angle="90" symbol="referenced-symbol"/>
+    <component x="4.1" y="5.4" angle="180" symbol="referenced-symbol"/>
+    <component x="4.1" y="5.4" angle="270" symbol="referenced-symbol"/>
+    <component x="5.6" y="5.4" angle="0"
+               mirror="yes" symbol="referenced-symbol"/>
+    <component x="5.6" y="5.4" angle="90"
+               mirror="yes" symbol="referenced-symbol"/>
+    <component x="5.6" y="5.4" angle="180"
+               mirror="yes" symbol="referenced-symbol"/>
+    <component x="5.6" y="5.4" angle="270"
+               mirror="yes" symbol="referenced-symbol"/>
+    <component x="4.1" y="3.8" angle="0" symbol="res">
+      <attribute name="refdes" x="4.2" y="4.1" size="10" visible="yes"
+                 show="value" angle="0">R?</attribute>
+    </component>
+    <component x="4.1" y="3.8" angle="90" symbol="res">
+      <attribute name="refdes" x="3.8" y="3.9" size="10" visible="yes"
+                 show="value" angle="90">R?</attribute>
+    </component>
+    <component x="4.1" y="3.8" angle="180" symbol="res">
+      <attribute name="refdes" x="4" y="3.5" size="10" visible="yes"
+                 show="value" angle="180">R?</attribute>
+    </component>
+    <component x="4.1" y="3.8" angle="270" symbol="res">
+      <attribute name="refdes" x="4.4" y="3.7" size="10" visible="yes"
+                 show="value" angle="270">R?</attribute>
+    </component>
+    <component x="5.6" y="3.8" angle="0" mirror="yes" symbol="res">
+      <attribute name="refdes" x="5.5" y="4.1" size="10" visible="yes"
+                 show="value" angle="0" alignment="lower-right">R?</attribute>
+    </component>
+    <component x="5.6" y="3.8" angle="90" mirror="yes" symbol="res">
+      <attribute name="refdes" x="5.3" y="3.7" size="10" visible="yes"
+                 show="value" angle="90" alignment="lower-right">R?</attribute>
+    </component>
+    <component x="5.6" y="3.8" angle="180" mirror="yes" symbol="res">
+      <attribute name="refdes" x="5.7" y="3.5" size="10" visible="yes"
+                 show="value" angle="180" alignment="lower-right">R?</attribute>
+    </component>
+    <component x="5.6" y="3.8" angle="270" mirror="yes" symbol="res">
+      <attribute name="refdes" x="5.9" y="3.9" size="10" visible="yes"
+                 show="value" angle="270" alignment="lower-right">R?</attribute>
+    </component>
+
+    <text x="3.5" y="2.6" size="12">Picture angle/mirror</text>
+    <picture x="4.4" y="1.4" width=".7" height=".9" angle="0"
+             pixmap="referenced-pixmap"/>
+    <picture x="3.5" y="1.4" width=".9" height=".7" angle="90"
+             pixmap="referenced-pixmap"/>
+    <picture x="3.7" y=".5" width=".7" height=".9" angle="180"
+             pixmap="referenced-pixmap"/>
+    <picture x="4.4" y=".7" width=".9" height=".7" angle="270"
+             pixmap="referenced-pixmap"/>
+    <picture x="5.9" y="1.4" width=".7" height=".9" angle="0" mirrored="yes"
+             pixmap="referenced-pixmap"/>
+    <picture x="5.7" y=".7" width=".9" height=".7" angle="90" mirrored="yes"
+             pixmap="referenced-pixmap"/>
+    <picture x="6.6" y=".5" width=".7" height=".9" angle="180" mirrored="yes"
+             pixmap="referenced-pixmap"/>
+    <picture x="6.6" y="1.4" width=".9" height=".7" angle="270" mirrored="yes"
+             pixmap="referenced-pixmap"/>
+
+    <!-- General attributes -->
+    <text x="8.5" y="10.1" size="16">General attributes</text>
+    <box x="8.5" y="1.4" width="4.3" height="8.4"
+         linewidth=".01" capstyle="square"/>
+
+    <text x="9" y="9.1" size="12">Colors</text>
+    <box x="9" y="8.6" width=".5" height=".3" color="background"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="9" y="8.1" width=".5" height=".3" color="pin"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="9" y="7.6" width=".5" height=".3" color="net-endpoint"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="9" y="7.1" width=".5" height=".3" color="graphic"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="9" y="6.6" width=".5" height=".3" color="net"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="9.7" y="8.6" width=".5" height=".3" color="attribute"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="9.7" y="8.1" width=".5" height=".3" color="logic-bubble"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="9.7" y="7.6" width=".5" height=".3" color="dots-grid"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="9.7" y="7.1" width=".5" height=".3" color="detached-attribute"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="9.7" y="6.6" width=".5" height=".3" color="text"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="10.4" y="8.6" width=".5" height=".3" color="bus"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="10.4" y="8.1" width=".5" height=".3" color="select"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="10.4" y="7.6" width=".5" height=".3" color="boundingbox"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="10.4" y="7.1" width=".5" height=".3" color="zoom-box"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="10.4" y="6.6" width=".5" height=".3" color="stroke"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="11.1" y="8.6" width=".5" height=".3" color="lock"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="11.1" y="8.1" width=".5" height=".3" color="output-background"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="11.1" y="7.6" width=".5" height=".3" color="freestyle1"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="11.1" y="7.1" width=".5" height=".3" color="freestyle3"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+    <box x="11.1" y="6.6" width=".5" height=".3" color="freestyle4"
+         linewidth=".01" capstyle="square" filltype="fill"/>
+
+    <text x="9" y="5.9" size="12">Line attributes</text>
+    <text x="9" y="5.5" size="12">Width</text>
+    <line x0="9" y0="5.3" x1="10.5" y1="5.3" linewidth="0" capstyle="square"/>
+    <line x0="9" y0="5.1" x1="10.5" y1="5.1" linewidth=".005" capstyle="square"/>
+    <line x0="9" y0="4.9" x1="10.5" y1="4.9" linewidth=".01" capstyle="square"/>
+    <line x0="9" y0="4.7" x1="10.5" y1="4.7" linewidth=".015" capstyle="square"/>
+    <line x0="9" y0="4.5" x1="10.5" y1="4.5" linewidth=".02" capstyle="square"/>
+    <line x0="9" y0="4.3" x1="10.5" y1="4.3" linewidth=".025" capstyle="square"/>
+    <line x0="9" y0="4.1" x1="10.5" y1="4.1" linewidth=".03" capstyle="square"/>
+    <line x0="9" y0="3.9" x1="10.5" y1="3.9" linewidth=".035" capstyle="square"/>
+    <line x0="9" y0="3.7" x1="10.5" y1="3.7" linewidth=".04" capstyle="square"/>
+    <line x0="9" y0="3.5" x1="10.5" y1="3.5" linewidth=".045" capstyle="square"/>
+    <line x0="9" y0="3.3" x1="10.5" y1="3.3" linewidth=".05" capstyle="square"/>
+
+    <text x="10.8" y="5.5" size="12">Cap style</text>
+    <line x0="10.8" y0="5.3" x1="12.3" y1="5.3" linewidth=".01" capstyle="none"/>
+    <line x0="10.8" y0="5.1" x1="12.3" y1="5.1" linewidth=".01" capstyle="square"/>
+    <line x0="10.8" y0="4.9" x1="12.3" y1="4.9" linewidth=".01" capstyle="round"/>
+
+    <text x="10.8" y="4.3" size="12">Dash style</text>
+    <line x0="10.8" y0="4.1" x1="12.3" y1="4.1" linewidth=".01" capstyle="square"
+          dashstyle="solid"/>
+    <line x0="10.8" y0="3.9" x1="12.3" y1="3.9" linewidth=".01" capstyle="square"
+          dashstyle="dotted" dashspace=".1"/>
+    <line x0="10.8" y0="3.7" x1="12.3" y1="3.7" linewidth=".01" capstyle="square"
+          dashstyle="dashed" dashlength=".1" dashspace=".1"/>
+    <line x0="10.8" y0="3.5" x1="12.3" y1="3.5" linewidth=".01" capstyle="square"
+          dashstyle="center" dashlength=".1" dashspace=".1"/>
+    <line x0="10.8" y0="3.3" x1="12.3" y1="3.3" linewidth=".01" capstyle="square"
+          dashstyle="phantom" dashlength=".1" dashspace=".1"/>
+
+    <text x="9" y="2.6" size="12">Fill types</text>
+    <box x="9" y="1.9" width=".5" height=".5" linewidth=".01" capstyle="square"
+         filltype="hollow"/>
+    <box x="9.7" y="1.9" width=".5" height=".5" linewidth=".01" capstyle="square"
+         filltype="fill"/>
+    <box x="10.4" y="1.9" width=".5" height=".5" linewidth=".01" capstyle="square"
+         filltype="mesh" fillwidth=".001" angle0="45" pitch0=".1"
+                                         angle1="135" pitch1=".1"/>
+    <box x="11.1" y="1.9" width=".5" height=".5" linewidth=".01" capstyle="square"
+         filltype="hatch" fillwidth=".001" angle0="45" pitch0=".1"/>
+    <box x="11.8" y="1.9" width=".5" height=".5" linewidth=".01" capstyle="square"
+         filltype="void"/>
+
+    <!-- Text attributes -->
+    <text x="13.3" y="10.1" size="16">Text attributes</text>
+    <box x="13.3" y="2.6" width="6.6" height="7.2"
+         linewidth=".01" capstyle="square"/>
+
+    <text x="13.8" y="9.1" size="12">Size</text>
+    <text x="13.8" y="8.8" size="8">size 8</text>
+    <text x="13.8" y="8.6" size="10">size 10</text>
+    <text x="13.8" y="8.4" size="12">size 12</text>
+    <text x="13.8" y="8.15" size="16">size 16</text>
+    <text x="13.8" y="7.8" size="20">size 20</text>
+    <text x="13.8" y="7.4" size="24">size 24</text>
+
+    <text x="13.8" y="6.7" size="12">Show name/value</text>
+    <attribute name="name" x="13.8" y="6.3" color="text" size="12"
+               visible="yes" show="name-value">value</attribute>
+    <attribute name="name" x="13.8" y="6" color="text" size="12"
+               visible="yes" show="value">value</attribute>
+    <attribute name="name" x="13.8" y="5.7" color="text" size="12"
+               visible="yes" show="name">value</attribute>
+    <attribute name="name" x="13.8" y="6.3" color="text" size="12"
+               visible="no" show="name-value">value</attribute>
+    <attribute name="name" x="13.8" y="6" color="text" size="12"
+               visible="no" show="value">value</attribute>
+    <attribute name="name" x="13.8" y="5.7" color="text" size="12"
+               visible="no" show="name">value</attribute>
+
+    <text x="13.8" y="5" size="12">Multiline text</text>
+    <text x="13.8" y="4.1" size="12">First line<br/>Second line <overbar>with overbar</overbar>!<br/>Third line</text>
+    <attribute name="multiline-text" x="13.8" y="3.2" color="text" size="12" visible="yes" show="value">First line<br/>Second line <overbar>with overbar</overbar>!<br/>Third line</attribute>
+
+    <text x="17.3" y="9.1" size="12">Angle</text>
+    <text x="18.1" y="8.2" size="12" angle="0">0 deg</text>
+    <text x="18.1" y="8.2" size="12" angle="90">90 deg</text>
+    <text x="18.1" y="8.2" size="12" angle="180">180 deg</text>
+    <text x="18.1" y="8.2" size="12" angle="270">270 deg</text>
+
+    <text x="17.3" y="6.8" size="12">Alignment</text>
+    <component x="18.8" y="6.3" symbol="cross"/>
+    <text x="18.8" y="6.3" size="12" alignment="lower-left">ABC</text>
+    <component x="18.8" y="5.8" symbol="cross"/>
+    <text x="18.8" y="5.8" size="12" alignment="middle-left">ABC</text>
+    <component x="18.8" y="5.3" symbol="cross"/>
+    <text x="18.8" y="5.3" size="12" alignment="upper-left">ABC</text>
+    <component x="18.3" y="6.3" symbol="cross"/>
+    <text x="18.3" y="6.3" size="12" alignment="lower-middle">ABC</text>
+    <component x="18.3" y="5.8" symbol="cross"/>
+    <text x="18.3" y="5.8" size="12" alignment="middle-middle">ABC</text>
+    <component x="18.3" y="5.3" symbol="cross"/>
+    <text x="18.3" y="5.3" size="12" alignment="upper-middle">ABC</text>
+    <component x="17.8" y="6.3" symbol="cross"/>
+    <text x="17.8" y="6.3" size="12" alignment="lower-right">ABC</text>
+    <component x="17.8" y="5.8" symbol="cross"/>
+    <text x="17.8" y="5.8" size="12" alignment="middle-right">ABC</text>
+    <component x="17.8" y="5.3" symbol="cross"/>
+    <text x="17.8" y="5.3" size="12" alignment="upper-right">ABC</text>
+
+    <text x="17.3" y="4.5" size="12">Attached text</text>
+    <net x0="17.3" y0="4" x1="18.5" y1="4">
+      <attribute name="netname" x="17.3" y="4.05" size="10"
+                 visible="yes" show="name-value">A</attribute>
+      <text x="17.3" y="3.8" size="10">attached text</text>
+    </net>
+    <component x="18.5" y="3.9" symbol="res">
+      <attribute name="refdes" x="18.6" y="4.2" size="10"
+                 visible="yes" show="value">R1</attribute>
+    </component>
+
+    <text x="17.3" y="3.2" size="12">Text with backslash: \</text>
+  </content>
+
+  <symbol id="res" name="res.sym" mode="referenced">
+    <content>
+      <attribute name="refdes" x=".1" y=".3" color="detached-attribute"
+                 size="10" visible="yes" show="value">R?</attribute>
+      <pin x0="0" y0=".1" x1=".1" y1=".1">
+        <attribute name="pinnumber" x=".05" y=".15" size="8" visible="no"
+                   show="value" alignment="lower-right">1</attribute>
+      </pin>
+      <box x=".1" y="0" width=".4" height=".2" linewidth=".01" capstyle="round"/>
+      <pin x0=".6" y0=".1" x1=".5" y1=".1">
+        <attribute name="pinnumber" x=".55" y=".15" size="8" visible="no"
+                   show="value">2</attribute>
+      </pin>
+    </content>
+  </symbol>
+
+  <symbol id="cross" name="cross.sym" mode="referenced">
+    <content>
+      <line x0="-2" y0="0" x1=".2" y1="0" linewidth=".01" capstyle="square"/>
+      <line x0="0" y0="-2" x1="0" y1=".2" linewidth=".01" capstyle="square"/>
+    </content>
+  </symbol>
+
+  <symbol id="referenced-symbol" name="referenced.sym" mode="referenced">
+    <content>
+      <line x0="0" y0="0" x1="0" y1=".6" linewidth=".01" capstyle="square"/>
+      <line x0="0" y0=".6" x1=".2" y1=".6" linewidth=".01" capstyle="square"/>
+      <arc x=".2" y=".45" radius=".15" startangle="270" sweepangle="180"
+           linewidth=".01" capstyle="square"/>
+      <line x0=".2" y0=".3" x1="0" y1=".3" linewidth=".01" capstyle="square"/>
+      <line x0=".2" y0=".3" x1=".4" y1="0" linewidth=".01" capstyle="square"/>
+    </content>
+  </symbol>
+  <symbol id="embedded-symbol" name="embedded.sym" mode="embedded">
+    <content>
+      <line x0="0" y0="0" x1="0" y1=".6" linewidth=".01" capstyle="square"/>
+      <line x0="0" y0=".6" x1=".2" y1=".6" linewidth=".01" capstyle="square"/>
+      <arc x=".2" y=".45" radius=".15" startangle="270" sweepangle="180"
+           linewidth=".01" capstyle="square"/>
+      <line x0=".2" y0=".3" x1="0" y1=".3" linewidth=".01" capstyle="square"/>
+      <line x0=".2" y0=".3" x1=".4" y1="0" linewidth=".01" capstyle="square"/>
+    </content>
+  </symbol>
+  <symbol id="omitted-symbol" name="omitted.sym" mode="omitted"/>
+
+  <pixmap id="referenced-pixmap" name="referenced.png" mode="referenced">
+iVBORw0KGgoAAAANSUhEUgAAAAcAAAAJCAYAAAD+WDajAAAABmJLR0QA/wD/AP+gvaeTAAAA
+NklEQVQY042NQQoAIAzDmuH/vxxPwhAVcyo0EJKYAypjjf0ErDx4nnw3AXu/dhvw2uxC3XqA
+E8+wHw3W/ClgAAAAAElFTkSuQmCC
+  </pixmap>
+  <pixmap id="embedded-pixmap" name="embedded.png" mode="embedded">
+iVBORw0KGgoAAAANSUhEUgAAAAcAAAAJCAYAAAD+WDajAAAABmJLR0QA/wD/AP+gvaeTAAAA
+NklEQVQY042NQQoAIAzDmuH/vxxPwhAVcyo0EJKYAypjjf0ErDx4nnw3AXu/dhvw2uxC3XqA
+E8+wHw3W/ClgAAAAAElFTkSuQmCC
+  </pixmap>
+  <pixmap id="omitted-pixmap" name="omitted.png" mode="omitted"/>
+</schematic>

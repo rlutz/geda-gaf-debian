@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,7 +60,6 @@
  */
 
 #include <config.h>
-#include <missing.h>
 
 #include <stdio.h>
 #include <math.h>
@@ -74,10 +73,6 @@
 
 #include "libgeda_priv.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 /*! \brief Scale factor between legacy gschem font units and postscript points.
  *
  *  \par Description
@@ -85,18 +80,10 @@
  *  difference in how the specified font size corresponds to the metrics of
  *  the font when compared to typical typographic usage.
  *
- *  The following factor was impirically determined to approximately match the
+ *  The following factor was empirically determined to approximately match the
  *  cap-height between the legacy gschem font, and fonts rendered using pango.
  */
 #define GEDA_FONT_FACTOR 1.3
-
-/*! \brief Scale factor font height and line-spacing (for print only)
- *
- *  \par Description
- *  Specifies the scale factor between the nominal font size and the inter-
- *  line spacing used to render it when printing.
- */
-#define PRINT_LINE_SPACING 1.12
 
 /*! Size of a tab in characters */
 int tab_in_chars = 8;
@@ -163,34 +150,44 @@ static void update_disp_string (OBJECT *object)
  *  \param [out] right     the right world coord
  *  \param [out] bottom    the bottom world coord
  */
-int world_get_text_bounds(TOPLEVEL *toplevel, OBJECT *o_current, int *left,
+int world_get_text_bounds(TOPLEVEL *toplevel, OBJECT *object, int *left,
                           int *top, int *right, int *bottom)
 {
-  if (toplevel->rendered_text_bounds_func != NULL) {
-    return
-      toplevel->rendered_text_bounds_func (toplevel->rendered_text_bounds_data,
-                                           o_current,
-                                           left, top, right, bottom);
-  }
+  g_return_val_if_fail (object != NULL, FALSE);
+  g_return_val_if_fail (object->text != NULL, FALSE);
+  g_return_val_if_fail (object->type == OBJ_TEXT, FALSE);
+  g_return_val_if_fail (toplevel != NULL, FALSE);
+  g_return_val_if_fail (toplevel->rendered_text_bounds_func != NULL, FALSE);
 
-  return FALSE;
+  return
+      toplevel->rendered_text_bounds_func (toplevel->rendered_text_bounds_data,
+                                           object,
+                                           left, top, right, bottom);
 }
 
 /*! \brief get the position of a text object
  *  \par Function Description
  *  This function gets the position of the base point of a text object.
  *
- *  \param [in] toplevel The toplevel environment.
+ *  \param [in] object   The object to get the position.
  *  \param [out] x       pointer to the x-position
  *  \param [out] y       pointer to the y-position
- *  \param [in] object   The object to get the position.
  *  \return TRUE if successfully determined the position, FALSE otherwise
  */
-gboolean o_text_get_position (TOPLEVEL *toplevel, gint *x, gint *y,
-                              OBJECT *object)
+gboolean o_text_get_position (OBJECT *object, gint *x, gint *y)
 {
-  *x = object->text->x;
-  *y = object->text->y;
+  g_return_val_if_fail (object != NULL, FALSE);
+  g_return_val_if_fail (object->type == OBJ_TEXT, FALSE);
+  g_return_val_if_fail (object->text != NULL, FALSE);
+
+  if (x != NULL) {
+    *x = object->text->x;
+  }
+
+  if (y != NULL) {
+    *y = object->text->y;
+  }
+
   return TRUE;
 }
 
@@ -209,9 +206,7 @@ int o_text_num_lines(const char *string)
   const gchar *aux;
   gunichar current_char;
 
-  if (string == NULL) {
-    return 0;
-  }
+  g_return_val_if_fail (string != NULL, 0);
   
   /* if it's not null, then we have at least one line */
   line_count++;
@@ -233,7 +228,6 @@ int o_text_num_lines(const char *string)
  *  Create an OBJECT of type OBJ_TEXT.
  *
  *  \param [in]  toplevel              The TOPLEVEL object.
- *  \param [in]  type                   OBJ_TEXT (TODO: why bother)
  *  \param [in]  color                  The color of the text.
  *  \param [in]  x                      World x coord of text.
  *  \param [in]  y                      World y coord of text.
@@ -249,18 +243,16 @@ int o_text_num_lines(const char *string)
  *  Caller is responsible for string; this function allocates its own copy.
  */
 OBJECT *o_text_new(TOPLEVEL *toplevel,
-		   char type, int color, int x, int y, int alignment,
+		   int color, int x, int y, int alignment,
 		   int angle, const char *string, int size, 
 		   int visibility, int show_name_value)
 {
   OBJECT *new_node=NULL;
   TEXT *text;
 
-  if (string == NULL) {
-    return(NULL);
-  }
+  g_return_val_if_fail (string != NULL, NULL);
 
-  new_node = s_basic_new_object(type, "text");
+  new_node = s_basic_new_object(OBJ_TEXT, "text");
 
   text = (TEXT *) g_malloc(sizeof(TEXT));
 
@@ -282,35 +274,9 @@ OBJECT *o_text_new(TOPLEVEL *toplevel,
   update_disp_string (new_node);
 
   /* Update bounding box */
-  new_node->w_bounds_valid = FALSE;
+  new_node->w_bounds_valid_for = NULL;
 
   return new_node;
-}
-
-/*! \brief update the visual boundaries of the text object
- *  \par Function Description
- *  This function updates the boundaries of the object \a o_current.
- *
- *  \param [in]  toplevel  The TOPLEVEL object
- *  \param [in]  o_current The OBJECT to update
- */
-void o_text_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
-{
-  int left, right, top, bottom;
-
-  if ((!o_is_visible (toplevel, o_current)) &&
-      (!toplevel->show_hidden_text)) {
-    return;
-  }
-
-  if ( !world_get_text_bounds(toplevel, o_current, &left, &top, &right, &bottom) )
-    return;
-
-  o_current->w_left = left;
-  o_current->w_top = top;
-  o_current->w_right = right;
-  o_current->w_bottom = bottom;
-  o_current->w_bounds_valid = TRUE;
 }
 
 /*! \brief read a text object from a char buffer
@@ -421,7 +387,7 @@ OBJECT *o_text_read (TOPLEVEL *toplevel,
       break;
   }
 
-  if (color < 0 || color > MAX_COLORS) {
+  if (color < 0 || color >= MAX_OBJECT_COLORS) {
     s_log_message(_("Found an invalid color [ %s ]\n"), first_line);
     s_log_message(_("Setting color to default color\n"));
     color = DEFAULT_COLOR;
@@ -464,7 +430,7 @@ OBJECT *o_text_read (TOPLEVEL *toplevel,
     }
   }
   
-  new_obj = o_text_new(toplevel, type, color, x, y,
+  new_obj = o_text_new(toplevel, color, x, y,
                        alignment, angle, string,
                        size, visibility, show_name_value);
   g_free(string);
@@ -478,34 +444,30 @@ OBJECT *o_text_read (TOPLEVEL *toplevel,
  *  This function takes a text \a object and return a string
  *  according to the file format definition.
  *
- *  \param [in] toplevel  a TOPLEVEL structure
  *  \param [in] object  a text OBJECT
  *  \return the string representation of the text OBJECT
  */
-char *o_text_save(TOPLEVEL *toplevel, OBJECT *object)
+char *o_text_save(OBJECT *object)
 {
-  int x, y;
-  int size;
-  char *string;
-  char *buf;
-  int num_lines;
-
-  x = object->text->x;
-  y = object->text->y;
-
-  string = object->text->string;
-  size = object->text->size;
+  g_return_val_if_fail (object != NULL, NULL);
+  g_return_val_if_fail (object->text != NULL, NULL);
+  g_return_val_if_fail (object->type == OBJ_TEXT, NULL);
+  g_return_val_if_fail (object->text->string != NULL, NULL);
 
   /* string can have multiple lines (seperated by \n's) */
-  num_lines = o_text_num_lines(string);
 
-  buf = g_strdup_printf ("%c %d %d %d %d %d %d %d %d %d\n%s", object->type,
-                         x, y, object->color, size,
-                         o_is_visible (toplevel, object) ? VISIBLE : INVISIBLE,
-                         object->show_name_value, object->text->angle,
-                         object->text->alignment, num_lines, string);
-
-  return(buf);
+  return g_strdup_printf ("%c %d %d %d %d %d %d %d %d %d\n%s",
+                          OBJ_TEXT,
+                          object->text->x,
+                          object->text->y,
+                          object->color,
+                          object->text->size,
+                          o_is_visible (object) ? VISIBLE : INVISIBLE,
+                          object->show_name_value,
+                          object->text->angle,
+                          object->text->alignment,
+                          o_text_num_lines(object->text->string),
+                          object->text->string);
 }
 
 /*! \brief recreate the graphics of a text object
@@ -520,27 +482,29 @@ void o_text_recreate(TOPLEVEL *toplevel, OBJECT *o_current)
 {
   o_emit_pre_change_notify (toplevel, o_current);
   update_disp_string (o_current);
-  o_current->w_bounds_valid = FALSE;
+  o_current->w_bounds_valid_for = NULL;
   o_emit_change_notify (toplevel, o_current);
 }
 
 /*! \brief move a text object
  *  \par Function Description
- *  This function changes the position of a text object \a o_current.
+ *  This function changes the position of a text object.
  *
- *  \param [in] toplevel     The TOPLEVEL object
+ *  \param [ref] object      The text OBJECT to be moved
  *  \param [in] dx           The x-distance to move the object
  *  \param [in] dy           The y-distance to move the object
- *  \param [in] o_current    The text OBJECT to be moved
  */
-void o_text_translate_world(TOPLEVEL *toplevel,
-                            int dx, int dy, OBJECT *o_current)
+void o_text_translate_world(OBJECT *object, int dx, int dy)
 {
-  o_current->text->x = o_current->text->x + dx;
-  o_current->text->y = o_current->text->y + dy;
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->text != NULL);
+  g_return_if_fail (object->type == OBJ_TEXT);
+
+  object->text->x = object->text->x + dx;
+  object->text->y = object->text->y + dy;
 
   /* Update bounding box */
-  o_current->w_bounds_valid = FALSE;
+  object->w_bounds_valid_for = NULL;
 }
 
 /*! \brief create a copy of a text object
@@ -555,243 +519,17 @@ OBJECT *o_text_copy(TOPLEVEL *toplevel, OBJECT *o_current)
 {
   OBJECT *new_obj;
 
-  new_obj = o_text_new (toplevel, OBJ_TEXT, o_current->color,
+  new_obj = o_text_new (toplevel, o_current->color,
                         o_current->text->x, o_current->text->y,
                         o_current->text->alignment,
                         o_current->text->angle,
                         o_current->text->string,
                         o_current->text->size,
-                        o_is_visible (toplevel, o_current) ? VISIBLE : INVISIBLE,
+                        o_is_visible (o_current) ? VISIBLE : INVISIBLE,
                         o_current->show_name_value);
 
   return new_obj;
 }
-
-
-/*! \brief write a text string to a postscript file
- *  \par Function Description
- *  This function writes the single \a string into the postscript file \a fp.
- *
- *  \param [in] fp           pointer to a FILE structure
- *  \param [in] string       The string to print
- *  \param [in] unicode_count Number of items in the unicode table
- *  \param [in] unicode_table Table of unicode items
- *  
- *  \todo investigate whether the TAB character is handled correctly
- */
-void o_text_print_text_string(FILE *fp, char *string, int unicode_count, 
-			      gunichar *unicode_table)
-{
-  int j;
-  gchar *aux;
-  gunichar current_char, c;
-
-  if (!string)
-  {
-    return;
-  }
-
-  aux = string;
-
-  fprintf(fp, "(");
-
-  while (aux && ((gunichar) (*aux) != 0)) {
-    current_char = g_utf8_get_char_validated(aux, -1);
-    if (current_char == '(' || current_char == ')' || current_char == '\\') {
-      fprintf(fp, "\\");
-    }
-  
-    c = current_char;
-    if (c >= 128) {
-      current_char = '?';
-      if (unicode_count)  {
-        for (j = 0; j < unicode_count; j++)
-          if (c == unicode_table[j]) {
-	    current_char = j + 128;
-            break;
-          }
-      }
-    }
-
-
-    if (current_char == '\t') {
-      /* Output eight spaces instead of the tab character */
-      fprintf(fp, "       ");
-    } else {
-      fprintf(fp, "%c", current_char);
-    }
-
-    aux = g_utf8_find_next_char(aux, NULL);
-  }
-
-  fprintf(fp,") ");
-}
-
-
-/*! \brief print a text object into a postscript file
- *  \par Function Description
- *  This function writes the postscript representation of the text object
- *  \a o_current into the the file \a fp.
- *  \param [in] toplevel     The TOPLEVEL object
- *  \param [in] fp           pointer to a FILE structure
- *  \param [in] o_current    The OBJECT to print
- *  \param [in] origin_x     x-coord of the postscript origin
- *  \param [in] origin_y     y-coord of the postscript origin
- *  \param [in] unicode_count Number of items in the unicode table
- *  \param [in] unicode_table Table of unicode items
- */
-void o_text_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
-		  int origin_x, int origin_y, 
-		  int unicode_count, gunichar *unicode_table)
-{
-  int alignment;
-  char *centering_control = NULL;
-  char *p,*s;
-  char *output_string = NULL;
-  char *name = NULL;
-  char *value = NULL;
-  int x, y, angle, len;
-  float font_size;
-
-
-  if (!o_current->text->string) {
-    return;
-  }
-
-  f_print_set_color(toplevel, fp, o_current->color);
-
-
-  if (o_attrib_get_name_value (o_current, &name, &value)) {
-    switch(o_current->show_name_value) {
-      case(SHOW_NAME_VALUE):
-        output_string = g_strdup(o_current->text->string);
-        break;
-
-      case(SHOW_NAME):
-        if (name[0] != '\0') {
-          output_string = g_strdup(name);
-        } else {
-          fprintf(stderr, 
-                  "Got an improper attribute: %s\n", 
-                  o_current->text->string);
-          output_string = g_strdup("invalid");
-        }
-        break;
-
-      case(SHOW_VALUE):
-        if (value[0] != '\0') {
-          output_string = g_strdup(value);
-        } else {
-          /* you probably can remove this now... */
-          /* since improper attributes will never get here */
-          fprintf(stderr, 
-                  "Got an improper attribute: %s\n", 
-                  o_current->text->string);
-          output_string = g_strdup("invalid");
-        }
-        break;
-
-    default:
-      g_return_if_reached ();
-
-    }
-  } else {
-    output_string = g_strdup(o_current->text->string);
-  }
-
-  /* Apply alignment map to apply when text is 180 degrees rotated.
-   * We want the text on the printer to appear upside right, even
-   * though mathematically it aught to be upside down.  To make this
-   * work, we will reset the angle to 0, when it's equal to 180
-   * degrees, then apply a transformation to the origin location as if
-   * the text was rotated about that point.  E.g. if the text origin
-   * was at the lower left, and the text was rotated by 180 degrees,
-   * it would be as if the origin was at the upper right. The same
-   * reasoning has been applied to all 8 other text origins.
-   * MIDDLE_MIDDLE maps to itself.
-   */
-  alignment = o_current->text->alignment;
-  angle = o_current->text->angle;
-  if(angle == 180) {
-    angle = 0;        /* reset angle to 0 to make text upright */
-    switch(alignment) {
-    case(LOWER_LEFT):    alignment = UPPER_RIGHT;
-      break;
-    case(MIDDLE_LEFT):   alignment = MIDDLE_RIGHT;
-      break;
-    case(UPPER_LEFT):    alignment = LOWER_RIGHT;
-      break;
-    case(LOWER_MIDDLE):  alignment = UPPER_MIDDLE;
-      break;
-    case(MIDDLE_MIDDLE): alignment = MIDDLE_MIDDLE;
-      break;
-    case(UPPER_MIDDLE):  alignment = LOWER_MIDDLE;
-      break;
-    case(LOWER_RIGHT):   alignment = UPPER_LEFT;
-      break;
-    case(MIDDLE_RIGHT):  alignment = MIDDLE_LEFT;
-      break;
-    case(UPPER_RIGHT):   alignment = LOWER_LEFT;
-      break;
-    }
-  }
-
-  /* Create an appropriate control string for the centering. */
-  switch(alignment) {
-                                       /* hcenter rjustify vcenter vjustify */
-  case(LOWER_LEFT):    centering_control = "false false false false";
-    break;
-  case(MIDDLE_LEFT):   centering_control = "false false true false";
-    break;
-  case(UPPER_LEFT):    centering_control = "false false false true";
-    break;
-  case(LOWER_MIDDLE):  centering_control = "true false false false";
-    break;
-  case(MIDDLE_MIDDLE): centering_control = "true false true false";
-    break;
-  case(UPPER_MIDDLE):  centering_control = "true false false true";
-    break;
-  case(LOWER_RIGHT):   centering_control = "false true false false";
-    break;
-  case(MIDDLE_RIGHT):  centering_control = "false true true false";
-    break;
-  case(UPPER_RIGHT):   centering_control = "false true false true";
-    break;
-  }
-
-  font_size = o_text_get_font_size_in_points (toplevel, o_current)
-                / 72.0 * 1000.0;
-  fprintf(fp,"%s %f [",centering_control, font_size * PRINT_LINE_SPACING);
-
-  /* split the line at each newline and print them */
-  p = output_string;   /* Current point */
-  s = output_string;   /* Start of the current string */
-  len = strlen(output_string)+1;
-  while(len != 0) {
-    /* Have we reached the end of a line? */
-    if((*p == '\n') || (*p == '\0')) {
-      /* Yes, replace the newline with a NULL and output the string */
-      *p = '\0';
-      o_text_print_text_string(fp,s,unicode_count,unicode_table);
-      /* Update output string start for next string */
-      s = p+1; /* One past the current character. */
-    }
-    p++;   /* Advance to next character */
-    len--; /* Keep track of how many characters left to process */
-  }
-
-  /* Finish up with the rest of the text print command */
-  /* Collect pertinent info about the text location */
-  x = o_current->text->x;
-  y = o_current->text->y;
-  fprintf(fp,"] %d %d %d %f text\n",angle,x,y,font_size);
-
-  
-  g_free(output_string);
-  g_free(name);
-  g_free(value);
-}
-
 
 /*! \brief rotate a text object around a centerpoint
  *  \par Function Description
@@ -812,10 +550,17 @@ void o_text_rotate_world(TOPLEVEL *toplevel,
   int x, y;
   int newx, newy;
 
-  g_return_if_fail(object != NULL);
-  g_return_if_fail(object->type == OBJ_TEXT);
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->text != NULL);
+  g_return_if_fail (object->type == OBJ_TEXT);
+  g_return_if_fail (angle % 90 == 0);
 
-  object->text->angle = ( object->text->angle + angle ) % 360;
+  object->text->angle += angle;
+
+  if (object->text->angle < 0)
+    object->text->angle = 360 - (-object->text->angle % 360);
+  if (object->text->angle >= 360)
+    object->text->angle %= 360;
 
   x = object->text->x + (-world_centerx);
   y = object->text->y + (-world_centery);
@@ -825,7 +570,7 @@ void o_text_rotate_world(TOPLEVEL *toplevel,
   x = newx + (world_centerx);
   y = newy + (world_centery);
 
-  o_text_translate_world(toplevel, x-object->text->x, y-object->text->y, object);
+  o_text_translate_world(object, x-object->text->x, y-object->text->y);
 
   o_text_recreate(toplevel, object);
 }
@@ -847,7 +592,11 @@ void o_text_mirror_world(TOPLEVEL *toplevel,
 {
   int origx, origy;
   int x, y;
-	
+
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->text != NULL);
+  g_return_if_fail (object->type == OBJ_TEXT);
+
   origx = object->text->x;
   origy = object->text->y;
 
@@ -926,6 +675,7 @@ void o_text_mirror_world(TOPLEVEL *toplevel,
  *  This function will calculate the distance to the text regardless
  *  if the text is visible or not.
  *
+ *  \param [in] toplevel     The TOPLEVEL object.
  *  \param [in] object       The text OBJECT.
  *  \param [in] x            The x coordinate of the given point.
  *  \param [in] y            The y coordinate of the given point.
@@ -935,19 +685,25 @@ void o_text_mirror_world(TOPLEVEL *toplevel,
  *  number (G_MAXDOUBLE).  With an invalid parameter, this funciton
  *  returns G_MAXDOUBLE.
  */
-double o_text_shortest_distance (OBJECT *object, int x, int y, int force_solid)
+double o_text_shortest_distance (TOPLEVEL *toplevel, OBJECT *object,
+                                 int x, int y, int force_solid)
 {
+  int left, top, right, bottom;
   double dx, dy;
 
   g_return_val_if_fail (object->text != NULL, G_MAXDOUBLE);
 
-  dx = min (x - object->w_left, object->w_right - x);
-  dy = min (y - object->w_top, object->w_bottom - y);
+  if (!world_get_single_object_bounds(toplevel, object,
+                                      &left, &top, &right, &bottom))
+    return G_MAXDOUBLE;
+
+  dx = min (x - left, right - x);
+  dy = min (y - top, bottom - y);
 
   dx = min (dx, 0);
   dy = min (dy, 0);
 
-  return sqrt ((dx * dx) + (dy * dy));
+  return hypot (dx, dy);
 }
 
 /*! \brief Set the string displayed by a text object.
@@ -971,9 +727,6 @@ void o_text_set_string (TOPLEVEL *toplevel, OBJECT *obj,
   obj->text->string = g_strdup (new_string);
 
   o_text_recreate (toplevel, obj);
-
-  if (obj->attached_to != NULL)
-    o_attrib_emit_attribs_changed (toplevel, obj->attached_to);
 }
 
 
@@ -1021,12 +774,13 @@ void o_text_set_rendered_bounds_func (TOPLEVEL *toplevel,
  *  function applies an appopriate scaling to return the
  *  font size in postscript points.
  *
- *  \param [in] toplevel  The TOPLEVEL object
  *  \param [in] object    The text OBJECT whos font size to return
  *  \return The font size converted to postscript points.
  */
-double o_text_get_font_size_in_points (TOPLEVEL *toplevel, OBJECT *object)
+double o_text_get_font_size_in_points (OBJECT *object)
 {
+  g_return_val_if_fail (object != NULL, 0.);
+  g_return_val_if_fail (object->text != NULL, 0.);
   g_return_val_if_fail (object->type == OBJ_TEXT, 0.);
 
   return object->text->size * GEDA_FONT_FACTOR;

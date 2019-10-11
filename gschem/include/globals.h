@@ -2,7 +2,7 @@
  * gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ GtkRecentManager *recent_manager;
 extern GdkColor white;
 extern GdkColor black;
 
-extern char *rc_filename; 
+extern char *rc_filename;
 extern char *output_filename;
 
 
@@ -46,9 +46,9 @@ extern int quiet_mode;
 extern int verbose_mode;
 extern int auto_place_mode;
 
-#define MAX_BUFFERS 	5
 /* Global buffers */
-extern GList *object_buffer[MAX_BUFFERS];
+#define MAX_BUFFERS      (5)
+#define CLIPBOARD_BUFFER (0)
 
 /* Hooks */
 extern SCM complex_place_list_changed_hook;
@@ -62,6 +62,21 @@ extern SCM complex_place_list_changed_hook;
 # endif
 #else
 # define N_(String) (String)
+#endif
+
+#ifndef pgettext
+# define GETTEXT_CONTEXT_GLUE "\004"
+# define pgettext(Msgctxt, Msgid) \
+   pgettext_aux (Msgctxt GETTEXT_CONTEXT_GLUE Msgid, Msgid)
+  static inline const char *
+  pgettext_aux (const char *msg_ctxt_id, const char *msgid)
+  {
+    const char *translation = gettext (msg_ctxt_id);
+    if (translation == msg_ctxt_id)
+      return msgid;
+    else
+      return translation;
+  }
 #endif
 
 /*

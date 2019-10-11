@@ -1,5 +1,5 @@
-<!-- Creator     : groff version 1.22.2 -->
-<!-- CreationDate: Wed Sep 25 22:56:02 2013 -->
+<!-- Creator     : groff version 1.22.3 -->
+<!-- CreationDate: Tue Oct  8 18:33:59 2019 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -36,17 +36,17 @@
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em">gschlas &minus;
-gEDA schematic load and save</p>
+<p style="margin-left:11%; margin-top: 1em">gschlas - gEDA
+schematic load and save</p>
 
 <h2>SYNOPSIS
 <a name="SYNOPSIS"></a>
 </h2>
 
 
-<p style="margin-left:11%; margin-top: 1em"><b>gschlas [
-&minus;e | &minus;u ] [ &minus;q | &minus;v ]</b>
-<i>file</i> <b>[</b> <i>file ...</i> <b>]</b></p>
+<p style="margin-left:11%; margin-top: 1em"><b>gschlas</b>
+[<b>-e</b>|<b>-u</b>] [<b>-q</b>|<b>-v</b>] <i>file</i> [
+<i>file ...</i> ]</p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>gschlas
 -h</b></p>
@@ -58,7 +58,7 @@ gEDA schematic load and save</p>
 
 <p style="margin-left:11%; margin-top: 1em"><b>gschlas</b>
 can embed the in-use schematic symbols and pictures into a
-schematic or set of schematics. It allow, for instance,
+schematic or set of schematics. It allows, for instance,
 putting a schematic on a website or in an email without the
 recipient needing to download lots of custom symbols for the
 design.</p>
@@ -75,75 +75,28 @@ results.</p>
 </h2>
 
 
-<table width="100%" border="0" rules="none" frame="void"
-       cellspacing="0" cellpadding="0">
-<tr valign="top" align="left">
-<td width="11%"></td>
-<td width="3%">
+<p style="margin-left:11%; margin-top: 1em"><b>-e</b>,
+<b>--embed</b></p>
 
+<p style="margin-left:22%;">Embed all
+components/pictures.</p>
 
-<p style="margin-top: 1em">&minus;e</p></td>
-<td width="8%"></td>
-<td width="49%">
+<p style="margin-left:11%;"><b>-u</b>, <b>--unembed</b></p>
 
+<p style="margin-left:22%;">Unembed all
+components/pictures.</p>
 
-<p style="margin-top: 1em">Embed all
-components/pictures.</p> </td>
-<td width="29%">
-</td></tr>
-<tr valign="top" align="left">
-<td width="11%"></td>
-<td width="3%">
+<p style="margin-left:11%;"><b>-q</b>, <b>--quiet</b></p>
 
+<p style="margin-left:22%;">Quiet mode.</p>
 
-<p>&minus;u</p></td>
-<td width="8%"></td>
-<td width="49%">
+<p style="margin-left:11%;"><b>-v</b>, <b>--verbose</b></p>
 
+<p style="margin-left:22%;">Verbose mode.</p>
 
-<p>Unembed all components/pictures.</p></td>
-<td width="29%">
-</td></tr>
-<tr valign="top" align="left">
-<td width="11%"></td>
-<td width="3%">
+<p style="margin-left:11%;"><b>-h</b>, <b>--help</b></p>
 
-
-<p>&minus;q</p></td>
-<td width="8%"></td>
-<td width="49%">
-
-
-<p>Quiet mode.</p></td>
-<td width="29%">
-</td></tr>
-<tr valign="top" align="left">
-<td width="11%"></td>
-<td width="3%">
-
-
-<p>&minus;v</p></td>
-<td width="8%"></td>
-<td width="49%">
-
-
-<p>Verbose mode.</p></td>
-<td width="29%">
-</td></tr>
-<tr valign="top" align="left">
-<td width="11%"></td>
-<td width="3%">
-
-
-<p>&minus;h</p></td>
-<td width="8%"></td>
-<td width="49%">
-
-
-<p>Print usage information.</p></td>
-<td width="29%">
-</td></tr>
-</table>
+<p style="margin-left:22%;">Print usage information.</p>
 
 <h2>AUTHOR
 <a name="AUTHOR"></a>
@@ -158,7 +111,7 @@ components/pictures.</p> </td>
 
 
 
-<p style="margin-left:11%; margin-top: 1em"><b>gschem(1)</b></p>
+<p style="margin-left:11%; margin-top: 1em"><b>gschem</b>(1)</p>
 
 <h2>COPYRIGHT
 <a name="COPYRIGHT"></a>
@@ -166,9 +119,9 @@ components/pictures.</p> </td>
 
 
 <p style="margin-left:11%; margin-top: 1em">Copyright
-&copy; 1999-2011 gEDA Contributors. License GPLv2+: GNU GPL
+&copy; 1999-2019 gEDA Contributors. License GPLv2+: GNU GPL
 <br>
-version 2 or later. Please see the &lsquo;COPYING&rsquo;
+version 2 or later. Please see the &rsquo;COPYING&rsquo;
 file included with this <br>
 program for full details.</p>
 

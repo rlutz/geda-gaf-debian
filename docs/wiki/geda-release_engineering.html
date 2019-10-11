@@ -2,7 +2,6 @@
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-  <title></title>
   <link rel="stylesheet" media="screen" type="text/css" href="./style.css" />
   <link rel="stylesheet" media="screen" type="text/css" href="./design.css" />
   <link rel="stylesheet" media="print" type="text/css" href="./print.css" />
@@ -11,20 +10,19 @@
 </head>
 <body>
 
-
-<h1 class="sectionedit567"><a name="geda_s_release_engineering" id="geda_s_release_engineering">gEDA&#039;s Release Engineering</a></h1>
+<h1 id="gedasreleaseengineering">gEDA&#039;s Release Engineering</h1>
 <div class="level1">
 
 </div>
-<!-- EDIT567 SECTION "gEDA's Release Engineering" [1-49] -->
-<h2 class="sectionedit568"><a name="geda_gaf_release_creation_checklist" id="geda_gaf_release_creation_checklist">gEDA/gaf Release Creation Checklist</a></h2>
+
+<h2 id="gedagafreleasecreationchecklist">gEDA/gaf Release Creation Checklist</h2>
 <div class="level2">
 
 <p>
 Here is a list of steps that are taken every time when creating a new gEDA/gaf release:
 </p>
 <ul>
-<li class="level1"><div class="li"> In the toplevel configure.ac file update the package version in the AC_INIT macro, the date in the AX_GIT_VERSION macro, and update libgeda&#039;s shared library version (libgeda&#039;s so version should follow what is described in <a href="http://sourceware.org/autobook/autobook/autobook_91.html" class="urlextern" title="http://sourceware.org/autobook/autobook/autobook_91.html"  rel="nofollow"> Autobook&#039;s library versioning</a> chapter).</div>
+<li class="level1"><div class="li"> In the toplevel configure.ac file update the package version in the AC_INIT macro, the date in the AX_GIT_VERSION macro, and update shared library versions of the package libraries, currently <em>libgeda</em> (AX_LIBGEDA)  and <em>libgedacairo</em> (AX_LIBGEDACAIRO) (their <code>.so</code> versions should follow what is described in  Autobook&#039;s library versioning chapter).</div>
 </li>
 <li class="level1"><div class="li"> Update the toplevel NEWS file with a summary of all the changes in the new release.  The NEWS file forms the basis for the release notes.</div>
 </li>
@@ -37,13 +35,13 @@ Here is a list of steps that are taken every time when creating a new gEDA/gaf r
 </li>
 <li class="level1"><div class="li"> Update all the versions and dates in the man pages (gschem.1, gnetlist.1, gsymcheck.1, grenum.1)</div>
 </li>
-<li class="level1"><div class="li"> Go into the wiki pages and update the “gEDA/gaf File Format Document” and add the release date to the version field.</div>
+<li class="level1"><div class="li"> Go into the wiki pages and update the &quot;gEDA/gaf File Format Document&quot; and add the release date to the version field.</div>
 </li>
-<li class="level1"><div class="li"> Update the wiki documentation snapshot (which is shipped with the release) by doing the following steps:</div>
+<li class="level1 node"><div class="li"> Update the wiki documentation snapshot (which is shipped with the release) by doing the following steps:</div>
 <ol>
-<li class="level2"><div class="li"> Get the wiki source files.  (For now you have to ask Ales to get them from the SEUL.org server; eventually this should be changed so they are available without asking anybody).  Put these files in some directory called “wikisrc”.  Also make an output directory called “htmloutput”</div>
+<li class="level2"><div class="li"> Get the wiki source files.  (For now you have to ask Ales to get them from the SEUL.org server; eventually this should be changed so they are available without asking anybody).  Put these files in some directory called &quot;wikisrc&quot;.  Also make an output directory called &quot;htmloutput&quot;</div>
 </li>
-<li class="level2"><div class="li"> Download a handy php-based package called “offline-doku”.  Latest version seems to be v0.1.1 and it was last seen at: <a href="http://sourceforge.net/projects/limb/files/" class="urlextern" title="http://sourceforge.net/projects/limb/files/"  rel="nofollow"> offline-doku </a>.</div>
+<li class="level2"><div class="li"> Download a handy php-based package called &quot;offline-doku&quot;.  Latest version seems to be v0.1.1 and it was last seen at:  offline-doku .</div>
 </li>
 <li class="level2"><div class="li"> You might need to tweak/add the following line in offline-doku/make.php to make sure it has enough memory to operate: <pre class="code"> ini_set(&#039;memory_limit&#039;,&#039;256M&#039;);</pre>
 </div>
@@ -57,7 +55,7 @@ Here is a list of steps that are taken every time when creating a new gEDA/gaf r
 </li>
 <li class="level2"><div class="li"> Tar/copy the htmloutput directory into the gaf git directory docs/</div>
 </li>
-<li class="level2"><div class="li"> Move aside (do not delete yet) the current wiki directory to something like “wikiold”.  Rename the new htmloutput directory to “wiki”</div>
+<li class="level2"><div class="li"> Move aside (do not delete yet) the current wiki directory to something like &quot;wikiold&quot;.  Rename the new htmloutput directory to &quot;wiki&quot;</div>
 </li>
 <li class="level2"><div class="li"> Run: <pre class="code"> cp -f wikiold/design.css wiki </pre>
 </div>
@@ -92,10 +90,10 @@ Here is a list of steps that are taken every time when creating a new gEDA/gaf r
 <ul>
 <li class="level1"><div class="li"> Commit all of the above changes (preferably in between each step)</div>
 </li>
-<li class="level1"><div class="li"> To build the distribution tarball (and verify all tests on the contained files) run:  </div>
+<li class="level1"><div class="li"> To build the distribution tarball (and verify all tests on the contained files) run:</div>
 </li>
 </ul>
-<pre class="code">        make distcheck   </pre>
+<pre class="code">        make distcheck</pre>
 
 <p>
 and make sure it completes without any errors.  After this is complete you will find the distribution tarball in the toplevel directory (named geda-gaf-VERSION.tar.gz).
@@ -103,7 +101,7 @@ and make sure it completes without any errors.  After this is complete you will 
 <ul>
 <li class="level1"><div class="li"> Copy the distribution tarball some place else along with the toplevel README (which should be renamed to gEDA-gaf-VERSION-README.txt).</div>
 </li>
-<li class="level1"><div class="li"> Create a file the md5sum for the toplevel tarball. </div>
+<li class="level1"><div class="li"> Create a file the md5sum for the toplevel tarball.</div>
 </li>
 </ul>
 <pre class="code">        md5sum -b geda-gaf-1.5.3.tar.gz &gt; geda-gaf-1.5.3.md5sum</pre>
@@ -117,7 +115,7 @@ and make sure it completes without any errors.  After this is complete you will 
 </ul>
 <pre class="code">        git tag -a 1.5.3-20090829</pre>
 <ul>
-<li class="level1"><div class="li"> Push all the commits to the main repository.  If you are on a branch the command should be: </div>
+<li class="level1"><div class="li"> Push all the commits to the main repository.  If you are on a branch the command should be:</div>
 </li>
 </ul>
 <pre class="code">        git push origin remote_branch_name</pre>
@@ -135,12 +133,12 @@ and make sure it completes without any errors.  After this is complete you will 
 </li>
 <li class="level1"><div class="li"> Update news update the sources download pages on the website with links to the new version</div>
 </li>
-<li class="level1"><div class="li"> Update the geda:todos page moving the release into the historical todos page.</div>
+<li class="level1"><div class="li"> Update the <a href="geda-todos.html" class="wikilink1" title="geda-todos.html">todos</a> removing the release information.</div>
 </li>
 <li class="level1"><div class="li"> Done!</div>
 </li>
 </ul>
 
 </div>
-<!-- EDIT568 SECTION "gEDA/gaf Release Creation Checklist" [50-] --></body>
+</body>
 </html>

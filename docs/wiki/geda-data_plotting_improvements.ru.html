@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <link rel="stylesheet" media="screen" type="text/css" href="./style.css" />
+  <link rel="stylesheet" media="screen" type="text/css" href="./design.css" />
+  <link rel="stylesheet" media="print" type="text/css" href="./print.css" />
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+
+<p>
+<em>Эта страница доступна также на следующих языках:</em>
+<a href="geda-data_plotting_improvements.html" class="wikilink1" title="geda-data_plotting_improvements.html">English</a>
+</p>
+
+<h1 id="построениеграфиковданныхмоделирования">Построение графиков данных моделирования</h1>
+<div class="level1">
+
+</div>
+
+<h2 id="обоснование">Обоснование</h2>
+<div class="level2">
+
+<p>
+В этой статье обсуждаются варианты улучшения построения графиков данных.
+Существуют различные программы, и каждая имеет свои «за» и «против».
+</p>
+<ul>
+<li class="level1"><div class="li">  gtkwave: прекрасная программа просмотра данных цифрового моделирования</div>
+</li>
+<li class="level1"><div class="li">  gwave: программа просмотра аналоговых сигналов</div>
+</li>
+<li class="level1"><div class="li">  KJWaves: оболочка моделирования с окном построения графиков</div>
+</li>
+<li class="level1"><div class="li"> встроенные функции вычерчивания графиков в ngspice</div>
+</li>
+<li class="level1"><div class="li"> gnuplot / octave / scipy / ... или подобные программы как скриптовые языки пост-обработки</div>
+</li>
+<li class="level1"><div class="li"> ...</div>
+</li>
+</ul>
+
+<p>
+В списках рассылки были разные предложения о том, какие возможности могла бы
+иметь программа вывода графиков:
+</p>
+<ul>
+<li class="level1"><div class="li"> пост-обработка: интегрирование, сложение, дифференцирование, БПФ, ...</div>
+</li>
+<li class="level1"><div class="li"> просмотр, исследования: курсоры, много окон, ...</div>
+</li>
+<li class="level1"><div class="li"> импорт данных, формат файла: данные моделирования (gnucap, spice, ...)  hdf5 , измеренные данные с осциллографов, анализаторов спектра, ...</div>
+</li>
+<li class="level1"><div class="li"> экспорт данных, формат файла: hdf5, изображения (png, ps, ...), <a href="geda-glossary.ru.html#ascii" class="wikilink1" title="geda-glossary.ru.html">ASCII</a></div>
+</li>
+<li class="level1"><div class="li"> низкоуровневые средства коммуникации: dbus, ...</div>
+</li>
+<li class="level1"><div class="li"> язык расширений / написания скриптов</div>
+</li>
+</ul>
+
+</div>
+
+<h2 id="план1расширитьвозможностиgtkwaves">План 1: расширить возможности gtkwaves</h2>
+<div class="level2">
+<ul>
+<li class="level1"><div class="li"> написать несколько функций импорта аналоговых данных</div>
+</li>
+</ul>
+
+</div>
+
+<h2 id="план2улучшитьgwave">План 2: улучшить gwave</h2>
+<div class="level2">
+
+<p>
+gwave требует старой версии 
+guile-gtk для GTK1.2.
+</p>
+<ul>
+<li class="level1"><div class="li"> перенести gwave на guile-gtk2.0 для GTK2.x</div>
+</li>
+<li class="level1"><div class="li"> удалить зависимость от guile-gtk. Может быть создать приложение на чистом gtk2 с помощью libglade?</div>
+</li>
+</ul>
+
+<p>
+Переделанная gwave:
+</p>
+<ul>
+<li class="level1"><div class="li"> gaw: http://www.rvq.fr/linux/gaw.php</div>
+</li>
+</ul>
+
+</div>
+
+<h2 id="план3поискатьсуществующиепрограммыобработкиданных">План 3: поискать существующие программы обработки данных</h2>
+<div class="level2">
+
+<p>
+Есть ли какие-нибудь программы для отображения и пост-обработки данных
+моделирования? Если да, как их приспособить для работы в качестве программ
+просмотра временных диаграмм сигналов для программ моделирования (gnucap,
+ngspice)?
+</p>
+
+</div>
+
+<h2 id="план4новоеприложениедляпостроенияграфиков">План 4: новое приложение для построения графиков</h2>
+<div class="level2">
+
+<p>
+Несколько неясных заметок о возможностях написания нового приложения для
+построения графиков.  В настоящий момент в качестве языка программирования в
+них предполагается python.
+</p>
+<ul>
+<li class="level1"><div class="li"> графический интерфейс можно создать с помощью libglade</div>
+</li>
+<li class="level1"><div class="li"> форматом хранения данных мог бы быть  hdf5 , может быть вместе с pytables</div>
+</li>
+<li class="level1"><div class="li"> движком построения графиков может быть  matplotlib (туда входит экспорт PNG и PS)</div>
+</li>
+<li class="level1"><div class="li"> пост-обработку можно было бы делать с помощью  scipy</div>
+</li>
+<li class="level1"><div class="li"> языком для скриптов является python. Поэтому легко может быть написан фильтр импорта в hdf5. Можно даже использовать интегрированную оболочку python. Видел такое на  MayaVi 2</div>
+</li>
+</ul>
+
+<p>
+Недостаток: В такой конфигурации требуется огромный рюкзак дополнительных
+пакетов.
+</p>
+
+<p>
+<strong>Обновление</strong>
+</p>
+
+<p>
+Есть несколько программ, использующих такой набор инструментов как python, numpy, matplotlib:
+</p>
+<ul>
+<li class="level1"><div class="li"> oscopy: http://repo.or.cz/w/oscopy.git</div>
+</li>
+<li class="level1"><div class="li"> dataplot: http://www.h-renrew.de/h/dataplot/dataplot.html, http://repo.or.cz/w/dataplot.git</div>
+</li>
+<li class="level1"><div class="li"> gsim: http://kiwiki.fmtnuni.sk/mediawiki/index.php/Description_of_gsim</div>
+</li>
+</ul>
+
+</div>
+</body>
+</html>

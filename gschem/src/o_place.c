@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2011 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,17 +22,23 @@
 
 #include "gschem.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
+/*! \brief Start placement action
  *
+ *  \par Function Description
+ *  This function remembers the current world coordinates and
+ *  invalidates the bounding box of the objects in the current
+ *  place list.
+ *
+ *  \param [in] w_current   GschemToplevel which we're drawing for.
+ *  \param [in] w_x         The current world X coordinate.
+ *  \param [in] w_y         The current world Y coordinate.
  */
-void o_place_start (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void o_place_start (GschemToplevel *w_current, int w_x, int w_y)
 {
+  g_return_if_fail (w_current != NULL);
+
+  i_action_start (w_current);
+
   w_current->second_wx = w_x;
   w_current->second_wy = w_y;
 
@@ -40,27 +46,45 @@ void o_place_start (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
   w_current->rubber_visible = 1;
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
+/*! \brief End placement action
  *
+ *  \par Function Description
+ *  This function finishes the current placement action by adding
+ *  objects to the current page at the given new world coordinates
+ *  and redrawing them on the canvas. It also saves the current
+ *  state in the undo list and updates the menus.
+ *
+ *  If \a continue_placing is TRUE, a copy of the placement list
+ *  is saved to start a new place action.
+ *
+ *  \param [in]  w_current  GschemToplevel which we're drawing for.
+ *  \param [in]  w_x        The current world X coordinate.
+ *  \param [in]  w_y        The current world Y coordinate.
+ *  \param [in]  hook_name  The hook to run after adding the objects.
  */
-void o_place_end (GSCHEM_TOPLEVEL *w_current,
+void o_place_end (GschemToplevel *w_current,
                   int w_x, int w_y,
                   int continue_placing,
-                  GList **ret_new_objects,
-                  const char* hook_name)
+                  const char* hook_name,
+                  const gchar *undo_desc)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   int w_diff_x, w_diff_y;
   OBJECT *o_current;
-  PAGE *p_current;
   GList *temp_dest_list = NULL;
   GList *connected_objects = NULL;
   GList *iter;
 
+  g_return_if_fail (w_current != NULL);
+  g_assert (w_current->inside_action != 0);
+
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
+
+  PAGE *page = gschem_page_view_get_page (page_view);
+  g_return_if_fail (page != NULL);
+
   /* erase old image */
-  /* o_place_invaidate_rubber (w_current, FALSE); */
+  /* o_place_invalidate_rubber (w_current, FALSE); */
   w_current->rubber_visible = 0;
 
   /* Calc final object positions */
@@ -72,32 +96,26 @@ void o_place_end (GSCHEM_TOPLEVEL *w_current,
 
   if (continue_placing) {
     /* Make a copy of the place list if we want to keep it afterwards */
-    temp_dest_list = o_glist_copy_all (toplevel,
-                                       toplevel->page_current->place_list,
+    temp_dest_list = o_glist_copy_all (page->toplevel,
+                                       page->place_list,
                                        temp_dest_list);
   } else {
     /* Otherwise just take it */
-    temp_dest_list = toplevel->page_current->place_list;
-    toplevel->page_current->place_list = NULL;
+    temp_dest_list = page->place_list;
+    page->place_list = NULL;
   }
 
-  if (ret_new_objects != NULL) {
-    *ret_new_objects = g_list_copy (temp_dest_list);
-  }
-
-  o_glist_translate_world(toplevel, w_diff_x, w_diff_y, temp_dest_list);
+  o_glist_translate_world(temp_dest_list, w_diff_x, w_diff_y);
 
   /* Attach each item back onto the page's object list. Update object
    * connectivity and add the new objects to the selection list.*/
-  p_current = toplevel->page_current;
-
   for (iter = temp_dest_list; iter != NULL; iter = g_list_next (iter)) {
     o_current = iter->data;
 
-    s_page_append (toplevel, p_current, o_current);
+    s_page_append (page->toplevel, page, o_current);
 
     /* Update object connectivity */
-    s_conn_update_object (toplevel, o_current);
+    s_conn_update_object (page, o_current);
     connected_objects = s_conn_return_others (connected_objects, o_current);
   }
 
@@ -109,21 +127,38 @@ void o_place_end (GSCHEM_TOPLEVEL *w_current,
   g_list_free (connected_objects);
   connected_objects = NULL;
 
-  toplevel->page_current->CHANGED = 1;
   o_invalidate_glist (w_current, temp_dest_list); /* only redraw new objects */
   g_list_free (temp_dest_list);
 
-  o_undo_savestate (w_current, UNDO_ALL);
+  gschem_toplevel_page_content_changed (w_current, page);
+  o_undo_savestate_old (w_current, UNDO_ALL, undo_desc);
   i_update_menus (w_current);
+
+  if (!continue_placing) {
+    i_set_state(w_current, SELECT);
+    i_action_stop (w_current);
+  }
 }
 
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
+/*! \brief Move the objects in the place list to new coordinates
  *
+ *  \par Function Description
+ *  This function erases the objects in the current place list at
+ *  their previous coordinates and draws them at the new given
+ *  coordinates.
+ *
+ *  \param [in] w_current   GschemToplevel which we're drawing for.
+ *  \param [in] w_x         The current world X coordinate.
+ *  \param [in] w_y         The current world Y coordinate.
  */
-void o_place_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
+void o_place_motion (GschemToplevel *w_current, int w_x, int w_y)
 {
+  PAGE *page = gschem_page_view_get_page (gschem_toplevel_get_current_page_view (w_current));
+  g_return_if_fail (page != NULL);
+
+  g_return_if_fail (page->place_list != NULL);
+  g_assert (w_current->inside_action != 0);
+
   if (w_current->rubber_visible)
     o_place_invalidate_rubber (w_current, FALSE);
   w_current->second_wx = w_x;
@@ -161,27 +196,35 @@ void o_place_motion (GSCHEM_TOPLEVEL *w_current, int w_x, int w_y)
  * no mode / constraint changes were made between the pair, it is not
  * harmful to call the draw operation with "drawing=FALSE".
  *
- *  \param [in] w_current   GSCHEM_TOPLEVEL which we're drawing for.
+ *  \param [in] w_current   GschemToplevel which we're drawing for.
  *  \param [in] drawing     Set to FALSE for undraw operations to ensure
  *                            matching conditions to a previous draw operation.
  */
-void o_place_invalidate_rubber (GSCHEM_TOPLEVEL *w_current, int drawing)
+void o_place_invalidate_rubber (GschemToplevel *w_current, int drawing)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   int diff_x, diff_y;
   int left, top, bottom, right;
-  int s_left, s_top, s_bottom, s_right;
 
-  g_return_if_fail (toplevel->page_current->place_list != NULL);
+  g_return_if_fail (w_current != NULL);
+
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
+
+  PAGE *page = gschem_page_view_get_page (page_view);
+  g_return_if_fail (page != NULL);
+  g_return_if_fail (page->place_list != NULL);
 
   /* If drawing is true, then don't worry about the previous drawing
    * method and movement constraints, use with the current settings */
   if (drawing) {
     /* Ensure we set this to flag there is "something" supposed to be
-     * drawn when the invaliate call below causes an expose event. */
+     * drawn when the invalidate call below causes an expose event. */
     w_current->last_drawb_mode = w_current->actionfeedback_mode;
-    w_current->drawbounding_action_mode = (w_current->CONTROLKEY)
-                                            ? CONSTRAINED : FREE;
+    w_current->drawbounding_action_mode = (w_current->CONTROLKEY &&
+                                           ! ((w_current->event_state == PASTEMODE) ||
+                                              (w_current->event_state == COMPMODE) ||
+                                              (w_current->event_state == TEXTMODE)))
+                                          ? CONSTRAINED : FREE;
   }
 
   /* Calculate delta of X-Y positions from buffer's origin */
@@ -206,17 +249,18 @@ void o_place_invalidate_rubber (GSCHEM_TOPLEVEL *w_current, int drawing)
   }
 
   /* Find the bounds of the drawing to be done */
-  world_get_object_glist_bounds (toplevel, toplevel->page_current->place_list,
+  world_get_object_glist_bounds (page->toplevel, page->place_list,
                                  &left, &top, &right, &bottom);
-  WORLDtoSCREEN (w_current, left + diff_x, top + diff_y, &s_left, &s_top);
-  WORLDtoSCREEN (w_current, right + diff_x, bottom + diff_y, &s_right, &s_bottom);
 
-  o_invalidate_rect (w_current, s_left, s_top, s_right, s_bottom);
+  gschem_page_view_invalidate_world_rect (page_view,
+                                          left + diff_x,
+                                          top + diff_y,
+                                          right + diff_x,
+                                          bottom + diff_y);
 }
 
 
 /*! \brief Draw a bounding box or outline for OBJECT placement
- *
  *  \par Function Description
  *  This function draws either the OBJECTS in the place list
  *  or a rectangle around their bounding box, depending upon the
@@ -227,43 +271,32 @@ void o_place_invalidate_rubber (GSCHEM_TOPLEVEL *w_current, int drawing)
  * before drawing if the CONTROL key is recording as being pressed in
  * the w_current structure.
  *
- * The "drawing" parameter is used to indicate if this drawing should
- * immediately use the selected feedback mode and positioning constraints.
- *
- * With drawing=TRUE, the selected conditions are used immediately,
- * otherwise the conditions from the last drawing operation are used,
- * saving the new state for next time.
- *
- * This function should be called with drawing=TRUE when starting a
- * rubberbanding operation and when otherwise refreshing the rubberbanded
- * outline (e.g. after a screen redraw). For any undraw operation, should
- * be called with drawing=FALSE, ensuring that the undraw XOR matches the
- * mode and constraints of the corresponding "draw" operation.
- *
- * If any mode / constraint changes are made between a undraw, redraw XOR
- * pair, the latter (draw) operation must be called with drawing=TRUE. If
- * no mode / constraint changes were made between the pair, it is not
- * harmful to call the draw operation with "drawing=FALSE".
- *
- *  \param [in] w_current   GSCHEM_TOPLEVEL which we're drawing for.
- *  \param [in] drawing     Set to FALSE for undraw operations to ensure
- *                            matching conditions to a previous draw operation.
+ *  \param w_current   GschemToplevel which we're drawing for.
+ *  \param renderer    Renderer to use for drawing.
  */
-void o_place_draw_rubber (GSCHEM_TOPLEVEL *w_current, int drawing)
+void
+o_place_draw_rubber (GschemToplevel *w_current, EdaRenderer *renderer)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
   int diff_x, diff_y;
-  int left, top, bottom, right;
+  cairo_t *cr = eda_renderer_get_cairo_context (renderer);
 
-  g_return_if_fail (toplevel->page_current->place_list != NULL);
+  g_return_if_fail (w_current != NULL);
 
-  /* If drawing is true, then don't worry about the previous drawing
-   * method and movement constraints, use with the current settings */
-  if (drawing) {
-    w_current->last_drawb_mode = w_current->actionfeedback_mode;
-    w_current->drawbounding_action_mode = (w_current->CONTROLKEY)
-                                            ? CONSTRAINED : FREE;
-  }
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
+
+  PAGE *page = gschem_page_view_get_page (page_view);
+  g_return_if_fail (page != NULL);
+  g_return_if_fail (page->place_list != NULL);
+
+  /* Don't worry about the previous drawing method and movement
+   * constraints, use with the current settings */
+  w_current->last_drawb_mode = w_current->actionfeedback_mode;
+  w_current->drawbounding_action_mode = (w_current->CONTROLKEY &&
+                                         ! ((w_current->event_state == PASTEMODE) ||
+                                            (w_current->event_state == COMPMODE) ||
+                                            (w_current->event_state == TEXTMODE)))
+                                        ? CONSTRAINED : FREE;
 
   /* Calculate delta of X-Y positions from buffer's origin */
   diff_x = w_current->second_wx - w_current->first_wx;
@@ -280,48 +313,94 @@ void o_place_draw_rubber (GSCHEM_TOPLEVEL *w_current, int drawing)
     }
   }
 
+  /* Translate the cairo context to the required offset before drawing. */
+  cairo_save (cr);
+  cairo_translate (cr, diff_x, diff_y);
+
   /* Draw with the appropriate mode */
   if (w_current->last_drawb_mode == BOUNDINGBOX) {
+    GArray *map = eda_renderer_get_color_map (renderer);
+    int flags = eda_renderer_get_cairo_flags (renderer);
+    int left, top, bottom, right;
 
     /* Find the bounds of the drawing to be done */
-    world_get_object_glist_bounds (toplevel,
-                                   toplevel->page_current->place_list,
+    world_get_object_glist_bounds (page->toplevel,
+                                   page->place_list,
                                    &left, &top, &right, &bottom);
 
-    gschem_cairo_box (w_current, 0, left  + diff_x, top    + diff_y,
-                                    right + diff_x, bottom + diff_y);
-
-    gschem_cairo_set_source_color (w_current,
-                                   x_color_lookup_dark (BOUNDINGBOX_COLOR));
-    gschem_cairo_stroke (w_current, TYPE_SOLID, END_NONE, 0, -1, -1);
+    /* Draw box outline */
+    eda_cairo_box (cr, flags, 0, left, top, right, bottom);
+    eda_cairo_set_source_color (cr, BOUNDINGBOX_COLOR, map);
+    eda_cairo_stroke (cr, flags, TYPE_SOLID, END_NONE, 0, -1, -1);
   } else {
-    o_glist_draw_place (w_current, diff_x, diff_y,
-                        toplevel->page_current->place_list);
+    GList *iter;
+    for (iter = page->place_list; iter != NULL;
+         iter = g_list_next (iter)) {
+      eda_renderer_draw (renderer, (OBJECT *) iter->data);
+    }
   }
-
-  /* Save movement constraints and drawing method for any
-   * corresponding undraw operation. */
-  w_current->last_drawb_mode = w_current->actionfeedback_mode;
-  w_current->drawbounding_action_mode = (w_current->CONTROLKEY)
-                                          ? CONSTRAINED : FREE;
+  cairo_restore (cr);
 }
 
 
-/*! \todo Finish function documentation!!!
- *  \brief
- *  \par Function Description
+/*! \brief Rotate the objects being placed
  *
+ *  \par Function Description
+ *  This function erases the objects in the place list, rotates
+ *  them, runs %rotate-objects-hook, and redraws the objects after
+ *  rotating.
+ *
+ *  \param [in] w_current   The GschemToplevel object.
  */
-void o_place_rotate (GSCHEM_TOPLEVEL *w_current)
+void o_place_rotate (GschemToplevel *w_current)
 {
-  TOPLEVEL *toplevel = w_current->toplevel;
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
 
-  o_glist_rotate_world (toplevel,
-                        w_current->first_wx, w_current->first_wy, 90,
-                        toplevel->page_current->place_list);
+  PAGE *page = gschem_page_view_get_page (page_view);
+  g_return_if_fail (page != NULL);
 
+  o_place_invalidate_rubber (w_current, FALSE);
+
+  o_glist_rotate_world (page->toplevel,
+                        w_current->first_wx,
+                        w_current->first_wy,
+                        90,
+                        page->place_list);
 
   /* Run rotate-objects-hook */
-  g_run_hook_object_list (w_current, "%rotate-objects-hook",
-                          toplevel->page_current->place_list);
+  g_run_hook_object_list (w_current, "%rotate-objects-hook", page->place_list);
+
+  o_place_invalidate_rubber (w_current, TRUE);
+}
+
+
+/*! \brief Mirror the objects being placed
+ *
+ *  \par Function Description
+ *  This function erases the objects in the place list, mirrors
+ *  them, runs %mirror-objects-hook, and redraws the objects after
+ *  mirroring.
+ *
+ *  \param [in] w_current   The GschemToplevel object.
+ */
+void o_place_mirror (GschemToplevel *w_current)
+{
+  GschemPageView *page_view = gschem_toplevel_get_current_page_view (w_current);
+  g_return_if_fail (page_view != NULL);
+
+  PAGE *page = gschem_page_view_get_page (page_view);
+  g_return_if_fail (page != NULL);
+
+  o_place_invalidate_rubber (w_current, FALSE);
+
+  o_glist_mirror_world (page->toplevel,
+                        w_current->first_wx,
+                        w_current->first_wy,
+                        page->place_list);
+
+  /* Run mirror-objects-hook */
+  g_run_hook_object_list (w_current, "%mirror-objects-hook", page->place_list);
+
+  o_place_invalidate_rubber (w_current, TRUE);
 }

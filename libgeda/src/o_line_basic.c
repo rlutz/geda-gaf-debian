@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,6 @@
 
 #include "libgeda_priv.h"
 
-#ifdef HAVE_LIBDMALLOC
-#include <dmalloc.h>
-#endif
-
 /*! \brief Create and add line OBJECT to list.
  *  \par Function Description
  *  This function creates a new object representing a line.
@@ -53,7 +49,6 @@
  *  #o_set_fill_options().
  *
  *  \param [in]     toplevel     The TOPLEVEL object.
- *  \param [in]     type         Must be OBJ_LINE.
  *  \param [in]     color        Circle line color.
  *  \param [in]     x1           Upper x coordinate.
  *  \param [in]     y1           Upper y coordinate.
@@ -62,13 +57,12 @@
  *  \return A pointer to the new end of the object list.
  */
 OBJECT *o_line_new(TOPLEVEL *toplevel,
-		   char type, int color, 
-		   int x1, int y1, int x2, int y2)
+		   int color, int x1, int y1, int x2, int y2)
 {
   OBJECT *new_node;
 
   /* create the object */
-  new_node = s_basic_new_object(type, "line");
+  new_node = s_basic_new_object(OBJ_LINE, "line");
   new_node->color = color;
   
   new_node->line  = (LINE *) g_malloc(sizeof(LINE));
@@ -81,12 +75,12 @@ OBJECT *o_line_new(TOPLEVEL *toplevel,
   
   /* line type and filling initialized to default */
   o_set_line_options(toplevel, new_node,
-		     END_NONE, TYPE_SOLID, 0, -1, -1);
+		     DEFAULT_OBJECT_END, TYPE_SOLID, 0, -1, -1);
   o_set_fill_options(toplevel, new_node,
 		     FILLING_HOLLOW, -1, -1, -1, -1, -1);
 
   /* compute bounding box */
-  o_line_recalc(toplevel, new_node);
+  new_node->w_bounds_valid_for = NULL;
 
   return new_node;
 }
@@ -106,7 +100,7 @@ OBJECT *o_line_copy(TOPLEVEL *toplevel, OBJECT *o_current)
 
   /* A new line object is created with #o_line_new().
    * Values for its fields are default and need to be modified. */
-  new_obj = o_line_new (toplevel, OBJ_LINE, o_current->color,
+  new_obj = o_line_new (toplevel, o_current->color,
                         o_current->line->x[0], o_current->line->y[0],
                         o_current->line->x[1], o_current->line->y[1]);
 
@@ -114,9 +108,6 @@ OBJECT *o_line_copy(TOPLEVEL *toplevel, OBJECT *o_current)
    * The coordinates of the ends of the new line are set with the ones
    * of the original line. The two lines have the sale line type and
    * filling options.
-   *
-   * The bounding box are computed with
-   * #o_line_recalc().
    */
 
   /* copy the line type and filling options */
@@ -129,7 +120,7 @@ OBJECT *o_line_copy(TOPLEVEL *toplevel, OBJECT *o_current)
 		     o_current->fill_pitch2, o_current->fill_angle2);
   
   /* calc the bounding box */
-  o_line_recalc(toplevel, o_current);
+  o_current->w_bounds_valid_for = NULL;
   
   /* new_obj->attribute = 0;*/
 
@@ -181,7 +172,7 @@ void o_line_modify(TOPLEVEL *toplevel, OBJECT *object,
   }
 
   /* recalculate the bounding box */
-  o_line_recalc(toplevel, object);
+  object->w_bounds_valid_for = NULL;
   o_emit_change_notify (toplevel, object);
 }
 
@@ -260,7 +251,7 @@ OBJECT *o_line_read (TOPLEVEL *toplevel, const char buf[],
                    type, x1, y1, x2, y2, color);
   }
 
-  if (color < 0 || color > MAX_COLORS) {
+  if (color < 0 || color >= MAX_OBJECT_COLORS) {
     s_log_message (_("Found an invalid color [ %s ]\n"), buf);
     s_log_message (_("Setting color to default color\n"));
     color = DEFAULT_COLOR;
@@ -272,7 +263,7 @@ OBJECT *o_line_read (TOPLEVEL *toplevel, const char buf[],
    * type is set according to the values of the fields on the line.
    */
   /* create and add the line to the list */
-  new_obj = o_line_new (toplevel, type, color, x1, y1, x2, y2);
+  new_obj = o_line_new (toplevel, color, x1, y1, x2, y2);
   /* set its line options */
   o_set_line_options (toplevel, new_obj,
                       line_end, line_type, line_width, line_length,
@@ -291,7 +282,6 @@ OBJECT *o_line_read (TOPLEVEL *toplevel, const char buf[],
  *  It follows the post-20000704 release file format that handle the
  *  line type and fill options - filling is irrelevant here.
  *
- *  \param [in] toplevel  a TOPLEVEL structure.
  *  \param [in] object  Line OBJECT to create string from.
  *  \return A pointer to the line OBJECT character string.
  *
@@ -299,33 +289,24 @@ OBJECT *o_line_read (TOPLEVEL *toplevel, const char buf[],
  *  Caller must g_free returned character string.
  *
  */
-char *o_line_save(TOPLEVEL *toplevel, OBJECT *object)
+char *o_line_save(OBJECT *object)
 {
-  int x1, x2, y1, y2;
-  int line_width, line_space, line_length;
-  char *buf;
-  OBJECT_END line_end;
-  OBJECT_TYPE line_type;
+  g_return_val_if_fail (object != NULL, NULL);
+  g_return_val_if_fail (object->line != NULL, NULL);
+  g_return_val_if_fail (object->type == OBJ_LINE, NULL);
 
-  /* get the two ends */
-  x1 = object->line->x[0];
-  y1 = object->line->y[0];
-  x2 = object->line->x[1];
-  y2 = object->line->y[1];
-  
-  /* description of the line type */
-  line_width = object->line_width;
-  line_end   = object->line_end;
-  line_type  = object->line_type;
-  line_length= object->line_length;
-  line_space = object->line_space;
-  
-  buf = g_strdup_printf("%c %d %d %d %d %d %d %d %d %d %d", object->type,
-			x1, y1, x2, y2, object->color,
-			line_width, line_end, line_type,
-			line_length, line_space);
-
-  return(buf);
+  return g_strdup_printf ("%c %d %d %d %d %d %d %d %d %d %d",
+                          OBJ_LINE,
+                          object->line->x[0],
+                          object->line->y[0],
+                          object->line->x[1],
+                          object->line->y[1],
+                          object->color,
+                          object->line_width,
+                          object->line_end,
+                          object->line_type,
+                          object->line_length,
+                          object->line_space);
 }
 
 /*! \brief Translate a line position in WORLD coordinates by a delta.
@@ -333,14 +314,16 @@ char *o_line_save(TOPLEVEL *toplevel, OBJECT *object)
  *  This function applies a translation of (<B>x1</B>,<B>y1</B>) to the line
  *  described by <B>*object</B>. <B>x1</B> and <B>y1</B> are in world unit.
  *
- *  \param [in]     toplevel  The TOPLEVEL object.
+ *  \param [in,out] object     Line OBJECT to translate.
  *  \param [in]     dx         x distance to move.
  *  \param [in]     dy         y distance to move.
- *  \param [in,out] object     Line OBJECT to translate.
  */
-void o_line_translate_world(TOPLEVEL *toplevel,
-			    int dx, int dy, OBJECT *object)
+void o_line_translate_world(OBJECT *object, int dx, int dy)
 {
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->line != NULL);
+  g_return_if_fail (object->type == OBJ_LINE);
+
   /* Update world coords */
   object->line->x[0] = object->line->x[0] + dx;
   object->line->y[0] = object->line->y[0] + dy;
@@ -348,7 +331,7 @@ void o_line_translate_world(TOPLEVEL *toplevel,
   object->line->y[1] = object->line->y[1] + dy;
   
   /* Update bounding box */
-  o_line_recalc (toplevel, object);
+  object->w_bounds_valid_for = NULL;
 }
 
 /*! \brief Rotate Line OBJECT using WORLD coordinates. 
@@ -369,7 +352,11 @@ void o_line_rotate_world(TOPLEVEL *toplevel,
 			 OBJECT *object)
 {
   int newx, newy;
-	
+
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->line != NULL);
+  g_return_if_fail (object->type == OBJ_LINE);
+
   if (angle == 0) 
     return;
 
@@ -385,7 +372,7 @@ void o_line_rotate_world(TOPLEVEL *toplevel,
    * back to its previous location.
    */
   /* translate object to origin */
-  o_line_translate_world(toplevel, -world_centerx, -world_centery, object);
+  o_line_translate_world(object, -world_centerx, -world_centery);
 
   /* rotate line end 1 */
   rotate_point_90(object->line->x[0], object->line->y[0], angle,
@@ -402,7 +389,7 @@ void o_line_rotate_world(TOPLEVEL *toplevel,
   object->line->y[1] = newy;
 
   /* translate object back to normal position */
-  o_line_translate_world(toplevel, world_centerx, world_centery, object);
+  o_line_translate_world(object, world_centerx, world_centery);
   
 }
 
@@ -422,41 +409,20 @@ void o_line_rotate_world(TOPLEVEL *toplevel,
 void o_line_mirror_world(TOPLEVEL *toplevel, int world_centerx,
 			 int world_centery, OBJECT *object)
 {
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (object->line != NULL);
+  g_return_if_fail (object->type == OBJ_LINE);
+
   /* translate object to origin */
-  o_line_translate_world(toplevel, -world_centerx, -world_centery, object);
+  o_line_translate_world(object, -world_centerx, -world_centery);
 
   /* mirror the line ends */
   object->line->x[0] = -object->line->x[0];
   object->line->x[1] = -object->line->x[1];
 
   /* translate back in position */
-  o_line_translate_world(toplevel, world_centerx, world_centery, object);
+  o_line_translate_world(object, world_centerx, world_centery);
   
-}
-
-/*! \brief Recalculate line coordinates in SCREEN units.
- *  \par Function Description
- *  This function recalculate the bounding box of the <B>o_current</B>
- *
- *  \param [in] toplevel      The TOPLEVEL object.
- *  \param [in,out] o_current  Line OBJECT to be recalculated.
- */
-void o_line_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
-{
-  int left, right, top, bottom;
-
-  if (o_current->line == NULL) {
-    return;
-  }
-  
-  /* update the bounding box - screen unit */
-  world_get_line_bounds(toplevel, o_current,
-		  &left, &top, &right, &bottom);
-  o_current->w_left   = left;
-  o_current->w_top    = top;
-  o_current->w_right  = right;
-  o_current->w_bottom = bottom;
-  o_current->w_bounds_valid = TRUE;
 }
 
 /*! \brief Get line bounding rectangle in WORLD coordinates.
@@ -475,9 +441,9 @@ void o_line_recalc(TOPLEVEL *toplevel, OBJECT *o_current)
 void world_get_line_bounds(TOPLEVEL *toplevel, OBJECT *object,
                            int *left, int *top, int *right, int *bottom)
 {
-  int halfwidth;
+  int expand;
 
-  halfwidth = object->line_width / 2;
+  expand = ceil (0.5 * G_SQRT2 * object->line_width);
 
   *left = min( object->line->x[0], object->line->x[1] );
   *top = min( object->line->y[0], object->line->y[1] );
@@ -485,665 +451,39 @@ void world_get_line_bounds(TOPLEVEL *toplevel, OBJECT *object,
   *bottom = max( object->line->y[0], object->line->y[1] );
 
   /* This isn't strictly correct, but a 1st order approximation */
-  *left   -= halfwidth;
-  *top    -= halfwidth;
-  *right  += halfwidth;
-  *bottom += halfwidth;
+  *left   -= expand;
+  *top    -= expand;
+  *right  += expand;
+  *bottom += expand;
 }
 
 /*! \brief get the position of the first line point
  *  \par Function Description
  *  This function gets the position of the first point of a line object.
  *
- *  \param [in] toplevel The toplevel environment.
+ *  \param [in] object   The object to get the position.
  *  \param [out] x       pointer to the x-position
  *  \param [out] y       pointer to the y-position
- *  \param [in] object   The object to get the position.
  *  \return TRUE if successfully determined the position, FALSE otherwise
  */
-gboolean o_line_get_position (TOPLEVEL *toplevel, gint *x, gint *y,
-                              OBJECT *object)
+gboolean o_line_get_position (OBJECT *object, gint *x, gint *y)
 {
-  *x = object->line->x[0];
-  *y = object->line->y[0];
+  g_return_val_if_fail (object != NULL, FALSE);
+  g_return_val_if_fail (object->type == OBJ_LINE, FALSE);
+  g_return_val_if_fail (object->line != NULL, FALSE);
+
+  if (x != NULL) {
+    *x = object->line->x[0];
+  }
+
+  if (y != NULL) {
+    *y = object->line->y[0];
+  }
+
   return TRUE;
 }
 
-
-/*! \brief Print line to Postscript document.
- *  \par Function Description
- *  This function prints the line described by the <B>o_current</B>
- *  parameter to a Postscript document.
- *  The Postscript document is described by the <B>fp</B> file pointer.
- *
- *  Parameters of the line are extracted from object pointed by
- *  <B>o_current</B>.
- *  
- *  \param [in] toplevel  The TOPLEVEL object.
- *  \param [in] fp         FILE pointer to Postscript document.
- *  \param [in] o_current  Line OBJECT to write to document.
- *  \param [in] origin_x   Page x coordinate to place line OBJECT.
- *  \param [in] origin_y   Page y coordinate to place line OBJECT.
- */
-void o_line_print(TOPLEVEL *toplevel, FILE *fp, OBJECT *o_current,
-		  int origin_x, int origin_y)
-{
-  int x1, y1, x2, y2;
-  int color;
-  int line_width, length, space;
-  void (*outl_func)() = NULL;
-	
-  if (o_current == NULL) {
-    printf("got null in o_line_print\n");
-    return;
-  }
-
-  x1    = o_current->line->x[0];
-  y1    = o_current->line->y[0];
-  x2    = o_current->line->x[1];
-  y2    = o_current->line->y[1];
-  color = o_current->color;
-
-  /*
-   * Depending on the type of the line for this particular line, the
-   * appropriate function is chosen among
-   * #o_line_print_solid(), #o_line_print_dotted()#, #o_line_print_dashed(),
-   * #o_line_print_center() and #o_line_print_phantom().
-   *
-   * The needed parameters for each of these types are extracted from the
-   * <B>o_current</B> object. Depending on the type, unused parameters are
-   * set to -1.
-   *
-   * In the eventuality of a length and/or space null, the line is printed
-   * solid to avoid and endless loop produced by other functions.
-   */
-  line_width = o_current->line_width;
-  if(line_width <=2) {
-    if(toplevel->line_style == THICK) {
-      line_width=LINE_WIDTH;
-    } else {
-      line_width=2;
-    }
-  }
-
-  length = o_current->line_length;
-  space  = o_current->line_space;
-  
-  switch(o_current->line_type) {
-    case(TYPE_SOLID):
-      length = -1; space = -1;
-      outl_func = o_line_print_solid;
-      break;
-      
-    case(TYPE_DOTTED):
-      length = -1;
-      outl_func = o_line_print_dotted;
-      break;
-      
-    case(TYPE_DASHED):
-      outl_func = o_line_print_dashed;
-      break;
-      
-    case(TYPE_CENTER):
-      outl_func = o_line_print_center;
-      break;
-      
-    case(TYPE_PHANTOM):
-      outl_func = o_line_print_phantom;
-      break;
-      
-    case(TYPE_ERASE):
-      /* Unused for now, print it solid */
-      length = -1; space = -1;
-      outl_func =  o_line_print_solid;
-      break;
-  }
-
-  if((length == 0) || (space == 0)) {
-    length = -1; space = -1;
-    outl_func = o_line_print_solid;
-  }
-  
-  (*outl_func)(toplevel, fp,
-	       x1 - origin_x, y1 - origin_y,
-	       x2 - origin_x, y2 - origin_y,
-	       color,
-	       line_width, length, space,
-	       origin_x, origin_y);
-}
-
-/*! \brief Print a solid line to Postscript document.
- *  \par Function Description
- *  This function prints a line when a solid line type is required.
- *  The line is defined by the coordinates of its two ends in
- *  (<B>x1</B>,<B>y1</B>) and (<B>x2</B>,<B>y2</B>).
- *  The Postscript document is defined by the file pointer <B>fp</B>.
- *  The parameters <B>length</B> and <B>space</B> are ignored whereas
- *  <B>line_width</B> specifies the width of the printed line.
- *
- *  \param [in] toplevel     The TOPLEVEL object.
- *  \param [in] fp            FILE pointer to Postscript document.
- *  \param [in] x1            Upper x coordinate.
- *  \param [in] y1            Upper y coordinate.
- *  \param [in] x2            Lower x coordinate.
- *  \param [in] y2            Lower y coordinate.
- *  \param [in] color         Line color.
- *  \param [in] line_width    Width of line.
- *  \param [in] length        (unused).
- *  \param [in] space         (unused).
- *  \param [in] origin_x      Page x coordinate to place line OBJECT.
- *  \param [in] origin_y      Page y coordinate to place line OBJECT.
- */
-void o_line_print_solid(TOPLEVEL *toplevel, FILE *fp,
-			int x1, int y1, int x2, int y2,
-			int color,
-			int line_width, int length, int space,
-			int origin_x, int origin_y)
-{
-  f_print_set_color(toplevel, fp, color);
-  
-  fprintf(fp,"%d %d %d %d %d line\n",
-	  x1,y1,x2,y2, line_width);
-}
-
-/*! \brief Print a dotted line to Postscript document.
- *  \par Function Description
- *  This function prints a line when a dotted line type is required.
- *  The line is defined by the coordinates of its two ends in
- *  (<B>x1</B>,<B>y1</B>) and (<B>x2</B>,<B>y2</B>).
- *  The Postscript document is defined by the file pointer <B>fp</B>.
- *  The parameter <B>length</B> is ignored whereas <B>line_width</B>
- *  specifies the diameter of the dots and <B>space</B> the distance
- *  between two dots.
- *
- *  A negative value for <B>space</B> leads to an endless loop.
- *
- *  All dimensions are in mils.
- *
- *  The function sets the color in which the line will be printed with.
- *
- *  \param [in] toplevel     The TOPLEVEL object.
- *  \param [in] fp            FILE pointer to Postscript document.
- *  \param [in] x1            Upper x coordinate.
- *  \param [in] y1            Upper y coordinate.
- *  \param [in] x2            Lower x coordinate.
- *  \param [in] y2            Lower y coordinate.
- *  \param [in] color         Line color.
- *  \param [in] line_width    Width of line.
- *  \param [in] length        (unused).
- *  \param [in] space         Space between dots.
- *  \param [in] origin_x      Page x coordinate to place line OBJECT.
- *  \param [in] origin_y      Page y coordinate to place line OBJECT.
- */
-void o_line_print_dotted(TOPLEVEL *toplevel, FILE *fp,
-			 int x1, int y1, int x2, int y2,
-			 int color,
-			 int line_width, int length, int space,
-			 int origin_x, int origin_y)
-{
-  double dx, dy, l, d;
-  double dx1, dy1;
-  double xa, ya;
-  
-  f_print_set_color(toplevel, fp, color);
-  
-  /* The dotted line command takes an array of dots so print out the
-   * beginnings of the array 
-   */
-  fprintf(fp,"[");
-  /* is the width relevant for a dot (circle) ? */
-  /* f_print_set_line_width(fp, line_width); */
-  
-  /*
-   * Depending on the slope of the line the space parameter is
-   * projected on each of the two directions x and y resulting
-   * in <B>dx1</B> and <B>dy1</B>. Starting from one end by increments
-   * of space the dots are printed.
-   *
-   * A dot is represented by a filled circle. Position of the
-   * circle is (<B>xa</B>, <B>ya</B>) and its radius is the <B>line_width</B>
-   * parameter.
-   */
-  
-  dx = (double) (x2 - x1);
-  dy = (double) (y2 - y1);
-  l = sqrt((dx * dx) + (dy * dy));
-  
-  dx1 = (dx * space) / l;
-  dy1 = (dy * space) / l;
-  
-  d = 0;
-  xa = x1; ya = y1;
-  while(d < l) {
-    
-    fprintf(fp,"[%d %d] ",
-	    (int)xa, (int)ya);
-    d = d + space;
-    xa = xa + dx1;
-    ya = ya + dy1;
-  }
-  
-  fprintf(fp,"] %d dashed\n",line_width);
-  
-}
-
-
-/*! \brief Print a dashed line to Postscript document.
- *  \par Function Description
- *  This function prints a line when a dashed line type is required.
- *  The line is defined by the coordinates of its two ends in
- *  (<B>x1</B>,<B>y1</B>) and (<B>x2</B>,<B>y2</B>).
- *  The postscript file is defined by the file pointer <B>fp</B>.
- *
- *  A negative value for <B>space</B> or <B>length</B> leads to an
- *  endless loop.
- *
- *  All dimensions are in mils.
- *
- *  The function sets the color in which the line will be printed and
- *  the width of the line - that is the width of the dashes.
- *
- *  \param [in] toplevel     The TOPLEVEL object.
- *  \param [in] fp            FILE pointer to Postscript document.
- *  \param [in] x1            Upper x coordinate.
- *  \param [in] y1            Upper y coordinate.
- *  \param [in] x2            Lower x coordinate.
- *  \param [in] y2            Lower y coordinate.
- *  \param [in] color         Line color.
- *  \param [in] line_width    Width of line.
- *  \param [in] length        Length of a dash.
- *  \param [in] space         Space between dashes.
- *  \param [in] origin_x      Page x coordinate to place line OBJECT.
- *  \param [in] origin_y      Page y coordinate to place line OBJECT.
- */
-void o_line_print_dashed(TOPLEVEL *toplevel, FILE *fp,
-			 int x1, int y1, int x2, int y2,
-			 int color,
-			 int line_width, int length, int space,
-			 int origin_x, int origin_y)
-{
-  double dx, dy, l, d;
-  double dx1, dy1, dx2, dy2;
-  double xa, ya, xb, yb;
-  
-  f_print_set_color(toplevel, fp, color);
-  
-  /* the dashed line function takes an array of start-finish pairs
-   * output the beginnings of the array now
-   */
-  fprintf(fp,"[");
-  
-  /*
-   * Depending on the slope of the line the <B>length</B> (resp. <B>space</B>)
-   * parameter is projected on each of the two directions x and y
-   * resulting in <B>dx1</B> and <B>dy1</B> (resp. <B>dx2</B> and <B>dy2</B>).
-   * Starting from one end and incrementing alternatively by <B>space</B>
-   * and <B>length</B> the dashes are printed.
-   *
-   * It prints as many dashes of length <B>length</B> as possible.
-   */
-  dx = (double) (x2 - x1);
-  dy = (double) (y2 - y1);
-  l = sqrt((dx * dx) + (dy * dy));
-  
-  dx1 = (dx * length) / l;
-  dy1 = (dy * length) / l;
-  
-  dx2 = (dx * space) / l;
-  dy2 = (dy * space) / l;
-  
-  d = 0;
-  xa = x1; ya = y1;
-  while((d + length + space) < l) {
-    d = d + length;
-    xb = xa + dx1;
-    yb = ya + dy1;
-    
-    fprintf(fp, "[%d %d %d %d] ", 
-	    (int) xa, (int) ya,
-	    (int) xb, (int) yb);
-    
-    d = d + space;
-    xa = xb + dx2;
-    ya = yb + dy2;
-  }
-  /*
-   * When the above condition is no more satisfied, then it is not possible
-   * to print a dash of length <B>length</B>. However it may be possible to
-   * print the complete dash or a shorter one.
-   */
-
-  if((d + length) < l) {
-    d = d + length;
-    xb = xa + dx1;
-    yb = ya + dy1;
-  } else {
-    xb = x2;
-    yb = y2;
-  }
-	
-  fprintf(fp, "[%d %d %d %d] ", 
-	  (int) xa, (int) ya,
-	  (int) xb, (int) yb);
-
-  fprintf(fp,"] %d dashed\n", line_width);
-}
-
-
-/*! \brief Print a centered line type line to Postscript document.
- *  \par Function Description
- *  This function prints a line when a centered line type is required.
- *  The line is defined by the coordinates of its two ends in
- *  (<B>x1</B>,<B>y1</B>) and (<B>x2</B>,<B>y2</B>).
- *  The Postscript document is defined by the file pointer <B>fp</B>.
- *
- *  A negative value for <B>space</B> or <B>length</B> leads to an
- *  endless loop.
- *
- *  All dimensions are in mils.
- *
- *  The function sets the color in which the line will be printed and the
- *  width of the line - that is the width of the dashes and the diameter
- *  of the dots.
- *
- *  \param [in] toplevel     The TOPLEVEL object.
- *  \param [in] fp            FILE pointer to Postscript document.
- *  \param [in] x1            Upper x coordinate.
- *  \param [in] y1            Upper y coordinate.
- *  \param [in] x2            Lower x coordinate.
- *  \param [in] y2            Lower y coordinate.
- *  \param [in] color         Line color.
- *  \param [in] line_width    Width of line.
- *  \param [in] length        Length of a dash.
- *  \param [in] space         Space between dashes.
- *  \param [in] origin_x      Page x coordinate to place line OBJECT.
- *  \param [in] origin_y      Page y coordinate to place line OBJECT.
- */
-void o_line_print_center(TOPLEVEL *toplevel, FILE *fp,
-			 int x1, int y1, int x2, int y2,
-			 int color,
-			 int line_width, int length, int space,
-			 int origin_x, int origin_y)
-{
-  double dx, dy, l, d;
-  double dx1, dy1, dx2, dy2;
-  double xa, ya, xb, yb;
-  
-  f_print_set_color(toplevel, fp, color);
-  
-  fprintf(fp, "[");
-
-  /*
-   * Depending on the slope of the line the <B>length</B> (resp. <B>space</B>)
-   * parameter is projected on each of the two directions x and y resulting
-   * in <B>dx1</B> and <B>dy1</B> (resp. <B>dx2</B> and <B>dy2</B>).
-   * Starting from one end and incrementing alternatively by <B>space</B>
-   * and <B>length</B> the dashes and dots are printed.
-   *
-   * It prints as many sets of dash and dot as possible.
-   */
-  dx = (double) (x2 - x1);
-  dy = (double) (y2 - y1);
-  l = sqrt((dx * dx) + (dy * dy));
-  
-  dx1 = (dx * length) / l;
-  dy1 = (dy * length) / l;
-  
-  dx2 = (dx * space) / l;
-  dy2 = (dy * space) / l;
-  
-  d = 0;
-  xa = x1; ya = y1;
-  while((d + length + 2 * space) < l) {
-    d = d + length;
-    xb = xa + dx1;
-    yb = ya + dy1;
-    
-    fprintf(fp, "[%d %d %d %d] ", 
-	    (int) xa, (int) ya,
-	    (int) xb, (int) yb);
-    
-    d = d + space;
-    xa = xb + dx2;
-    ya = yb + dy2;
-    
-    fprintf(fp,"[%d %d] ",(int) xa, (int) ya);
-    
-    d = d + space;
-    xa = xa + dx2;
-    ya = ya + dy2;
-  }
-  /*
-   * When the above condition is no more satisfied, then it is not possible
-   * to print a dash of length <B>length</B>.
-   * However two cases are possible :
-   * <DL>
-   *   <DT>*</DT><DD>it is possible to print the dash and the dot.
-   *   <DT>*</DT><DD>it is possible to print the dash or a part
-   *                 of the original dash.
-   * </DL>
-   */
-
-  if((d + length + space) < l) {
-    d = d + length;
-    xb = xa + dx1;
-    yb = ya + dy1;
-    
-    fprintf(fp, "[%d %d %d %d] ", 
-	    (int) xa, (int) ya,
-	    (int) xb, (int) yb);
-    
-    d = d + space;
-    xa = xb + dx2;
-    ya = yb + dy2;
-    
-    fprintf(fp,"[%d %d] ",(int) xa, (int) ya);
-    
-  } else {
-    if(d + length < l) {
-      xb = xa + dx1;
-      yb = ya + dy1;
-    } else {
-      xb = x2;
-      yb = y2;
-    }
-    
-    fprintf(fp, "[%d %d %d %d] ", 
-	    (int) xa, (int) ya,
-	    (int) xb, (int) yb);
-    
-  }
-  
-  fprintf(fp,"] %d dashed\n", line_width);
-
-  /*
-   * A dot is represented by a filled circle. Position of the circle is
-   * (<B>xa</B>, <B>ya</B>) and its radius by the <B>line_width</B> parameter.
-   */
-}
-
-/*! \brief Print a phantom line type line to Postscript document.
- *  \par Function Description
- *  This function prints a line when a phantom line type is required.
- *  The line is defined by the coordinates of its two ends in 
- *  (<B>x1</B>,<B>y1</B>) and (<B>x2</B>,<B>y2</B>).
- *  The Postscript document is defined by the file pointer <B>fp</B>.
- *
- *  A negative value for <B>space</B> or <B>length</B> leads to an
- *  endless loop.
- *
- *  All dimensions are in mils.
- *
- *  The function sets the color in which the line will be printed and the
- *  width of the line - that is the width of the dashes and the diameter
- *  of the dots.
- *
- *  \param [in] toplevel     The TOPLEVEL object.
- *  \param [in] fp            FILE pointer to Postscript document.
- *  \param [in] x1            Upper x coordinate.
- *  \param [in] y1            Upper y coordinate.
- *  \param [in] x2            Lower x coordinate.
- *  \param [in] y2            Lower y coordinate.
- *  \param [in] color         Line color.
- *  \param [in] line_width    Width of line.
- *  \param [in] length        Length of a dash.
- *  \param [in] space         Space between dashes.
- *  \param [in] origin_x      Page x coordinate to place line OBJECT.
- *  \param [in] origin_y      Page y coordinate to place line OBJECT.
- */
-void o_line_print_phantom(TOPLEVEL *toplevel, FILE *fp,
-			  int x1, int y1, int x2, int y2,
-			  int color,
-			  int line_width, int length, int space,
-			  int origin_x, int origin_y)
-{
-  double dx, dy, l, d;
-  double dx1, dy1, dx2, dy2;
-  double xa, ya, xb, yb;
-  
-  f_print_set_color(toplevel, fp, color);
-  
-  fprintf(fp,"[");
-
-  /*
-   * Depending on the slope of the line the <B>length</B> (resp. <B>space</B>)
-   * parameter is projected on each of the two directions x and y resulting
-   * in <B>dx1</B> and <B>dy1</B> (resp. <B>dx2</B> and <B>dy2</B>).
-   * Starting from one end and incrementing alternatively by <B>space</B>
-   * and <B>length</B> the dashes and dots are printed.
-   *
-   * It prints as many sets of dash-dot-dot as possible.
-   */
-  dx = (double) (x2 - x1);
-  dy = (double) (y2 - y1);
-  l = sqrt((dx * dx) + (dy * dy));
-  
-  dx1 = (dx * length) / l;
-  dy1 = (dy * length) / l;
-  
-  dx2 = (dx * space) / l;
-  dy2 = (dy * space) / l;
-  
-  d = 0;
-  xa = x1; ya = y1;
-  while((d + length + 3 * space) < l) {
-    d = d + length;
-    xb = xa + dx1;
-    yb = ya + dy1;
-    
-    fprintf(fp,"[%d %d %d %d] ",
-	    (int) xa, (int)ya,
-	    (int) xb, (int)yb);
-    
-    d = d + space;
-    xa = xb + dx2;
-    ya = yb + dy2;
-    
-    fprintf(fp,"[%d %d] ",(int) xa, (int) ya);
-    
-    d = d + space;
-    xa = xa + dx2;
-    ya = ya + dy2;
-    
-    fprintf(fp,"[%d %d] ",(int) xa, (int) ya);
-    
-    d = d + space;
-    xa = xa + dx2;
-    ya = ya + dy2;
-  }
-  /*
-   * When the above condition is no more satisfied, then it is not possible
-   * to print a complete set of dash-dot-dot.
-   * However three cases are possible :
-   * <DL>
-   *   <DT>*</DT><DD>it is possible to print a dash and a dot and a dot.
-   *   <DT>*</DT><DD>it is possible to print a dash and a dot.
-   *   <DT>*</DT><DD>it is possible to print the dash or a part
-   *                 of the original dash.
-   * </DL>
-   */
-
-  if((d + length + 2 * space) < l) {
-    d = d + length;
-    xb = xa + dx1;
-    yb = ya + dy1;
-    
-    fprintf(fp,"[%d %d %d %d] ",
-	    (int) xa, (int)ya,
-	    (int) xb, (int)yb);
-    
-    d = d + space;
-    xa = xb + dx2;
-    ya = yb + dy2;
-    
-    fprintf(fp,"[%d %d] ",(int) xa, (int)ya);
-    
-    d = d + space;
-    xa = xb + dx2;
-    ya = yb + dy2;
-    
-    fprintf(fp,"[%d %d] ",(int) xa, (int)ya);
-    
-  } else {
-    if(d + length + space < l) {
-      d = d + length;
-      xb = xa + dx1;
-      yb = ya + dy1;
-      
-      fprintf(fp,"[%d %d %d %d] ",
-	      (int) xa, (int)ya,
-	      (int) xb, (int)yb);
-      
-      d = d + space;
-      xa = xb + dx2;
-      ya = yb + dy2;
-      
-      fprintf(fp,"[%d %d] ",(int) xa, (int)ya);
-      
-    } else {
-      if(d + length < l) {
-	xb = xa + dx1;
-	yb = ya + dy1;
-      } else {
-	xb = x2;
-	yb = y2;
-      }
-      
-      fprintf(fp,"[%d %d %d %d] ",
-	      (int) xa, (int)ya,
-	      (int) xb, (int)yb);
-      
-    }
-  }
-  
-  fprintf(fp,"] %d dashed\n", line_width);
-}
-
-
-/*! \brief
- *  \par Function Description
- *
- *  \param [in] toplevel  The TOPLEVEL object.
- *  \param [in] x_scale
- *  \param [in] y_scale
- *  \param [in] object
- */
-void o_line_scale_world(TOPLEVEL *toplevel, int x_scale, int y_scale,
-			OBJECT *object)
-{
-  /* scale the line world coords */
-  object->line->x[0] = object->line->x[0] * x_scale;
-  object->line->y[0] = object->line->y[0] * y_scale;
-  object->line->x[1] = object->line->x[1] * x_scale;
-  object->line->y[1] = object->line->y[1] * y_scale;
-
-  /* update boundingbox */
-  o_line_recalc(toplevel, object);
-  
-}
-
-
-/*! \brief calculate the lenght of a line object
+/*! \brief calculate the length of a line object
  *  \par Function Description
  *  This function calculates the length of a line object
  *
@@ -1162,8 +502,8 @@ double o_line_length(OBJECT *object)
   dx = object->line->x[0]-object->line->x[1];
   dy = object->line->y[0]-object->line->y[1];
 
-  length = sqrt((dx*dx) + (dy*dy));
-                
+  length = hypot(dx, dy);
+
   return(length);
 }
 
@@ -1177,6 +517,7 @@ double o_line_length(OBJECT *object)
  *  If the line represents a single point (the endpoints are the same), this
  *  function calcualtes the distance to that point.
  *
+ *  \param [in] toplevel     The TOPLEVEL object.
  *  \param [in] object       The line OBJECT.
  *  \param [in] x            The x coordinate of the given point.
  *  \param [in] y            The y coordinate of the given point.
@@ -1184,7 +525,8 @@ double o_line_length(OBJECT *object)
  *  \return The shortest distance from the object to the point. With an
  *  invalid parameter, this function returns G_MAXDOUBLE.
  */
-double o_line_shortest_distance (OBJECT *object, int x, int y, int force_solid)
+double o_line_shortest_distance (TOPLEVEL *toplevel, OBJECT *object,
+                                 int x, int y, int force_solid)
 {
   return m_line_shortest_distance (object->line, x, y);
 }
