@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,7 +96,8 @@ static GObjectClass *gschem_macro_widget_parent_class = NULL;
 static gboolean
 key_press_event (GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
-  if (event->keyval == GDK_KEY_Escape && event->state == 0) {
+  if (event->keyval == GDK_KEY_Escape &&
+      (event->state & gtk_accelerator_get_default_mod_mask ()) == 0) {
     gtk_info_bar_response (GTK_INFO_BAR (user_data), GTK_RESPONSE_CANCEL);
     return TRUE;
   }

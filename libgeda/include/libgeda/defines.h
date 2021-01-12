@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's Library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -154,11 +154,6 @@
 #define EXTENTS			0
 #define WINDOW			1
 #define EXTENTS_NOMARGINS	2
-
-/* for output-capstyle */ 
-#define BUTT_CAP 		0
-#define ROUND_CAP 		1
-#define SQUARE_CAP 		2
 
 /* for print dialog box */
 #define LANDSCAPE		0

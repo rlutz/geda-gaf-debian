@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -249,13 +249,13 @@ x_highlevel_open_page (GschemToplevel *w_current, const gchar *filename)
 
   PAGE *page = open_or_create_page (w_current, filename, FALSE);
 
-  if (page != NULL)
-    x_window_set_current_page (w_current, page);
-
-  if (sole_page != NULL && toplevel->page_current != sole_page &&
+  if (sole_page != NULL && page != NULL && page != sole_page &&
       g_list_find (geda_list_get_glist (toplevel->pages), sole_page) != NULL &&
       sole_page->is_untitled && !sole_page->CHANGED)
     x_lowlevel_close_page (w_current, sole_page);
+
+  if (page != NULL)
+    x_window_set_current_page (w_current, page);
 
   /* if there were any symbols which had major changes, put up an
      error dialog box */
@@ -305,13 +305,13 @@ x_highlevel_open_pages (GschemToplevel *w_current, GSList *filenames,
       first_page = page;
   }
 
-  if (first_page != NULL)
-    x_window_set_current_page (w_current, first_page);
-
-  if (sole_page != NULL && toplevel->page_current != sole_page &&
+  if (sole_page != NULL && first_page != NULL && first_page != sole_page &&
       g_list_find (geda_list_get_glist (toplevel->pages), sole_page) != NULL &&
       sole_page->is_untitled && !sole_page->CHANGED)
     x_lowlevel_close_page (w_current, sole_page);
+
+  if (first_page != NULL)
+    x_window_set_current_page (w_current, first_page);
 
   /* if there were any symbols which had major changes, put up an
      error dialog box */

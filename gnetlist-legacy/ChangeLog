@@ -1,3 +1,33 @@
+commit f752c1cd21817ef7eee63fed9a56a2ad47a5792a
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Dec 16 18:14:08 2020 +0100
+
+    Regenerate PO files
+
+commit 36a555fb3581e9ef5db4bc6c3e3a0d43844762c3
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Dec 13 19:33:43 2020 +0100
+
+    Update copyright years
+
+commit 5e45d8a2ea71a67a189cc554da060aa9b1450e1d
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Apr 5 14:28:08 2020 +0200
+
+    Skip HTML generation if groff HTML driver isn't present
+
+commit 0465d1df75aa9b1f3fa1735e38072ed50390a7f2
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Mar 5 11:51:50 2020 +0100
+
+    Add GIO compiler/linker options
+    
+    libgeda uses the GFile API which means all gEDA/gaf binaries must be
+    linked against libgio-2.0.  This appears to be inferred automatically
+    on most systems, but sometimes it needs to be explicitly specified.
+    
+    Affects-bug: lp-1866057
+
 commit 0ab03654668ba723a287c97406e45329ff8e4e3d
 Author: Roland Lutz <rlutz@hedmen.org>
 Date:   Tue Oct 8 20:21:05 2019 +0200

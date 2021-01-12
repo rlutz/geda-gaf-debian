@@ -1,3 +1,292 @@
+commit 72bb61e76a11b00119cd18dc0fc7c7eeef137a01
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sat Dec 12 16:49:19 2020 +0100
+
+    gschem: Update German translation
+
+commit f752c1cd21817ef7eee63fed9a56a2ad47a5792a
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Dec 16 18:14:08 2020 +0100
+
+    Regenerate PO files
+
+commit 4b4092705d5e7181e0c6dfb4fc8fb4c0f6b13e62
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Dec 14 18:19:01 2020 +0100
+
+    gschem: Don't scroll log window unless realized
+    
+    gtk_text_view_scroll_to_iter doesn't check if the text view has a
+    layout; if it hasn't, an assertion in gtk_text_layout_get_iter_location
+    is violated, and the program aborts.  In order to avoid that, check if
+    the text view is realized before trying to scroll it.
+
+commit 359d1cf8abd3da9866d2d39f4b3ca7d9f82d8383
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Dec 14 14:51:50 2020 +0100
+
+    gschem: Fix order in which gschem is quit
+
+commit bab83c809a0e3a15ccf35e693e0abc51d39eefef
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Dec 13 22:48:52 2020 +0100
+
+    Add AppStream metainfo files
+
+commit cf03f824577e7e3d41c0bfde08ce25ce48ad0b7d
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Dec 16 16:36:12 2020 +0100
+
+    Add screenshots
+
+commit 36a555fb3581e9ef5db4bc6c3e3a0d43844762c3
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Dec 13 19:33:43 2020 +0100
+
+    Update copyright years
+
+commit 2776b0b0b4b6faea5a234e09317556d3efabb896
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Dec 11 14:52:10 2020 +0100
+
+    Fix whitespace
+
+commit 960b63468205bd302100b90baa4e4b47646c39a9
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Dec 11 15:04:24 2020 +0100
+
+    gschem: Simplify code
+
+commit 20cf7e05996c36d5b1076a86962a7fb7c4bb6312
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Dec 11 14:59:38 2020 +0100
+
+    Define convenience function locally
+
+commit 174d9a1210c76ed11822a0edcff287a4b39a6815
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Dec 11 15:01:44 2020 +0100
+
+    gschem: Don't free string stored as object data
+
+commit 480d64b88866a8c3cf1f5c49c69688c206ae756a
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Dec 11 15:03:09 2020 +0100
+
+    gschem: Don't free context but retrieved string
+
+commit e2c4b03fb4551f185622223f7e4da017e51c2070
+Author: Glenn Pavlovic <glimrick@epilitimus.com>
+Date:   Sun Dec 6 22:19:30 2020 -0800
+
+    memleak fixes - 1 of ?
+
+commit c1d796cefd656e242498a2a3d02b59ba251d5374
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Dec 9 17:29:29 2020 +0100
+
+    gschem: Select newly-pasted objects
+
+commit e952b2f56d1de7f1e73edc21a6b2b4abae056393
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Dec 9 17:09:41 2020 +0100
+
+    gschem: Make promoted attributes visible by default
+
+commit 88d4c94b7b9b950a2629b8310188ee2d5e69518e
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Dec 9 17:46:33 2020 +0100
+
+    gschem: Don't try to place component netname= attributes
+
+commit cb6bac898fe43c5a59b577123ba8698ec04deef6
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Sep 4 19:37:45 2020 +0200
+
+    gschem: Fix definition of global variable "recent_manager"
+    
+    Reported-by: Glen W. Ruch <gw.ruch@yahoo.com>
+
+commit 20aec04f904a89d251b9a1f9faf5c53a002a00f8
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Sep 4 13:41:19 2020 +0200
+
+    gschem: Define action variables only once
+    
+    Reported-by: Glen W. Ruch <gw.ruch@yahoo.com>
+
+commit e7cfde62980bd63c982d9a80e450588734a84c6c
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Sep 4 13:23:22 2020 +0200
+
+    gschem: Fix `may be used uninitialized' warning
+    
+    Reported-by: Glen W. Ruch <gw.ruch@yahoo.com>
+
+commit 9d4afcadb8459df103f46e7de69671f825cb9c96
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sat Aug 29 14:02:38 2020 +0200
+
+    gschem: stroke: Remove unused global variable "point"
+
+commit 5e45d8a2ea71a67a189cc554da060aa9b1450e1d
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Apr 5 14:28:08 2020 +0200
+
+    Skip HTML generation if groff HTML driver isn't present
+
+commit 0465d1df75aa9b1f3fa1735e38072ed50390a7f2
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Mar 5 11:51:50 2020 +0100
+
+    Add GIO compiler/linker options
+    
+    libgeda uses the GFile API which means all gEDA/gaf binaries must be
+    linked against libgio-2.0.  This appears to be inferred automatically
+    on most systems, but sometimes it needs to be explicitly specified.
+    
+    Affects-bug: lp-1866057
+
+commit 47d9d622ef164cd4c64346994c9814a2cc576c4b
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 19 22:29:22 2019 +0200
+
+    gschem: library: Use GLib string functions
+
+commit eb02c92752d862aba47be3484aa80ce9b59724a1
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 19 21:55:14 2019 +0200
+
+    gschem: library: Define and use column index constants
+
+commit 581d0bc1e9339ac7cc3ad0fbb7cfa8d2a5900d25
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 19 21:55:48 2019 +0200
+
+    gschem: library: Fix hard-coded attribute column indices
+
+commit d5b28cef705a59ec6e3fa000582f262716c19ed7
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Sep 19 21:29:03 2019 +0200
+
+    gschem: library: Move declarations to top of file
+
+commit 52a94f5ef13b4df24200cb4b92f79c9a38a458e7
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Jun 30 19:11:54 2019 +0200
+
+    gschem: Remove obsolete option "bus-ripper-rotation"
+
+commit 7a6338f387e494e074296e777bb5743de20dd181
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Jun 30 19:04:39 2019 +0200
+
+    gschem: Make bus ripper code orientation-independent
+
+commit c5334bd1d959469349f2c8f886db68034903dec4
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Jun 30 18:45:26 2019 +0200
+
+    gschem: Fix ripper orientation in bus-to-bus case
+
+commit 30d7a0ce8d487db63aaf6a1bfa4ca87341a9f9a6
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Jun 30 18:43:01 2019 +0200
+
+    Inline BUS_RIPPER definition in o_net_add_busrippers
+
+commit 645540906bca84515c766d4abcc04189fdb03806
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sat Jan 25 21:11:16 2020 +0100
+
+    gschem: Test for modifier keys correctly
+
+commit 9a6b8b11a55d3b2b51f1e0c0d107b2677a120b1c
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Jan 21 21:41:30 2020 +0100
+
+    gschem: print: Allow selecting page size and orientation
+    
+    Reported-by: Girvin Herr <gherrl@fastmail.com>
+
+commit 61aa2d0ba86f44d2548e27fb1bf04bdd809bc2d9
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Jan 21 21:39:14 2020 +0100
+
+    gschem: print: Fix assertion
+
+commit 7fe5795e12e1c9968f29c9f2bb83b030d86cece0
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Dec 17 15:03:45 2019 +0100
+
+    gschem: Update clipboard-paste sensitivity only when necessary
+
+commit 050ca5138844a837b2bd51a3235188baa4ac3048
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Dec 17 14:39:57 2019 +0100
+
+    gschem: attribute editor: Rename column "Vis?" => "Vis"
+
+commit 046f4ac10ee2104acbec570c5b3cdbd150d4d314
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Dec 17 14:38:17 2019 +0100
+
+    gschem: attribute editor: Move visibility columns to left
+
+commit 50158e85288d4990a79795772226bf643eea14b6
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Dec 17 14:30:32 2019 +0100
+
+    gschem: attribute editor: Show tooltips
+
+commit 3bb1d99080e9525599b2ed0d47d6a4283ffafacd
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Dec 17 14:34:00 2019 +0100
+
+    gschem: attribute editor: Keep pointers to columns
+
+commit 8e18d3bca1a7c786b16373158f5a8e074f62f3cd
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Dec 17 13:26:49 2019 +0100
+
+    gschem: Don't close schematics on "hierarchy-up"
+
+commit 24eab4c6a9106585464722c0a72cbb0f939fb434
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Dec 5 21:02:50 2019 +0100
+
+    gschem: Pass FAM event code as unsigned integer
+    
+    Reported-by: Karl Hammar <karl@aspodata.se>
+
+commit 77e707746ff8256073ef1bc35d1a2c8f530064b7
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Dec 5 16:52:16 2019 +0100
+
+    gschem: Only include `fam.h' if building with FAM support
+    
+    Reported-by: Karl Hammar <karl@aspodata.se>
+
+commit 10161a66271ed47c79e0fc12933ed436baec7ca7
+Author: أحمد المحمودي (Ahmed El-Mahmoudy) <aelmahmoudy@users.sourceforge.net>
+Date:   Sat Oct 19 08:33:31 2019 +0200
+
+    fix string format security issue
+    
+    Closes-bug: lp-1848837
+
+commit f4ff93d33f331704dd383ca21a27fdda9f693956
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Tue Oct 15 12:16:43 2019 +0200
+
+    gschem: Leave "Previous Page" insensitive when opening single file
+
+commit 4e8ef670fc9b50bf8f454d3738608a08cc7612d2
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Oct 9 20:27:26 2019 +0200
+
+    gschem: Fix German translation
+
 commit 28257b8b4d7bd1b7722137a5458cbf0366ae03b0
 Author: Roland Lutz <rlutz@hedmen.org>
 Date:   Tue Oct 8 17:15:36 2019 +0200

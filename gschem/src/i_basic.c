@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -353,18 +353,33 @@ void i_update_toolbar(GschemToplevel *w_current)
 }
 
 
-/*! \brief Update sensitivity of the Edit/Paste menu item
- *
+/*! \brief Check if an object has an attribute
  *  \par Function Description
- *  Asynchronous callback to update sensitivity of the Edit/Paste
- *  menu item.
+ *  This functions returns TRUE if the given OBJECT has an attribute
+ *  with the given name. Both attached and inherited attributes are
+ *  checked.
+ *
+ *  \param [in] object       OBJECT to check
+ *  \param [in] name         the attribute name to check for
+ *  \return TRUE if the given OBJECT has an attribute with the given name
  */
-static void clipboard_usable_cb (int usable, void *userdata)
+/* It would probably be more efficient to look for them directly rather
+ * than relying on the search functions. */
+static int object_has_attribute (OBJECT *object, gchar *name)
 {
-  GschemToplevel *w_current = userdata;
-  gschem_action_set_sensitive (action_clipboard_paste, usable, w_current);
-}
+  gchar *buf = o_attrib_search_attached_attribs_by_name (object, name, 0);
+  int result = buf != NULL;
 
+  g_free (buf);
+  if (result)
+    return result;
+
+  buf = o_attrib_search_inherited_attribs_by_name (object, name, 0);
+  result = buf != NULL;
+
+  g_free (buf);
+  return result;
+}
 
 /*! \brief Update sensitivity of relevant menu items
  *
@@ -378,8 +393,6 @@ void i_update_menus(GschemToplevel *w_current)
   TOPLEVEL *toplevel = gschem_toplevel_get_toplevel (w_current);
   g_return_if_fail (w_current != NULL);
   g_return_if_fail (toplevel->page_current != NULL);
-
-  x_clipboard_query_usable (w_current, clipboard_usable_cb, w_current);
 
   gboolean sel_object = FALSE;          /* any object */
   gboolean sel_editable = FALSE;        /* object that can be edited via E E */
@@ -456,17 +469,9 @@ void i_update_menus(GschemToplevel *w_current)
         g_free (filename);
       }
 
-      if (o_attrib_search_attached_attribs_by_name (obj, "slot", 0) ||
-          o_attrib_search_inherited_attribs_by_name (obj, "slot", 0))
-        sel_slotted = TRUE;
-
-      if (o_attrib_search_attached_attribs_by_name (obj, "source", 0) ||
-          o_attrib_search_inherited_attribs_by_name (obj, "source", 0))
-        sel_subsheet = TRUE;
-
-      if (o_attrib_search_attached_attribs_by_name (obj, "documentation", 0) ||
-          o_attrib_search_inherited_attribs_by_name (obj, "documentation", 0))
-        sel_documented = TRUE;
+      sel_slotted = object_has_attribute (obj, "slot");
+      sel_subsheet = object_has_attribute (obj,"source");
+      sel_documented = object_has_attribute (obj, "documentation");
     }
 
     if (obj->type == OBJ_TEXT) {

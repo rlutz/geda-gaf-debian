@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -745,6 +745,8 @@ restore_state (GschemDockable *dockable)
     gschem_dockable_set_state (dockable, GSCHEM_DOCKABLE_STATE_DOCKED_BOTTOM);
   else if (strcmp (state, "docked-right") == 0)
     gschem_dockable_set_state (dockable, GSCHEM_DOCKABLE_STATE_DOCKED_RIGHT);
+
+  g_free (state);
 }
 
 
@@ -769,6 +771,8 @@ restore_page_order (GschemToplevel *w_current,
     if (dockable != NULL && dockable->widget != NULL)
       gtk_notebook_reorder_child (notebook, dockable->widget, page_num);
   }
+
+  g_strfreev (list);
 }
 
 
@@ -782,11 +786,12 @@ restore_current_page (GschemToplevel *w_current,
   gchar *current_page = eda_config_get_string (
     cfg, get_notebook_group_name (w_current, notebook),
     "current-page", NULL);
-  if (current_page == NULL || *current_page == '\0')
-    return;
 
-  GschemDockable *dockable =
-    get_dockable_by_settings_name (w_current, current_page);
+  GschemDockable *dockable = NULL;
+  if (current_page != NULL && *current_page != '\0')
+    dockable = get_dockable_by_settings_name (w_current, current_page);
+
+  g_free (current_page);
   if (dockable == NULL || dockable->widget == NULL)
     return;
 
@@ -815,6 +820,8 @@ restore_detached_dockables (GschemToplevel *w_current)
     if (state != NULL ? strcmp (state, "detached") == 0 :
           dockable->initial_state == GSCHEM_DOCKABLE_STATE_WINDOW)
       gschem_dockable_detach (dockable, FALSE);
+
+    g_free (state);
   }
 
   /* open up log window on startup */
@@ -1460,7 +1467,8 @@ callback_after_window_key_press_event (GtkWidget *widget,
 {
   if ((event->keyval == GDK_KEY_Return ||
        event->keyval == GDK_KEY_ISO_Enter ||
-       event->keyval == GDK_KEY_KP_Enter) && event->state == 0) {
+       event->keyval == GDK_KEY_KP_Enter) &&
+      (event->state & gtk_accelerator_get_default_mod_mask ()) == 0) {
     if (gschem_dockable_get_state (dockable) == GSCHEM_DOCKABLE_STATE_DIALOG)
       gschem_dockable_hide (dockable);
     else {
@@ -1470,7 +1478,8 @@ callback_after_window_key_press_event (GtkWidget *widget,
     return TRUE;
   }
 
-  if (event->keyval == GDK_KEY_Escape && event->state == 0) {
+  if (event->keyval == GDK_KEY_Escape &&
+      (event->state & gtk_accelerator_get_default_mod_mask ()) == 0) {
     if (gschem_dockable_get_state (dockable) == GSCHEM_DOCKABLE_STATE_DIALOG)
       gschem_dockable_hide (dockable);
     else {
@@ -1723,12 +1732,14 @@ callback_notebook_key_press_event (GtkWidget *notebook,
 
   if ((event->keyval == GDK_KEY_Return ||
        event->keyval == GDK_KEY_ISO_Enter ||
-       event->keyval == GDK_KEY_KP_Enter) && event->state == 0) {
+       event->keyval == GDK_KEY_KP_Enter) &&
+      (event->state & gtk_accelerator_get_default_mod_mask ()) == 0) {
     gtk_widget_grab_focus (w_current->drawing_area);
     return TRUE;
   }
 
-  if (event->keyval == GDK_KEY_Escape && event->state == 0) {
+  if (event->keyval == GDK_KEY_Escape &&
+      (event->state & gtk_accelerator_get_default_mod_mask ()) == 0) {
     gtk_widget_grab_focus (w_current->drawing_area);
     if (GSCHEM_DOCKABLE_GET_CLASS (dockable)->cancel != NULL)
       GSCHEM_DOCKABLE_GET_CLASS (dockable)->cancel (dockable);

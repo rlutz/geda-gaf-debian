@@ -1,4 +1,4 @@
-/* Copyright (C) 2013-2019 Roland Lutz
+/* Copyright (C) 2013-2020 Roland Lutz
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,6 +15,25 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #include "module.h"
+
+
+SCM scm_procedure_or_name(SCM proc)
+{
+#if SCM_MINOR_VERSION < 2
+	return proc;
+#else
+	return scm_procedure_name(proc);
+#endif
+}
+
+SCM scm_frame_procedure_or_name(SCM frame)
+{
+#if SCM_MINOR_VERSION < 2
+	return scm_frame_procedure(frame);
+#else
+	return scm_frame_procedure_name(frame);
+#endif
+}
 
 
 struct call_data {

@@ -1,3 +1,27 @@
+commit f752c1cd21817ef7eee63fed9a56a2ad47a5792a
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Dec 16 18:14:08 2020 +0100
+
+    Regenerate PO files
+
+commit 36a555fb3581e9ef5db4bc6c3e3a0d43844762c3
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Dec 13 19:33:43 2020 +0100
+
+    Update copyright years
+
+commit 14dce63156f122a22c8e0cefb760458cb85642ee
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Dec 11 14:52:27 2020 +0100
+
+    gaf: Fix memory leak
+
+commit 5e45d8a2ea71a67a189cc554da060aa9b1450e1d
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Apr 5 14:28:08 2020 +0200
+
+    Skip HTML generation if groff HTML driver isn't present
+
 commit 0ab03654668ba723a287c97406e45329ff8e4e3d
 Author: Roland Lutz <rlutz@hedmen.org>
 Date:   Tue Oct 8 20:21:05 2019 +0200

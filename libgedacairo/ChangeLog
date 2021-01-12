@@ -1,3 +1,29 @@
+commit 36a555fb3581e9ef5db4bc6c3e3a0d43844762c3
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Dec 13 19:33:43 2020 +0100
+
+    Update copyright years
+
+commit 4acd8b76ddd75ef6f1a306a07c19d07a370dbe50
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 19 19:41:24 2020 +0200
+
+    Work around bug in Pango >= 1.44
+    
+    Closes-bug: lp-1853617
+
+commit e98156aa52bc76b9caf1d4ca3ae40a6b86dfb01e
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 19 16:04:28 2020 +0200
+
+    Replace use of deprecated macro G_TYPE_INSTANCE_GET_PRIVATE
+
+commit a3deb1f5c776dec46f8ddb44e3e96b58c065a9d3
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Apr 10 16:08:42 2020 +0200
+
+    Replace use of deprecated function g_type_class_add_private
+
 commit a1bebce61206600770771d451d68c12a735bbe22
 Author: Roland Lutz <rlutz@hedmen.org>
 Date:   Mon Oct 7 17:50:47 2019 +0200

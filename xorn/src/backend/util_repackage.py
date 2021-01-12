@@ -1,7 +1,7 @@
 # gaf.netlist - gEDA Netlist Extraction and Generation
 # Copyright (C) 1998-2010 Ales Hvezda
 # Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
-# Copyright (C) 2013-2019 Roland Lutz
+# Copyright (C) 2013-2020 Roland Lutz
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -93,11 +93,10 @@ def repackage(netlist, refdes_func):
                 component.warning(_("component dropped during re-packaging"))
             continue
 
-        if netlist.flat_package_namespace \
-                or component.sheet.instantiating_component is None:
+        if netlist.flat_package_namespace:
             namespace = None
         else:
-            namespace = component.sheet
+            namespace = component.sheet.instantiating_component
 
         try:
             package = pkg_dict[namespace, new_refdes]

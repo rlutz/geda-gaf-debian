@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -315,7 +315,6 @@ GschemToplevel *gschem_toplevel_new ()
   w_current->handleboxes = 0;
   w_current->bus_ripper_size = 0;
   w_current->bus_ripper_type = 0;
-  w_current->bus_ripper_rotation = 0;
   w_current->grid_mode = GRID_MODE_NONE;
   w_current->dots_grid_fixed_threshold = 10;
   w_current->dots_grid_dot_size = 1;

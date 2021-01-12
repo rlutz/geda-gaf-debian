@@ -9,7 +9,7 @@ original gEDA file format.  For example,
 
 becomes
 
-    <box x="0" y="0" width="170" height="110" color="lock" width="0"/>
+    <box x="0" y="0" width="170" height="110" color="lock" linewidth="0"/>
 
 However, there are some moderate changes to the format with the
 intention to make the files more exactly represent what Xorn sees,
@@ -441,7 +441,7 @@ Does not have any attributes.
 
 --------------------------------------------------------------------------------
 
-Copyright (C) 2013-2019 Roland Lutz
+Copyright (C) 2013-2020 Roland Lutz
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the [GNU Free Documentation License, Version 1.2]

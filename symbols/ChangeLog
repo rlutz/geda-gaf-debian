@@ -1,3 +1,25 @@
+commit ba63e1ea6cb875fc0c0460ad426b11d06a81f153
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Dec 14 14:22:18 2020 +0100
+
+    Add new-style power symbols
+
+commit c619bf3b34d616ea182336c2c5b603fa3f82fbfa
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Mar 4 16:44:49 2020 +0100
+
+    symbols: Fix FreeBSD return status issue
+    
+    If the old installation directories for the gnetman, Verilog, and VHDL
+    symbols exist, "make install" tries to remove the old symbols in order
+    to make sure there aren't any duplicates left from an older
+    installation (see commit 800b5e6).
+    
+    It appears shell exit codes work slightly different for FreeBSD, and an
+    extra "|| true" is required to ignore errors from missing directories.
+    
+    Affects-bug: lp-1866057
+
 commit 6d2253170902183bbee127606df6ff0ec839b010
 Author: Roland Lutz <rlutz@hedmen.org>
 Date:   Thu Sep 26 16:13:58 2019 +0200

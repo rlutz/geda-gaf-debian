@@ -1,7 +1,7 @@
 # gaf - Python library for manipulating gEDA files
 # Copyright (C) 1998-2010 Ales Hvezda
 # Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
-# Copyright (C) 2013-2019 Roland Lutz
+# Copyright (C) 2013-2020 Roland Lutz
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -379,7 +379,11 @@ def read_file(f, name, log, load_symbol, load_pixmap,
 # \warning This function is not implemented.  See Xorn bug #148.
 
 def pin_update_whichend(rev, force_boundingbox, log):
-    log.error(_("file is lacking pin orientation information"))
+    for ob in rev.get_objects():
+        data = rev.get_object_data(ob)
+        if isinstance(data, xorn.storage.Net) and data.is_pin:
+            log.error(_("file is lacking pin orientation information"))
+            break
 
 
 ## Construct a line attribute object.

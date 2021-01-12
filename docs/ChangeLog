@@ -1,3 +1,27 @@
+commit 9fbe269f551c2cd07a438101eca2ee3335e9e4fa
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Dec 16 18:37:32 2020 +0100
+
+    Bump gEDA version
+
+commit 2446f05b47116797a52554507f161ff0d7f837cb
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Dec 16 18:06:33 2020 +0100
+
+    Update wiki pages
+
+commit 3bfd408542915d4fccf6b5b4a093e743aa774d31
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Apr 5 14:33:04 2020 +0200
+
+    Scheme API documentation: Add .info file to repository
+
+commit 5e45d8a2ea71a67a189cc554da060aa9b1450e1d
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Apr 5 14:28:08 2020 +0200
+
+    Skip HTML generation if groff HTML driver isn't present
+
 commit 705872d767c5f288bdde16247634ebac6e67d9a5
 Author: Roland Lutz <rlutz@hedmen.org>
 Date:   Tue Oct 8 19:44:30 2019 +0200

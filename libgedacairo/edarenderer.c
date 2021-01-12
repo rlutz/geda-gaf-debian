@@ -1,6 +1,6 @@
 /* gEDA - GPL Electronic Design Automation
  * libgedacairo - Rendering gEDA schematics with Cairo
- * Copyright (C) 2010-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 2010-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -158,7 +158,7 @@ static int eda_renderer_get_text_user_bounds (EdaRenderer *renderer, OBJECT *obj
                                               double *left, double *top,
                                               double *right, double *bottom);
 
-G_DEFINE_TYPE (EdaRenderer, eda_renderer, G_TYPE_OBJECT);
+G_DEFINE_TYPE_WITH_PRIVATE (EdaRenderer, eda_renderer, G_TYPE_OBJECT)
 
 GType
 eda_renderer_flags_get_type ()
@@ -184,8 +184,6 @@ eda_renderer_class_init (EdaRendererClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GParamFlags param_flags;
-
-  g_type_class_add_private (gobject_class, sizeof (EdaRendererPrivate));
 
   /* Register functions with base class */
   gobject_class->constructor = eda_renderer_constructor;
@@ -249,9 +247,7 @@ eda_renderer_class_init (EdaRendererClass *klass)
 static void
 eda_renderer_init (EdaRenderer *renderer)
 {
-  renderer->priv = G_TYPE_INSTANCE_GET_PRIVATE (renderer,
-                                                EDA_TYPE_RENDERER,
-                                                EdaRendererPrivate);
+  renderer->priv = eda_renderer_get_instance_private (renderer);
 
   /* Set some sensible default options */
   renderer->priv->font_name = g_strdup (DEFAULT_FONT_NAME);
@@ -439,7 +435,10 @@ eda_renderer_update_contexts (EdaRenderer *renderer, cairo_t *new_cr,
 
   /* Now recreate anything necessary */
   if ((renderer->priv->pc == NULL) && (renderer->priv->cr != NULL)) {
+    cairo_save (renderer->priv->cr);
+    cairo_identity_matrix (renderer->priv->cr);
     renderer->priv->pc = pango_cairo_create_context (renderer->priv->cr);
+    cairo_restore (renderer->priv->cr);
     renderer->priv->pc_from_cr = 1;
   }
 
@@ -937,7 +936,10 @@ eda_renderer_prepare_text (EdaRenderer *renderer, OBJECT *object)
     cairo_translate (renderer->priv->cr, dx, dy);
   }
 
+  cairo_save (renderer->priv->cr);
+  cairo_identity_matrix (renderer->priv->cr);
   pango_cairo_update_layout (renderer->priv->cr, renderer->priv->pl);
+  cairo_restore (renderer->priv->cr);
   return TRUE;
 }
 

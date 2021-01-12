@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@
  * variable declarations for the individual actions defined in
  * actions.c.  The resulting file looks like this:
  *
- *     GschemAction *action_file_new;
- *     GschemAction *action_file_new_window;
- *     GschemAction *action_file_open;
+ *     extern GschemAction *action_file_new;
+ *     extern GschemAction *action_file_new_window;
+ *     extern GschemAction *action_file_open;
  *     ...
  *
  * Source files which reference individual actions by name (e.g. in
@@ -39,6 +39,6 @@
  */
 
 #define DEFINE_ACTION(c_id, id, icon, name, label, menu_label, tooltip, type) \
-  KEEP_LINE GschemAction *action_ ## c_id;
+  KEEP_LINE extern GschemAction *action_ ## c_id;
 #include "actions.c"
 #undef DEFINE_ACTION
