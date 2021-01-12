@@ -1,3 +1,92 @@
+commit f752c1cd21817ef7eee63fed9a56a2ad47a5792a
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Wed Dec 16 18:14:08 2020 +0100
+
+    Regenerate PO files
+
+commit 36a555fb3581e9ef5db4bc6c3e3a0d43844762c3
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Dec 13 19:33:43 2020 +0100
+
+    Update copyright years
+
+commit 2776b0b0b4b6faea5a234e09317556d3efabb896
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Dec 11 14:52:10 2020 +0100
+
+    Fix whitespace
+
+commit 20cf7e05996c36d5b1076a86962a7fb7c4bb6312
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Dec 11 14:59:38 2020 +0100
+
+    Define convenience function locally
+
+commit 08c58267177f51b516d8a5ec944e74bb4a9dfb88
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Dec 11 15:06:03 2020 +0100
+
+    libgeda: Don't double free path argument
+
+commit e2c4b03fb4551f185622223f7e4da017e51c2070
+Author: Glenn Pavlovic <glimrick@epilitimus.com>
+Date:   Sun Dec 6 22:19:30 2020 -0800
+
+    memleak fixes - 1 of ?
+
+commit e98156aa52bc76b9caf1d4ca3ae40a6b86dfb01e
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 19 16:04:28 2020 +0200
+
+    Replace use of deprecated macro G_TYPE_INSTANCE_GET_PRIVATE
+
+commit 1c7608d79051b0c2468227159f88fa970175b2f8
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 19 15:56:01 2020 +0200
+
+    Remove unused struct member `last_load_or_save_time'
+
+commit a3deb1f5c776dec46f8ddb44e3e96b58c065a9d3
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Fri Apr 10 16:08:42 2020 +0200
+
+    Replace use of deprecated function g_type_class_add_private
+
+commit 0465d1df75aa9b1f3fa1735e38072ed50390a7f2
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Thu Mar 5 11:51:50 2020 +0100
+
+    Add GIO compiler/linker options
+    
+    libgeda uses the GFile API which means all gEDA/gaf binaries must be
+    linked against libgio-2.0.  This appears to be inferred automatically
+    on most systems, but sometimes it needs to be explicitly specified.
+    
+    Affects-bug: lp-1866057
+
+commit 30d7a0ce8d487db63aaf6a1bfa4ca87341a9f9a6
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Jun 30 18:43:01 2019 +0200
+
+    Inline BUS_RIPPER definition in o_net_add_busrippers
+
+commit 00c366b9b880cd8e44b4b2f7de9d890efcc50227
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Sun Jun 30 18:07:37 2019 +0200
+
+    libgeda: Remove unused and wrong cap definitions
+
+commit be3459252aa36dde0155fa61efa9c3d1cf1cd7d0
+Author: Roland Lutz <rlutz@hedmen.org>
+Date:   Mon Oct 21 14:02:27 2019 +0200
+
+    libgeda: Fix test case `t0402-config.scm'
+    
+    The order in which `config-keys' returns its results isn't defined.
+    Fix the test so it accepts any order.
+    
+    Closes-bug: lp-1848838
+
 commit 0ab03654668ba723a287c97406e45329ff8e4e3d
 Author: Roland Lutz <rlutz@hedmen.org>
 Date:   Tue Oct 8 20:21:05 2019 +0200

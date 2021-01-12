@@ -1,4 +1,4 @@
-/* Copyright (C) 2013-2019 Roland Lutz
+/* Copyright (C) 2013-2020 Roland Lutz
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,6 +28,9 @@ typedef struct {
 extern PyTypeObject ProcedureType;
 extern PyObject *guile_error;
 extern SCM gsubr_alist;
+
+SCM scm_procedure_or_name(SCM proc);
+SCM scm_frame_procedure_or_name(SCM frame);
 
 SCM py2scm(PyObject *value);
 PyObject *scm2py(SCM value);

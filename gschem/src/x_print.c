@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -230,7 +230,7 @@ draw_page__print_operation (GtkPrintOperation *print,
   gboolean is_color;
 
   /* Find the page data */
-  g_return_if_fail (page_nr != 1);
+  g_return_if_fail (page_nr == 0);
   page = w_current->toplevel->page_current;
   g_return_if_fail (page != NULL);
 
@@ -391,6 +391,7 @@ x_print (GschemToplevel *w_current)
 
   /* Create the print operation and set it up */
   print = g_object_new (GTK_TYPE_PRINT_OPERATION,
+                        "embed-page-setup", TRUE,
                         "n-pages", num_pages,
                         "use-full-page", FALSE,
                         "unit", GTK_UNIT_POINTS,

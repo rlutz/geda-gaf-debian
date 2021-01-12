@@ -1,4 +1,4 @@
-/* Copyright (C) 2013-2019 Roland Lutz
+/* Copyright (C) 2013-2020 Roland Lutz
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -64,7 +64,8 @@ PyObject *scm2py(SCM value)
 		return result;
 	}
 	if (scm_to_bool(scm_procedure_p(value))) {
-		SCM ptr = scm_assq_ref(gsubr_alist, value);
+		SCM ptr = scm_assq_ref(gsubr_alist,
+				       scm_procedure_or_name(value));
 		if (!scm_is_false(ptr)) {
 			PyObject *result = scm_to_pointer(ptr);
 			Py_INCREF(result);

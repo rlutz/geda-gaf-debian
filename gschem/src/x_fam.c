@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,9 +31,9 @@ struct request {
   gboolean end_exist;  /* whether a FAMEndExist event has been received */
 
   gpointer user_data;
-  void (*exists_event) (const gchar *path, enum FAMCodes code,
+  void (*exists_event) (const gchar *path, unsigned int code,
                         gpointer user_data);
-  void (*regular_event) (const gchar *path, enum FAMCodes code,
+  void (*regular_event) (const gchar *path, unsigned int code,
                          gpointer user_data);
 };
 
@@ -88,9 +88,9 @@ x_fam_free ()
 
 gpointer
 x_fam_monitor (const gchar *path,
-               void (*exists_event) (const gchar *path, enum FAMCodes code,
+               void (*exists_event) (const gchar *path, unsigned int code,
                                      gpointer user_data),
-               void (*regular_event) (const gchar *path, enum FAMCodes code,
+               void (*regular_event) (const gchar *path, unsigned int code,
                                       gpointer user_data),
                gpointer user_data)
 {

@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * libgeda - gEDA's Library
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,6 @@ typedef struct st_undo UNDO;
 typedef struct st_bounds BOUNDS;
 
 typedef struct st_conn CONN;
-typedef struct st_bus_ripper BUS_RIPPER;
 
 /* netlist structures (gnetlist) */
 typedef struct st_netlist NETLIST;
@@ -305,14 +304,6 @@ struct st_conn {
   int other_whichone;
 };
 
-/* this structure is used in gschem to add rippers when drawing nets */
-/* it is never stored in any object, it is only temporary */
-struct st_bus_ripper
-{
-  int x[2];
-  int y[2];
-};
-
 struct st_bounds {
   gint min_x;
   gint min_y;
@@ -398,7 +389,6 @@ struct st_page {
   int page_control;
 
   /* backup variables */
-  GTimeVal last_load_or_save_time;
   char saved_since_first_loaded;
   gint ops_since_last_backup;
   gchar do_autosave_backup;

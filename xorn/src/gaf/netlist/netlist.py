@@ -1,7 +1,7 @@
 # gaf.netlist - gEDA Netlist Extraction and Generation
 # Copyright (C) 1998-2010 Ales Hvezda
 # Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
-# Copyright (C) 2013-2019 Roland Lutz
+# Copyright (C) 2013-2020 Roland Lutz
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -147,8 +147,12 @@ class Netlist:
             try:
                 rev = gaf.read.read(filename, load_symbols = True)
             except Exception as e:
-                sys.stderr.write(_("ERROR: Failed to load '%s': %s\n")
-                                 % (filename, e))
+                if str(e):
+                    sys.stderr.write(_("ERROR: Failed to load '%s': %s\n")
+                                         % (filename, e))
+                else:
+                    sys.stderr.write(_("ERROR: Failed to load '%s'\n")
+                                         % filename)
                 sys.exit(2)
 
             rev.finalize()
@@ -340,12 +344,9 @@ class Netlist:
         # assign component refdes
         for component in self.components:
             if component.blueprint.refdes is not None:
-                if component.sheet.instantiating_component is not None:
-                    namespace = component.sheet
-                else:
-                    namespace = None
                 component.refdes = refdes_mangle_func(
-                    component.blueprint.refdes, namespace)
+                    component.blueprint.refdes,
+                    component.sheet.instantiating_component)
 
         # assign package refdes
         for package in self.packages:

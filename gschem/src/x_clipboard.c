@@ -1,6 +1,6 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #endif
 
 #include "gschem.h"
+#include "actions.decl.x"
 
 #define MIME_TYPE_SCHEMATIC "application/x-geda-schematic"
 #define CLIP_TYPE_SCHEMATIC 1
@@ -41,7 +42,7 @@ clip_handle_owner_change (GtkClipboard *cb, GdkEvent *event,
 {
   GschemToplevel *w_current = (GschemToplevel *) user_data;
 
-  i_update_menus (w_current);
+  x_clipboard_update_menus (w_current);
 }
 
 static void
@@ -124,11 +125,11 @@ query_usable_targets_cb (GtkClipboard *clip, GdkAtom *targets, gint ntargets,
   int i;
   int is_usable = FALSE;
 
-  for (i = 0; i < ntargets; i++) {
-    if (strcmp (gdk_atom_name (targets[i]), MIME_TYPE_SCHEMATIC) == 0) {
+  for (i = 0; i < ntargets && !is_usable; i++) {
+    gchar *buf = gdk_atom_name (targets[i]);
+    if (strcmp (buf, MIME_TYPE_SCHEMATIC) == 0)
       is_usable = TRUE;
-      break;
-    }
+    g_free (buf);
   }
 
   cbinfo->callback (is_usable, cbinfo->userdata);
@@ -149,9 +150,9 @@ query_usable_targets_cb (GtkClipboard *clip, GdkAtom *targets, gint ntargets,
  * \param [in] callback    The callback to recieve the response.
  * \param [in] userdata    Arbitrary data to pass the callback.
  */
-void
-x_clipboard_query_usable (GschemToplevel *w_current,
-                          void (*callback) (int, void *), void *userdata)
+static void
+query_usable (GschemToplevel *w_current,
+              void (*callback) (int, void *), void *userdata)
 {
   GtkClipboard *clip = gtk_clipboard_get (GDK_SELECTION_CLIPBOARD);
   struct query_usable *cbinfo;
@@ -161,6 +162,25 @@ x_clipboard_query_usable (GschemToplevel *w_current,
   cbinfo->userdata = userdata;
 
   gtk_clipboard_request_targets (clip, query_usable_targets_cb, cbinfo);
+}
+
+/*! \brief Asynchronous callback to update the sensitivity of the
+ *         Edit/Paste menu item.
+ */
+static void
+clipboard_usable_cb (int usable, void *userdata)
+{
+  GschemToplevel *w_current = GSCHEM_TOPLEVEL (userdata);
+
+  gschem_action_set_sensitive (action_clipboard_paste, usable, w_current);
+}
+
+/*! \brief Update the sensitivity of the Edit/Paste menu item.
+ */
+void
+x_clipboard_update_menus(GschemToplevel *w_current)
+{
+  query_usable (w_current, clipboard_usable_cb, w_current);
 }
 
 /* \brief Set the contents of the system clipboard.

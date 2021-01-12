@@ -1,7 +1,7 @@
 # gaf.netlist - gEDA Netlist Extraction and Generation
 # Copyright (C) 1998-2010 Ales Hvezda
 # Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
-# Copyright (C) 2013-2019 Roland Lutz
+# Copyright (C) 2013-2020 Roland Lutz
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ TESTS = stack_1-geda.out \
 	regression/duplicate_pinlabel-geda.out \
 	regression/duplicate_port-geda.out \
 	regression/missing_pinseq-geda.out \
+	regression/multiple_sources-geda.out \
 	regression/named_unconnected_net-geda.out \
 	regression/override_netname-geda.out \
 	regression/refdes_promotion-geda.out \
@@ -123,6 +124,7 @@ TESTS = stack_1-geda.out \
 	common/JD-switcap.out \
 	common/JD-systemc.out \
 	common/JD-tango.out \
+	common/JD-tedax.out \
 	common/JD-vams.out \
 	common/JD-verilog.out \
 	common/JD-vhdl.out \
@@ -165,6 +167,7 @@ TESTS = stack_1-geda.out \
 	common/SlottedOpamps-switcap.out \
 	common/SlottedOpamps-systemc.out \
 	common/SlottedOpamps-tango.out \
+	common/SlottedOpamps-tedax.out \
 	common/SlottedOpamps-vams.out \
 	common/SlottedOpamps-verilog.out \
 	common/SlottedOpamps-vhdl.out \
@@ -209,6 +212,7 @@ TESTS = stack_1-geda.out \
 	common/TwoStageAmp-switcap.out \
 	common/TwoStageAmp-systemc.out \
 	common/TwoStageAmp-tango.out \
+	common/TwoStageAmp-tedax.out \
 	common/TwoStageAmp-vams.out \
 	common/TwoStageAmp-verilog.out \
 	common/TwoStageAmp-vhdl.out \
@@ -252,6 +256,7 @@ TESTS = stack_1-geda.out \
 	common/cascade-switcap.out \
 	common/cascade-systemc.out \
 	common/cascade-tango.out \
+	common/cascade-tedax.out \
 	common/cascade-vams.out \
 	common/cascade-verilog.out \
 	common/cascade-vhdl.out \
@@ -294,6 +299,7 @@ TESTS = stack_1-geda.out \
 	common/multiequal-switcap.out \
 	common/multiequal-systemc.out \
 	common/multiequal-tango.out \
+	common/multiequal-tedax.out \
 	common/multiequal-vams.out \
 	common/multiequal-verilog.out \
 	common/multiequal-vhdl.out \
@@ -336,6 +342,7 @@ TESTS = stack_1-geda.out \
 	common/netattrib-switcap.out \
 	common/netattrib-systemc.out \
 	common/netattrib-tango.out \
+	common/netattrib-tedax.out \
 	common/netattrib-vams.out \
 	common/netattrib-verilog.out \
 	common/netattrib-vhdl.out \
@@ -378,6 +385,7 @@ TESTS = stack_1-geda.out \
 	common/powersupply-switcap.out \
 	common/powersupply-systemc.out \
 	common/powersupply-tango.out \
+	common/powersupply-tedax.out \
 	common/powersupply-vams.out \
 	common/powersupply-verilog.out \
 	common/powersupply-vhdl.out \
@@ -420,6 +428,7 @@ TESTS = stack_1-geda.out \
 	common/singlenet-switcap.out \
 	common/singlenet-systemc.out \
 	common/singlenet-tango.out \
+	common/singlenet-tedax.out \
 	common/singlenet-vams.out \
 	common/singlenet-verilog.out \
 	common/singlenet-vhdl.out \
@@ -510,6 +519,12 @@ testdata = \
 	regression/duplicate_port.sch \
 	regression/missing_pinseq-symbols/missing_pinseq.sym \
 	regression/missing_pinseq.sch \
+	regression/multiple_sources-sources/sub-0.sch \
+	regression/multiple_sources-sources/sub-1.sch \
+	regression/multiple_sources-symbols/io.sym \
+	regression/multiple_sources-symbols/sub.sym \
+	regression/multiple_sources-symbols/sym.sym \
+	regression/multiple_sources.sch \
 	regression/named_unconnected_net.sch \
 	regression/override_netname-symbols/component.sym \
 	regression/override_netname-symbols/power.sym \

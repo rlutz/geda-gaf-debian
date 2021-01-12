@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,10 +33,6 @@
 /* for bus_ripper_type */
 #define COMP_BUS_RIPPER         0
 #define NET_BUS_RIPPER          1
-
-/* for bus_ripper_rotation */
-#define SYMMETRIC               0
-#define NON_SYMMETRIC           1
 
 #define FREE        1
 #define CONSTRAINED 2

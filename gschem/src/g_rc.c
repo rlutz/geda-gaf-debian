@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -832,14 +832,8 @@ SCM g_rc_bus_ripper_type(SCM mode)
  */
 SCM g_rc_bus_ripper_rotation(SCM mode)
 {
-  static const vstbl_entry mode_table[] = {
-    {SYMMETRIC,     "symmetric" },
-    {NON_SYMMETRIC, "non-symmetric"  }
-  };
-
-  RETURN_G_RC_MODE("bus-ripper-rotation",
-		   default_bus_ripper_rotation,
-		   2);
+  /* obsolete option, keep for compatibility reasons */
+  return SCM_BOOL_F;
 }
 
 /*! \todo Finish function documentation!!!

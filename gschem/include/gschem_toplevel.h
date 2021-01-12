@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -202,7 +202,6 @@ struct st_gschem_toplevel {
   int handleboxes;        /* sets if the handleboxes are enabled or disabled */
   int bus_ripper_size;    /* sets size of the bus rippers */
   int bus_ripper_type;    /* sets type of the bus ripper (component or net) */
-  int bus_ripper_rotation;  /* sets if the the bus ripper is symmetric or not */
 
   int grid_mode;          /* sets the mode of the grid (no grid, dots or mesh) */
   /* sets the mininum number of pixels necessary for the grid to be */

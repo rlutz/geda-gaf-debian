@@ -1,7 +1,7 @@
 # gaf.netlist - gEDA Netlist Extraction and Generation
 # Copyright (C) 1998-2010 Ales Hvezda
 # Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
-# Copyright (C) 2013-2019 Roland Lutz
+# Copyright (C) 2013-2020 Roland Lutz
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,9 +95,11 @@ def load(backend_name):
         raise ImportError
 
     # Load backend code.
-    sys.path.insert(0, os.path.dirname(pathname))
+    saved_path = sys.path
+    sys.path = load_path + sys.path
     try:
         return imp.load_module(BACKEND_PREFIX + backend_name,
                                f, pathname, description)
     finally:
+        sys.path = saved_path
         f.close()

@@ -21,7 +21,7 @@ dnl Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 AC_DEFUN([AX_CHECK_GUILE],
 [
-  AC_PREREQ([2.60])dnl
+  AC_PREREQ([2.69])dnl
 
   # First check for the libguile library
   # ------------------------------------
@@ -46,7 +46,7 @@ AC_DEFUN([AX_CHECK_GUILE],
   fi
 
   if test "${_found_pkg_config_guile}" = "no" ; then
-    AC_MSG_ERROR([you need at least version ${GUILE_MIN_VER} of guile])
+    AC_MSG_ERROR([you need Guile 2.x (at least version ${GUILE_MIN_VER})])
   fi
 
   AC_SUBST([GUILE_PKG_NAME])

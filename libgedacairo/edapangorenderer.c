@@ -1,6 +1,6 @@
 /* gEDA - GPL Electronic Design Automation
  * libgedacairo - Rendering gEDA schematics with Cairo
- * Copyright (C) 2010-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 2010-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -73,7 +73,8 @@ static void eda_pango_renderer_end (PangoRenderer *renderer);
 static void eda_pango_renderer_prepare_run (PangoRenderer *renderer,
                                             PangoLayoutRun *run);
 
-G_DEFINE_TYPE (EdaPangoRenderer, eda_pango_renderer, PANGO_TYPE_RENDERER);
+G_DEFINE_TYPE_WITH_PRIVATE (EdaPangoRenderer, eda_pango_renderer,
+                            PANGO_TYPE_RENDERER)
 
 /* ---------------------------------------- */
 
@@ -88,8 +89,6 @@ eda_pango_renderer_class_init (EdaPangoRendererClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   PangoRendererClass *parent_class = PANGO_RENDERER_CLASS (klass);
-
-  g_type_class_add_private (object_class, sizeof (EdaPangoRendererPrivate));
 
   /* Register functions with base class */
   object_class->constructor = eda_pango_renderer_constructor;
@@ -121,9 +120,7 @@ eda_pango_renderer_class_init (EdaPangoRendererClass *klass)
 static void
 eda_pango_renderer_init (EdaPangoRenderer *renderer)
 {
-  renderer->priv = G_TYPE_INSTANCE_GET_PRIVATE (renderer,
-                                                EDA_TYPE_PANGO_RENDERER,
-                                                EdaPangoRendererPrivate);
+  renderer->priv = eda_pango_renderer_get_instance_private (renderer);
 }
 
 static GObject *

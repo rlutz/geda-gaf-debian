@@ -1,7 +1,7 @@
 /* gEDA - GPL Electronic Design Automation
  * gschem - gEDA Schematic Capture
  * Copyright (C) 1998-2010 Ales Hvezda
- * Copyright (C) 1998-2019 gEDA Contributors (see ChangeLog for details)
+ * Copyright (C) 1998-2020 gEDA Contributors (see ChangeLog for details)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -495,9 +495,8 @@ x_multiattrib_edit_attribute (GschemToplevel *w_current, OBJECT *object)
   /* invoke the editor */
   path = gtk_tree_model_get_path (multiattrib->store, &iter);
   gtk_widget_grab_focus (GTK_WIDGET (multiattrib->treeview));
-  gtk_tree_view_set_cursor (
-    multiattrib->treeview, path,
-    gtk_tree_view_get_column (multiattrib->treeview, 1), TRUE);
+  gtk_tree_view_set_cursor (multiattrib->treeview, path,
+                            multiattrib->column_value, TRUE);
   gtk_tree_path_free (path);
 }
 
@@ -635,6 +634,7 @@ multiattrib_action_promote_attributes (GschemMultiattribDockable *multiattrib,
     } else {
         /* make a copy of the attribute object */
         o_new = o_object_copy (toplevel, o_attrib);
+        o_set_visibility (toplevel, o_new, VISIBLE);
         s_page_append (toplevel, toplevel->page_current, o_new);
         /* add the attribute its parent */
         o_attrib_attach (toplevel, o_new, o_attrib->parent, TRUE);
@@ -1238,7 +1238,7 @@ multiattrib_callback_key_pressed (GtkWidget *widget,
   GschemMultiattribDockable *multiattrib =
     GSCHEM_MULTIATTRIB_DOCKABLE (user_data);
 
-  if (event->state == 0 &&
+  if ((event->state & gtk_accelerator_get_default_mod_mask ()) == 0 &&
       (event->keyval == GDK_Delete || event->keyval == GDK_KP_Delete)) {
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -1361,7 +1361,7 @@ multiattrib_edit_cell_at_pos (GschemMultiattribDockable *multiattrib,
   gtk_tree_path_free (path);
 
   /* don't promote attributes when trying to edit columns other than "value" */
-  if (column != gtk_tree_view_get_column (multiattrib->treeview, 1))
+  if (column != multiattrib->column_value)
     return;
 
   /* see if there's already a matching attached attribute */
@@ -1427,6 +1427,74 @@ multiattrib_callback_button_pressed (GtkWidget *widget,
 
   return ret;
 }
+
+
+/*! \todo Finish function documentation
+ *  \brief
+ *  \par Function Description
+ *
+ */
+static gboolean
+multiattrib_callback_query_tooltip (GtkWidget *widget,
+                                    gint x, gint y, gboolean keyboard_mode,
+                                    GtkTooltip *tooltip, gpointer user_data)
+{
+  GschemMultiattribDockable *multiattrib =
+    GSCHEM_MULTIATTRIB_DOCKABLE (user_data);
+
+  GtkTreeView *tree_view = GTK_TREE_VIEW (widget);
+  GtkTreePath *path = NULL;
+  GtkTreeViewColumn *column = NULL;
+
+  if (keyboard_mode)
+    gtk_tree_view_get_cursor (tree_view, &path, &column);
+  else {
+    gtk_tree_view_convert_widget_to_bin_window_coords (tree_view, x, y,
+                                                       &x, &y);
+    if (y < 0 ? !gtk_tree_view_get_path_at_pos (tree_view, x, 0,
+                                                NULL, &column, NULL, NULL)
+              : !gtk_tree_view_get_path_at_pos (tree_view, x, y,
+                                                &path, &column, NULL, NULL))
+      return FALSE;
+  }
+
+  if (path == NULL) {
+    /* show tooltip for column header */
+
+    if (column == multiattrib->column_visible)
+      gtk_tooltip_set_markup (tooltip, _("Is the attribute visible?"));
+    else if (column == multiattrib->column_show_name)
+      gtk_tooltip_set_markup (tooltip, _("Show attribute name?"));
+    else if (column == multiattrib->column_show_value)
+      gtk_tooltip_set_markup (tooltip, _("Show attribute value?"));
+    else
+      return FALSE;
+
+  } else {
+    /* show tooltip for cell */
+
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    gchar *value;
+
+    if (column != multiattrib->column_value)
+      return FALSE;
+
+    model = gtk_tree_view_get_model (tree_view);
+    gtk_tree_model_get_iter (model, &iter, path);
+    gtk_tree_model_get (model, &iter, COLUMN_VALUE, &value, -1);
+
+    gtk_tooltip_set_markup (tooltip, value);
+    gtk_tree_view_set_tooltip_row (tree_view, tooltip, path);
+
+    g_free (value);
+    gtk_tree_path_free (path);
+
+  }
+
+  return TRUE;
+}
+
 
 /*! \todo Finish function documentation
  *  \brief
@@ -2209,12 +2277,74 @@ multiattrib_create_widget (GschemDockable *dockable)
                     "popup-menu",
                     G_CALLBACK (multiattrib_callback_popup_menu),
                     multiattrib);
+  g_signal_connect (treeview,
+                    "query-tooltip",
+                    G_CALLBACK (multiattrib_callback_query_tooltip),
+                    multiattrib);
+  gtk_widget_set_has_tooltip (GTK_WIDGET (treeview), TRUE);
   selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (treeview));
   gtk_tree_selection_set_mode (selection,
                                GTK_SELECTION_SINGLE);
 
   /*   - and now the columns of the treeview */
-  /*       - column 1: attribute name */
+  /*       - column 1: visibility */
+  renderer = GTK_CELL_RENDERER (
+                                g_object_new (GTK_TYPE_CELL_RENDERER_TOGGLE,
+                                              NULL));
+  g_signal_connect (renderer,
+                    "toggled",
+                    G_CALLBACK (multiattrib_callback_toggled_visible),
+                    multiattrib);
+  multiattrib->column_visible =
+  column = GTK_TREE_VIEW_COLUMN (
+                                 g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
+                                               /* GtkTreeViewColumn */
+                                               "title", _("Vis"),
+                                               NULL));
+  gtk_tree_view_column_pack_start (column, renderer, TRUE);
+  gtk_tree_view_column_set_cell_data_func (column, renderer,
+                                           multiattrib_column_set_data_visible,
+                                           multiattrib, NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
+  /*       - column 2: show name */
+  renderer = GTK_CELL_RENDERER (
+                                g_object_new (GTK_TYPE_CELL_RENDERER_TOGGLE,
+                                              NULL));
+  g_signal_connect (renderer,
+                    "toggled",
+                    G_CALLBACK (multiattrib_callback_toggled_show_name),
+                    multiattrib);
+  multiattrib->column_show_name =
+  column = GTK_TREE_VIEW_COLUMN (
+                                 g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
+                                               /* GtkTreeViewColumn */
+                                               "title", _("N"),
+                                               NULL));
+  gtk_tree_view_column_pack_start (column, renderer, TRUE);
+  gtk_tree_view_column_set_cell_data_func (column, renderer,
+                                           multiattrib_column_set_data_show_name,
+                                           NULL, NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
+  /*       - column 3: show value */
+  renderer = GTK_CELL_RENDERER (
+                                g_object_new (GTK_TYPE_CELL_RENDERER_TOGGLE,
+                                              NULL));
+  g_signal_connect (renderer,
+                    "toggled",
+                    G_CALLBACK (multiattrib_callback_toggled_show_value),
+                    multiattrib);
+  multiattrib->column_show_value =
+  column = GTK_TREE_VIEW_COLUMN (
+                                 g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
+                                               /* GtkTreeViewColumn */
+                                               "title", _("V"),
+                                               NULL));
+  gtk_tree_view_column_pack_start (column, renderer, TRUE);
+  gtk_tree_view_column_set_cell_data_func (column, renderer,
+                                           multiattrib_column_set_data_show_value,
+                                           NULL, NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
+  /*       - column 4: attribute name */
   renderer = GTK_CELL_RENDERER (
                                 g_object_new (GTK_TYPE_CELL_RENDERER_TEXT,
                                               /* GtkCellRendererText */
@@ -2226,6 +2356,7 @@ multiattrib_create_widget (GschemDockable *dockable)
                     "edited",
                     G_CALLBACK (multiattrib_callback_edited_name),
                     multiattrib);
+  multiattrib->column_name =
   column = GTK_TREE_VIEW_COLUMN (
                                  g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
                                                /* GtkTreeViewColumn */
@@ -2238,7 +2369,7 @@ multiattrib_create_widget (GschemDockable *dockable)
                                            multiattrib_column_set_data_name,
                                            multiattrib, NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
-  /*       - column 2: attribute value */
+  /*       - column 5: attribute value */
   renderer = GTK_CELL_RENDERER (
                                 g_object_new (TYPE_CELL_RENDERER_MULTI_LINE_TEXT,
                                               /* GtkCellRendererText */
@@ -2250,6 +2381,7 @@ multiattrib_create_widget (GschemDockable *dockable)
                     "edited",
                     G_CALLBACK (multiattrib_callback_edited_value),
                     multiattrib);
+  multiattrib->column_value =
   column = GTK_TREE_VIEW_COLUMN (
                                  g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
                                                /* GtkTreeViewColumn */
@@ -2261,60 +2393,6 @@ multiattrib_create_widget (GschemDockable *dockable)
   gtk_tree_view_column_set_cell_data_func (column, renderer,
                                            multiattrib_column_set_data_value,
                                            multiattrib, NULL);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
-  /*       - column 3: visibility */
-  renderer = GTK_CELL_RENDERER (
-                                g_object_new (GTK_TYPE_CELL_RENDERER_TOGGLE,
-                                              NULL));
-  g_signal_connect (renderer,
-                    "toggled",
-                    G_CALLBACK (multiattrib_callback_toggled_visible),
-                    multiattrib);
-  column = GTK_TREE_VIEW_COLUMN (
-                                 g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
-                                               /* GtkTreeViewColumn */
-                                               "title", _("Vis?"),
-                                               NULL));
-  gtk_tree_view_column_pack_start (column, renderer, TRUE);
-  gtk_tree_view_column_set_cell_data_func (column, renderer,
-                                           multiattrib_column_set_data_visible,
-                                           multiattrib, NULL);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
-  /*       - column 4: show name */
-  renderer = GTK_CELL_RENDERER (
-                                g_object_new (GTK_TYPE_CELL_RENDERER_TOGGLE,
-                                              NULL));
-  g_signal_connect (renderer,
-                    "toggled",
-                    G_CALLBACK (multiattrib_callback_toggled_show_name),
-                    multiattrib);
-  column = GTK_TREE_VIEW_COLUMN (
-                                 g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
-                                               /* GtkTreeViewColumn */
-                                               "title", _("N"),
-                                               NULL));
-  gtk_tree_view_column_pack_start (column, renderer, TRUE);
-  gtk_tree_view_column_set_cell_data_func (column, renderer,
-                                           multiattrib_column_set_data_show_name,
-                                           NULL, NULL);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
-  /*       - column 5: show value */
-  renderer = GTK_CELL_RENDERER (
-                                g_object_new (GTK_TYPE_CELL_RENDERER_TOGGLE,
-                                              NULL));
-  g_signal_connect (renderer,
-                    "toggled",
-                    G_CALLBACK (multiattrib_callback_toggled_show_value),
-                    multiattrib);
-  column = GTK_TREE_VIEW_COLUMN (
-                                 g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
-                                               /* GtkTreeViewColumn */
-                                               "title", _("V"),
-                                               NULL));
-  gtk_tree_view_column_pack_start (column, renderer, TRUE);
-  gtk_tree_view_column_set_cell_data_func (column, renderer,
-                                           multiattrib_column_set_data_show_value,
-                                           NULL, NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
 
   /* add the treeview to the scrolled window */

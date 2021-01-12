@@ -1,7 +1,7 @@
 # gaf - Python library for manipulating gEDA files
 # Copyright (C) 1998-2010 Ales Hvezda
 # Copyright (C) 1998-2010 gEDA Contributors (see ChangeLog for details)
-# Copyright (C) 2013-2019 Roland Lutz
+# Copyright (C) 2013-2020 Roland Lutz
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -117,14 +117,19 @@ def read_file(f, name, format, log = None,
             # it if necessary.
             try:
                 return gaf.clib.lookup_symbol(basename)
-            except ValueError:
+            except gaf.clib.NotFoundError:
                 if fallback_available:
                     log.warn(
                         _("symbol \"%s\" not found in library") % basename)
                 else:
                     log.error(
                         _("symbol \"%s\" not found in library") % basename)
-                # fallthrough
+            except gaf.clib.DuplicateError:
+                log.error(
+                    _("multiple symbols \"%s\" found in library") % basename)
+            except ValueError:
+                log.error(
+                    _("error while loading symbol \"%s\"") % basename)
 
         if fallback_available:
             return None
